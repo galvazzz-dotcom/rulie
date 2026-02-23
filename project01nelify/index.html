@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦃 Le Royaume de Roullieee - Dindies Imaginaires</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&amp;family=Creepster&amp;display=swap');
+        .title-font { font-family: 'Creepster', cursive; }
+        .gobble { animation: gobble 0.6s infinite alternate; }
+        @keyframes gobble {
+            from { transform: scale(1) rotate(-5deg); }
+            to { transform: scale(1.12) rotate(5deg); }
+        }
+        .feather {
+            position: absolute;
+            font-size: 2rem;
+            animation: fall linear forwards;
+            opacity: 0.8;
+        }
+        @keyframes fall {
+            to { transform: translateY(800px) rotate(720deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-[#4a2c0b] text-amber-100 overflow-x-hidden">
+
+    <!-- NAVBAR CORRIGÉE -->
+    <nav class="bg-[#c2410c] border-b-4 border-amber-400 sticky top-0 z-50 shadow-xl">
+        <div class="max-w-6xl mx-auto px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                <span class="text-3xl sm:text-5xl gobble shrink-0">🦃</span>
+                <div class="min-w-0">
+                    <h1 class="text-xl sm:text-3xl font-black title-font tracking-wider sm:tracking-widest text-amber-200 truncate">ROULLIEEE</h1>
+                    <p class="text-[10px] sm:text-xs -mt-1 sm:-mt-2 text-amber-300 font-bold">Grande Dindologue Mondiale™</p>
+                </div>
+            </div>
+            
+            <!-- Tous les titres restaurés -->
+            <div class="hidden md:flex gap-6 text-lg font-medium">
+                <a href="#bio" class="hover:text-orange-300 transition-colors">Qui est-elle ?</a>
+                <a href="#galerie" class="hover:text-orange-300 transition-colors">Galerie</a>
+                <a href="#especes" class="hover:text-orange-300 transition-colors">Espèces</a>
+                <a href="#legend" class="hover:text-orange-300 transition-colors">La Légende</a>
+            </div>
+            
+            <button onclick="launchFeathers()" 
+                    class="bg-amber-400 hover:bg-amber-300 text-[#4a2c0b] font-bold px-3 sm:px-6 py-2 sm:py-3 rounded-full flex items-center gap-2 transition shrink-0">
+                <i class="fa-solid fa-feather"></i>
+                <span class="hidden sm:inline">Glouglouter</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <header class="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
+        <img src="https://picsum.photos/id/1015/2000/1200" alt="Forêt enchantée des dindies" 
+             class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-[#4a2c0b]/70 to-[#4a2c0b]"></div>
+        
+        <div class="relative z-10 text-center px-4 sm:px-6 max-w-4xl w-full">
+            <div class="mb-6 sm:mb-8 flex justify-center gap-4 sm:gap-8 text-4xl sm:text-6xl md:text-7xl">
+                <span class="gobble">🦃</span>
+                <span class="gobble delay-150">🦃</span>
+                <span class="gobble delay-300">🦃</span>
+            </div>
+            <h1 class="text-3xl sm:text-5xl md:text-8xl title-font text-orange-400 tracking-wide sm:tracking-widest leading-none mb-3 sm:mb-4">
+                GOULOUGOULOU !!!
+            </h1>
+            <p class="text-2xl sm:text-4xl md:text-6xl font-black text-white title-font">Le royaume des dindies imaginaires</p>
+            <p class="text-lg sm:text-2xl md:text-3xl mt-4 sm:mt-6 text-amber-200">Découvert par la légendaire <span class="text-orange-400">ROULLIEEE</span></p>
+            
+            <button onclick="gobbleAlert()" 
+                    class="mt-8 sm:mt-12 bg-orange-600 hover:bg-orange-500 text-white font-bold text-lg sm:text-2xl md:text-3xl px-8 sm:px-12 md:px-16 py-4 sm:py-6 md:py-8 rounded-3xl shadow-2xl transition-all hover:scale-110 active:scale-95 inline-flex items-center gap-3 sm:gap-6">
+                INVOQUER ROULLIEEE
+                <span class="text-2xl sm:text-4xl md:text-5xl">🦃</span>
+            </button>
+        </div>
+
+        <div class="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 text-amber-300 text-sm sm:text-xl animate-bounce flex flex-col items-center">
+            SCROLL POUR L'AVENTURE
+            <span class="text-2xl sm:text-4xl mt-1 sm:mt-2">↓</span>
+        </div>
+    </header>
+
+    <!-- BIO -->
+    <section id="bio" class="py-24 bg-[#5c3a1f]">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <span class="inline-block bg-orange-500 text-white text-sm font-bold px-6 py-2 rounded-full mb-6">★ DINDOLOGUE EN CHEF ★</span>
+                    <h2 class="text-3xl sm:text-5xl md:text-6xl title-font text-orange-300 mb-8 leading-none">Qui est la grande<br>ROULLIEEE ?</h2>
+                    <div class="space-y-6 text-lg md:text-xl leading-relaxed">
+                        <p>Née dans un potager magique de Belgique, Roullieee a découvert sa vocation à 5 ans quand une dinde lui a crié « GOULOUGOULOU » en pleine nuit.</p>
+                        <p>Depuis, elle parcourt son jardin (et parfois le Maroc imaginaire) à la recherche des espèces les plus exotiques. Son cri légendaire « ROUUUUUULIIIIIIEEEE !!! » fait vibrer les plumes à 10 km à la ronde.</p>
+                        <p class="italic text-amber-200">"Si ça a des plumes et que ça glougloute, je l'étudie. Et si ça n'a pas de plumes… je lui mets quand même des plumes."</p>
+                    </div>
+                </div>
+                <div class="relative">
+                    <img src="Rulie.jpg" alt="Portrait officiel de Roullieee" 
+                         class="rounded-3xl shadow-2xl border-8 border-orange-400">
+                    <div class="absolute -bottom-6 -right-6 bg-[#4a2c0b] text-orange-300 px-8 py-4 rounded-2xl shadow-xl text-center text-xl font-bold">
+                        ROUUUUULIIIIIIEEEE !!!<br>
+                        <span class="text-xs block mt-1 opacity-75">Cri officiel</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GALERIE -->
+    <section id="galerie" class="py-24 bg-[#4a2c0b]">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-center text-3xl sm:text-5xl md:text-6xl title-font text-orange-400 mb-16">Les Dindies Légendaires</h2>
+            <div class="grid md:grid-cols-3 gap-10">
+                <div class="group bg-[#5c3a1f] rounded-3xl overflow-hidden shadow-xl hover:-translate-y-4 transition-all">
+                    <img src="Dindromakus.jpg" 
+                         alt="Dindromakus RUUULIUSSS Maximus" class="w-full h-64 object-cover group-hover:scale-110 transition">
+                    <div class="p-8">
+                        <h3 class="text-2xl md:text-3xl font-bold text-orange-300">Dindromakus RUUULIUSSS Maximus</h3>
+                        <p class="text-amber-200 mt-2">La plus grande découverte de Roullieee. Cri si puissant qu'il fait tomber les pommes du pommier voisin.</p>
+                        <div class="mt-6 text-xs font-mono text-orange-400 bg-black/30 p-3 rounded-xl">Habitat : Jardin sacré de Roullieee • Couleur : Rainbow !</div>
+                    </div>
+                </div>
+
+                <div class="group bg-[#5c3a1f] rounded-3xl overflow-hidden shadow-xl hover:-translate-y-4 transition-all">
+                    <img src="dddv.jpg" 
+                         alt="Dinde Dinde Dingue" class="w-full h-64 object-cover group-hover:scale-110 transition">
+                    <div class="p-8">
+                        <h3 class="text-2xl md:text-3xl font-bold text-orange-300">La Dinde Dinde Dingue Verte</h3>
+                        <p class="text-amber-200 mt-2">Change de couleur selon son humeur. Très bavarde. Découverte après une sieste trop longue au Maroc imaginaire.</p>
+                        <div class="mt-6 text-xs font-mono text-orange-400 bg-black/30 p-3 rounded-xl">Cri : GLOU GLOU DINGUE DINGUE</div>
+                    </div>
+                </div>
+
+                <div class="group bg-[#5c3a1f] rounded-3xl overflow-hidden shadow-xl hover:-translate-y-4 transition-all">
+                    <img src="belgicus.jpg" 
+                         alt="Dindonus Classicus" class="w-full h-64 object-cover group-hover:scale-110 transition">
+                    <div class="p-8">
+                        <h3 class="text-2xl md:text-3xl font-bold text-orange-300">The Dindonus Belgicus</h3>
+                        <p class="text-amber-200 mt-2">L'ancêtre noble. Très chic. Toujours en costume trois-pièces de plumes.</p>
+                        <div class="mt-6 text-xs font-mono text-orange-400 bg-black/30 p-3 rounded-xl">Lieu : Belgique • Couleur : Rouge sang</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TABLEAU -->
+    <section id="especes" class="py-24 bg-[#5c3a1f]">
+        <div class="max-w-5xl mx-auto px-6">
+            <h2 class="text-center text-3xl sm:text-5xl md:text-6xl title-font text-orange-400 mb-16">Tableau Officiel des Dindies</h2>
+            <div class="overflow-x-auto rounded-3xl shadow-2xl">
+                <table class="w-full border-collapse bg-[#4a2c0b] text-sm sm:text-base">
+                    <thead>
+                        <tr class="bg-orange-700">
+                            <th class="p-3 sm:p-6 text-left text-base sm:text-xl font-bold">Nom</th>
+                            <th class="p-3 sm:p-6 text-left text-base sm:text-xl font-bold">Couleur</th>
+                            <th class="p-3 sm:p-6 text-left text-base sm:text-xl font-bold">Cri</th>
+                            <th class="p-3 sm:p-6 text-left text-base sm:text-xl font-bold">Découverte par</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-orange-900">
+                        <tr class="hover:bg-orange-900/50 transition">
+                            <td class="p-3 sm:p-6 font-bold">Dindromakus RUUULIUSSS Maximus</td>
+                            <td class="p-3 sm:p-6">Noir / Rainbow !</td>
+                            <td class="p-3 sm:p-6 font-mono text-orange-300">RUUUULIIIIIIEEEEEEE !!!</td>
+                            <td class="p-3 sm:p-6 text-amber-200">Roullieee (dans son jardin)</td>
+                        </tr>
+                        <tr class="hover:bg-orange-900/50 transition">
+                            <td class="p-3 sm:p-6 font-bold">Dinde Dinde Dingue</td>
+                            <td class="p-3 sm:p-6">Vert fluo</td>
+                            <td class="p-3 sm:p-6 font-mono text-orange-300">GLOU GLOU DINGUE</td>
+                            <td class="p-3 sm:p-6 text-amber-200">Roullieee (Maroc imaginaire)</td>
+                        </tr>
+                        <tr class="hover:bg-orange-900/50 transition">
+                            <td class="p-3 sm:p-6 font-bold">The Dindonus Belgicus</td>
+                            <td class="p-3 sm:p-6">Rouge sang</td>
+                            <td class="p-3 sm:p-6 font-mono text-orange-300">GOULOU BELGE</td>
+                            <td class="p-3 sm:p-6 text-amber-200">Roullieee (Belgique)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- HISTOIRE -->
+    <section id="legend" class="py-24 bg-gradient-to-br from-[#4a2c0b] to-[#5c3a1f]">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-3xl sm:text-5xl md:text-6xl title-font text-orange-300 mb-12">L'Histoire de la Grande Découverte</h2>
+            <div class="bg-black/30 p-6 sm:p-12 rounded-3xl max-w-2xl mx-auto">
+                <p class="text-lg sm:text-xl md:text-2xl leading-relaxed italic">"C'était une nuit de pleine lune. Je criais mon cri légendaire quand soudain… un énorme glouglou venu des buissons ! J'ai couru, filet à la main… et là, devant moi, se tenait le Dindromakus RUUULIUSSS Maximus. Le plus beau spécimen de ma vie. Depuis, nous sommes inséparables. GOULOUGOULOU À TOUS !"</p>
+                <p class="mt-8 sm:mt-12 text-orange-400 font-bold text-xl sm:text-2xl md:text-3xl">— Roullieee, la nuit de la grande découverte</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-black py-16 text-center border-t-8 border-orange-600">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-3xl sm:text-5xl mb-6">🦃 🦃 🦃</div>
+            <p class="text-xl sm:text-3xl title-font text-orange-400">GOULOUGOULOU FOREVER</p>
+            <p class="mt-4 text-amber-300">Site statique 100% fun • Version mobile ultra-optimisée février 2026</p>
+        </div>
+    </footer>
+
+   <script>
+        const gobbleSound = new Audio("glou.mp3");
+        gobbleSound.volume = 0.8;
+
+        function gobbleAlert() {
+            const phrases = [
+                "🦃 ROUUUUULIIIIIIEEEE !!! Tu viens de faire vibrer 47 dindies imaginaires !",
+                "GOULOUGOULOU MAXIMUS ACTIVÉ ! Une nouvelle espèce vient d'apparaître dans ton jardin !",
+                "Roullieee est en route… avec son filet, sa casquette et 3 kg de graines !",
+                "🌟 GLOUGLOU POWER !!! Tu es maintenant dindologue honoraire.",
+                "TOUCHE PAS AU CORNELIUS DINDROMAKUS !!!!!!!!!!!!!!!!!"
+            ];
+            alert(phrases[Math.floor(Math.random() * phrases.length)]);
+            document.documentElement.style.transition = "background-color 0.4s";
+            document.documentElement.style.backgroundColor = "#f59e0b";
+            setTimeout(() => document.documentElement.style.backgroundColor = "", 400);
+        }
+
+        function launchFeathers() {
+            gobbleSound.currentTime = 0;
+            gobbleSound.play();
+
+            for (let i = 0; i < 30; i++) {
+                const feather = document.createElement("div");
+                feather.className = "feather";
+                feather.textContent = ["🪶","🦃","🍂"][Math.floor(Math.random()*3)];
+                feather.style.left = Math.random() * 100 + "vw";
+                feather.style.top = "-50px";
+                feather.style.animationDuration = (Math.random() * 3 + 2) + "s";
+                feather.style.animationDelay = Math.random() * 0.5 + "s";
+                feather.style.fontSize = (Math.random() * 2 + 1.5) + "rem";
+                document.body.appendChild(feather);
+                setTimeout(() => feather.remove(), 6000);
+            }
+        }
+    </script>
+</body>
+</html>
