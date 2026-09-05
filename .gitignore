@@ -1,0 +1,8 @@
+# Outils de développement local — ne doivent pas partir sur GitHub
+.claude/
+node_modules/
+
+# Fichiers créés automatiquement par Windows / macOS
+Thumbs.db
+desktop.ini
+.DS_Store

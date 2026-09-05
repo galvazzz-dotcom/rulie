@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🦃 La Classe de Rulie</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Creepster&display=swap');
+body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+.title-font{font-family:'Creepster',cursive}
+.gobble{animation:gobble .6s infinite alternate}
+@keyframes gobble{from{transform:scale(1) rotate(-5deg)}to{transform:scale(1.1) rotate(5deg)}}
+.pop{animation:pop .45s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{0%{transform:scale(.2);opacity:0}100%{transform:scale(1);opacity:1}}
+.wiggle{animation:wiggle .5s ease}
+@keyframes wiggle{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(-9deg) scale(1.1)}75%{transform:rotate(9deg) scale(1.1)}}
+.shake{animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-9px)}75%{transform:translateX(9px)}}
+.faller{position:fixed;animation:fall linear forwards;pointer-events:none;z-index:60}
+@keyframes fall{to{transform:translateY(115vh) rotate(720deg);opacity:0}}
+.tap{transition:transform .12s ease;touch-action:manipulation}
+.tap:active{transform:scale(.94)}
+.card{transition:transform .2s ease}
+.card:active{transform:scale(.97)}
+</style>
+</head>
+<body class="bg-[#4a2c0b] text-amber-100 min-h-[100dvh] overflow-x-hidden select-none">
+
+<!-- ═══════════ ÉCRAN DE DÉMARRAGE (débloque le son) ═══════════ -->
+<div id="unlock" class="fixed inset-0 z-[100] bg-[#4a2c0b] flex flex-col items-center justify-center gap-8 px-6 text-center">
+  <div class="text-8xl sm:text-9xl gobble">🦃</div>
+  <h1 class="title-font text-4xl sm:text-6xl text-orange-400 tracking-wider">LA CLASSE DE RULIE</h1>
+  <button onclick="startApp()" class="tap bg-orange-600 hover:bg-orange-500 text-white font-bold text-2xl sm:text-4xl px-12 py-8 rounded-[2rem] shadow-2xl border-4 border-amber-400">
+    👆 TOUCHER POUR COMMENCER
+  </button>
+  <p class="text-amber-300 text-sm sm:text-base max-w-md">Ce premier appui autorise le son sur téléphone et tablette.</p>
+</div>
+
+<!-- ═══════════ BARRE DU HAUT ═══════════ -->
+<header class="sticky top-0 z-50 bg-[#c2410c] border-b-4 border-amber-400 shadow-xl">
+  <div class="flex items-center justify-between gap-2 px-3 py-2">
+    <button onclick="goMenu()" class="tap bg-[#4a2c0b] text-amber-200 font-bold text-xl w-14 h-14 rounded-2xl shrink-0" aria-label="Retour">↩</button>
+    <h1 id="pageTitle" class="title-font text-lg sm:text-3xl text-amber-200 tracking-wider truncate">LA CLASSE DE RULIE</h1>
+    <div class="flex gap-2 shrink-0">
+      <button id="btnSound" onclick="toggleMute()" class="tap bg-amber-400 text-[#4a2c0b] text-2xl w-14 h-14 rounded-2xl" aria-label="Son">🔊</button>
+      <button onclick="toggleFs()" class="tap bg-amber-400 text-[#4a2c0b] text-2xl w-14 h-14 rounded-2xl" aria-label="Plein écran">📺</button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════ MENU DES ACTIVITÉS ═══════════ -->
+<main id="menu" class="p-4 sm:p-8 max-w-5xl mx-auto">
+  <p class="text-center text-amber-300 text-base sm:text-xl mb-6">Choisis une activité 👇</p>
+  <div id="menuGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6"></div>
+  <div class="text-center mt-10 flex flex-col gap-3">
+    <a href="index.html" class="text-amber-400 underline text-base sm:text-lg">← Retour au Royaume de Roullieee</a>
+    <button onclick="openAct('credits')" class="text-amber-500 underline text-sm">ℹ️ Sons &amp; crédits</button>
+  </div>
+</main>
+
+<!-- ═══════════ CRÉDITS (licences des sons) ═══════════ -->
+<section id="act-credits" class="hidden p-5 sm:p-8 max-w-3xl mx-auto text-sm sm:text-base leading-relaxed">
+  <h2 class="text-2xl sm:text-3xl font-bold text-orange-300 mb-4">D'où viennent les sons ?</h2>
+
+  <p class="mb-4">Les cris d'animaux sont de vrais enregistrements repris de
+  <a href="https://commons.wikimedia.org" class="text-amber-400 underline">Wikimedia Commons</a>,
+  raccourcis et harmonisés en volume. La vache et le mouton viennent de
+  Mudchute Park &amp; Farm, une ferme pédagogique de Londres ; le canard vient de
+  <a href="https://xeno-canto.org" class="text-amber-400 underline">Xeno-canto</a>,
+  la base de référence des ornithologues.</p>
+
+  <ul class="space-y-2 mb-6">
+    <li>🐄 <b>Vache</b> — <i>Mudchute cow 1</i>, par Secretlondon — CC BY-SA 3.0</li>
+    <li>🐑 <b>Mouton</b> — <i>Mudchute sheep 1</i>, par Secretlondon — CC BY-SA 3.0</li>
+    <li>🦆 <b>Canard</b> — <i>Anas platyrhynchos (colvert femelle) XC112828</i>, par Jonathon Jongsma — CC BY-SA 3.0</li>
+    <li>🐈 <b>Chat</b> — <i>Maullido de gata hembra joven</i>, par George Miquilena — CC0</li>
+    <li>🐕 <b>Chien</b> — <i>Barking of a dog 2</i>, par Amada44 — CC BY-SA 3.0</li>
+    <li>🐸 <b>Grenouille</b> — <i>Single Frog Croak</i>, par MichaeltheFox8621 — CC BY-SA 4.0</li>
+    <li>🦉 <b>Hibou</b> — <i>Strix aluco male</i> (chouette hulotte mâle), par Vianney Bajart — CC BY-SA 4.0</li>
+    <li>🐝 <b>Abeille</b> — <i>Bombus buzz</i>, par Mysid — domaine public.
+        C'est en réalité un <b>bourdon</b> butinant, enregistré en Finlande.</li>
+    <li>🦃 <b>Dinde</b> — le glouglou historique du Royaume de Roullieee</li>
+  </ul>
+
+  <p class="text-amber-300">Les licences CC BY-SA imposent de citer l'auteur et de
+  partager toute version modifiée aux mêmes conditions. Les sons ont été coupés et
+  normalisés ; cette page tient lieu d'attribution.</p>
+
+  <div class="text-center mt-8">
+    <button onclick="goMenu()" class="tap bg-amber-400 text-[#4a2c0b] font-bold text-lg px-8 py-4 rounded-3xl shadow-xl">↩ Retour</button>
+  </div>
+</section>
+
+<!-- ═══════════ 1. LE GRAND GLOUGLOU ═══════════ -->
+<section id="act-glouglou" class="hidden flex-col items-center justify-center p-4" style="min-height:calc(100dvh - 74px)">
+  <button onclick="bigGobble(this)" class="tap text-[9rem] sm:text-[16rem] leading-none drop-shadow-2xl" aria-label="Faire crier la dinde">🦃</button>
+  <p id="glouText" class="title-font text-3xl sm:text-6xl text-orange-400 mt-4 tracking-wider text-center min-h-[3rem]">APPUIE SUR LA DINDE !</p>
+</section>
+
+<!-- ═══════════ 2. LE DINDOPHONE ═══════════ -->
+<section id="act-dindophone" class="hidden p-3 sm:p-6">
+  <div id="padGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5 max-w-4xl mx-auto"></div>
+</section>
+
+<!-- ═══════════ 3. CACHE-CACHE ═══════════ -->
+<section id="act-cache" class="hidden p-3 sm:p-6">
+  <p id="cacheScore" class="text-center text-2xl sm:text-4xl font-bold text-amber-200 mb-3">🦃 0 / 3</p>
+  <div id="eggGrid" class="grid grid-cols-3 gap-2 sm:gap-5 max-w-4xl mx-auto"></div>
+  <div id="cacheWin" class="hidden text-center mt-5">
+    <p class="title-font text-4xl sm:text-6xl text-orange-400 tracking-wider">BRAVO !</p>
+  </div>
+  <div class="text-center mt-5">
+    <button onclick="resetEggs()" class="tap bg-amber-400 text-[#4a2c0b] font-bold text-xl sm:text-2xl px-8 py-5 rounded-3xl shadow-xl">🔄 Recommencer</button>
+  </div>
+</section>
+
+<!-- ═══════════ 4. COMPTE LES DINDES ═══════════ -->
+<section id="act-compte" class="hidden flex-col items-center p-4" style="min-height:calc(100dvh - 74px)">
+  <!-- chiffre en police simple et non décorative : il doit rester lisible -->
+  <div class="flex items-baseline gap-4 mt-2">
+    <span id="countNum" class="font-bold text-[5rem] sm:text-[8rem] leading-none text-orange-400">0</span>
+    <span id="countWord" class="text-3xl sm:text-5xl font-bold text-amber-200">zéro</span>
+  </div>
+  <div id="countZone" class="flex flex-wrap justify-center items-center content-center gap-1 max-w-3xl w-full flex-1 my-2"></div>
+  <div class="flex gap-4 mt-auto mb-4 flex-wrap justify-center">
+    <button onclick="addTurkey()" class="tap bg-orange-600 text-white font-bold text-3xl sm:text-4xl px-12 py-8 rounded-[2rem] shadow-2xl border-4 border-amber-400">➕ 🦃</button>
+    <button onclick="resetCount()" class="tap bg-amber-400 text-[#4a2c0b] font-bold text-2xl px-8 py-8 rounded-[2rem] shadow-xl">🔄</button>
+  </div>
+</section>
+
+<!-- ═══════════ 5. LA FERME DE RULIE ═══════════ -->
+<section id="act-ferme" class="hidden p-3 sm:p-6">
+  <p id="fermeNom" class="text-center text-2xl sm:text-4xl font-bold text-amber-200 mb-3 min-h-[2.5rem]">Appuie sur un animal 👇</p>
+  <div id="fermeGrid" class="grid grid-cols-3 gap-2 sm:gap-4 max-w-3xl mx-auto"></div>
+</section>
+
+<!-- ═══════════ 6. LES COULEURS ═══════════ -->
+<section id="act-couleurs" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <!-- picto dessiné en SVG : les plumes changent de couleur -->
+  <svg viewBox="0 0 220 215" class="w-44 h-44 sm:w-72 sm:h-72 shrink-0" role="img" aria-label="La dinde de Rulie">
+    <g id="tailFan"></g>
+    <ellipse cx="110" cy="145" rx="46" ry="42" fill="#7c4a21"/>
+    <ellipse cx="110" cy="152" rx="29" ry="27" fill="#96602f"/>
+    <path d="M98 186 l0 15 M122 186 l0 15" stroke="#f59e0b" stroke-width="6" stroke-linecap="round"/>
+    <path d="M90 202 l14 0 M116 202 l14 0" stroke="#f59e0b" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="110" cy="98" r="21" fill="#7c4a21"/>
+    <polygon points="112,99 137,106 112,113" fill="#f59e0b"/>
+    <path d="M117 107 q 9 15 -3 23" stroke="#dc2626" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <circle cx="103" cy="93" r="4.5" fill="#1c1917"/>
+    <circle cx="104.5" cy="91.5" r="1.6" fill="#fff"/>
+  </svg>
+  <p id="couleurNom" class="text-3xl sm:text-5xl font-bold text-amber-200 my-3 min-h-[2.5rem]">Choisis une couleur</p>
+  <div id="couleurGrid" class="grid grid-cols-4 gap-2 sm:gap-4 max-w-2xl w-full"></div>
+</section>
+
+<!-- ═══════════ 7. JE LIS AVEC RULIE ═══════════ -->
+<section id="act-lire" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div class="flex flex-col items-center justify-center flex-1 w-full">
+    <div id="lireEmoji" class="text-[6rem] sm:text-[10rem] leading-none">👇</div>
+    <!-- la première lettre est mise en avant, et le mot est aussi donné en minuscules -->
+    <p id="lireMot" class="text-5xl sm:text-8xl font-bold tracking-[0.15em] text-amber-100 mt-2 text-center">?</p>
+    <p id="lireMin" class="text-2xl sm:text-4xl text-amber-300 tracking-widest mt-1"></p>
+  </div>
+  <div id="lireGrid" class="grid grid-cols-4 gap-2 sm:gap-4 max-w-3xl w-full mt-3"></div>
+</section>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   1. SON ÉCHANTILLONNÉ — le vrai glouglou de la dinde
+   Un seul fichier (glou.mp3) réutilisé : on change la hauteur avec
+   playbackRate. preservesPitch = false est indispensable, sinon le
+   navigateur garde la note d'origine et ne change que la vitesse.
+   ══════════════════════════════════════════════════════════ */
+const POOL_SIZE = 8;
+const pool = [];
+let poolIdx = 0, muted = false;
+
+for (let i = 0; i < POOL_SIZE; i++) {
+  const a = new Audio('glou.mp3');
+  a.preload = 'auto';
+  pool.push(a);
+}
+
+function glou(rate) {
+  if (muted) return;
+  const a = pool[poolIdx++ % POOL_SIZE];
+  try { a.pause(); a.currentTime = 0; } catch (e) {}
+  a.preservesPitch = false;
+  a.mozPreservesPitch = false;
+  a.webkitPreservesPitch = false;
+  a.playbackRate = rate || 1;
+  a.volume = 0.9;
+  a.play().catch(function () {});
+}
+
+/* ══════════════════════════════════════════════════════════
+   2. ÉCHANTILLONS — vrais enregistrements d'animaux
+   Fichiers courts (0,8 à 2,2 s) dans sons/. Voir les crédits.
+   ══════════════════════════════════════════════════════════ */
+const SONS = ['vache', 'mouton', 'chat', 'chien', 'canard', 'grenouille', 'hibou', 'abeille'];
+const banque = {};
+
+SONS.forEach(function (nom) {
+  const p = [];
+  for (let i = 0; i < 3; i++) {          /* 3 lecteurs : les appuis rapides se superposent */
+    const a = new Audio('sons/' + nom + '.mp3');
+    a.preload = 'auto';
+    p.push(a);
+  }
+  banque[nom] = { pool: p, idx: 0, ok: true };
+  /* si le fichier manque (dossier sons/ non déployé), on retombe sur la synthèse */
+  p[0].addEventListener('error', function () { banque[nom].ok = false; });
+});
+
+function jouer(nom) {
+  const b = banque[nom];
+  if (muted || !b || !b.ok) return false;
+  const a = b.pool[b.idx++ % b.pool.length];
+  try { a.pause(); a.currentTime = 0; } catch (e) {}
+  a.play().catch(function () {});
+  return true;
+}
+
+/* ══════════════════════════════════════════════════════════
+   3. SON SYNTHÉTISÉ — le bourdon de l'abeille, et le filet de
+   secours si un échantillon ne charge pas.
+   ══════════════════════════════════════════════════════════ */
+let AC = null;
+function ac() {
+  if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+  if (AC.state === 'suspended') AC.resume();
+  return AC;
+}
+
+/* un oscillateur avec glissando, vibrato optionnel et enveloppe douce */
+function osc(o) {
+  if (muted) return;
+  const A = ac();
+  const t0 = A.currentTime + (o.delay || 0);
+  const dur = o.dur || 0.5;
+  const peak = o.peak || 0.25;
+  const n = A.createOscillator();
+  n.type = o.type || 'sawtooth';
+  n.frequency.setValueAtTime(o.from, t0);
+  n.frequency.exponentialRampToValueAtTime(Math.max(20, o.to), t0 + dur);
+  let last = n;
+  if (o.cutoff) {
+    const f = A.createBiquadFilter();
+    f.type = 'lowpass';
+    f.frequency.value = o.cutoff;
+    n.connect(f);
+    last = f;
+  }
+  if (o.vibHz) {
+    const lfo = A.createOscillator();
+    lfo.frequency.value = o.vibHz;
+    const lg = A.createGain();
+    lg.gain.value = o.vibDepth || 20;
+    lfo.connect(lg);
+    lg.connect(n.frequency);
+    lfo.start(t0);
+    lfo.stop(t0 + dur);
+  }
+  const g = A.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.linearRampToValueAtTime(peak, t0 + Math.min(0.04, dur * 0.25));
+  g.gain.setValueAtTime(peak, t0 + dur * 0.7);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  last.connect(g);
+  g.connect(A.destination);
+  n.start(t0);
+  n.stop(t0 + dur + 0.05);
+}
+
+/* bruit filtré : souffle, aboiement, sifflement */
+function noise(o) {
+  if (muted) return;
+  const A = ac();
+  const t0 = A.currentTime + (o.delay || 0);
+  const dur = o.dur || 0.3;
+  const len = Math.ceil(A.sampleRate * dur);
+  const buf = A.createBuffer(1, len, A.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  const src = A.createBufferSource();
+  src.buffer = buf;
+  const f = A.createBiquadFilter();
+  f.type = o.hp ? 'highpass' : 'lowpass';
+  f.frequency.value = o.hp || o.lp || 1000;
+  const g = A.createGain();
+  g.gain.setValueAtTime(o.peak || 0.2, t0);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  src.connect(f);
+  f.connect(g);
+  g.connect(A.destination);
+  src.start(t0);
+  src.stop(t0 + dur);
+}
+
+/* ══════════════════════════════════════════════════════════
+   3. PAROLE — le nom lu à voix haute
+   Voix française du téléphone. Rien à installer, rien à charger.
+   ══════════════════════════════════════════════════════════ */
+let voixFR = null;
+function choisirVoix() {
+  if (!window.speechSynthesis) return;
+  const v = speechSynthesis.getVoices();
+  voixFR = v.find(function (x) { return x.lang && x.lang.toLowerCase().indexOf('fr') === 0; }) || null;
+}
+if (window.speechSynthesis) {
+  choisirVoix();
+  speechSynthesis.onvoiceschanged = choisirVoix;
+}
+
+function dire(texte, delai) {
+  if (muted || !window.speechSynthesis) return;
+  setTimeout(function () {
+    if (muted) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(texte);
+    if (voixFR) u.voice = voixFR;
+    u.lang = 'fr-FR';
+    u.rate = 0.85;   /* un peu lent : on articule */
+    u.pitch = 1.1;
+    speechSynthesis.speak(u);
+  }, delai || 0);
+}
+
+/* ══════════════════════════════════════════════════════════
+   DÉMARRAGE / RÉGLAGES
+   ══════════════════════════════════════════════════════════ */
+/* Sur iOS et Android le son n'est autorisé qu'après un geste de
+   l'utilisateur : on amorce tout au tout premier appui. */
+/* on lance puis on coupe aussitôt, volume à zéro pour éviter le clic */
+function amorcer(a) {
+  const v = a.volume;
+  a.volume = 0;
+  a.play().then(function () {
+    a.pause();
+    a.currentTime = 0;
+    a.volume = v;
+  }).catch(function () { a.volume = v; });
+}
+
+function startApp() {
+  pool.forEach(amorcer);
+  SONS.forEach(function (nom) { banque[nom].pool.forEach(amorcer); });
+  try { ac(); } catch (e) {}
+  document.getElementById('unlock').classList.add('hidden');
+}
+
+function toggleMute() {
+  muted = !muted;
+  document.getElementById('btnSound').textContent = muted ? '🔇' : '🔊';
+  if (muted && window.speechSynthesis) speechSynthesis.cancel();
+}
+
+function toggleFs() {
+  if (!document.fullscreenElement) {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function () {});
+    }
+  } else if (document.exitFullscreen) {
+    document.exitFullscreen();
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   NAVIGATION
+   ══════════════════════════════════════════════════════════ */
+const ACTS = [
+  { id: 'glouglou',   titre: 'LE GRAND GLOUGLOU',  icone: '🦃', nom: 'Le Grand Glouglou',  sous: "J'appuie, la dinde crie !",   flex: true },
+  { id: 'dindophone', titre: 'LE DINDOPHONE',      icone: '🎹', nom: 'Le Dindophone',      sous: 'Six couleurs, six glouglous', flex: false },
+  { id: 'cache',      titre: 'CACHE-CACHE',        icone: '🥚', nom: 'Cache-Cache',        sous: 'Trouve les dindes cachées !', flex: false },
+  { id: 'compte',     titre: 'COMPTE LES DINDES',  icone: '🔢', nom: 'Compte les Dindes',  sous: 'Une, deux, trois…',           flex: true },
+  { id: 'ferme',      titre: 'LA FERME DE RULIE',  icone: '🐄', nom: 'La Ferme de Rulie',  sous: 'Qui fait ce bruit ?',         flex: false },
+  { id: 'couleurs',   titre: 'LES COULEURS',       icone: '🎨', nom: 'Les Couleurs',       sous: 'Habille la dinde !',          flex: true },
+  { id: 'lire',       titre: 'JE LIS AVEC RULIE',  icone: '🔤', nom: 'Je Lis avec Rulie',  sous: 'Le mot et sa image',          flex: true },
+  /* page de crédits : atteinte par le lien du bas, pas par une carte */
+  { id: 'credits',    titre: 'SONS & CRÉDITS',     icone: 'ℹ️', nom: 'Sons & crédits',     sous: '',                            flex: false, horsMenu: true }
+];
+
+ACTS.filter(function (a) { return !a.horsMenu; }).forEach(function (a) {
+  const b = document.createElement('button');
+  b.className = 'card tap bg-[#5c3a1f] border-4 border-orange-500 rounded-[2rem] p-5 sm:p-8 shadow-xl flex items-center gap-5 text-left';
+  b.innerHTML =
+    '<span class="text-6xl sm:text-7xl shrink-0">' + a.icone + '</span>' +
+    '<span><span class="block text-2xl sm:text-3xl font-bold text-orange-300">' + a.nom + '</span>' +
+    '<span class="block text-amber-200 text-base sm:text-lg mt-1">' + a.sous + '</span></span>';
+  b.onclick = function () { openAct(a.id); };
+  document.getElementById('menuGrid').appendChild(b);
+});
+
+function openAct(id) {
+  goMenu();
+  document.getElementById('menu').classList.add('hidden');
+  const a = ACTS.find(function (x) { return x.id === id; });
+  const el = document.getElementById('act-' + id);
+  el.classList.remove('hidden');
+  if (a.flex) el.classList.add('flex');
+  document.getElementById('pageTitle').textContent = a.titre;
+  if (id === 'cache') resetEggs();
+  window.scrollTo(0, 0);
+}
+
+function goMenu() {
+  ACTS.forEach(function (a) {
+    const el = document.getElementById('act-' + a.id);
+    el.classList.add('hidden');
+    el.classList.remove('flex');
+  });
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  document.getElementById('menu').classList.remove('hidden');
+  document.getElementById('pageTitle').textContent = 'LA CLASSE DE RULIE';
+}
+
+/* ══════════════════════════════════════════════════════════
+   EFFETS
+   ══════════════════════════════════════════════════════════ */
+function pleuvoir(n, choix) {
+  for (let i = 0; i < n; i++) {
+    const f = document.createElement('div');
+    f.className = 'faller';
+    f.textContent = choix[Math.floor(Math.random() * choix.length)];
+    f.style.left = Math.random() * 95 + 'vw';
+    f.style.top = '-60px';
+    f.style.fontSize = (Math.random() * 2 + 1.5) + 'rem';
+    f.style.animationDuration = (Math.random() * 2 + 2.5) + 's';
+    document.body.appendChild(f);
+    setTimeout(function () { f.remove(); }, 6000);
+  }
+}
+function feathers(n) { pleuvoir(n, ['🪶', '🦃', '🍂']); }
+
+/* relance une animation CSS déjà jouée */
+function replay(el, cls) {
+  el.classList.remove(cls);
+  void el.offsetWidth;
+  el.classList.add(cls);
+}
+
+/* ══════════════════════════════════════════════════════════
+   1. LE GRAND GLOUGLOU
+   ══════════════════════════════════════════════════════════ */
+const CRIS = ['GLOU GLOU !', 'GOULOUGOULOU !', 'ROUUULIIIEEE !', 'GLOU DINGUE !', 'BRAVO !', 'ENCORE !'];
+
+function bigGobble(el) {
+  glou(0.85 + Math.random() * 0.4);
+  replay(el, 'wiggle');
+  document.getElementById('glouText').textContent = CRIS[Math.floor(Math.random() * CRIS.length)];
+  feathers(10);
+}
+
+/* ══════════════════════════════════════════════════════════
+   2. LE DINDOPHONE — six hauteurs, du grave à l'aigu
+   ══════════════════════════════════════════════════════════ */
+const PADS = [
+  { c: '#dc2626', rate: 0.60 },
+  { c: '#ea580c', rate: 0.75 },
+  { c: '#f59e0b', rate: 0.90 },
+  { c: '#65a30d', rate: 1.10 },
+  { c: '#0891b2', rate: 1.35 },
+  { c: '#7c3aed', rate: 1.65 }
+];
+
+PADS.forEach(function (p, i) {
+  const b = document.createElement('button');
+  b.className = 'tap rounded-[2rem] shadow-2xl border-4 border-amber-200 flex items-center justify-center text-6xl sm:text-8xl';
+  b.style.background = p.c;
+  b.style.minHeight = '26vh';
+  b.textContent = '🦃';
+  b.setAttribute('aria-label', 'Note ' + (i + 1));
+  b.onclick = function () { glou(p.rate); replay(b, 'wiggle'); };
+  document.getElementById('padGrid').appendChild(b);
+});
+
+/* ══════════════════════════════════════════════════════════
+   3. CACHE-CACHE
+   Certains œufs sont vides : ils font "pfff" dans les graves.
+   Un œuf vide ne fait rien perdre, il n'y a rien à rater.
+   ══════════════════════════════════════════════════════════ */
+const EGG_COUNT = 6;
+const eggGrid = document.getElementById('eggGrid');
+let plan = [], trouvees = 0, aTrouver = 0;
+
+function majScore() {
+  document.getElementById('cacheScore').textContent = '🦃 ' + trouvees + ' / ' + aTrouver;
+}
+
+function resetEggs() {
+  aTrouver = 2 + Math.floor(Math.random() * 3);   /* 2, 3 ou 4 dindes */
+  trouvees = 0;
+  plan = new Array(EGG_COUNT).fill(false);
+  let pose = 0;
+  while (pose < aTrouver) {
+    const i = Math.floor(Math.random() * EGG_COUNT);
+    if (!plan[i]) { plan[i] = true; pose++; }
+  }
+  document.getElementById('cacheWin').classList.add('hidden');
+  majScore();
+
+  eggGrid.innerHTML = '';
+  for (let i = 0; i < EGG_COUNT; i++) {
+    const b = document.createElement('button');
+    b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-[2rem] shadow-xl text-5xl sm:text-8xl flex items-center justify-center';
+    b.style.minHeight = '22vh';
+    b.textContent = '🥚';
+    b.dataset.i = i;
+    b.dataset.ouvert = '0';
+    b.setAttribute('aria-label', 'Oeuf ' + (i + 1));
+    b.onclick = function () { ouvrirOeuf(b); };
+    eggGrid.appendChild(b);
+  }
+}
+
+function ouvrirOeuf(b) {
+  const i = Number(b.dataset.i);
+  const dejaOuvert = b.dataset.ouvert === '1';
+
+  if (plan[i]) {
+    /* une dinde ! son clair, plumes, et ça compte */
+    b.textContent = '🦃';
+    replay(b, 'pop');
+    glou(1.05 + Math.random() * 0.35);
+    feathers(8);
+    if (!dejaOuvert) {
+      b.dataset.ouvert = '1';
+      trouvees++;
+      majScore();
+      if (trouvees === aTrouver) victoire();
+    }
+  } else {
+    /* œuf vide : "pfff" bien gras, et on peut retaper autant qu'on veut */
+    b.textContent = '💨';
+    b.style.opacity = '0.55';
+    b.dataset.ouvert = '1';
+    replay(b, 'shake');
+    glou(0.42);
+    noise({ dur: 0.45, lp: 700, peak: 0.18, delay: 0.05 });
+  }
+}
+
+function victoire() {
+  document.getElementById('cacheWin').classList.remove('hidden');
+  pleuvoir(45, ['🦃', '🪶', '🎉', '⭐']);
+  /* petite fanfare : les glouglous montent */
+  for (let k = 0; k < 5; k++) {
+    setTimeout(function () { glou(0.8 + k * 0.22); }, k * 170);
+  }
+  dire('Bravo ! Tu as trouvé ' + aTrouver + ' dindes !', 1000);
+}
+
+/* ══════════════════════════════════════════════════════════
+   4. COMPTE LES DINDES
+   Le nombre est donné en chiffre, en mot et en quantité :
+   trois façons de lire la même information.
+   ══════════════════════════════════════════════════════════ */
+const MOTS = ['zéro', 'une', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit',
+              'neuf', 'dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize',
+              'dix-sept', 'dix-huit', 'dix-neuf', 'vingt'];
+const MAX_COUNT = 20;
+let count = 0;
+
+function renderCount() {
+  document.getElementById('countNum').textContent = count;
+  document.getElementById('countWord').textContent = MOTS[count];
+}
+
+function addTurkey() {
+  if (count >= MAX_COUNT) { glou(1.7); return; }
+  count++;
+  const s = document.createElement('span');
+  s.className = 'text-5xl sm:text-7xl pop';
+  s.textContent = '🦃';
+  document.getElementById('countZone').appendChild(s);
+  glou(0.7 + count * 0.045);   /* la note monte : on entend la quantité grandir */
+  dire(MOTS[count], 260);
+  renderCount();
+}
+
+function resetCount() {
+  count = 0;
+  document.getElementById('countZone').innerHTML = '';
+  renderCount();
+  glou(0.6);
+}
+
+renderCount();
+
+/* ══════════════════════════════════════════════════════════
+   5. LA FERME DE RULIE
+   Chaque cri est fabriqué par synthèse : ce sont des versions
+   "dessin animé", volontairement rigolotes.
+   ══════════════════════════════════════════════════════════ */
+/* son : nom de l'échantillon dans sons/ — secours : version synthétisée */
+const ANIMAUX = [
+  { e: '🦃', nom: 'la dinde',      son: null,         secours: function () { glou(1); } },
+  { e: '🐄', nom: 'la vache',      son: 'vache',      secours: function () { osc({ type: 'sawtooth', from: 175, to: 105, dur: 1.1, cutoff: 700, vibHz: 5, vibDepth: 7, peak: 0.3 }); } },
+  { e: '🐑', nom: 'le mouton',     son: 'mouton',     secours: function () { osc({ type: 'sawtooth', from: 440, to: 380, dur: 0.85, cutoff: 1500, vibHz: 17, vibDepth: 40, peak: 0.2 }); } },
+  { e: '🐈', nom: 'le chat',       son: 'chat',       secours: function () { osc({ type: 'sawtooth', from: 480, to: 900, dur: 0.25, cutoff: 1700, peak: 0.2 }); osc({ type: 'sawtooth', from: 900, to: 400, dur: 0.5, delay: 0.25, cutoff: 1500, peak: 0.2 }); } },
+  { e: '🐕', nom: 'le chien',      son: 'chien',      secours: function () { aboyer(0); aboyer(0.3); } },
+  { e: '🦆', nom: 'le canard',     son: 'canard',     secours: function () { coincoin(0); coincoin(0.28); coincoin(0.56); } },
+  { e: '🐸', nom: 'la grenouille', son: 'grenouille', secours: function () { for (let i = 0; i < 5; i++) osc({ type: 'square', from: 135, to: 110, dur: 0.11, delay: i * 0.15, cutoff: 600, peak: 0.16 }); } },
+  { e: '🐝', nom: "l'abeille",     son: 'abeille',    secours: function () { osc({ type: 'sawtooth', from: 195, to: 170, dur: 1.2, cutoff: 430, vibHz: 27, vibDepth: 24, peak: 0.16 }); } },
+  { e: '🦉', nom: 'le hibou',      son: 'hibou',      secours: function () { osc({ type: 'sine', from: 430, to: 355, dur: 0.45, peak: 0.3 }); osc({ type: 'sine', from: 410, to: 330, dur: 0.55, delay: 0.55, peak: 0.3 }); } }
+];
+
+function crier(a) {
+  if (a.son && jouer(a.son)) return;
+  a.secours();
+}
+
+function aboyer(d) {
+  osc({ type: 'square', from: 300, to: 140, dur: 0.15, delay: d, cutoff: 1300, peak: 0.3 });
+  noise({ dur: 0.12, delay: d, lp: 1600, peak: 0.18 });
+}
+function coincoin(d) {
+  osc({ type: 'sawtooth', from: 350, to: 250, dur: 0.17, delay: d, cutoff: 2000, peak: 0.26 });
+}
+
+ANIMAUX.forEach(function (a) {
+  const b = document.createElement('button');
+  b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-[2rem] shadow-xl text-5xl sm:text-7xl flex items-center justify-center';
+  b.style.minHeight = '20vh';
+  b.textContent = a.e;
+  b.setAttribute('aria-label', a.nom);
+  b.onclick = function () {
+    crier(a);
+    replay(b, 'wiggle');
+    document.getElementById('fermeNom').textContent = a.nom;
+    /* le cri d'abord, le mot ensuite : on attend la vraie durée du son */
+    const src = a.son && banque[a.son] && banque[a.son].ok ? banque[a.son].pool[0] : null;
+    const attente = src && src.duration ? src.duration * 1000 + 250 : 1200;
+    dire(a.nom, attente);
+  };
+  document.getElementById('fermeGrid').appendChild(b);
+});
+
+/* ══════════════════════════════════════════════════════════
+   6. LES COULEURS — les plumes du picto SVG changent de couleur
+   ══════════════════════════════════════════════════════════ */
+const COULEURS = [
+  { nom: 'rouge',  hex: '#dc2626' },
+  { nom: 'orange', hex: '#ea580c' },
+  { nom: 'jaune',  hex: '#facc15' },
+  { nom: 'vert',   hex: '#16a34a' },
+  { nom: 'bleu',   hex: '#2563eb' },
+  { nom: 'violet', hex: '#7c3aed' },
+  { nom: 'rose',   hex: '#ec4899' },
+  { nom: 'blanc',  hex: '#f1f5f9' }
+];
+
+/* éventail de plumes : 7 ellipses pivotées autour du corps */
+const fan = document.getElementById('tailFan');
+const plumes = [];
+for (let a = -66; a <= 66; a += 22) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+  el.setAttribute('cx', '110');
+  el.setAttribute('cy', '76');
+  el.setAttribute('rx', '15');
+  el.setAttribute('ry', '44');
+  el.setAttribute('transform', 'rotate(' + a + ' 110 145)');
+  el.setAttribute('fill', '#8f5a2a');
+  el.setAttribute('stroke', '#4a2c0b');
+  el.setAttribute('stroke-width', '3');
+  el.style.transition = 'fill .25s ease';
+  fan.appendChild(el);
+  plumes.push(el);
+}
+
+COULEURS.forEach(function (c) {
+  const b = document.createElement('button');
+  b.className = 'tap rounded-2xl border-4 border-amber-200 shadow-xl';
+  b.style.background = c.hex;
+  b.style.minHeight = '11vh';
+  b.setAttribute('aria-label', c.nom);
+  b.onclick = function () {
+    plumes.forEach(function (p, i) {
+      setTimeout(function () { p.setAttribute('fill', c.hex); }, i * 45);
+    });
+    document.getElementById('couleurNom').textContent = c.nom;
+    glou(0.8 + Math.random() * 0.6);
+    dire(c.nom, 500);
+  };
+  document.getElementById('couleurGrid').appendChild(b);
+});
+
+/* ══════════════════════════════════════════════════════════
+   7. JE LIS AVEC RULIE
+   Image + mot en capitales + mot en minuscules + mot entendu.
+   Quatre entrées pour la même information.
+   ══════════════════════════════════════════════════════════ */
+const IMAGIER = [
+  { e: '🦃', mot: 'DINDE',  lu: 'dinde' },
+  { e: '🥚', mot: 'ŒUF',    lu: 'œuf' },
+  { e: '🐄', mot: 'VACHE',  lu: 'vache' },
+  { e: '🐈', mot: 'CHAT',   lu: 'chat' },
+  { e: '🐔', mot: 'POULE',  lu: 'poule' },
+  { e: '🦆', mot: 'CANARD', lu: 'canard' },
+  { e: '🍎', mot: 'POMME',  lu: 'pomme' },
+  { e: '🌙', mot: 'LUNE',   lu: 'lune' }
+];
+
+IMAGIER.forEach(function (m) {
+  const b = document.createElement('button');
+  b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl shadow-xl text-4xl sm:text-6xl py-3 sm:py-5';
+  b.textContent = m.e;
+  b.setAttribute('aria-label', m.lu);
+  b.onclick = function () {
+    const zone = document.getElementById('lireEmoji');
+    zone.textContent = m.e;
+    replay(zone, 'pop');
+    /* première lettre mise en couleur : repère d'attaque du mot */
+    document.getElementById('lireMot').innerHTML =
+      '<span class="text-orange-400">' + m.mot.charAt(0) + '</span>' + m.mot.slice(1);
+    document.getElementById('lireMin').textContent = m.mot.toLowerCase();
+    glou(1.2);
+    dire(m.lu, 450);
+  };
+  document.getElementById('lireGrid').appendChild(b);
+});
+</script>
+</body>
+</html>
