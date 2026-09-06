@@ -165,6 +165,56 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
   <div id="lireGrid" class="grid grid-cols-4 gap-2 sm:gap-4 max-w-3xl w-full mt-3"></div>
 </section>
 
+
+<!-- ═══════════ 8. RANGE LES DINDES (sériation) ═══════════ -->
+<section id="act-ranger" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <p id="rangerConsigne" class="text-center text-xl sm:text-3xl font-bold text-amber-200 my-2">
+    Touche la plus <span class="text-orange-400">PETITE</span> dinde
+  </p>
+  <!-- le bloc est centré verticalement, mais les dindes restent posées
+       sur une même ligne de sol (items-end) pour que la comparaison marche -->
+  <div class="flex-1 flex items-center w-full">
+    <div id="rangerPool" class="flex flex-nowrap items-end justify-center gap-1 sm:gap-4 w-full"></div>
+  </div>
+  <div class="w-full border-t-4 border-orange-700 pt-2">
+    <div id="rangerLigne" class="flex flex-nowrap items-end justify-center gap-1 sm:gap-4 min-h-[4rem] sm:min-h-[6rem]"></div>
+  </div>
+  <div class="mt-3 mb-2">
+    <button onclick="resetRanger()" class="tap bg-amber-400 text-[#4a2c0b] font-bold text-lg sm:text-xl px-8 py-4 rounded-3xl shadow-xl">🔄 Recommencer</button>
+  </div>
+</section>
+
+<!-- ═══════════ 9. LE MEMORY DES DINDES ═══════════ -->
+<section id="act-memory" class="hidden p-3 sm:p-6">
+  <p id="memoryScore" class="text-center text-xl sm:text-3xl font-bold text-amber-200 mb-3">Paires trouvées : 0 / 4</p>
+  <div id="memoryGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 max-w-3xl mx-auto"></div>
+  <div class="text-center mt-5">
+    <button onclick="resetMemory()" class="tap bg-amber-400 text-[#4a2c0b] font-bold text-lg sm:text-xl px-8 py-4 rounded-3xl shadow-xl">🔄 Recommencer</button>
+  </div>
+</section>
+
+<!-- ═══════════ 10. LE CHEMIN DE ROULLIEEE (repérage spatial) ═══════════ -->
+<section id="act-chemin" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <p id="cheminConsigne" class="text-center text-lg sm:text-2xl font-bold text-amber-200 mb-3">Ramène la dinde à sa maison 🏠</p>
+  <!-- en portrait : grille au-dessus, flèches en dessous.
+       En paysage (TV, tablette couchée) : grille à gauche, flèches à droite,
+       sinon les flèches passent sous la ligne de flottaison. -->
+  <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-12 w-full flex-1">
+    <div id="cheminGrille" class="grid grid-cols-4 gap-1 sm:gap-2 shrink-0"></div>
+    <!-- croix directionnelle : les 4 flèches encadrent le bouton recommencer -->
+    <div class="grid grid-cols-3 gap-2 w-full max-w-[17rem] shrink-0">
+      <div></div>
+      <button onclick="bouger(0,-1)" class="tap bg-orange-600 text-white text-4xl rounded-2xl py-4 shadow-xl border-4 border-amber-400" aria-label="Aller en haut">↑</button>
+      <div></div>
+      <button onclick="bouger(-1,0)" class="tap bg-orange-600 text-white text-4xl rounded-2xl py-4 shadow-xl border-4 border-amber-400" aria-label="Aller à gauche">←</button>
+      <button onclick="resetChemin()" class="tap bg-amber-400 text-[#4a2c0b] text-2xl rounded-2xl py-4 shadow-xl" aria-label="Recommencer">🔄</button>
+      <button onclick="bouger(1,0)" class="tap bg-orange-600 text-white text-4xl rounded-2xl py-4 shadow-xl border-4 border-amber-400" aria-label="Aller à droite">→</button>
+      <div></div>
+      <button onclick="bouger(0,1)" class="tap bg-orange-600 text-white text-4xl rounded-2xl py-4 shadow-xl border-4 border-amber-400" aria-label="Aller en bas">↓</button>
+      <div></div>
+    </div>
+  </div>
+</section>
 <script>
 /* ══════════════════════════════════════════════════════════
    1. SON ÉCHANTILLONNÉ — le vrai glouglou de la dinde
@@ -377,6 +427,9 @@ const ACTS = [
   { id: 'ferme',      titre: 'LA FERME DE ROULLIEEE',  icone: '🐄', nom: 'La Ferme de Roullieee',  sous: 'Qui fait ce bruit ?',         flex: false },
   { id: 'couleurs',   titre: 'LES COULEURS',       icone: '🎨', nom: 'Les Couleurs',       sous: 'Habille la dinde !',          flex: true },
   { id: 'lire',       titre: 'JE LIS AVEC ROULLIEEE',  icone: '🔤', nom: 'Je Lis avec Roullieee',  sous: 'Le mot et son image',          flex: true },
+  { id: 'ranger',     titre: 'RANGE LES DINDES',   icone: '📏', nom: 'Range les Dindes',   sous: 'De la plus petite à la plus grande', flex: true },
+  { id: 'memory',     titre: 'LE MEMORY',          icone: '🃏', nom: 'Le Memory des Dindes', sous: 'Retrouve les paires !',      flex: false },
+  { id: 'chemin',     titre: 'LE CHEMIN',          icone: '🧭', nom: 'Le Chemin de Roullieee', sous: 'Ramène la dinde chez elle', flex: true },
   /* page de crédits : atteinte par le lien du bas, pas par une carte */
   { id: 'credits',    titre: 'SONS & CRÉDITS',     icone: 'ℹ️', nom: 'Sons & crédits',     sous: '',                            flex: false, horsMenu: true }
 ];
@@ -400,7 +453,11 @@ function openAct(id) {
   el.classList.remove('hidden');
   if (a.flex) el.classList.add('flex');
   document.getElementById('pageTitle').textContent = a.titre;
-  if (id === 'cache') resetEggs();
+  /* chaque module qui tire un tirage au sort se reinitialise a l'ouverture */
+  if (id === 'cache')  resetEggs();
+  if (id === 'ranger') resetRanger();
+  if (id === 'memory') resetMemory();
+  if (id === 'chemin') resetChemin();
   window.scrollTo(0, 0);
 }
 
@@ -720,6 +777,240 @@ IMAGIER.forEach(function (m) {
   };
   document.getElementById('lireGrid').appendChild(b);
 });
+
+/* ══════════════════════════════════════════════════════════
+   8. RANGE LES DINDES — sériation
+   On demande toujours la plus petite restante : l'enfant compare
+   visuellement au lieu de compter. Toucher la mauvaise dinde ne
+   coûte rien, elle rebondit simplement.
+   ══════════════════════════════════════════════════════════ */
+/* Tailles en unités d'écran : les cinq dindes doivent tenir sur UNE seule
+   ligne, sinon la comparaison de taille perd tout son sens. Le plafond en
+   rem évite qu'elles deviennent énormes sur une TV. */
+const RANGER_TAILLES = [
+  { rang: 1, css: 'min(7vw, 3rem)' },
+  { rang: 2, css: 'min(10vw, 4.2rem)' },
+  { rang: 3, css: 'min(13.5vw, 5.6rem)' },
+  { rang: 4, css: 'min(17vw, 7rem)' },
+  { rang: 5, css: 'min(21vw, 8.6rem)' }
+];
+let rangerRestant = [];
+
+function resetRanger() {
+  rangerRestant = RANGER_TAILLES.map(function (t) { return t.rang; });
+  document.getElementById('rangerLigne').innerHTML = '';
+  document.getElementById('rangerConsigne').innerHTML =
+    'Touche la plus <span class="text-orange-400">PETITE</span> dinde';
+
+  const pool = document.getElementById('rangerPool');
+  pool.innerHTML = '';
+  const melange = RANGER_TAILLES.slice().sort(function () { return Math.random() - 0.5; });
+  melange.forEach(function (t) {
+    const b = document.createElement('button');
+    b.className = 'tap leading-none';
+    b.style.fontSize = t.css;
+    b.textContent = '🦃';
+    b.dataset.rang = t.rang;
+    b.setAttribute('aria-label', 'Dinde numéro ' + t.rang + ' sur 5');
+    b.onclick = function () { choisirDinde(b); };
+    pool.appendChild(b);
+  });
+}
+
+function choisirDinde(b) {
+  const rang = Number(b.dataset.rang);
+  const min = Math.min.apply(null, rangerRestant);
+
+  if (rang !== min) {
+    /* ce n'est pas la plus petite : rebond doux, aucune pénalité */
+    replay(b, 'shake');
+    glou(0.5);
+    return;
+  }
+
+  rangerRestant = rangerRestant.filter(function (x) { return x !== rang; });
+  b.remove();
+
+  const s = document.createElement('span');
+  s.className = 'pop leading-none';
+  s.style.fontSize = b.style.fontSize;
+  s.textContent = '🦃';
+  document.getElementById('rangerLigne').appendChild(s);
+
+  /* la note monte avec la taille : on entend l'ordre se construire */
+  glou(0.75 + (rang - 1) * 0.18);
+  feathers(5);
+
+  if (rangerRestant.length) {
+    dire('Bravo !', 250);
+  } else {
+    document.getElementById('rangerConsigne').textContent = 'BRAVO ! Elles sont rangées !';
+    pleuvoir(35, ['🦃', '🪶', '⭐', '🎉']);
+    dire('Bravo ! De la plus petite à la plus grande !', 700);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   9. LE MEMORY DES DINDES — mémoire visuelle
+   Quatre paires seulement, et aucun chronomètre : on peut regarder
+   aussi longtemps qu'on veut avant que les cartes se retournent.
+   ══════════════════════════════════════════════════════════ */
+const MEMORY_FACES = ['🦃', '🥚', '🪶', '🌽', '🍎', '🌙', '🐄', '🌻'];
+const MEMORY_PAIRES = 4;
+let memoryOuvertes = [], memoryTrouvees = 0, memoryBloque = false;
+
+function resetMemory() {
+  memoryOuvertes = [];
+  memoryTrouvees = 0;
+  memoryBloque = false;
+
+  const auHasard = function () { return Math.random() - 0.5; };
+  const faces = MEMORY_FACES.slice().sort(auHasard).slice(0, MEMORY_PAIRES);
+  const cartes = faces.concat(faces).sort(auHasard);
+
+  const g = document.getElementById('memoryGrid');
+  g.innerHTML = '';
+  cartes.forEach(function (f, i) {
+    const b = document.createElement('button');
+    b.className = 'tap title-font bg-orange-600 border-4 border-amber-300 rounded-[1.5rem] shadow-xl text-5xl sm:text-7xl flex items-center justify-center';
+    b.style.minHeight = '16vh';
+    b.textContent = '?';
+    b.dataset.face = f;
+    b.dataset.etat = 'fermee';
+    b.setAttribute('aria-label', 'Carte ' + (i + 1));
+    b.onclick = function () { retourner(b); };
+    g.appendChild(b);
+  });
+  majMemory();
+}
+
+function majMemory() {
+  document.getElementById('memoryScore').textContent =
+    'Paires trouvées : ' + memoryTrouvees + ' / ' + MEMORY_PAIRES;
+}
+
+function faceVisible(b) {
+  b.textContent = b.dataset.face;
+  b.classList.remove('bg-orange-600');
+  b.classList.add('bg-[#5c3a1f]');
+  replay(b, 'pop');
+}
+
+function faceCachee(b) {
+  b.textContent = '?';
+  b.classList.add('bg-orange-600');
+  b.classList.remove('bg-[#5c3a1f]');
+  b.dataset.etat = 'fermee';
+}
+
+function retourner(b) {
+  if (memoryBloque || b.dataset.etat !== 'fermee') return;
+
+  faceVisible(b);
+  b.dataset.etat = 'ouverte';
+  glou(1.1);
+  memoryOuvertes.push(b);
+  if (memoryOuvertes.length < 2) return;
+
+  const a = memoryOuvertes[0], c = memoryOuvertes[1];
+
+  if (a.dataset.face === c.dataset.face) {
+    /* paire trouvée : les deux cartes restent ouvertes, bord vert */
+    a.dataset.etat = 'trouvee';
+    c.dataset.etat = 'trouvee';
+    a.classList.add('border-green-400');
+    c.classList.add('border-green-400');
+    memoryOuvertes = [];
+    memoryTrouvees++;
+    majMemory();
+    glou(1.5);
+    feathers(6);
+
+    if (memoryTrouvees === MEMORY_PAIRES) {
+      pleuvoir(40, ['🦃', '🪶', '⭐', '🎉']);
+      for (let k = 0; k < 5; k++) {
+        setTimeout(function () { glou(0.9 + k * 0.2); }, k * 170);
+      }
+      dire('Bravo ! Tu as trouvé toutes les paires !', 900);
+    }
+    return;
+  }
+
+  /* pas une paire : on laisse le temps de bien regarder avant de refermer */
+  memoryBloque = true;
+  setTimeout(function () {
+    faceCachee(a);
+    faceCachee(c);
+    memoryOuvertes = [];
+    memoryBloque = false;
+  }, 1400);
+}
+
+/* ══════════════════════════════════════════════════════════
+   10. LE CHEMIN DE ROULLIEEE — repérage spatial
+   Déplacement libre sur une grille 4x4. Sortir de la grille ne
+   provoque pas d'erreur : il ne se passe simplement rien.
+   ══════════════════════════════════════════════════════════ */
+const CHEMIN_N = 4;
+let dindePos = { x: 0, y: 0 }, maisonPos = { x: 3, y: 3 }, cheminFini = false;
+
+function resetChemin() {
+  cheminFini = false;
+  /* dinde et maison dans deux coins opposés, tirés au sort */
+  const coins = [{ x: 0, y: 0 }, { x: CHEMIN_N - 1, y: 0 },
+                 { x: 0, y: CHEMIN_N - 1 }, { x: CHEMIN_N - 1, y: CHEMIN_N - 1 }];
+  const i = Math.floor(Math.random() * 4);
+  dindePos = { x: coins[i].x, y: coins[i].y };
+  maisonPos = { x: coins[3 - i].x, y: coins[3 - i].y };
+  document.getElementById('cheminConsigne').textContent = 'Ramène la dinde à sa maison 🏠';
+  dessinerChemin();
+}
+
+function dessinerChemin() {
+  const g = document.getElementById('cheminGrille');
+  g.innerHTML = '';
+  for (let y = 0; y < CHEMIN_N; y++) {
+    for (let x = 0; x < CHEMIN_N; x++) {
+      const c = document.createElement('div');
+      c.className = 'bg-[#5c3a1f] border-2 border-orange-800 rounded-xl flex items-center justify-center text-4xl sm:text-6xl leading-none';
+      c.style.width = 'min(19vw, 13vh, 5.5rem)';
+      c.style.height = 'min(19vw, 13vh, 5.5rem)';
+      if (x === dindePos.x && y === dindePos.y) {
+        c.textContent = '🦃';
+        c.classList.add('pop');
+      } else if (x === maisonPos.x && y === maisonPos.y) {
+        c.textContent = '🏠';
+      }
+      g.appendChild(c);
+    }
+  }
+}
+
+function bouger(dx, dy) {
+  if (cheminFini) return;
+  const nx = dindePos.x + dx, ny = dindePos.y + dy;
+
+  if (nx < 0 || ny < 0 || nx >= CHEMIN_N || ny >= CHEMIN_N) {
+    glou(0.5);          /* bord de la grille : simple son grave, rien d'autre */
+    return;
+  }
+
+  dindePos.x = nx;
+  dindePos.y = ny;
+  dessinerChemin();
+
+  if (nx === maisonPos.x && ny === maisonPos.y) {
+    cheminFini = true;
+    document.getElementById('cheminConsigne').textContent = 'BRAVO ! Elle est rentrée !';
+    pleuvoir(35, ['🦃', '🪶', '🥚', '🎉']);
+    for (let k = 0; k < 4; k++) {
+      setTimeout(function () { glou(1 + k * 0.2); }, k * 160);
+    }
+    dire('Bravo ! La dinde est rentrée à la maison !', 700);
+  } else {
+    glou(1.1);
+  }
+}
 </script>
 </body>
 </html>
