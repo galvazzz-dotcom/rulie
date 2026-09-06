@@ -168,7 +168,12 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
 
 <!-- ═══════════ 8. RANGE LES DINDES (sériation) ═══════════ -->
 <section id="act-ranger" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
-  <p id="rangerConsigne" class="text-center text-xl sm:text-3xl font-bold text-amber-200 my-2">
+  <!-- sens du tri : conservé d'une partie à l'autre, y compris après Recommencer -->
+  <div class="flex gap-2 sm:gap-3 mb-2">
+    <button id="rangerBtnPetite" onclick="setSensRanger('petite')" class="tap px-3 sm:px-6 py-3 rounded-2xl font-bold text-sm sm:text-lg border-4">🔽 La plus PETITE</button>
+    <button id="rangerBtnGrande" onclick="setSensRanger('grande')" class="tap px-3 sm:px-6 py-3 rounded-2xl font-bold text-sm sm:text-lg border-4">🔼 La plus GRANDE</button>
+  </div>
+  <p id="rangerConsigne" class="text-center text-lg sm:text-2xl font-bold text-amber-200 mb-1">
     Touche la plus <span class="text-orange-400">PETITE</span> dinde
   </p>
   <!-- le bloc est centré verticalement, mais les dindes restent posées
@@ -195,19 +200,30 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
 
 <!-- ═══════════ 10. LE CHEMIN DE ROULLIEEE (repérage spatial) ═══════════ -->
 <section id="act-chemin" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
-  <p id="cheminConsigne" class="text-center text-lg sm:text-2xl font-bold text-amber-200 mb-3">Ramène la dinde à sa maison 🏠</p>
+  <!-- Recommencer est placé en haut à droite, volontairement loin des
+       flèches : les enfants appuyaient dessus par accident. -->
+  <div class="w-full flex items-start justify-between gap-3 mb-2">
+    <div class="flex-1 min-w-0">
+      <p id="cheminConsigne" class="text-base sm:text-2xl font-bold text-amber-200">Ramène la dinde à sa maison 🏠</p>
+      <div class="flex gap-2 mt-2">
+        <button id="nivFacile"    onclick="setNiveau('facile')"    class="tap px-3 sm:px-5 py-2 rounded-xl font-bold text-xs sm:text-base border-4">Facile</button>
+        <button id="nivMoyen"     onclick="setNiveau('moyen')"     class="tap px-3 sm:px-5 py-2 rounded-xl font-bold text-xs sm:text-base border-4">Moyen</button>
+        <button id="nivDifficile" onclick="setNiveau('difficile')" class="tap px-3 sm:px-5 py-2 rounded-xl font-bold text-xs sm:text-base border-4">Difficile</button>
+      </div>
+    </div>
+    <button onclick="resetChemin()" class="tap bg-amber-400 text-[#4a2c0b] text-2xl w-14 h-14 rounded-2xl shadow-xl shrink-0" aria-label="Recommencer">🔄</button>
+  </div>
   <!-- en portrait : grille au-dessus, flèches en dessous.
        En paysage (TV, tablette couchée) : grille à gauche, flèches à droite,
        sinon les flèches passent sous la ligne de flottaison. -->
   <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-12 w-full flex-1">
-    <div id="cheminGrille" class="grid grid-cols-4 gap-1 sm:gap-2 shrink-0"></div>
-    <!-- croix directionnelle : les 4 flèches encadrent le bouton recommencer -->
+    <div id="cheminGrille" class="grid gap-1 shrink-0"></div>
     <div class="grid grid-cols-3 gap-2 w-full max-w-[17rem] shrink-0">
       <div></div>
       <button onclick="bouger(0,-1)" class="tap bg-orange-600 text-white text-4xl rounded-2xl py-4 shadow-xl border-4 border-amber-400" aria-label="Aller en haut">↑</button>
       <div></div>
       <button onclick="bouger(-1,0)" class="tap bg-orange-600 text-white text-4xl rounded-2xl py-4 shadow-xl border-4 border-amber-400" aria-label="Aller à gauche">←</button>
-      <button onclick="resetChemin()" class="tap bg-amber-400 text-[#4a2c0b] text-2xl rounded-2xl py-4 shadow-xl" aria-label="Recommencer">🔄</button>
+      <div class="flex items-center justify-center text-3xl opacity-40" aria-hidden="true">🦃</div>
       <button onclick="bouger(1,0)" class="tap bg-orange-600 text-white text-4xl rounded-2xl py-4 shadow-xl border-4 border-amber-400" aria-label="Aller à droite">→</button>
       <div></div>
       <button onclick="bouger(0,1)" class="tap bg-orange-600 text-white text-4xl rounded-2xl py-4 shadow-xl border-4 border-amber-400" aria-label="Aller en bas">↓</button>
@@ -795,12 +811,30 @@ const RANGER_TAILLES = [
   { rang: 5, css: 'min(21vw, 8.6rem)' }
 ];
 let rangerRestant = [];
+/* 'petite' ou 'grande' : volontairement hors de resetRanger, pour que le
+   choix de la maîtresse survive à chaque Recommencer */
+let rangerSens = 'petite';
+
+function setSensRanger(sens) {
+  rangerSens = sens;
+  resetRanger();
+}
+
+function majBoutonsRanger() {
+  const base = 'tap px-3 sm:px-6 py-3 rounded-2xl font-bold text-sm sm:text-lg border-4 ';
+  const actif = 'bg-orange-500 text-white border-amber-300';
+  const veille = 'bg-[#5c3a1f] text-amber-300 border-orange-800';
+  document.getElementById('rangerBtnPetite').className = base + (rangerSens === 'petite' ? actif : veille);
+  document.getElementById('rangerBtnGrande').className = base + (rangerSens === 'grande' ? actif : veille);
+}
 
 function resetRanger() {
   rangerRestant = RANGER_TAILLES.map(function (t) { return t.rang; });
   document.getElementById('rangerLigne').innerHTML = '';
-  document.getElementById('rangerConsigne').innerHTML =
-    'Touche la plus <span class="text-orange-400">PETITE</span> dinde';
+  document.getElementById('rangerConsigne').innerHTML = rangerSens === 'petite'
+    ? 'Touche la plus <span class="text-orange-400">PETITE</span> dinde'
+    : 'Touche la plus <span class="text-orange-400">GRANDE</span> dinde';
+  majBoutonsRanger();
 
   const pool = document.getElementById('rangerPool');
   pool.innerHTML = '';
@@ -819,10 +853,12 @@ function resetRanger() {
 
 function choisirDinde(b) {
   const rang = Number(b.dataset.rang);
-  const min = Math.min.apply(null, rangerRestant);
+  const attendu = rangerSens === 'petite'
+    ? Math.min.apply(null, rangerRestant)
+    : Math.max.apply(null, rangerRestant);
 
-  if (rang !== min) {
-    /* ce n'est pas la plus petite : rebond doux, aucune pénalité */
+  if (rang !== attendu) {
+    /* mauvaise dinde : rebond doux, aucune pénalité */
     replay(b, 'shake');
     glou(0.5);
     return;
@@ -837,7 +873,8 @@ function choisirDinde(b) {
   s.textContent = '🦃';
   document.getElementById('rangerLigne').appendChild(s);
 
-  /* la note monte avec la taille : on entend l'ordre se construire */
+  /* la note suit la TAILLE, pas l'ordre de jeu : elle monte en mode
+     "plus petite", elle descend en mode "plus grande" */
   glou(0.75 + (rang - 1) * 0.18);
   feathers(5);
 
@@ -846,7 +883,9 @@ function choisirDinde(b) {
   } else {
     document.getElementById('rangerConsigne').textContent = 'BRAVO ! Elles sont rangées !';
     pleuvoir(35, ['🦃', '🪶', '⭐', '🎉']);
-    dire('Bravo ! De la plus petite à la plus grande !', 700);
+    dire(rangerSens === 'petite'
+      ? 'Bravo ! De la plus petite à la plus grande !'
+      : 'Bravo ! De la plus grande à la plus petite !', 700);
   }
 }
 
@@ -948,13 +987,39 @@ function retourner(b) {
 
 /* ══════════════════════════════════════════════════════════
    10. LE CHEMIN DE ROULLIEEE — repérage spatial
-   Déplacement libre sur une grille 4x4 semée de 1 ou 2 arbres.
-   Sortir de la grille ou buter sur un arbre ne provoque pas
-   d'erreur : la case concernée tremble, et c'est tout.
+   Trois niveaux. Sortir de la grille ou buter sur un arbre ne
+   provoque pas d'erreur : la case tremble, et c'est tout.
    ══════════════════════════════════════════════════════════ */
-const CHEMIN_N = 4;
+const NIVEAUX = {
+  facile:    { n: 4, minArbres: 1, maxArbres: 2, renard: false,
+               cell: 'min(19vw, 13vh, 5.5rem)',  police: 'min(11vw, 7.5vh, 3.2rem)' },
+  moyen:     { n: 6, minArbres: 3, maxArbres: 4, renard: false,
+               cell: 'min(13vw, 9vh, 3.6rem)',   police: 'min(8vw, 5.5vh, 2.2rem)' },
+  difficile: { n: 8, minArbres: 5, maxArbres: 6, renard: true,
+               cell: 'min(10vw, 6.8vh, 2.8rem)', police: 'min(6.2vw, 4.4vh, 1.8rem)' }
+};
+/* hors de resetChemin : le niveau choisi survit à chaque Recommencer */
+let cheminNiveau = 'facile';
+
+let CHEMIN_N = 4;
 let dindePos = { x: 0, y: 0 }, maisonPos = { x: 3, y: 3 };
-let obstacles = [], cheminFini = false;
+let obstacles = [], renard = null;
+let cheminFini = false, cheminPerdu = false;
+
+function setNiveau(nom) {
+  cheminNiveau = nom;
+  resetChemin();
+}
+
+function majBoutonsNiveau() {
+  const base = 'tap px-3 sm:px-5 py-2 rounded-xl font-bold text-xs sm:text-base border-4 ';
+  const actif = 'bg-orange-500 text-white border-amber-300';
+  const veille = 'bg-[#5c3a1f] text-amber-300 border-orange-800';
+  ['facile', 'moyen', 'difficile'].forEach(function (n) {
+    const id = 'niv' + n.charAt(0).toUpperCase() + n.slice(1);
+    document.getElementById(id).className = base + (cheminNiveau === n ? actif : veille);
+  });
+}
 
 function estObstacle(x, y) {
   return obstacles.some(function (o) { return o.x === x && o.y === y; });
@@ -962,7 +1027,8 @@ function estObstacle(x, y) {
 
 /* Parcours en largeur depuis la dinde : sans cette vérification, un
    tirage malchanceux pourrait emmurer la dinde dans son coin (un coin
-   n'a que deux voisins) ou rendre la maison inatteignable. */
+   n'a que deux voisins) ou rendre la maison inatteignable.
+   Le renard est ignoré : il bouge, il ne bloque donc rien durablement. */
 function maisonAtteignable() {
   const vus = {};
   const file = [{ x: dindePos.x, y: dindePos.y }];
@@ -984,8 +1050,84 @@ function maisonAtteignable() {
   return false;
 }
 
+/* le renard patrouille une ligne ou une colonne entière, jamais un bord
+   (là où se trouvent la dinde et la maison) */
+function placerRenard() {
+  const axe = Math.random() < 0.5 ? 'h' : 'v';
+  const fixe = 1 + Math.floor(Math.random() * (CHEMIN_N - 2));
+  let pos = Math.floor(Math.random() * CHEMIN_N);
+  /* il ne démarre jamais sur la dinde */
+  const surDinde = function (p) {
+    return axe === 'h' ? (p === dindePos.x && fixe === dindePos.y)
+                       : (fixe === dindePos.x && p === dindePos.y);
+  };
+  let garde = 0;
+  while (surDinde(pos) && garde++ < 20) pos = Math.floor(Math.random() * CHEMIN_N);
+  renard = { axe: axe, fixe: fixe, pos: pos, pas: Math.random() < 0.5 ? 1 : -1 };
+}
+
+function renardXY() {
+  if (!renard) return null;
+  return renard.axe === 'h' ? { x: renard.pos, y: renard.fixe }
+                            : { x: renard.fixe, y: renard.pos };
+}
+
+function surLigneRenard(x, y) {
+  if (!renard) return false;
+  return renard.axe === 'h' ? y === renard.fixe : x === renard.fixe;
+}
+
+/* Explore tout l'espace d'états (position dinde × position renard × sens du
+   renard) en reproduisant les règles de bouger(). Sans cette vérification,
+   environ une grille difficile sur 120 est impossible à gagner : l'enfant
+   échouerait indéfiniment sans avoir commis la moindre erreur. */
+function partieGagnable() {
+  if (!renard) return maisonAtteignable();
+
+  const posRenard = function (p) {
+    return renard.axe === 'h' ? { x: p, y: renard.fixe } : { x: renard.fixe, y: p };
+  };
+  const cle = function (tx, ty, rp, rd) {
+    return tx + ',' + ty + ',' + rp + ',' + (rd > 0 ? 1 : 0);
+  };
+
+  const depart = { tx: dindePos.x, ty: dindePos.y, rp: renard.pos, rd: renard.pas };
+  const vus = {};
+  vus[cle(depart.tx, depart.ty, depart.rp, depart.rd)] = true;
+  const file = [depart];
+  const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+
+  while (file.length) {
+    const s = file.shift();
+    for (const d of dirs) {
+      const nx = s.tx + d[0], ny = s.ty + d[1];
+      if (nx < 0 || ny < 0 || nx >= CHEMIN_N || ny >= CHEMIN_N) continue;
+      if (estObstacle(nx, ny)) continue;
+
+      const avant = posRenard(s.rp);
+      if (nx === avant.x && ny === avant.y) continue;      /* on se jette sur lui */
+      if (nx === maisonPos.x && ny === maisonPos.y) return true;
+
+      let pas = s.rd, suivant = s.rp + pas;
+      if (suivant < 0 || suivant >= CHEMIN_N) { pas = -pas; suivant = s.rp + pas; }
+      const apres = posRenard(suivant);
+      if (apres.x === nx && apres.y === ny) continue;      /* il vient la cueillir */
+
+      const k = cle(nx, ny, suivant, pas);
+      if (vus[k]) continue;
+      vus[k] = true;
+      file.push({ tx: nx, ty: ny, rp: suivant, rd: pas });
+    }
+  }
+  return false;
+}
+
 function resetChemin() {
+  const cfg = NIVEAUX[cheminNiveau];
+  CHEMIN_N = cfg.n;
   cheminFini = false;
+  cheminPerdu = false;
+  renard = null;
 
   /* dinde et maison dans deux coins opposés, tirés au sort */
   const coins = [{ x: 0, y: 0 }, { x: CHEMIN_N - 1, y: 0 },
@@ -994,39 +1136,51 @@ function resetChemin() {
   dindePos = { x: coins[i].x, y: coins[i].y };
   maisonPos = { x: coins[3 - i].x, y: coins[3 - i].y };
 
-  /* on retire au sort tant que le chemin n'est pas praticable */
-  const combien = 1 + Math.floor(Math.random() * 2);   /* 1 ou 2 arbres */
+  /* On retire arbres ET renard tant que la partie n'est pas gagnable.
+     Les arbres évitent la ligne du renard, pour qu'il puisse patrouiller. */
+  const combien = cfg.minArbres + Math.floor(Math.random() * (cfg.maxArbres - cfg.minArbres + 1));
   let essais = 0;
   do {
+    if (cfg.renard) placerRenard();
     obstacles = [];
-    let pose = 0;
-    while (pose < combien && pose < CHEMIN_N * CHEMIN_N) {
+    let pose = 0, tentatives = 0;
+    while (pose < combien && tentatives++ < 500) {
       const x = Math.floor(Math.random() * CHEMIN_N);
       const y = Math.floor(Math.random() * CHEMIN_N);
       const occupe = (x === dindePos.x && y === dindePos.y) ||
                      (x === maisonPos.x && y === maisonPos.y) ||
-                     estObstacle(x, y);
+                     surLigneRenard(x, y) || estObstacle(x, y);
       if (!occupe) { obstacles.push({ x: x, y: y }); pose++; }
     }
     essais++;
-  } while (!maisonAtteignable() && essais < 50);
+  } while (!partieGagnable() && essais < 80);
 
-  /* filet de sécurité : mieux vaut aucun arbre qu'une grille bloquée */
-  if (!maisonAtteignable()) obstacles = [];
+  /* filets de sécurité en cascade : d'abord on enlève les arbres,
+     et en dernier recours le renard. Jamais de grille impossible. */
+  if (!partieGagnable()) obstacles = [];
+  if (!partieGagnable()) renard = null;
 
-  document.getElementById('cheminConsigne').textContent = 'Ramène la dinde à sa maison 🏠';
+  document.getElementById('cheminConsigne').textContent = (cfg.renard && renard)
+    ? 'Rentre à la maison sans toucher le renard ! 🦊'
+    : 'Ramène la dinde à sa maison 🏠';
+  majBoutonsNiveau();
   dessinerChemin();
 }
 
 function dessinerChemin() {
+  const cfg = NIVEAUX[cheminNiveau];
   const g = document.getElementById('cheminGrille');
+  g.style.gridTemplateColumns = 'repeat(' + CHEMIN_N + ', auto)';
   g.innerHTML = '';
+  const rx = renardXY();
+
   for (let y = 0; y < CHEMIN_N; y++) {
     for (let x = 0; x < CHEMIN_N; x++) {
       const c = document.createElement('div');
-      c.className = 'border-2 border-orange-800 rounded-xl flex items-center justify-center text-4xl sm:text-6xl leading-none';
-      c.style.width = 'min(19vw, 13vh, 5.5rem)';
-      c.style.height = 'min(19vw, 13vh, 5.5rem)';
+      c.className = 'border-2 border-orange-800 rounded-xl flex items-center justify-center leading-none';
+      c.style.width = cfg.cell;
+      c.style.height = cfg.cell;
+      c.style.fontSize = cfg.police;
 
       if (estObstacle(x, y)) {
         /* case plus sombre : on voit au premier coup d'oeil qu'elle est fermée */
@@ -1037,6 +1191,8 @@ function dessinerChemin() {
         if (x === dindePos.x && y === dindePos.y) {
           c.textContent = '🦃';
           c.classList.add('pop');
+        } else if (rx && x === rx.x && y === rx.y) {
+          c.textContent = '🦊';
         } else if (x === maisonPos.x && y === maisonPos.y) {
           c.textContent = '🏠';
         }
@@ -1046,8 +1202,32 @@ function dessinerChemin() {
   }
 }
 
+/* le renard avance d'une case à chaque déplacement de la dinde, et fait
+   demi-tour au bout de sa ligne. Tour par tour plutôt qu'en temps réel :
+   l'enfant peut réfléchir sans être mis sous pression. */
+function avancerRenard() {
+  if (!renard) return;
+  let suivant = renard.pos + renard.pas;
+  if (suivant < 0 || suivant >= CHEMIN_N) {
+    renard.pas = -renard.pas;
+    suivant = renard.pos + renard.pas;
+  }
+  renard.pos = suivant;
+}
+
+function attrapee() {
+  cheminPerdu = true;
+  document.getElementById('cheminConsigne').textContent = 'Oh non ! Le renard t’a attrapée !';
+  glou(0.35);
+  const g = document.getElementById('cheminGrille');
+  for (const c of g.children) replay(c, 'shake');
+  dire('Oh non, le renard ! On recommence.', 400);
+  /* on relance tout seul : l'enfant n'a rien à faire pour repartir */
+  setTimeout(resetChemin, 2200);
+}
+
 function bouger(dx, dy) {
-  if (cheminFini) return;
+  if (cheminFini || cheminPerdu) return;
   const nx = dindePos.x + dx, ny = dindePos.y + dy;
 
   if (nx < 0 || ny < 0 || nx >= CHEMIN_N || ny >= CHEMIN_N) {
@@ -1065,9 +1245,14 @@ function bouger(dx, dy) {
 
   dindePos.x = nx;
   dindePos.y = ny;
-  dessinerChemin();
 
+  /* la dinde se jette dans la gueule du renard */
+  let rx = renardXY();
+  if (rx && nx === rx.x && ny === rx.y) { dessinerChemin(); attrapee(); return; }
+
+  /* arrivée : on gagne avant même que le renard ne bouge */
   if (nx === maisonPos.x && ny === maisonPos.y) {
+    dessinerChemin();
     cheminFini = true;
     document.getElementById('cheminConsigne').textContent = 'BRAVO ! Elle est rentrée !';
     pleuvoir(35, ['🦃', '🪶', '🥚', '🎉']);
@@ -1075,9 +1260,16 @@ function bouger(dx, dy) {
       setTimeout(function () { glou(1 + k * 0.2); }, k * 160);
     }
     dire('Bravo ! La dinde est rentrée à la maison !', 700);
-  } else {
-    glou(1.1);
+    return;
   }
+
+  /* puis le renard avance et peut venir la cueillir */
+  avancerRenard();
+  rx = renardXY();
+  dessinerChemin();
+  if (rx && rx.x === dindePos.x && rx.y === dindePos.y) { attrapee(); return; }
+
+  glou(1.1);
 }
 </script>
 </body>
