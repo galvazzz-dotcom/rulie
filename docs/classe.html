@@ -948,20 +948,72 @@ function retourner(b) {
 
 /* ══════════════════════════════════════════════════════════
    10. LE CHEMIN DE ROULLIEEE — repérage spatial
-   Déplacement libre sur une grille 4x4. Sortir de la grille ne
-   provoque pas d'erreur : il ne se passe simplement rien.
+   Déplacement libre sur une grille 4x4 semée de 1 ou 2 arbres.
+   Sortir de la grille ou buter sur un arbre ne provoque pas
+   d'erreur : la case concernée tremble, et c'est tout.
    ══════════════════════════════════════════════════════════ */
 const CHEMIN_N = 4;
-let dindePos = { x: 0, y: 0 }, maisonPos = { x: 3, y: 3 }, cheminFini = false;
+let dindePos = { x: 0, y: 0 }, maisonPos = { x: 3, y: 3 };
+let obstacles = [], cheminFini = false;
+
+function estObstacle(x, y) {
+  return obstacles.some(function (o) { return o.x === x && o.y === y; });
+}
+
+/* Parcours en largeur depuis la dinde : sans cette vérification, un
+   tirage malchanceux pourrait emmurer la dinde dans son coin (un coin
+   n'a que deux voisins) ou rendre la maison inatteignable. */
+function maisonAtteignable() {
+  const vus = {};
+  const file = [{ x: dindePos.x, y: dindePos.y }];
+  vus[dindePos.x + ',' + dindePos.y] = true;
+
+  while (file.length) {
+    const p = file.shift();
+    if (p.x === maisonPos.x && p.y === maisonPos.y) return true;
+    const voisins = [{ x: p.x + 1, y: p.y }, { x: p.x - 1, y: p.y },
+                     { x: p.x, y: p.y + 1 }, { x: p.x, y: p.y - 1 }];
+    for (const v of voisins) {
+      if (v.x < 0 || v.y < 0 || v.x >= CHEMIN_N || v.y >= CHEMIN_N) continue;
+      const cle = v.x + ',' + v.y;
+      if (vus[cle] || estObstacle(v.x, v.y)) continue;
+      vus[cle] = true;
+      file.push(v);
+    }
+  }
+  return false;
+}
 
 function resetChemin() {
   cheminFini = false;
+
   /* dinde et maison dans deux coins opposés, tirés au sort */
   const coins = [{ x: 0, y: 0 }, { x: CHEMIN_N - 1, y: 0 },
                  { x: 0, y: CHEMIN_N - 1 }, { x: CHEMIN_N - 1, y: CHEMIN_N - 1 }];
   const i = Math.floor(Math.random() * 4);
   dindePos = { x: coins[i].x, y: coins[i].y };
   maisonPos = { x: coins[3 - i].x, y: coins[3 - i].y };
+
+  /* on retire au sort tant que le chemin n'est pas praticable */
+  const combien = 1 + Math.floor(Math.random() * 2);   /* 1 ou 2 arbres */
+  let essais = 0;
+  do {
+    obstacles = [];
+    let pose = 0;
+    while (pose < combien && pose < CHEMIN_N * CHEMIN_N) {
+      const x = Math.floor(Math.random() * CHEMIN_N);
+      const y = Math.floor(Math.random() * CHEMIN_N);
+      const occupe = (x === dindePos.x && y === dindePos.y) ||
+                     (x === maisonPos.x && y === maisonPos.y) ||
+                     estObstacle(x, y);
+      if (!occupe) { obstacles.push({ x: x, y: y }); pose++; }
+    }
+    essais++;
+  } while (!maisonAtteignable() && essais < 50);
+
+  /* filet de sécurité : mieux vaut aucun arbre qu'une grille bloquée */
+  if (!maisonAtteignable()) obstacles = [];
+
   document.getElementById('cheminConsigne').textContent = 'Ramène la dinde à sa maison 🏠';
   dessinerChemin();
 }
@@ -972,14 +1024,22 @@ function dessinerChemin() {
   for (let y = 0; y < CHEMIN_N; y++) {
     for (let x = 0; x < CHEMIN_N; x++) {
       const c = document.createElement('div');
-      c.className = 'bg-[#5c3a1f] border-2 border-orange-800 rounded-xl flex items-center justify-center text-4xl sm:text-6xl leading-none';
+      c.className = 'border-2 border-orange-800 rounded-xl flex items-center justify-center text-4xl sm:text-6xl leading-none';
       c.style.width = 'min(19vw, 13vh, 5.5rem)';
       c.style.height = 'min(19vw, 13vh, 5.5rem)';
-      if (x === dindePos.x && y === dindePos.y) {
-        c.textContent = '🦃';
-        c.classList.add('pop');
-      } else if (x === maisonPos.x && y === maisonPos.y) {
-        c.textContent = '🏠';
+
+      if (estObstacle(x, y)) {
+        /* case plus sombre : on voit au premier coup d'oeil qu'elle est fermée */
+        c.classList.add('bg-[#2e1a06]');
+        c.textContent = '🌳';
+      } else {
+        c.classList.add('bg-[#5c3a1f]');
+        if (x === dindePos.x && y === dindePos.y) {
+          c.textContent = '🦃';
+          c.classList.add('pop');
+        } else if (x === maisonPos.x && y === maisonPos.y) {
+          c.textContent = '🏠';
+        }
       }
       g.appendChild(c);
     }
@@ -992,6 +1052,14 @@ function bouger(dx, dy) {
 
   if (nx < 0 || ny < 0 || nx >= CHEMIN_N || ny >= CHEMIN_N) {
     glou(0.5);          /* bord de la grille : simple son grave, rien d'autre */
+    return;
+  }
+
+  if (estObstacle(nx, ny)) {
+    /* l'arbre tremble : l'enfant voit POURQUOI la dinde n'avance pas */
+    glou(0.45);
+    const case_ = document.getElementById('cheminGrille').children[ny * CHEMIN_N + nx];
+    if (case_) replay(case_, 'shake');
     return;
   }
 
