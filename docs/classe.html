@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🦃 La Classe de Rulie</title>
+<title>🦃 La Classe de Roullieee</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Creepster&display=swap');
@@ -30,7 +30,7 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
 <!-- ═══════════ ÉCRAN DE DÉMARRAGE (débloque le son) ═══════════ -->
 <div id="unlock" class="fixed inset-0 z-[100] bg-[#4a2c0b] flex flex-col items-center justify-center gap-8 px-6 text-center">
   <div class="text-8xl sm:text-9xl gobble">🦃</div>
-  <h1 class="title-font text-4xl sm:text-6xl text-orange-400 tracking-wider">LA CLASSE DE RULIE</h1>
+  <h1 class="title-font text-4xl sm:text-6xl text-orange-400 tracking-wider">LA CLASSE DE ROULLIEEE</h1>
   <button onclick="startApp()" class="tap bg-orange-600 hover:bg-orange-500 text-white font-bold text-2xl sm:text-4xl px-12 py-8 rounded-[2rem] shadow-2xl border-4 border-amber-400">
     👆 TOUCHER POUR COMMENCER
   </button>
@@ -41,7 +41,7 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
 <header class="sticky top-0 z-50 bg-[#c2410c] border-b-4 border-amber-400 shadow-xl">
   <div class="flex items-center justify-between gap-2 px-3 py-2">
     <button onclick="goMenu()" class="tap bg-[#4a2c0b] text-amber-200 font-bold text-xl w-14 h-14 rounded-2xl shrink-0" aria-label="Retour">↩</button>
-    <h1 id="pageTitle" class="title-font text-lg sm:text-3xl text-amber-200 tracking-wider truncate">LA CLASSE DE RULIE</h1>
+    <h1 id="pageTitle" class="title-font text-base sm:text-3xl text-amber-200 tracking-wider truncate">LA CLASSE DE ROULLIEEE</h1>
     <div class="flex gap-2 shrink-0">
       <button id="btnSound" onclick="toggleMute()" class="tap bg-amber-400 text-[#4a2c0b] text-2xl w-14 h-14 rounded-2xl" aria-label="Son">🔊</button>
       <button onclick="toggleFs()" class="tap bg-amber-400 text-[#4a2c0b] text-2xl w-14 h-14 rounded-2xl" aria-label="Plein écran">📺</button>
@@ -129,7 +129,7 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
   </div>
 </section>
 
-<!-- ═══════════ 5. LA FERME DE RULIE ═══════════ -->
+<!-- ═══════════ 5. LA FERME DE ROULLIEEE ═══════════ -->
 <section id="act-ferme" class="hidden p-3 sm:p-6">
   <p id="fermeNom" class="text-center text-2xl sm:text-4xl font-bold text-amber-200 mb-3 min-h-[2.5rem]">Appuie sur un animal 👇</p>
   <div id="fermeGrid" class="grid grid-cols-3 gap-2 sm:gap-4 max-w-3xl mx-auto"></div>
@@ -138,7 +138,7 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
 <!-- ═══════════ 6. LES COULEURS ═══════════ -->
 <section id="act-couleurs" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
   <!-- picto dessiné en SVG : les plumes changent de couleur -->
-  <svg viewBox="0 0 220 215" class="w-44 h-44 sm:w-72 sm:h-72 shrink-0" role="img" aria-label="La dinde de Rulie">
+  <svg viewBox="0 0 220 215" class="w-44 h-44 sm:w-72 sm:h-72 shrink-0" role="img" aria-label="La dinde de Roullieee">
     <g id="tailFan"></g>
     <ellipse cx="110" cy="145" rx="46" ry="42" fill="#7c4a21"/>
     <ellipse cx="110" cy="152" rx="29" ry="27" fill="#96602f"/>
@@ -154,7 +154,7 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
   <div id="couleurGrid" class="grid grid-cols-4 gap-2 sm:gap-4 max-w-2xl w-full"></div>
 </section>
 
-<!-- ═══════════ 7. JE LIS AVEC RULIE ═══════════ -->
+<!-- ═══════════ 7. JE LIS AVEC ROULLIEEE ═══════════ -->
 <section id="act-lire" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
   <div class="flex flex-col items-center justify-center flex-1 w-full">
     <div id="lireEmoji" class="text-[6rem] sm:text-[10rem] leading-none">👇</div>
@@ -374,9 +374,9 @@ const ACTS = [
   { id: 'dindophone', titre: 'LE DINDOPHONE',      icone: '🎹', nom: 'Le Dindophone',      sous: 'Six couleurs, six glouglous', flex: false },
   { id: 'cache',      titre: 'CACHE-CACHE',        icone: '🥚', nom: 'Cache-Cache',        sous: 'Trouve les dindes cachées !', flex: false },
   { id: 'compte',     titre: 'COMPTE LES DINDES',  icone: '🔢', nom: 'Compte les Dindes',  sous: 'Une, deux, trois…',           flex: true },
-  { id: 'ferme',      titre: 'LA FERME DE RULIE',  icone: '🐄', nom: 'La Ferme de Rulie',  sous: 'Qui fait ce bruit ?',         flex: false },
+  { id: 'ferme',      titre: 'LA FERME DE ROULLIEEE',  icone: '🐄', nom: 'La Ferme de Roullieee',  sous: 'Qui fait ce bruit ?',         flex: false },
   { id: 'couleurs',   titre: 'LES COULEURS',       icone: '🎨', nom: 'Les Couleurs',       sous: 'Habille la dinde !',          flex: true },
-  { id: 'lire',       titre: 'JE LIS AVEC RULIE',  icone: '🔤', nom: 'Je Lis avec Rulie',  sous: 'Le mot et sa image',          flex: true },
+  { id: 'lire',       titre: 'JE LIS AVEC ROULLIEEE',  icone: '🔤', nom: 'Je Lis avec Roullieee',  sous: 'Le mot et son image',          flex: true },
   /* page de crédits : atteinte par le lien du bas, pas par une carte */
   { id: 'credits',    titre: 'SONS & CRÉDITS',     icone: 'ℹ️', nom: 'Sons & crédits',     sous: '',                            flex: false, horsMenu: true }
 ];
@@ -412,7 +412,7 @@ function goMenu() {
   });
   if (window.speechSynthesis) speechSynthesis.cancel();
   document.getElementById('menu').classList.remove('hidden');
-  document.getElementById('pageTitle').textContent = 'LA CLASSE DE RULIE';
+  document.getElementById('pageTitle').textContent = 'LA CLASSE DE ROULLIEEE';
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -589,7 +589,7 @@ function resetCount() {
 renderCount();
 
 /* ══════════════════════════════════════════════════════════
-   5. LA FERME DE RULIE
+   5. LA FERME DE ROULLIEEE
    Chaque cri est fabriqué par synthèse : ce sont des versions
    "dessin animé", volontairement rigolotes.
    ══════════════════════════════════════════════════════════ */
@@ -687,7 +687,7 @@ COULEURS.forEach(function (c) {
 });
 
 /* ══════════════════════════════════════════════════════════
-   7. JE LIS AVEC RULIE
+   7. JE LIS AVEC ROULLIEEE
    Image + mot en capitales + mot en minuscules + mot entendu.
    Quatre entrées pour la même information.
    ══════════════════════════════════════════════════════════ */
