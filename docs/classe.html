@@ -100,13 +100,20 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
 
 <!-- ═══════════ 2. LE DINDOPHONE ═══════════ -->
 <section id="act-dindophone" class="hidden p-3 sm:p-6">
+  <div id="dindoNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="dindoConsigne" class="text-center text-lg sm:text-2xl font-bold text-amber-200 mb-2 min-h-[1.8rem]">Appuie sur les dindes !</p>
+  <div id="dindoRejouer" class="hidden text-center mb-3">
+    <button onclick="rejouerMelodie()" class="tap bg-amber-400 text-[#4a2c0b] font-bold text-base sm:text-xl px-6 py-3 rounded-2xl shadow-xl">🔊 Réécouter</button>
+  </div>
   <div id="padGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5 max-w-4xl mx-auto"></div>
 </section>
 
 <!-- ═══════════ 3. CACHE-CACHE ═══════════ -->
 <section id="act-cache" class="hidden p-3 sm:p-6">
+  <div id="cacheNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="cacheConsigne" class="text-center text-sm sm:text-lg text-amber-300 mb-2 min-h-[1.5rem] px-2">Trouve les dindes cachées !</p>
   <p id="cacheScore" class="text-center text-2xl sm:text-4xl font-bold text-amber-200 mb-3">🦃 0 / 3</p>
-  <div id="eggGrid" class="grid grid-cols-3 gap-2 sm:gap-5 max-w-4xl mx-auto"></div>
+  <div id="eggGrid" class="grid gap-2 sm:gap-4 max-w-4xl mx-auto"></div>
   <div id="cacheWin" class="hidden text-center mt-5">
     <p class="title-font text-4xl sm:text-6xl text-orange-400 tracking-wider">BRAVO !</p>
   </div>
@@ -116,29 +123,40 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
 </section>
 
 <!-- ═══════════ 4. COMPTE LES DINDES ═══════════ -->
-<section id="act-compte" class="hidden flex-col items-center p-4" style="min-height:calc(100dvh - 74px)">
+<section id="act-compte" class="hidden flex-col items-center p-3 sm:p-4" style="min-height:calc(100dvh - 74px)">
+  <div id="compteNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="compteConsigne" class="text-center text-lg sm:text-2xl font-bold text-amber-200 min-h-[1.8rem]"></p>
   <!-- chiffre en police simple et non décorative : il doit rester lisible -->
-  <div class="flex items-baseline gap-4 mt-2">
-    <span id="countNum" class="font-bold text-[5rem] sm:text-[8rem] leading-none text-orange-400">0</span>
-    <span id="countWord" class="text-3xl sm:text-5xl font-bold text-amber-200">zéro</span>
+  <div id="compteAffichage" class="flex items-baseline gap-4">
+    <span id="countNum" class="font-bold text-[4rem] sm:text-[7rem] leading-none text-orange-400">0</span>
+    <span id="countWord" class="text-2xl sm:text-4xl font-bold text-amber-200">zéro</span>
   </div>
   <div id="countZone" class="flex flex-wrap justify-center items-center content-center gap-1 max-w-3xl w-full flex-1 my-2"></div>
-  <div class="flex gap-4 mt-auto mb-4 flex-wrap justify-center">
-    <button onclick="addTurkey()" class="tap bg-orange-600 text-white font-bold text-3xl sm:text-4xl px-12 py-8 rounded-[2rem] shadow-2xl border-4 border-amber-400">➕ 🦃</button>
-    <button onclick="resetCount()" class="tap bg-amber-400 text-[#4a2c0b] font-bold text-2xl px-8 py-8 rounded-[2rem] shadow-xl">🔄</button>
+  <!-- niveau « Combien ? » : on répond en touchant un nombre -->
+  <div id="compteChoix" class="hidden grid-cols-3 gap-3 w-full max-w-md mb-3"></div>
+  <div id="compteBoutons" class="flex gap-2 sm:gap-4 mt-auto mb-3 flex-wrap justify-center">
+    <button onclick="retirerDinde()" class="tap bg-orange-800 text-white font-bold text-2xl sm:text-3xl px-7 py-6 rounded-[2rem] shadow-2xl border-4 border-amber-400" aria-label="Enlever une dinde">➖</button>
+    <button onclick="addTurkey()" class="tap bg-orange-600 text-white font-bold text-2xl sm:text-3xl px-7 py-6 rounded-[2rem] shadow-2xl border-4 border-amber-400" aria-label="Ajouter une dinde">➕ 🦃</button>
+    <button id="compteValider" onclick="validerDonneMoi()" class="hidden tap bg-green-600 text-white font-bold text-xl sm:text-2xl px-6 py-6 rounded-[2rem] shadow-2xl border-4 border-amber-300">✅ C’est bon !</button>
+    <button onclick="resetCount()" class="tap bg-amber-400 text-[#4a2c0b] font-bold text-2xl px-6 py-6 rounded-[2rem] shadow-xl" aria-label="Recommencer">🔄</button>
   </div>
 </section>
 
 <!-- ═══════════ 5. LA FERME DE ROULLIEEE ═══════════ -->
 <section id="act-ferme" class="hidden p-3 sm:p-6">
-  <p id="fermeNom" class="text-center text-2xl sm:text-4xl font-bold text-amber-200 mb-3 min-h-[2.5rem]">Appuie sur un animal 👇</p>
+  <div id="fermeNiveaux" class="flex gap-2 flex-wrap justify-center mb-3"></div>
+  <p id="fermeNom" class="text-center text-xl sm:text-3xl font-bold text-amber-200 mb-2 min-h-[2.2rem]">Appuie sur un animal 👇</p>
+  <div id="fermeRejouer" class="hidden text-center mb-3">
+    <button onclick="rejouerCri()" class="tap bg-amber-400 text-[#4a2c0b] font-bold text-base sm:text-xl px-6 py-3 rounded-2xl shadow-xl">🔊 Réécouter</button>
+  </div>
   <div id="fermeGrid" class="grid grid-cols-3 gap-2 sm:gap-4 max-w-3xl mx-auto"></div>
 </section>
 
 <!-- ═══════════ 6. LES COULEURS ═══════════ -->
 <section id="act-couleurs" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="couleursNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
   <!-- picto dessiné en SVG : les plumes changent de couleur -->
-  <svg viewBox="0 0 220 215" class="w-44 h-44 sm:w-72 sm:h-72 shrink-0" role="img" aria-label="La dinde de Roullieee">
+  <svg viewBox="0 0 220 215" class="w-36 h-36 sm:w-64 sm:h-64 shrink-0" role="img" aria-label="La dinde de Roullieee">
     <g id="tailFan"></g>
     <ellipse cx="110" cy="145" rx="46" ry="42" fill="#7c4a21"/>
     <ellipse cx="110" cy="152" rx="29" ry="27" fill="#96602f"/>
@@ -150,17 +168,18 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
     <circle cx="103" cy="93" r="4.5" fill="#1c1917"/>
     <circle cx="104.5" cy="91.5" r="1.6" fill="#fff"/>
   </svg>
-  <p id="couleurNom" class="text-3xl sm:text-5xl font-bold text-amber-200 my-3 min-h-[2.5rem]">Choisis une couleur</p>
+  <p id="couleurNom" class="text-2xl sm:text-4xl font-bold text-amber-200 my-2 min-h-[2.2rem] text-center">Choisis une couleur</p>
   <div id="couleurGrid" class="grid grid-cols-4 gap-2 sm:gap-4 max-w-2xl w-full"></div>
 </section>
 
 <!-- ═══════════ 7. JE LIS AVEC ROULLIEEE ═══════════ -->
 <section id="act-lire" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="lireNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
   <div class="flex flex-col items-center justify-center flex-1 w-full">
-    <div id="lireEmoji" class="text-[6rem] sm:text-[10rem] leading-none">👇</div>
+    <div id="lireEmoji" class="text-[5rem] sm:text-[9rem] leading-none">👇</div>
     <!-- la première lettre est mise en avant, et le mot est aussi donné en minuscules -->
-    <p id="lireMot" class="text-5xl sm:text-8xl font-bold tracking-[0.15em] text-amber-100 mt-2 text-center">?</p>
-    <p id="lireMin" class="text-2xl sm:text-4xl text-amber-300 tracking-widest mt-1"></p>
+    <p id="lireMot" class="text-4xl sm:text-7xl font-bold tracking-[0.15em] text-amber-100 mt-2 text-center">?</p>
+    <p id="lireMin" class="text-xl sm:text-3xl text-amber-300 tracking-widest mt-1"></p>
   </div>
   <div id="lireGrid" class="grid grid-cols-4 gap-2 sm:gap-4 max-w-3xl w-full mt-3"></div>
 </section>
@@ -168,12 +187,13 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
 
 <!-- ═══════════ 8. RANGE LES DINDES (sériation) ═══════════ -->
 <section id="act-ranger" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="rangerNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
   <!-- sens du tri : conservé d'une partie à l'autre, y compris après Recommencer -->
   <div class="flex gap-2 sm:gap-3 mb-2">
-    <button id="rangerBtnPetite" onclick="setSensRanger('petite')" class="tap px-3 sm:px-6 py-3 rounded-2xl font-bold text-sm sm:text-lg border-4">🔽 La plus PETITE</button>
-    <button id="rangerBtnGrande" onclick="setSensRanger('grande')" class="tap px-3 sm:px-6 py-3 rounded-2xl font-bold text-sm sm:text-lg border-4">🔼 La plus GRANDE</button>
+    <button id="rangerBtnPetite" onclick="setSensRanger('petite')" class="tap px-3 sm:px-6 py-2 rounded-2xl font-bold text-xs sm:text-lg border-4">🔽 La plus PETITE</button>
+    <button id="rangerBtnGrande" onclick="setSensRanger('grande')" class="tap px-3 sm:px-6 py-2 rounded-2xl font-bold text-xs sm:text-lg border-4">🔼 La plus GRANDE</button>
   </div>
-  <p id="rangerConsigne" class="text-center text-lg sm:text-2xl font-bold text-amber-200 mb-1">
+  <p id="rangerConsigne" class="text-center text-base sm:text-2xl font-bold text-amber-200 mb-1">
     Touche la plus <span class="text-orange-400">PETITE</span> dinde
   </p>
   <!-- le bloc est centré verticalement, mais les dindes restent posées
@@ -182,17 +202,18 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
     <div id="rangerPool" class="flex flex-nowrap items-end justify-center gap-1 sm:gap-4 w-full"></div>
   </div>
   <div class="w-full border-t-4 border-orange-700 pt-2">
-    <div id="rangerLigne" class="flex flex-nowrap items-end justify-center gap-1 sm:gap-4 min-h-[4rem] sm:min-h-[6rem]"></div>
+    <div id="rangerLigne" class="flex flex-nowrap items-end justify-center gap-1 sm:gap-4 min-h-[3.5rem] sm:min-h-[6rem]"></div>
   </div>
-  <div class="mt-3 mb-2">
-    <button onclick="resetRanger()" class="tap bg-amber-400 text-[#4a2c0b] font-bold text-lg sm:text-xl px-8 py-4 rounded-3xl shadow-xl">🔄 Recommencer</button>
+  <div class="mt-2 mb-2">
+    <button onclick="resetRanger()" class="tap bg-amber-400 text-[#4a2c0b] font-bold text-base sm:text-xl px-8 py-3 rounded-3xl shadow-xl">🔄 Recommencer</button>
   </div>
 </section>
 
 <!-- ═══════════ 9. LE MEMORY DES DINDES ═══════════ -->
 <section id="act-memory" class="hidden p-3 sm:p-6">
+  <div id="memoryNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
   <p id="memoryScore" class="text-center text-xl sm:text-3xl font-bold text-amber-200 mb-3">Paires trouvées : 0 / 4</p>
-  <div id="memoryGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 max-w-3xl mx-auto"></div>
+  <div id="memoryGrid" class="grid gap-2 sm:gap-4 max-w-3xl mx-auto"></div>
   <div class="text-center mt-5">
     <button onclick="resetMemory()" class="tap bg-amber-400 text-[#4a2c0b] font-bold text-lg sm:text-xl px-8 py-4 rounded-3xl shadow-xl">🔄 Recommencer</button>
   </div>
@@ -231,6 +252,36 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
     </div>
   </div>
 </section>
+
+<!-- ═══════════ 11. DEDANS OU DEHORS ? (notions spatiales) ═══════════ -->
+<section id="act-espace" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="espaceNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="espaceConsigne" class="text-center text-lg sm:text-2xl font-bold text-amber-200 mb-3 min-h-[1.8rem] px-2">Touche une image</p>
+  <div id="espaceGrid" class="grid grid-cols-2 gap-3 sm:gap-5 w-full max-w-2xl flex-1 content-center"></div>
+</section>
+
+<!-- ═══════════ 12. AVANT OU APRÈS ? (notions temporelles) ═══════════ -->
+<section id="act-temps" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="tempsNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="tempsConsigne" class="text-center text-base sm:text-2xl font-bold text-amber-200 mb-2 min-h-[1.8rem]">Touche les images dans l'ordre</p>
+  <!-- la frise : ce qui est déjà placé, de gauche à droite -->
+  <div class="w-full flex-1 flex flex-col items-center justify-center gap-3">
+    <div id="tempsFrise" class="flex flex-nowrap items-center justify-center gap-2 sm:gap-4 min-h-[5rem] sm:min-h-[7rem] w-full"></div>
+    <p id="tempsLegende" class="text-sm sm:text-lg text-amber-300 text-center min-h-[1.5rem]"></p>
+  </div>
+  <div id="tempsGrid" class="grid grid-cols-3 gap-2 sm:gap-4 w-full max-w-2xl mb-2"></div>
+</section>
+
+<!-- ═══════════ 13. LES SUITES DE ROULLIEEE (algorithmes) ═══════════ -->
+<section id="act-suites" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="suitesNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="suitesConsigne" class="text-center text-lg sm:text-2xl font-bold text-amber-200 mb-2 min-h-[1.8rem]">Qu'est-ce qui vient après ?</p>
+  <div class="flex-1 flex items-center w-full overflow-x-auto">
+    <div id="suitesFrise" class="flex flex-nowrap items-center justify-center gap-1 sm:gap-3 w-full"></div>
+  </div>
+  <div id="suitesGrid" class="grid grid-cols-3 gap-3 w-full max-w-lg mb-2"></div>
+</section>
+
 <script>
 /* ══════════════════════════════════════════════════════════
    1. SON ÉCHANTILLONNÉ — le vrai glouglou de la dinde
@@ -446,6 +497,9 @@ const ACTS = [
   { id: 'ranger',     titre: 'RANGE LES DINDES',   icone: '📏', nom: 'Range les Dindes',   sous: 'De la plus petite à la plus grande', flex: true },
   { id: 'memory',     titre: 'LE MEMORY',          icone: '🃏', nom: 'Le Memory des Dindes', sous: 'Retrouve les paires !',      flex: false },
   { id: 'chemin',     titre: 'LE CHEMIN',          icone: '🧭', nom: 'Le Chemin de Roullieee', sous: 'Ramène la dinde chez elle', flex: true },
+  { id: 'espace',     titre: 'DEDANS OU DEHORS', icone: '🧺', nom: 'Dedans ou Dehors ?', sous: 'Où est la dinde ?',        flex: true },
+  { id: 'temps',      titre: 'AVANT OU APRÈS',   icone: '⏳', nom: 'Avant ou Après ?',   sous: 'L’ordre des choses',       flex: true },
+  { id: 'suites',     titre: 'LES SUITES',       icone: '🔗', nom: 'Les Suites',         sous: 'Devine ce qui vient après', flex: true },
   /* page de crédits : atteinte par le lien du bas, pas par une carte */
   { id: 'credits',    titre: 'SONS & CRÉDITS',     icone: 'ℹ️', nom: 'Sons & crédits',     sous: '',                            flex: false, horsMenu: true }
 ];
@@ -461,6 +515,14 @@ ACTS.filter(function (a) { return !a.horsMenu; }).forEach(function (a) {
   document.getElementById('menuGrid').appendChild(b);
 });
 
+/* id du module -> id de sa barre de niveaux */
+const BARRES = {
+  dindophone: 'dindoNiveaux', cache: 'cacheNiveaux', compte: 'compteNiveaux',
+  ferme: 'fermeNiveaux', couleurs: 'couleursNiveaux', lire: 'lireNiveaux',
+  ranger: 'rangerNiveaux', memory: 'memoryNiveaux',
+  espace: 'espaceNiveaux', temps: 'tempsNiveaux', suites: 'suitesNiveaux'
+};
+
 function openAct(id) {
   goMenu();
   document.getElementById('menu').classList.add('hidden');
@@ -469,11 +531,23 @@ function openAct(id) {
   el.classList.remove('hidden');
   if (a.flex) el.classList.add('flex');
   document.getElementById('pageTitle').textContent = a.titre;
+  /* le surlignage doit refleter le niveau memorise, meme si celui-ci
+     a ete change ailleurs que par un clic sur la barre */
+  const barre = document.getElementById(BARRES[id]);
+  if (barre) majNiveaux(BARRES[id], id);
   /* chaque module qui tire un tirage au sort se reinitialise a l'ouverture */
   if (id === 'cache')  resetEggs();
   if (id === 'ranger') resetRanger();
   if (id === 'memory') resetMemory();
-  if (id === 'chemin') resetChemin();
+  if (id === 'chemin')     resetChemin();
+  if (id === 'ferme')      resetFerme();
+  if (id === 'couleurs')   resetCouleurs();
+  if (id === 'lire')       resetLire();
+  if (id === 'dindophone') resetDindo();
+  if (id === 'compte')     resetCompte();
+  if (id === 'espace')     resetEspace();
+  if (id === 'temps')      resetTemps();
+  if (id === 'suites')     resetSuites();
   window.scrollTo(0, 0);
 }
 
@@ -514,6 +588,68 @@ function replay(el, cls) {
 }
 
 /* ══════════════════════════════════════════════════════════
+   NIVEAUX — système partagé par tous les modules
+   Le niveau 0 est toujours démonstratif : l'enfant explore, rien ne
+   lui est demandé. Les suivants ajoutent une consigne, puis de la
+   complexité. Le choix est mémorisé par module et survit aux
+   allers-retours par le menu : la maîtresse règle une fois pour
+   l'élève qu'elle a en face d'elle.
+   ══════════════════════════════════════════════════════════ */
+const niveauDe = {};
+
+function niveau(mod) { return niveauDe[mod] || 0; }
+
+function poserNiveaux(zoneId, mod, noms, auChangement) {
+  const z = document.getElementById(zoneId);
+  z.innerHTML = '';
+  noms.forEach(function (nom, i) {
+    const b = document.createElement('button');
+    b.textContent = nom;
+    b.setAttribute('aria-label', 'Niveau ' + (i + 1) + ' : ' + nom);
+    b.onclick = function () {
+      niveauDe[mod] = i;
+      majNiveaux(zoneId, mod);
+      auChangement(i);
+    };
+    z.appendChild(b);
+  });
+  majNiveaux(zoneId, mod);
+}
+
+function majNiveaux(zoneId, mod) {
+  const base = 'tap px-3 sm:px-4 py-2 rounded-xl font-bold text-xs sm:text-sm border-4 ';
+  const actif = 'bg-orange-500 text-white border-amber-300';
+  const veille = 'bg-[#5c3a1f] text-amber-300 border-orange-800';
+  const cur = niveau(mod);
+  Array.prototype.forEach.call(document.getElementById(zoneId).children, function (b, i) {
+    b.className = base + (i === cur ? actif : veille);
+  });
+}
+
+/* tire un élément au hasard, en évitant si possible le précédent :
+   deux fois la même consigne d'affilée déroute les enfants */
+function tirageSansRepetition(liste, precedent) {
+  if (liste.length < 2) return liste[0];
+  let choix, garde = 0;
+  do { choix = liste[Math.floor(Math.random() * liste.length)]; }
+  while (choix === precedent && garde++ < 20);
+  return choix;
+}
+
+/* réponse juste : son qui monte, plumes, et on enchaîne */
+function bravo(delaiSuite, suite) {
+  glou(1.4);
+  feathers(6);
+  if (suite) setTimeout(suite, delaiSuite || 1100);
+}
+
+/* réponse fausse : jamais d'échec, juste un rebond et un son grave */
+function raté(el) {
+  glou(0.5);
+  if (el) replay(el, 'shake');
+}
+
+/* ══════════════════════════════════════════════════════════
    1. LE GRAND GLOUGLOU
    ══════════════════════════════════════════════════════════ */
 const CRIS = ['GLOU GLOU !', 'GOULOUGOULOU !', 'ROUUULIIIEEE !', 'GLOU DINGUE !', 'BRAVO !', 'ENCORE !'];
@@ -527,6 +663,10 @@ function bigGobble(el) {
 
 /* ══════════════════════════════════════════════════════════
    2. LE DINDOPHONE — six hauteurs, du grave à l'aigu
+   Niveau 1 : on joue librement.
+   Niveau 2 : l'app joue une mélodie, l'enfant la reproduit. La
+   mélodie s'allonge d'une note à chaque réussite : mémoire
+   auditive séquentielle, sans jamais de chronomètre.
    ══════════════════════════════════════════════════════════ */
 const PADS = [
   { c: '#dc2626', rate: 0.60 },
@@ -536,48 +676,170 @@ const PADS = [
   { c: '#0891b2', rate: 1.35 },
   { c: '#7c3aed', rate: 1.65 }
 ];
+const padsEl = [];
+
+let melodie = [], indexAttendu = 0, melodieEnCours = false;
+
+function allumerPad(i) {
+  const b = padsEl[i];
+  glou(PADS[i].rate);
+  replay(b, 'wiggle');
+}
+
+/* rejoue la mélodie note par note, en bloquant les appuis pendant ce temps */
+function rejouerMelodie() {
+  if (melodieEnCours || !melodie.length) return;
+  melodieEnCours = true;
+  indexAttendu = 0;
+  document.getElementById('dindoConsigne').textContent = 'Écoute bien…';
+  melodie.forEach(function (i, k) {
+    setTimeout(function () { allumerPad(i); }, 400 + k * 700);
+  });
+  setTimeout(function () {
+    melodieEnCours = false;
+    document.getElementById('dindoConsigne').textContent = 'À toi ! Répète la mélodie 🎵';
+  }, 400 + melodie.length * 700);
+}
+
+function nouvelleMelodie(longueur) {
+  melodie = [];
+  for (let k = 0; k < longueur; k++) {
+    melodie.push(Math.floor(Math.random() * PADS.length));
+  }
+  rejouerMelodie();
+}
+
+function resetDindo() {
+  melodie = [];
+  indexAttendu = 0;
+  melodieEnCours = false;
+  const n = niveau('dindophone');
+  document.getElementById('dindoRejouer').classList.toggle('hidden', n === 0);
+  if (n === 0) {
+    document.getElementById('dindoConsigne').textContent = 'Appuie sur les dindes !';
+  } else {
+    nouvelleMelodie(2);
+  }
+}
+
+function toucherPad(i) {
+  if (niveau('dindophone') === 0) { allumerPad(i); return; }
+  if (melodieEnCours) return;          /* on n'interrompt pas l'écoute */
+
+  allumerPad(i);
+  if (i !== melodie[indexAttendu]) {
+    /* raté : on ne perd rien, on réécoute simplement la même mélodie */
+    document.getElementById('dindoConsigne').textContent = 'Presque ! On réécoute…';
+    glou(0.5);
+    indexAttendu = 0;
+    setTimeout(rejouerMelodie, 900);
+    return;
+  }
+
+  indexAttendu++;
+  if (indexAttendu < melodie.length) return;
+
+  /* mélodie complète : on rallonge d'une note */
+  document.getElementById('dindoConsigne').textContent = 'BRAVO ! 🎉';
+  feathers(8);
+  const suivante = Math.min(melodie.length + 1, 6);
+  dire('Bravo !', 200);
+  setTimeout(function () {
+    if (niveau('dindophone') !== 0) nouvelleMelodie(suivante);
+  }, 1600);
+}
 
 PADS.forEach(function (p, i) {
   const b = document.createElement('button');
   b.className = 'tap rounded-[2rem] shadow-2xl border-4 border-amber-200 flex items-center justify-center text-6xl sm:text-8xl';
   b.style.background = p.c;
-  b.style.minHeight = '26vh';
+  b.style.minHeight = '22vh';
   b.textContent = '🦃';
   b.setAttribute('aria-label', 'Note ' + (i + 1));
-  b.onclick = function () { glou(p.rate); replay(b, 'wiggle'); };
+  b.onclick = function () { toucherPad(i); };
   document.getElementById('padGrid').appendChild(b);
+  padsEl.push(b);
 });
+
+poserNiveaux('dindoNiveaux', 'dindophone', ['1. Jouer', '2. Répète la mélodie'], resetDindo);
 
 /* ══════════════════════════════════════════════════════════
    3. CACHE-CACHE
-   Certains œufs sont vides : ils font "pfff" dans les graves.
-   Un œuf vide ne fait rien perdre, il n'y a rien à rater.
+   Les trois niveaux changent la COMPÉTENCE demandée, pas la quantité :
+   ajouter des œufs allongeait la partie sans la rendre plus difficile.
+     1. recherche libre  — aucune stratégie, bon niveau d'entrée
+     2. mémoire          — les dindes sont montrées puis cachées
+     3. chaud ou froid   — un œuf vide indique si une dinde est à côté
+   Dans tous les cas : aucun échec, on peut retaper autant qu'on veut.
    ══════════════════════════════════════════════════════════ */
-const EGG_COUNT = 6;
+const CACHE_NIVEAUX = [
+  { oeufs: 6,  min: 2, max: 4, colonnes: 3, hauteur: '19vh', mode: 'libre' },
+  { oeufs: 9,  min: 3, max: 5, colonnes: 3, hauteur: '15vh', mode: 'memoire' },
+  /* peu de dindes : avec 4 ou plus, presque toute case vide est voisine
+     d'une dinde et l'indice 🔥 ne distingue plus rien */
+  { oeufs: 12, min: 2, max: 3, colonnes: 4, hauteur: '13vh', mode: 'chaud' }
+];
 const eggGrid = document.getElementById('eggGrid');
-let plan = [], trouvees = 0, aTrouver = 0;
+let plan = [], trouvees = 0, aTrouver = 0, cacheBloque = false;
 
 function majScore() {
   document.getElementById('cacheScore').textContent = '🦃 ' + trouvees + ' / ' + aTrouver;
 }
 
+/* une dinde occupe-t-elle une des quatre cases voisines ? */
+function dindeACote(i) {
+  const cfg = CACHE_NIVEAUX[niveau('cache')];
+  const cols = cfg.colonnes, lignes = Math.ceil(cfg.oeufs / cols);
+  const r = Math.floor(i / cols), c = i % cols;
+  const voisins = [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]];
+  return voisins.some(function (v) {
+    if (v[0] < 0 || v[0] >= lignes || v[1] < 0 || v[1] >= cols) return false;
+    const j = v[0] * cols + v[1];
+    return j < cfg.oeufs && plan[j];
+  });
+}
+
+/* niveau 2 : on montre les cachettes, puis on referme tout */
+function revelerPuisCacher() {
+  cacheBloque = true;
+  const cases = eggGrid.children;
+  for (let i = 0; i < cases.length; i++) {
+    if (plan[i]) { cases[i].textContent = '🦃'; replay(cases[i], 'pop'); }
+  }
+  document.getElementById('cacheConsigne').textContent = 'Regarde bien où elles se cachent…';
+  glou(1.3);
+  dire('Regarde bien !', 200);
+
+  setTimeout(function () {
+    if (niveau('cache') !== 1) { cacheBloque = false; return; }
+    for (let i = 0; i < cases.length; i++) cases[i].textContent = '🥚';
+    document.getElementById('cacheConsigne').textContent = 'Retrouve-les !';
+    dire('Retrouve-les !', 150);
+    glou(0.9);
+    cacheBloque = false;
+  }, 3000);
+}
+
 function resetEggs() {
-  aTrouver = 2 + Math.floor(Math.random() * 3);   /* 2, 3 ou 4 dindes */
+  const cfg = CACHE_NIVEAUX[niveau('cache')];
+  aTrouver = cfg.min + Math.floor(Math.random() * (cfg.max - cfg.min + 1));
   trouvees = 0;
-  plan = new Array(EGG_COUNT).fill(false);
+  cacheBloque = false;
+  plan = new Array(cfg.oeufs).fill(false);
   let pose = 0;
   while (pose < aTrouver) {
-    const i = Math.floor(Math.random() * EGG_COUNT);
+    const i = Math.floor(Math.random() * cfg.oeufs);
     if (!plan[i]) { plan[i] = true; pose++; }
   }
   document.getElementById('cacheWin').classList.add('hidden');
   majScore();
 
+  eggGrid.style.gridTemplateColumns = 'repeat(' + cfg.colonnes + ', minmax(0, 1fr))';
   eggGrid.innerHTML = '';
-  for (let i = 0; i < EGG_COUNT; i++) {
+  for (let i = 0; i < cfg.oeufs; i++) {
     const b = document.createElement('button');
-    b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-[2rem] shadow-xl text-5xl sm:text-8xl flex items-center justify-center';
-    b.style.minHeight = '22vh';
+    b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-[2rem] shadow-xl text-4xl sm:text-7xl flex items-center justify-center';
+    b.style.minHeight = cfg.hauteur;
     b.textContent = '🥚';
     b.dataset.i = i;
     b.dataset.ouvert = '0';
@@ -585,15 +847,27 @@ function resetEggs() {
     b.onclick = function () { ouvrirOeuf(b); };
     eggGrid.appendChild(b);
   }
+
+  const c = document.getElementById('cacheConsigne');
+  if (cfg.mode === 'memoire') {
+    revelerPuisCacher();
+  } else if (cfg.mode === 'chaud') {
+    c.innerHTML = '🔥 = une dinde est <b>juste à côté</b> &nbsp;•&nbsp; ❄️ = elle est loin';
+  } else {
+    c.textContent = 'Trouve les dindes cachées !';
+  }
 }
 
 function ouvrirOeuf(b) {
+  if (cacheBloque) return;                      /* pendant la phase « regarde bien » */
   const i = Number(b.dataset.i);
   const dejaOuvert = b.dataset.ouvert === '1';
+  const cfg = CACHE_NIVEAUX[niveau('cache')];
 
   if (plan[i]) {
     /* une dinde ! son clair, plumes, et ça compte */
     b.textContent = '🦃';
+    b.style.opacity = '1';
     replay(b, 'pop');
     glou(1.05 + Math.random() * 0.35);
     feathers(8);
@@ -603,15 +877,30 @@ function ouvrirOeuf(b) {
       majScore();
       if (trouvees === aTrouver) victoire();
     }
-  } else {
-    /* œuf vide : "pfff" bien gras, et on peut retaper autant qu'on veut */
-    b.textContent = '💨';
-    b.style.opacity = '0.55';
-    b.dataset.ouvert = '1';
-    replay(b, 'shake');
-    glou(0.42);
-    noise({ dur: 0.45, lp: 700, peak: 0.18, delay: 0.05 });
+    return;
   }
+
+  /* œuf vide : on peut retaper autant qu'on veut, ça ne coûte rien */
+  b.dataset.ouvert = '1';
+  b.style.opacity = '0.65';
+  replay(b, 'shake');
+
+  if (cfg.mode === 'chaud') {
+    /* l'indice transforme la recherche au hasard en déduction */
+    if (dindeACote(i)) {
+      b.textContent = '🔥';
+      glou(1.25);
+    } else {
+      b.textContent = '❄️';
+      glou(0.42);
+      noise({ dur: 0.4, lp: 700, peak: 0.15, delay: 0.05 });
+    }
+    return;
+  }
+
+  b.textContent = '💨';
+  glou(0.42);
+  noise({ dur: 0.45, lp: 700, peak: 0.18, delay: 0.05 });
 }
 
 function victoire() {
@@ -624,31 +913,64 @@ function victoire() {
   dire('Bravo ! Tu as trouvé ' + aTrouver + ' dindes !', 1000);
 }
 
+poserNiveaux('cacheNiveaux', 'cache',
+  ['1. Découvrir', '2. Mémoire', '3. Chaud ou froid'], resetEggs);
+
 /* ══════════════════════════════════════════════════════════
    4. COMPTE LES DINDES
    Le nombre est donné en chiffre, en mot et en quantité :
    trois façons de lire la même information.
+   Niveau 1 : on ajoute et on retire librement (le décomptage est
+   un objectif à part entière, d'où le bouton ➖).
+   Niveau 2 : « Combien ? » — on montre des dindes, l'enfant touche
+   le bon nombre. C'est du dénombrement réel, pas une démonstration.
+   Niveau 3 : « Donne-moi N » — l'enfant construit la quantité.
    ══════════════════════════════════════════════════════════ */
 const MOTS = ['zéro', 'une', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit',
               'neuf', 'dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize',
               'dix-sept', 'dix-huit', 'dix-neuf', 'vingt'];
 const MAX_COUNT = 20;
+/* accord en nombre : « une dinde » mais « deux dindes » */
+function motDinde(n) { return n > 1 ? 'dindes' : 'dinde'; }
+
 let count = 0;
+let compteCible = 0;
 
 function renderCount() {
   document.getElementById('countNum').textContent = count;
   document.getElementById('countWord').textContent = MOTS[count];
 }
 
+function dessinerDindes(n) {
+  const z = document.getElementById('countZone');
+  z.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('span');
+    s.className = 'text-4xl sm:text-6xl pop';
+    s.textContent = '🦃';
+    z.appendChild(s);
+  }
+}
+
 function addTurkey() {
   if (count >= MAX_COUNT) { glou(1.7); return; }
   count++;
   const s = document.createElement('span');
-  s.className = 'text-5xl sm:text-7xl pop';
+  s.className = 'text-4xl sm:text-6xl pop';
   s.textContent = '🦃';
   document.getElementById('countZone').appendChild(s);
   glou(0.7 + count * 0.045);   /* la note monte : on entend la quantité grandir */
-  dire(MOTS[count], 260);
+  if (niveau('compte') !== 2) dire(MOTS[count], 260);
+  renderCount();
+}
+
+function retirerDinde() {
+  if (count <= 0) { glou(0.4); return; }
+  count--;
+  const z = document.getElementById('countZone');
+  if (z.lastChild) z.removeChild(z.lastChild);
+  glou(0.7 + count * 0.045);
+  if (niveau('compte') !== 2) dire(MOTS[count], 260);
   renderCount();
 }
 
@@ -659,13 +981,117 @@ function resetCount() {
   glou(0.6);
 }
 
+/* ─── niveau 2 : Combien ? ─── */
+function questionCombien() {
+  compteCible = 1 + Math.floor(Math.random() * 9);      /* de 1 à 9 */
+  count = compteCible;
+  dessinerDindes(compteCible);
+  document.getElementById('countNum').textContent = '?';
+  document.getElementById('countWord').textContent = '';
+  document.getElementById('compteConsigne').textContent = 'Combien y a-t-il de dindes ?';
+
+  /* trois propositions : la bonne et deux voisines plausibles */
+  const choix = [compteCible];
+  while (choix.length < 3) {
+    const c = Math.max(1, Math.min(MAX_COUNT, compteCible + (Math.floor(Math.random() * 5) - 2)));
+    if (choix.indexOf(c) < 0) choix.push(c);
+  }
+  choix.sort(function () { return Math.random() - 0.5; });
+
+  const z = document.getElementById('compteChoix');
+  z.innerHTML = '';
+  choix.forEach(function (c) {
+    const b = document.createElement('button');
+    b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl shadow-xl font-bold text-4xl sm:text-6xl py-4 text-amber-100';
+    b.textContent = c;
+    b.setAttribute('aria-label', MOTS[c]);
+    b.onclick = function () {
+      if (c === compteCible) {
+        document.getElementById('countNum').textContent = c;
+        document.getElementById('countWord').textContent = MOTS[c];
+        document.getElementById('compteConsigne').textContent = 'BRAVO ! ' + MOTS[c] + ' ' + motDinde(c) + ' !';
+        dire('Bravo ! ' + MOTS[c], 250);
+        bravo(2000, questionCombien);
+      } else {
+        raté(b);
+      }
+    };
+    z.appendChild(b);
+  });
+}
+
+/* ─── niveau 3 : Donne-moi N ─── */
+function questionDonneMoi() {
+  compteCible = 1 + Math.floor(Math.random() * 9);
+  count = 0;
+  document.getElementById('countZone').innerHTML = '';
+  renderCount();
+  document.getElementById('compteConsigne').textContent =
+    'Donne-moi ' + compteCible + ' ' + motDinde(compteCible) + ' ! (' + MOTS[compteCible] + ')';
+  dire('Donne-moi ' + MOTS[compteCible] + ' ' + motDinde(compteCible), 300);
+}
+
+/* La validation est explicite : l'enfant doit DÉCIDER qu'il a fini.
+   Se tromper ne coûte rien — on lui rappelle simplement où il en est. */
+function validerDonneMoi() {
+  if (niveau('compte') !== 2) return;
+  if (count === compteCible) {
+    document.getElementById('compteConsigne').textContent =
+      'BRAVO ! ' + MOTS[compteCible] + ' ' + motDinde(compteCible) + ' !';
+    dire('Bravo !', 300);
+    bravo(2300, questionDonneMoi);
+  } else {
+    document.getElementById('compteConsigne').textContent =
+      'Tu en as ' + MOTS[count] + '… il en faut ' + MOTS[compteCible] + ' !';
+    raté(document.getElementById('compteValider'));
+    dire('Tu en as ' + MOTS[count], 300);
+  }
+}
+
+function resetCompte() {
+  const n = niveau('compte');
+  const choix = document.getElementById('compteChoix');
+  const boutons = document.getElementById('compteBoutons');
+  choix.classList.toggle('hidden', n !== 1);
+  choix.classList.toggle('grid', n === 1);
+  boutons.classList.toggle('hidden', n === 1);
+  document.getElementById('compteValider').classList.toggle('hidden', n !== 2);
+  /* le chiffre est masqué tant que l'enfant construit sa quantité :
+     c'est à lui de compter ses dindes, pas à l'app de le faire */
+  document.getElementById('compteAffichage').classList.toggle('invisible', n === 2);
+
+  count = 0;
+  document.getElementById('countZone').innerHTML = '';
+  renderCount();
+
+  if (n === 0) {
+    document.getElementById('compteConsigne').textContent = 'Ajoute et enlève des dindes 🦃';
+  } else if (n === 1) {
+    questionCombien();
+  } else {
+    questionDonneMoi();
+  }
+}
+
 renderCount();
+poserNiveaux('compteNiveaux', 'compte',
+  ['1. Compter', '2. Combien ?', '3. Donne-moi'], resetCompte);
 
 /* ══════════════════════════════════════════════════════════
-   5. LA FERME DE ROULLIEEE
-   Chaque cri est fabriqué par synthèse : ce sont des versions
-   "dessin animé", volontairement rigolotes.
+   5. LA FERME DE ROULLIEEE — cris d'animaux
+   Niveau 1 : on touche, on entend (phase d'apprentissage).
+   Niveau 2 : l'app joue un cri, l'enfant cherche l'animal. C'est
+   le vrai exercice de discrimination auditive.
    ══════════════════════════════════════════════════════════ */
+/* deux cris synthetises reutilises comme secours */
+function aboyer(d) {
+  osc({ type: 'square', from: 300, to: 140, dur: 0.15, delay: d, cutoff: 1300, peak: 0.3 });
+  noise({ dur: 0.12, delay: d, lp: 1600, peak: 0.18 });
+}
+function coincoin(d) {
+  osc({ type: 'sawtooth', from: 350, to: 250, dur: 0.17, delay: d, cutoff: 2000, peak: 0.26 });
+}
+
 /* son : nom de l'échantillon dans sons/ — secours : version synthétisée */
 const ANIMAUX = [
   { e: '🦃', nom: 'la dinde',      son: null,         secours: function () { glou(1); } },
@@ -684,34 +1110,73 @@ function crier(a) {
   a.secours();
 }
 
-function aboyer(d) {
-  osc({ type: 'square', from: 300, to: 140, dur: 0.15, delay: d, cutoff: 1300, peak: 0.3 });
-  noise({ dur: 0.12, delay: d, lp: 1600, peak: 0.18 });
+/* durée réelle du cri, pour ne parler qu'une fois le son fini */
+function dureeCri(a) {
+  const src = a.son && banque[a.son] && banque[a.son].ok ? banque[a.son].pool[0] : null;
+  return src && src.duration ? src.duration * 1000 + 250 : 1200;
 }
-function coincoin(d) {
-  osc({ type: 'sawtooth', from: 350, to: 250, dur: 0.17, delay: d, cutoff: 2000, peak: 0.26 });
+
+let fermeCible = null;
+
+function rejouerCri() {
+  if (fermeCible) crier(fermeCible);
+}
+
+function nouvelleCibleFerme() {
+  fermeCible = tirageSansRepetition(ANIMAUX, fermeCible);
+  document.getElementById('fermeNom').textContent = 'Quel animal fait ce bruit ?';
+  setTimeout(function () { crier(fermeCible); }, 450);
+}
+
+function resetFerme() {
+  const n = niveau('ferme');
+  document.getElementById('fermeRejouer').classList.toggle('hidden', n === 0);
+  if (n === 0) {
+    fermeCible = null;
+    document.getElementById('fermeNom').textContent = 'Appuie sur un animal 👇';
+  } else {
+    nouvelleCibleFerme();
+  }
+}
+
+function toucherAnimal(a, b) {
+  if (niveau('ferme') === 0) {
+    /* découverte : on entend le cri, puis le nom */
+    crier(a);
+    replay(b, 'wiggle');
+    document.getElementById('fermeNom').textContent = a.nom;
+    dire(a.nom, dureeCri(a));
+    return;
+  }
+  /* écoute : il faut retrouver l'animal entendu */
+  if (a === fermeCible) {
+    replay(b, 'pop');
+    document.getElementById('fermeNom').textContent = 'BRAVO ! C’est ' + a.nom + ' !';
+    dire('Bravo ! ' + a.nom, 200);
+    bravo(1800, nouvelleCibleFerme);
+  } else {
+    raté(b);
+    setTimeout(rejouerCri, 350);
+  }
 }
 
 ANIMAUX.forEach(function (a) {
   const b = document.createElement('button');
   b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-[2rem] shadow-xl text-5xl sm:text-7xl flex items-center justify-center';
-  b.style.minHeight = '20vh';
+  b.style.minHeight = '18vh';
   b.textContent = a.e;
   b.setAttribute('aria-label', a.nom);
-  b.onclick = function () {
-    crier(a);
-    replay(b, 'wiggle');
-    document.getElementById('fermeNom').textContent = a.nom;
-    /* le cri d'abord, le mot ensuite : on attend la vraie durée du son */
-    const src = a.son && banque[a.son] && banque[a.son].ok ? banque[a.son].pool[0] : null;
-    const attente = src && src.duration ? src.duration * 1000 + 250 : 1200;
-    dire(a.nom, attente);
-  };
+  b.onclick = function () { toucherAnimal(a, b); };
   document.getElementById('fermeGrid').appendChild(b);
 });
 
+poserNiveaux('fermeNiveaux', 'ferme', ['1. Découvrir', '2. Écouter'], resetFerme);
+
 /* ══════════════════════════════════════════════════════════
    6. LES COULEURS — les plumes du picto SVG changent de couleur
+   Niveau 1 : exploration libre.
+   Niveau 2 : l'app demande une couleur, l'enfant la trouve.
+   Niveau 3 : la couleur est montrée puis cachée, il faut s'en souvenir.
    ══════════════════════════════════════════════════════════ */
 const COULEURS = [
   { nom: 'rouge',  hex: '#dc2626' },
@@ -723,6 +1188,7 @@ const COULEURS = [
   { nom: 'rose',   hex: '#ec4899' },
   { nom: 'blanc',  hex: '#f1f5f9' }
 ];
+const PLUME_NUE = '#8f5a2a';
 
 /* éventail de plumes : 7 ellipses pivotées autour du corps */
 const fan = document.getElementById('tailFan');
@@ -734,7 +1200,7 @@ for (let a = -66; a <= 66; a += 22) {
   el.setAttribute('rx', '15');
   el.setAttribute('ry', '44');
   el.setAttribute('transform', 'rotate(' + a + ' 110 145)');
-  el.setAttribute('fill', '#8f5a2a');
+  el.setAttribute('fill', PLUME_NUE);
   el.setAttribute('stroke', '#4a2c0b');
   el.setAttribute('stroke-width', '3');
   el.style.transition = 'fill .25s ease';
@@ -742,27 +1208,91 @@ for (let a = -66; a <= 66; a += 22) {
   plumes.push(el);
 }
 
+function peindrePlumes(hex, cascade) {
+  plumes.forEach(function (p, i) {
+    setTimeout(function () { p.setAttribute('fill', hex); }, cascade ? i * 45 : 0);
+  });
+}
+
+let couleurCible = null;
+
+function demanderCouleur() {
+  couleurCible = tirageSansRepetition(COULEURS, couleurCible);
+  peindrePlumes(PLUME_NUE, false);
+  document.getElementById('couleurNom').innerHTML =
+    'Mets du <span style="color:' + couleurCible.hex + '">' + couleurCible.nom.toUpperCase() + '</span> !';
+  dire('Mets du ' + couleurCible.nom, 300);
+}
+
+function memoriserCouleur() {
+  couleurCible = tirageSansRepetition(COULEURS, couleurCible);
+  peindrePlumes(couleurCible.hex, true);
+  document.getElementById('couleurNom').textContent = 'Regarde bien…';
+  glou(1.2);
+  /* on montre 2 s, puis on cache : c'est là que la mémoire travaille */
+  setTimeout(function () {
+    if (niveau('couleurs') !== 2) return;
+    peindrePlumes(PLUME_NUE, false);
+    document.getElementById('couleurNom').textContent = 'C’était quelle couleur ?';
+    dire('C’était quelle couleur ?', 200);
+  }, 2000);
+}
+
+function resetCouleurs() {
+  const n = niveau('couleurs');
+  couleurCible = null;
+  peindrePlumes(PLUME_NUE, false);
+  if (n === 0) {
+    document.getElementById('couleurNom').textContent = 'Choisis une couleur';
+  } else if (n === 1) {
+    demanderCouleur();
+  } else {
+    memoriserCouleur();
+  }
+}
+
+function toucherCouleur(c, b) {
+  const n = niveau('couleurs');
+
+  if (n === 0) {
+    peindrePlumes(c.hex, true);
+    document.getElementById('couleurNom').textContent = c.nom;
+    glou(0.8 + Math.random() * 0.6);
+    dire(c.nom, 500);
+    return;
+  }
+
+  if (c === couleurCible) {
+    peindrePlumes(c.hex, true);
+    document.getElementById('couleurNom').textContent = 'BRAVO ! ' + c.nom;
+    dire('Bravo ! ' + c.nom, 250);
+    /* au niveau Mémoire on laisse 2 s de plus : l'enfant doit avoir le
+       temps de souffler avant que la couleur suivante ne s'affiche */
+    bravo(n === 1 ? 1900 : 3900, n === 1 ? demanderCouleur : memoriserCouleur);
+  } else {
+    raté(b);
+  }
+}
+
 COULEURS.forEach(function (c) {
   const b = document.createElement('button');
   b.className = 'tap rounded-2xl border-4 border-amber-200 shadow-xl';
   b.style.background = c.hex;
-  b.style.minHeight = '11vh';
+  b.style.minHeight = '10vh';
   b.setAttribute('aria-label', c.nom);
-  b.onclick = function () {
-    plumes.forEach(function (p, i) {
-      setTimeout(function () { p.setAttribute('fill', c.hex); }, i * 45);
-    });
-    document.getElementById('couleurNom').textContent = c.nom;
-    glou(0.8 + Math.random() * 0.6);
-    dire(c.nom, 500);
-  };
+  b.onclick = function () { toucherCouleur(c, b); };
   document.getElementById('couleurGrid').appendChild(b);
 });
 
+poserNiveaux('couleursNiveaux', 'couleurs',
+  ['1. Découvrir', '2. Consigne', '3. Mémoire'], resetCouleurs);
+
 /* ══════════════════════════════════════════════════════════
    7. JE LIS AVEC ROULLIEEE
-   Image + mot en capitales + mot en minuscules + mot entendu.
-   Quatre entrées pour la même information.
+   Niveau 1 : image → mot écrit et prononcé (exposition à l'écrit).
+   Niveau 2 : mot écrit → l'enfant trouve l'image. C'est de la
+   lecture véritable, pas seulement de l'exposition.
+   Niveau 3 : une lettre → trouver un mot qui commence par elle.
    ══════════════════════════════════════════════════════════ */
 const IMAGIER = [
   { e: '🦃', mot: 'DINDE',  lu: 'dinde' },
@@ -775,42 +1305,106 @@ const IMAGIER = [
   { e: '🌙', mot: 'LUNE',   lu: 'lune' }
 ];
 
+let lireCible = null;
+
+function motColore(mot) {
+  return '<span class="text-orange-400">' + mot.charAt(0) + '</span>' + mot.slice(1);
+}
+
+function afficheLire(emoji, motHtml, minuscule) {
+  const z = document.getElementById('lireEmoji');
+  z.textContent = emoji;
+  replay(z, 'pop');
+  document.getElementById('lireMot').innerHTML = motHtml;
+  document.getElementById('lireMin').textContent = minuscule || '';
+}
+
+function demanderImage() {
+  lireCible = tirageSansRepetition(IMAGIER, lireCible);
+  afficheLire('👇', motColore(lireCible.mot), lireCible.mot.toLowerCase());
+  dire('Trouve : ' + lireCible.lu, 300);
+}
+
+function demanderLettre() {
+  lireCible = tirageSansRepetition(IMAGIER, lireCible);
+  const L = lireCible.mot.charAt(0);
+  afficheLire('👇', '<span class="text-orange-400">' + L + '</span>', L.toLowerCase());
+  dire('Quel mot commence par ' + L + ' ?', 300);
+}
+
+function resetLire() {
+  const n = niveau('lire');
+  lireCible = null;
+  if (n === 0) {
+    afficheLire('👇', '?', '');
+  } else if (n === 1) {
+    demanderImage();
+  } else {
+    demanderLettre();
+  }
+}
+
+function toucherImage(m, b) {
+  const n = niveau('lire');
+
+  if (n === 0) {
+    afficheLire(m.e, motColore(m.mot), m.mot.toLowerCase());
+    glou(1.2);
+    dire(m.lu, 450);
+    return;
+  }
+
+  /* au niveau 3 plusieurs mots peuvent partager la même initiale :
+     on accepte toute réponse dont la première lettre correspond */
+  const juste = n === 1 ? (m === lireCible)
+                        : (m.mot.charAt(0) === lireCible.mot.charAt(0));
+
+  if (juste) {
+    afficheLire(m.e, motColore(m.mot), m.mot.toLowerCase());
+    dire('Bravo ! ' + m.lu, 250);
+    bravo(2000, n === 1 ? demanderImage : demanderLettre);
+  } else {
+    raté(b);
+  }
+}
+
 IMAGIER.forEach(function (m) {
   const b = document.createElement('button');
   b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl shadow-xl text-4xl sm:text-6xl py-3 sm:py-5';
   b.textContent = m.e;
   b.setAttribute('aria-label', m.lu);
-  b.onclick = function () {
-    const zone = document.getElementById('lireEmoji');
-    zone.textContent = m.e;
-    replay(zone, 'pop');
-    /* première lettre mise en couleur : repère d'attaque du mot */
-    document.getElementById('lireMot').innerHTML =
-      '<span class="text-orange-400">' + m.mot.charAt(0) + '</span>' + m.mot.slice(1);
-    document.getElementById('lireMin').textContent = m.mot.toLowerCase();
-    glou(1.2);
-    dire(m.lu, 450);
-  };
+  b.onclick = function () { toucherImage(m, b); };
   document.getElementById('lireGrid').appendChild(b);
 });
 
+poserNiveaux('lireNiveaux', 'lire',
+  ['1. Découvrir', '2. Trouve l’image', '3. Première lettre'], resetLire);
+
 /* ══════════════════════════════════════════════════════════
    8. RANGE LES DINDES — sériation
-   On demande toujours la plus petite restante : l'enfant compare
-   visuellement au lieu de compter. Toucher la mauvaise dinde ne
-   coûte rien, elle rebondit simplement.
+   On demande toujours la plus petite (ou la plus grande) restante :
+   l'enfant compare visuellement au lieu de compter. Toucher la
+   mauvaise dinde ne coûte rien, elle rebondit simplement.
+   Trois niveaux : 3, 5 puis 7 dindes à ordonner.
    ══════════════════════════════════════════════════════════ */
-/* Tailles en unités d'écran : les cinq dindes doivent tenir sur UNE seule
-   ligne, sinon la comparaison de taille perd tout son sens. Le plafond en
-   rem évite qu'elles deviennent énormes sur une TV. */
-const RANGER_TAILLES = [
-  { rang: 1, css: 'min(7vw, 3rem)' },
-  { rang: 2, css: 'min(10vw, 4.2rem)' },
-  { rang: 3, css: 'min(13.5vw, 5.6rem)' },
-  { rang: 4, css: 'min(17vw, 7rem)' },
-  { rang: 5, css: 'min(21vw, 8.6rem)' }
+/* Tailles en unités d'écran : les dindes doivent tenir sur UNE seule
+   ligne, sinon la comparaison de taille perd tout son sens. Le plafond
+   en rem évite qu'elles deviennent énormes sur une TV. Sept tailles au
+   maximum, on en prend un sous-ensemble selon le niveau. */
+/* Un emoji se dessine environ 16 % plus large que sa taille de police :
+   les sept dindes réunies doivent donc rester bien en deçà de 100vw,
+   sinon la ligne déborde et la comparaison de tailles est cassée. */
+const RANGER_TOUTES = [
+  { rang: 1, css: 'min(4.5vw, 2rem)' },
+  { rang: 2, css: 'min(6vw, 2.7rem)' },
+  { rang: 3, css: 'min(7.5vw, 3.3rem)' },
+  { rang: 4, css: 'min(9vw, 4rem)' },
+  { rang: 5, css: 'min(10.5vw, 4.7rem)' },
+  { rang: 6, css: 'min(12vw, 5.3rem)' },
+  { rang: 7, css: 'min(13.5vw, 6rem)' }
 ];
-let rangerRestant = [];
+const RANGER_NIVEAUX = [3, 5, 7];
+let rangerTailles = [], rangerRestant = [];
 /* 'petite' ou 'grande' : volontairement hors de resetRanger, pour que le
    choix de la maîtresse survive à chaque Recommencer */
 let rangerSens = 'petite';
@@ -821,7 +1415,7 @@ function setSensRanger(sens) {
 }
 
 function majBoutonsRanger() {
-  const base = 'tap px-3 sm:px-6 py-3 rounded-2xl font-bold text-sm sm:text-lg border-4 ';
+  const base = 'tap px-3 sm:px-6 py-2 rounded-2xl font-bold text-xs sm:text-lg border-4 ';
   const actif = 'bg-orange-500 text-white border-amber-300';
   const veille = 'bg-[#5c3a1f] text-amber-300 border-orange-800';
   document.getElementById('rangerBtnPetite').className = base + (rangerSens === 'petite' ? actif : veille);
@@ -829,7 +1423,15 @@ function majBoutonsRanger() {
 }
 
 function resetRanger() {
-  rangerRestant = RANGER_TAILLES.map(function (t) { return t.rang; });
+  const combien = RANGER_NIVEAUX[niveau('ranger')];
+  /* on prend les plus grandes tailles disponibles, réparties sur l'échelle */
+  const pas = (RANGER_TOUTES.length - 1) / (combien - 1);
+  rangerTailles = [];
+  for (let k = 0; k < combien; k++) {
+    rangerTailles.push(RANGER_TOUTES[Math.round(k * pas)]);
+  }
+  rangerRestant = rangerTailles.map(function (t) { return t.rang; });
+
   document.getElementById('rangerLigne').innerHTML = '';
   document.getElementById('rangerConsigne').innerHTML = rangerSens === 'petite'
     ? 'Touche la plus <span class="text-orange-400">PETITE</span> dinde'
@@ -838,14 +1440,14 @@ function resetRanger() {
 
   const pool = document.getElementById('rangerPool');
   pool.innerHTML = '';
-  const melange = RANGER_TAILLES.slice().sort(function () { return Math.random() - 0.5; });
+  const melange = rangerTailles.slice().sort(function () { return Math.random() - 0.5; });
   melange.forEach(function (t) {
     const b = document.createElement('button');
     b.className = 'tap leading-none';
     b.style.fontSize = t.css;
     b.textContent = '🦃';
     b.dataset.rang = t.rang;
-    b.setAttribute('aria-label', 'Dinde numéro ' + t.rang + ' sur 5');
+    b.setAttribute('aria-label', 'Dinde de taille ' + t.rang);
     b.onclick = function () { choisirDinde(b); };
     pool.appendChild(b);
   });
@@ -858,9 +1460,7 @@ function choisirDinde(b) {
     : Math.max.apply(null, rangerRestant);
 
   if (rang !== attendu) {
-    /* mauvaise dinde : rebond doux, aucune pénalité */
-    replay(b, 'shake');
-    glou(0.5);
+    raté(b);
     return;
   }
 
@@ -875,7 +1475,7 @@ function choisirDinde(b) {
 
   /* la note suit la TAILLE, pas l'ordre de jeu : elle monte en mode
      "plus petite", elle descend en mode "plus grande" */
-  glou(0.75 + (rang - 1) * 0.18);
+  glou(0.7 + (rang - 1) * 0.14);
   feathers(5);
 
   if (rangerRestant.length) {
@@ -889,30 +1489,41 @@ function choisirDinde(b) {
   }
 }
 
+poserNiveaux('rangerNiveaux', 'ranger',
+  ['1. 3 dindes', '2. 5 dindes', '3. 7 dindes'], resetRanger);
+
 /* ══════════════════════════════════════════════════════════
    9. LE MEMORY DES DINDES — mémoire visuelle
-   Quatre paires seulement, et aucun chronomètre : on peut regarder
-   aussi longtemps qu'on veut avant que les cartes se retournent.
+   Aucun chronomètre : on peut regarder aussi longtemps qu'on veut
+   avant que les cartes se retournent.
+   Trois niveaux : 3, 4 puis 6 paires.
    ══════════════════════════════════════════════════════════ */
 const MEMORY_FACES = ['🦃', '🥚', '🪶', '🌽', '🍎', '🌙', '🐄', '🌻'];
-const MEMORY_PAIRES = 4;
-let memoryOuvertes = [], memoryTrouvees = 0, memoryBloque = false;
+const MEMORY_NIVEAUX = [
+  { paires: 3, colonnes: 2, hauteur: '16vh' },
+  { paires: 4, colonnes: 2, hauteur: '15vh' },
+  { paires: 6, colonnes: 3, hauteur: '13vh' }
+];
+let memoryOuvertes = [], memoryTrouvees = 0, memoryBloque = false, memoryTotal = 4;
 
 function resetMemory() {
+  const cfg = MEMORY_NIVEAUX[niveau('memory')];
+  memoryTotal = cfg.paires;
   memoryOuvertes = [];
   memoryTrouvees = 0;
   memoryBloque = false;
 
   const auHasard = function () { return Math.random() - 0.5; };
-  const faces = MEMORY_FACES.slice().sort(auHasard).slice(0, MEMORY_PAIRES);
+  const faces = MEMORY_FACES.slice().sort(auHasard).slice(0, cfg.paires);
   const cartes = faces.concat(faces).sort(auHasard);
 
   const g = document.getElementById('memoryGrid');
+  g.style.gridTemplateColumns = 'repeat(' + cfg.colonnes + ', minmax(0, 1fr))';
   g.innerHTML = '';
   cartes.forEach(function (f, i) {
     const b = document.createElement('button');
-    b.className = 'tap title-font bg-orange-600 border-4 border-amber-300 rounded-[1.5rem] shadow-xl text-5xl sm:text-7xl flex items-center justify-center';
-    b.style.minHeight = '16vh';
+    b.className = 'tap title-font bg-orange-600 border-4 border-amber-300 rounded-[1.5rem] shadow-xl text-4xl sm:text-7xl flex items-center justify-center';
+    b.style.minHeight = cfg.hauteur;
     b.textContent = '?';
     b.dataset.face = f;
     b.dataset.etat = 'fermee';
@@ -925,7 +1536,7 @@ function resetMemory() {
 
 function majMemory() {
   document.getElementById('memoryScore').textContent =
-    'Paires trouvées : ' + memoryTrouvees + ' / ' + MEMORY_PAIRES;
+    'Paires trouvées : ' + memoryTrouvees + ' / ' + memoryTotal;
 }
 
 function faceVisible(b) {
@@ -965,7 +1576,7 @@ function retourner(b) {
     glou(1.5);
     feathers(6);
 
-    if (memoryTrouvees === MEMORY_PAIRES) {
+    if (memoryTrouvees === memoryTotal) {
       pleuvoir(40, ['🦃', '🪶', '⭐', '🎉']);
       for (let k = 0; k < 5; k++) {
         setTimeout(function () { glou(0.9 + k * 0.2); }, k * 170);
@@ -984,6 +1595,9 @@ function retourner(b) {
     memoryBloque = false;
   }, 1400);
 }
+
+poserNiveaux('memoryNiveaux', 'memory',
+  ['1. 3 paires', '2. 4 paires', '3. 6 paires'], resetMemory);
 
 /* ══════════════════════════════════════════════════════════
    10. LE CHEMIN DE ROULLIEEE — repérage spatial
@@ -1271,6 +1885,411 @@ function bouger(dx, dy) {
 
   glou(1.1);
 }
+/* ══════════════════════════════════════════════════════════
+   11. DEDANS OU DEHORS ? — notions spatiales
+   Deux objets de référence SÉPARÉS, sans quoi les notions se
+   chevauchent : posée sur une boîte, une dinde est « dessus »…
+   mais aussi « dehors ». Ici dedans/dehors se jugent par rapport à
+   une boîte, dessus/dessous par rapport à une table. Chaque question
+   n'a donc qu'une seule bonne réponse.
+   L'enfant ne touche pas un mot mais l'IMAGE qui correspond : c'est
+   la situation spatiale qu'il doit lire, pas une étiquette.
+   ══════════════════════════════════════════════════════════ */
+const SCENES = {
+  dedans:  { objet: 'boite', x: 38, y: 52, mot: 'DEDANS',  lu: 'dedans' },
+  dehors:  { objet: 'boite', x: 85, y: 52, mot: 'DEHORS',  lu: 'dehors' },
+  dessus:  { objet: 'table', x: 50, y: 30, mot: 'DESSUS',  lu: 'dessus' },
+  dessous: { objet: 'table', x: 50, y: 71, mot: 'DESSOUS', lu: 'dessous' }
+};
+const ESPACE_NIVEAUX = [
+  { cles: ['dedans', 'dehors', 'dessus', 'dessous'], libre: true },
+  { cles: ['dedans', 'dehors'],                      libre: false },
+  { cles: ['dessus', 'dessous'],                     libre: false },
+  { cles: ['dedans', 'dehors', 'dessus', 'dessous'], libre: false }
+];
+let espaceCible = null;
+
+/* dessine une mini-scène : l'objet de référence, puis la dinde placée */
+function dessinerScene(hote, cle) {
+  const s = SCENES[cle];
+  hote.innerHTML = '';
+
+  if (s.objet === 'boite') {
+    const b = document.createElement('div');
+    b.className = 'absolute rounded-xl border-4 border-amber-400 bg-[#3d2408]';
+    b.style.left = '10%'; b.style.top = '30%';
+    b.style.width = '54%'; b.style.height = '46%';
+    hote.appendChild(b);
+  } else {
+    const plateau = document.createElement('div');
+    plateau.className = 'absolute rounded bg-amber-400';
+    plateau.style.left = '12%'; plateau.style.top = '48%';
+    plateau.style.width = '76%'; plateau.style.height = '7%';
+    hote.appendChild(plateau);
+    [18, 76].forEach(function (lx) {
+      const pied = document.createElement('div');
+      pied.className = 'absolute bg-amber-400';
+      pied.style.left = lx + '%'; pied.style.top = '55%';
+      pied.style.width = '6%'; pied.style.height = '30%';
+      hote.appendChild(pied);
+    });
+  }
+
+  /* le centrage est porté par un conteneur jamais animé : une animation
+     sur le même élément écraserait la propriété transform */
+  const d = document.createElement('div');
+  d.className = 'absolute leading-none';
+  d.style.left = s.x + '%';
+  d.style.top = s.y + '%';
+  d.style.transform = 'translate(-50%, -50%)';
+  d.style.fontSize = 'min(11vw, 3rem)';
+  d.textContent = '🦃';
+  hote.appendChild(d);
+}
+
+function construireCartes() {
+  const cfg = ESPACE_NIVEAUX[niveau('espace')];
+  const g = document.getElementById('espaceGrid');
+  g.innerHTML = '';
+
+  /* l'ordre change à chaque question : sinon l'enfant retient une place
+     au lieu de lire la situation */
+  const ordre = cfg.cles.slice().sort(function () { return Math.random() - 0.5; });
+  ordre.forEach(function (cle) {
+    const b = document.createElement('button');
+    b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-[1.5rem] shadow-xl p-2 flex flex-col items-center';
+    b.dataset.cle = cle;
+    b.setAttribute('aria-label', SCENES[cle].lu);
+
+    const scene = document.createElement('div');
+    scene.className = 'relative w-full';
+    scene.style.height = 'min(26vw, 8rem)';
+    dessinerScene(scene, cle);
+    b.appendChild(scene);
+
+    /* le mot n'est affiché qu'en découverte : sinon la réponse est donnée */
+    if (cfg.libre) {
+      const t = document.createElement('span');
+      t.className = 'font-bold text-sm sm:text-lg text-amber-200 mt-1';
+      t.textContent = SCENES[cle].mot;
+      b.appendChild(t);
+    }
+
+    b.onclick = function () { toucherCarte(cle, b); };
+    g.appendChild(b);
+  });
+}
+
+function demanderPosition() {
+  const cfg = ESPACE_NIVEAUX[niveau('espace')];
+  espaceCible = tirageSansRepetition(cfg.cles, espaceCible);
+  construireCartes();
+  const s = SCENES[espaceCible];
+  document.getElementById('espaceConsigne').innerHTML =
+    'Montre la dinde qui est <span class="text-orange-400">' + s.mot + '</span>';
+  dire('Montre la dinde qui est ' + s.lu, 350);
+}
+
+function resetEspace() {
+  if (ESPACE_NIVEAUX[niveau('espace')].libre) {
+    espaceCible = null;
+    construireCartes();
+    document.getElementById('espaceConsigne').textContent = 'Touche une image pour entendre le mot';
+  } else {
+    demanderPosition();
+  }
+}
+
+function toucherCarte(cle, b) {
+  const s = SCENES[cle];
+
+  if (ESPACE_NIVEAUX[niveau('espace')].libre) {
+    replay(b, 'wiggle');
+    document.getElementById('espaceConsigne').textContent = 'La dinde est ' + s.lu;
+    glou(1.1);
+    dire(s.lu, 300);
+    return;
+  }
+
+  if (cle === espaceCible) {
+    replay(b, 'pop');
+    document.getElementById('espaceConsigne').textContent = 'BRAVO ! ' + s.mot;
+    dire('Bravo ! ' + s.lu, 250);
+    bravo(2400, demanderPosition);
+  } else {
+    raté(b);
+  }
+}
+
+poserNiveaux('espaceNiveaux', 'espace',
+  ['1. Découvrir', '2. Dedans / Dehors', '3. Dessus / Dessous', '4. Les 4 mots'],
+  resetEspace);
+
+/* ══════════════════════════════════════════════════════════
+   12. AVANT OU APRÈS ? — notions temporelles
+   Niveau 1 : une histoire en 3 images, on la parcourt dans l'ordre.
+   Niveau 2 : les 3 images sont mélangées, il faut les remettre en
+   ordre — même geste que Range les Dindes, transposé au temps.
+   Niveau 3 : les jours de la semaine (quel jour vient après… ?).
+   ══════════════════════════════════════════════════════════ */
+const HISTOIRES = [
+  { titre: 'la dinde',   etapes: [{ e: '🥚', l: "l'œuf" }, { e: '🐣', l: 'le poussin' }, { e: '🦃', l: 'la dinde' }] },
+  { titre: "l'arbre",    etapes: [{ e: '🌰', l: 'la graine' }, { e: '🌱', l: 'la pousse' }, { e: '🌳', l: "l'arbre" }] },
+  { titre: 'la journée', etapes: [{ e: '🌅', l: 'le matin' }, { e: '☀️', l: 'le midi' }, { e: '🌙', l: 'la nuit' }] },
+  { titre: 'la pluie',   etapes: [{ e: '☁️', l: 'le nuage' }, { e: '🌧️', l: 'la pluie' }, { e: '🌈', l: "l'arc-en-ciel" }] }
+];
+const JOURS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+const RANGS = ['D’abord', 'Ensuite', 'À la fin'];
+
+let histoire = null, tempsPlaces = [], jourIndex = 0, jourSens = 'après';
+
+function caseFrise(contenu, grande) {
+  const d = document.createElement('div');
+  d.className = 'pop bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl flex items-center justify-center leading-none shrink-0';
+  d.style.width = grande ? 'min(24vw,7rem)' : 'min(20vw,6rem)';
+  d.style.height = d.style.width;
+  d.style.fontSize = grande ? 'min(13vw,3.6rem)' : 'min(11vw,3rem)';
+  d.textContent = contenu;
+  return d;
+}
+
+function dessinerFrise() {
+  const f = document.getElementById('tempsFrise');
+  f.innerHTML = '';
+  tempsPlaces.forEach(function (et, i) {
+    if (i) {
+      const fleche = document.createElement('div');
+      fleche.className = 'text-orange-400 text-2xl sm:text-4xl shrink-0';
+      fleche.textContent = '→';
+      f.appendChild(fleche);
+    }
+    f.appendChild(caseFrise(et.e, false));
+  });
+}
+
+/* ─── niveaux 1 et 2 : une histoire en trois images ─── */
+function nouvelleHistoire() {
+  histoire = tirageSansRepetition(HISTOIRES, histoire);
+  tempsPlaces = [];
+  dessinerFrise();
+  document.getElementById('tempsLegende').textContent = '';
+  document.getElementById('tempsConsigne').textContent = niveau('temps') === 0
+    ? 'Touche les images dans l’ordre'
+    : 'Qu’est-ce qui vient en premier ?';
+
+  const g = document.getElementById('tempsGrid');
+  g.style.gridTemplateColumns = 'repeat(3, minmax(0, 1fr))';
+  g.innerHTML = '';
+  /* au niveau 1 on garde l'ordre naturel, au niveau 2 on mélange */
+  const ordre = niveau('temps') === 0
+    ? histoire.etapes.slice()
+    : histoire.etapes.slice().sort(function () { return Math.random() - 0.5; });
+  ordre.forEach(function (et) {
+    const b = document.createElement('button');
+    b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl shadow-xl text-4xl sm:text-6xl py-4';
+    b.textContent = et.e;
+    b.setAttribute('aria-label', et.l);
+    b.onclick = function () { toucherEtape(et, b); };
+    g.appendChild(b);
+  });
+}
+
+function toucherEtape(et, b) {
+  const attendu = histoire.etapes[tempsPlaces.length];
+  if (et !== attendu) { raté(b); return; }
+
+  tempsPlaces.push(et);
+  b.disabled = true;
+  b.style.opacity = '0.3';
+  dessinerFrise();
+  glou(0.9 + (tempsPlaces.length - 1) * 0.25);
+  feathers(4);
+
+  const rang = RANGS[tempsPlaces.length - 1];
+  document.getElementById('tempsLegende').textContent = rang + ' : ' + et.l;
+  dire(rang + ', ' + et.l, 200);
+
+  if (tempsPlaces.length < histoire.etapes.length) {
+    document.getElementById('tempsConsigne').textContent = 'Et après ?';
+  } else {
+    document.getElementById('tempsConsigne').textContent = 'BRAVO ! C’est dans l’ordre !';
+    pleuvoir(30, ['🦃', '🪶', '⭐', '🎉']);
+    setTimeout(function () { if (niveau('temps') !== 2) nouvelleHistoire(); }, 2600);
+  }
+}
+
+/* ─── niveau 3 : les jours de la semaine ─── */
+function questionJour() {
+  jourSens = Math.random() < 0.5 ? 'après' : 'avant';
+  /* on évite les bords selon le sens, pour que la réponse existe */
+  jourIndex = jourSens === 'après'
+    ? Math.floor(Math.random() * (JOURS.length - 1))
+    : 1 + Math.floor(Math.random() * (JOURS.length - 1));
+  const bon = jourSens === 'après' ? JOURS[jourIndex + 1] : JOURS[jourIndex - 1];
+
+  document.getElementById('tempsConsigne').innerHTML =
+    'Quel jour vient <span class="text-orange-400">' + jourSens.toUpperCase() + '</span> ' + JOURS[jourIndex] + ' ?';
+  dire('Quel jour vient ' + jourSens + ' ' + JOURS[jourIndex] + ' ?', 300);
+
+  /* la frise montre la semaine, avec le jour de référence mis en avant */
+  const f = document.getElementById('tempsFrise');
+  f.innerHTML = '';
+  const ligne = document.createElement('div');
+  ligne.className = 'flex flex-wrap justify-center gap-1 sm:gap-2';
+  JOURS.forEach(function (j, i) {
+    const d = document.createElement('div');
+    d.className = 'px-2 py-1 rounded-lg text-xs sm:text-base font-bold ' +
+      (i === jourIndex ? 'bg-orange-500 text-white' : 'bg-[#5c3a1f] text-amber-300');
+    d.textContent = j;
+    ligne.appendChild(d);
+  });
+  f.appendChild(ligne);
+  document.getElementById('tempsLegende').textContent = '';
+
+  /* trois propositions : la bonne et deux autres jours */
+  const choix = [bon];
+  while (choix.length < 3) {
+    const j = JOURS[Math.floor(Math.random() * JOURS.length)];
+    if (choix.indexOf(j) < 0 && j !== JOURS[jourIndex]) choix.push(j);
+  }
+  choix.sort(function () { return Math.random() - 0.5; });
+
+  const g = document.getElementById('tempsGrid');
+  g.style.gridTemplateColumns = 'repeat(3, minmax(0, 1fr))';
+  g.innerHTML = '';
+  choix.forEach(function (j) {
+    const b = document.createElement('button');
+    b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl shadow-xl font-bold text-sm sm:text-2xl text-amber-100 py-4 px-1';
+    b.textContent = j;
+    b.onclick = function () {
+      if (j === bon) {
+        document.getElementById('tempsLegende').textContent = jourSens === 'après'
+          ? JOURS[jourIndex] + ' → ' + j
+          : j + ' → ' + JOURS[jourIndex];
+        document.getElementById('tempsConsigne').textContent = 'BRAVO ! ' + j;
+        dire('Bravo ! ' + j, 250);
+        bravo(2200, questionJour);
+      } else {
+        raté(b);
+      }
+    };
+    g.appendChild(b);
+  });
+}
+
+function resetTemps() {
+  if (niveau('temps') === 2) questionJour();
+  else nouvelleHistoire();
+}
+
+poserNiveaux('tempsNiveaux', 'temps',
+  ['1. L’histoire', '2. Remets en ordre', '3. Les jours'], resetTemps);
+
+/* ══════════════════════════════════════════════════════════
+   13. LES SUITES DE ROULLIEEE — algorithmes
+   Une suite logique se répète ; l'enfant devine l'élément suivant.
+   Niveau 1 : alternance simple AB (🔴🔵🔴🔵…).
+   Niveau 2 : motif à trois éléments ABC.
+   Niveau 3 : motif doublé AABB, nettement plus abstrait.
+   ══════════════════════════════════════════════════════════ */
+const SUITE_JETONS = [
+  { e: '🦃', l: 'la dinde' }, { e: '🥚', l: "l'œuf" }, { e: '🪶', l: 'la plume' },
+  { e: '🍎', l: 'la pomme' }, { e: '🌻', l: 'la fleur' }, { e: '🌰', l: 'le gland' }
+];
+const SUITE_MOTIFS = [
+  [0, 1],                 /* AB    */
+  [0, 1, 2],              /* ABC   */
+  [0, 0, 1, 1]            /* AABB  */
+];
+let suiteMotif = [], suiteJetons = [], suiteVisible = [], suiteAttendu = null;
+
+/* la case retrecit quand la suite s'allonge, pour que la frise
+   entiere — point d'interrogation compris — reste visible */
+function tailleCaseSuite() {
+  const total = suiteVisible.length + 1;
+  return 'min(' + (90 / total).toFixed(1) + 'vw, 4.5rem)';
+}
+
+function caseSuite(contenu, mystere) {
+  const d = document.createElement('div');
+  d.className = 'rounded-2xl flex items-center justify-center leading-none shrink-0 border-4 ' +
+    (mystere ? 'bg-orange-600 border-amber-300 title-font text-amber-100' : 'bg-[#5c3a1f] border-orange-700');
+  d.style.width = tailleCaseSuite();
+  d.style.height = d.style.width;
+  d.style.fontSize = 'calc(' + tailleCaseSuite() + ' * 0.6)';
+  d.textContent = contenu;
+  return d;
+}
+
+function dessinerSuite() {
+  const f = document.getElementById('suitesFrise');
+  f.innerHTML = '';
+  suiteVisible.forEach(function (j) { f.appendChild(caseSuite(j.e, false)); });
+  /* pas d'animation sur la case mystère : c'est la question posée,
+     elle doit être lisible tout de suite et ne pas bouger */
+  f.appendChild(caseSuite('?', true));
+}
+
+function nouvelleSuite() {
+  const n = niveau('suites');
+  suiteMotif = SUITE_MOTIFS[n];
+  /* on tire autant de jetons différents que le motif en demande */
+  const distincts = Math.max.apply(null, suiteMotif) + 1;
+  suiteJetons = SUITE_JETONS.slice().sort(function () { return Math.random() - 0.5; }).slice(0, distincts);
+
+  /* on montre deux répétitions complètes du motif, puis on coupe :
+     l'enfant a de quoi repérer la régularité avant de deviner */
+  const suite = [];
+  for (let k = 0; k < suiteMotif.length * 2; k++) {
+    suite.push(suiteJetons[suiteMotif[k % suiteMotif.length]]);
+  }
+  suiteVisible = suite;
+  suiteAttendu = suiteJetons[suiteMotif[suite.length % suiteMotif.length]];
+
+  document.getElementById('suitesConsigne').textContent = 'Qu’est-ce qui vient après ?';
+  dessinerSuite();
+
+  /* propositions : la bonne, plus les autres jetons du motif et un intrus */
+  const choix = [suiteAttendu];
+  suiteJetons.forEach(function (j) { if (choix.indexOf(j) < 0) choix.push(j); });
+  const reste = SUITE_JETONS.filter(function (j) { return choix.indexOf(j) < 0; });
+  while (choix.length < 3 && reste.length) {
+    choix.push(reste.splice(Math.floor(Math.random() * reste.length), 1)[0]);
+  }
+  choix.sort(function () { return Math.random() - 0.5; });
+
+  const g = document.getElementById('suitesGrid');
+  g.style.gridTemplateColumns = 'repeat(' + choix.length + ', minmax(0, 1fr))';
+  g.innerHTML = '';
+  choix.forEach(function (j) {
+    const b = document.createElement('button');
+    b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl shadow-xl text-4xl sm:text-6xl py-4';
+    b.textContent = j.e;
+    b.setAttribute('aria-label', j.l);
+    b.onclick = function () {
+      if (j === suiteAttendu) {
+        suiteVisible.push(j);
+        document.getElementById('suitesFrise').innerHTML = '';
+        suiteVisible.forEach(function (x) {
+          document.getElementById('suitesFrise').appendChild(caseSuite(x.e, false));
+        });
+        document.getElementById('suitesConsigne').textContent = 'BRAVO ! ' + j.l;
+        glou(1.4);
+        feathers(6);
+        dire('Bravo !', 250);
+        setTimeout(nouvelleSuite, 2000);
+      } else {
+        raté(b);
+      }
+    };
+    g.appendChild(b);
+  });
+}
+
+function resetSuites() { nouvelleSuite(); }
+
+poserNiveaux('suitesNiveaux', 'suites',
+  ['1. AB AB', '2. ABC ABC', '3. AABB'], resetSuites);
 </script>
 </body>
 </html>
