@@ -81,6 +81,7 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
     <li>🐝 <b>Abeille</b> — <i>Bombus buzz</i>, par Mysid — domaine public.
         C'est en réalité un <b>bourdon</b> butinant, enregistré en Finlande.</li>
     <li>🦃 <b>Dinde</b> — le glouglou historique du Royaume de Roullieee</li>
+    <li>👂 <b>Les sons des lettres</b> — enregistrés par la maîtresse elle-même, pour sa classe</li>
   </ul>
 
   <p class="text-amber-300">Les licences CC BY-SA imposent de citer l'auteur et de
@@ -175,9 +176,13 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
 <!-- ═══════════ 7. JE LIS AVEC ROULLIEEE ═══════════ -->
 <section id="act-lire" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
   <div id="lireNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="lireConsigne" class="text-center text-base sm:text-xl font-bold text-amber-200 min-h-[1.6rem] px-2">Touche une image</p>
+  <div id="lireRejouer" class="hidden text-center my-2">
+    <button onclick="rejouerSonLire()" class="tap bg-amber-400 text-[#4a2c0b] font-bold text-base sm:text-xl px-6 py-3 rounded-2xl shadow-xl">🔊 Réécouter</button>
+  </div>
   <div class="flex flex-col items-center justify-center flex-1 w-full">
     <div id="lireEmoji" class="text-[5rem] sm:text-[9rem] leading-none">👇</div>
-    <!-- la première lettre est mise en avant, et le mot est aussi donné en minuscules -->
+    <!-- la graphie du premier son est mise en avant, et le mot est aussi donné en minuscules -->
     <p id="lireMot" class="text-4xl sm:text-7xl font-bold tracking-[0.15em] text-amber-100 mt-2 text-center">?</p>
     <p id="lireMin" class="text-xl sm:text-3xl text-amber-300 tracking-widest mt-1"></p>
   </div>
@@ -256,8 +261,17 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
 <!-- ═══════════ 11. DEDANS OU DEHORS ? (notions spatiales) ═══════════ -->
 <section id="act-espace" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
   <div id="espaceNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
-  <p id="espaceConsigne" class="text-center text-lg sm:text-2xl font-bold text-amber-200 mb-3 min-h-[1.8rem] px-2">Touche une image</p>
-  <div id="espaceGrid" class="grid grid-cols-2 gap-3 sm:gap-5 w-full max-w-2xl flex-1 content-center"></div>
+  <p id="espaceConsigne" class="text-center text-lg sm:text-2xl font-bold text-amber-200 mb-3 min-h-[1.8rem] px-2">Touche un endroit</p>
+  <div class="flex-1 flex items-center justify-center w-full">
+    <div id="espaceScene" class="relative w-full max-w-lg" style="height:min(72vw,22rem)"></div>
+  </div>
+  <div class="flex items-center gap-3 mb-2">
+    <span class="text-amber-300 text-sm">glisse-moi 👉</span>
+    <div id="espaceDindeAPoser" class="tap leading-none select-none" style="font-size:min(15vw,4rem)">🦃</div>
+  </div>
+  <div class="mb-2">
+    <button id="espaceSuivant" onclick="decorSuivant()" class="tap bg-amber-400 text-[#4a2c0b] font-bold text-base sm:text-xl px-8 py-3 rounded-3xl shadow-xl">🔄 Autre décor</button>
+  </div>
 </section>
 
 <!-- ═══════════ 12. AVANT OU APRÈS ? (notions temporelles) ═══════════ -->
@@ -282,6 +296,71 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
   <div id="suitesGrid" class="grid grid-cols-3 gap-3 w-full max-w-lg mb-2"></div>
 </section>
 
+
+<!-- ═══════════ 14. LES SONS DE ROULLIEEE (phonèmes enregistrés) ═══════════ -->
+<section id="act-sons" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="sonsNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="sonsConsigne" class="text-center text-lg sm:text-2xl font-bold text-amber-200 mb-2 min-h-[1.8rem] px-2">Touche pour entendre le son</p>
+  <div id="sonsRejouer" class="hidden text-center mb-3">
+    <button onclick="rejouerPhoneme()" class="tap bg-amber-400 text-[#4a2c0b] font-bold text-base sm:text-xl px-6 py-3 rounded-2xl shadow-xl">🔊 Réécouter</button>
+  </div>
+  <div id="sonsGrid" class="grid gap-2 sm:gap-3 w-full max-w-3xl"></div>
+</section>
+
+<!-- ═══════════ 15. LES FORMES DU JARDIN ═══════════ -->
+<section id="act-formes" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="formesNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="formesConsigne" class="text-center text-lg sm:text-2xl font-bold text-amber-200 mb-1 min-h-[1.8rem] px-2">Touche une forme</p>
+  <p id="formesDit" class="text-center text-sm sm:text-base text-amber-300 mb-2 min-h-[2.4rem] px-3"></p>
+  <div id="formesGrid" class="grid gap-3 sm:gap-5 w-full max-w-xl flex-1 content-center"></div>
+</section>
+
+<!-- ═══════════ 16. PLUS, MOINS, AUTANT ═══════════ -->
+<section id="act-compare" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="compareNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="compareConsigne" class="text-center text-base sm:text-xl font-bold text-amber-200 mb-3 min-h-[2.4rem] px-2">Touche le nid</p>
+  <div class="grid grid-cols-2 gap-3 sm:gap-6 w-full max-w-3xl">
+    <div id="nidA" data-depot="A" onclick="choisirNid('A')" class="tap bg-[#5c3a1f] border-4 border-orange-500 rounded-[1.5rem] shadow-xl p-2 flex flex-col items-center">
+      <span class="text-amber-300 font-bold text-sm sm:text-lg">Nid A</span>
+      <div id="nidAZone"></div>
+      <span id="nidANum" class="font-bold text-2xl sm:text-4xl text-orange-300 min-h-[2rem]"></span>
+    </div>
+    <div id="nidB" data-depot="B" onclick="choisirNid('B')" class="tap bg-[#5c3a1f] border-4 border-orange-500 rounded-[1.5rem] shadow-xl p-2 flex flex-col items-center">
+      <span class="text-amber-300 font-bold text-sm sm:text-lg">Nid B</span>
+      <div id="nidBZone"></div>
+      <span id="nidBNum" class="font-bold text-2xl sm:text-4xl text-orange-300 min-h-[2rem]"></span>
+    </div>
+  </div>
+  <div id="compareBoutons" class="flex flex-wrap gap-3 justify-center mt-4"></div>
+  <button id="compareValider" onclick="verifierEquilibre()" class="hidden tap bg-green-600 text-white font-bold text-lg sm:text-xl px-7 py-4 rounded-[2rem] shadow-xl border-4 border-amber-300 mt-4">✅ C’est équilibré !</button>
+</section>
+
+<!-- ═══════════ 17. LE MARCHÉ DE ROULLIEEE ═══════════ -->
+<section id="act-marche" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="marcheNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="marcheConsigne" class="text-center text-base sm:text-xl font-bold text-amber-200 mb-2 min-h-[1.8rem] px-2">Touche un article</p>
+  <div id="marcheEtal" class="flex flex-wrap justify-center gap-2 w-full max-w-xl mb-2"></div>
+  <p id="marchePrix" class="text-center my-1 min-h-[2.6rem]"></p>
+  <div id="marchePlateauBoite" class="w-full max-w-lg border-4 border-amber-400 rounded-2xl bg-[#3d2408] p-2 my-1">
+    <div id="marchePlateau" class="flex flex-wrap justify-center gap-1" style="min-height:2.8rem"></div>
+    <p id="marcheCompte" class="text-center text-amber-300 text-sm mt-1">0 sur 0</p>
+  </div>
+  <div id="marcheBac" class="flex gap-3 justify-center my-2"></div>
+  <button id="marchePayer" onclick="payer()" class="tap bg-green-600 text-white font-bold text-lg sm:text-xl px-7 py-4 rounded-[2rem] shadow-xl border-4 border-amber-300 mt-auto mb-3">✅ C’est bon !</button>
+</section>
+
+<!-- ═══════════ 18. LE PUZZLE DE ROULLIEEE ═══════════ -->
+<section id="act-puzzle" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="puzzleNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="puzzleConsigne" class="text-center text-base sm:text-xl font-bold text-amber-200 mb-3 min-h-[1.8rem] px-2">Glisse une pièce, ou touche-en deux</p>
+  <div class="flex items-start justify-center gap-3 w-full max-w-2xl flex-1">
+    <div id="puzzlePlateau" class="grid gap-1 flex-1 max-w-sm"></div>
+    <div class="shrink-0">
+      <p class="text-amber-300 text-xs text-center mb-1">modèle</p>
+      <div id="puzzleModele" class="rounded-lg border-4 border-amber-400 bg-cover bg-center" style="width:min(24vw,7.5rem);height:min(24vw,7.5rem)"></div>
+    </div>
+  </div>
+</section>
 <script>
 /* ══════════════════════════════════════════════════════════
    1. SON ÉCHANTILLONNÉ — le vrai glouglou de la dinde
@@ -289,12 +368,17 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
    playbackRate. preservesPitch = false est indispensable, sinon le
    navigateur garde la note d'origine et ne change que la vitesse.
    ══════════════════════════════════════════════════════════ */
+/* Collé aux URL des sons. À incrémenter dès qu'un fichier audio est
+   refait : sans ça le navigateur ressert sa copie en cache et on continue
+   d'entendre l'ancienne version. */
+const VERSION_SONS = 6;
+
 const POOL_SIZE = 8;
 const pool = [];
 let poolIdx = 0, muted = false;
 
 for (let i = 0; i < POOL_SIZE; i++) {
-  const a = new Audio('glou.mp3');
+  const a = new Audio('glou.mp3?v=' + VERSION_SONS);
   a.preload = 'auto';
   pool.push(a);
 }
@@ -308,6 +392,7 @@ function glou(rate) {
   a.webkitPreservesPitch = false;
   a.playbackRate = rate || 1;
   a.volume = 0.9;
+  marquerSon(a.duration / a.playbackRate);
   a.play().catch(function () {});
 }
 
@@ -321,7 +406,7 @@ const banque = {};
 SONS.forEach(function (nom) {
   const p = [];
   for (let i = 0; i < 3; i++) {          /* 3 lecteurs : les appuis rapides se superposent */
-    const a = new Audio('sons/' + nom + '.mp3');
+    const a = new Audio('sons/' + nom + '.mp3?v=' + VERSION_SONS);
     a.preload = 'auto';
     p.push(a);
   }
@@ -335,6 +420,7 @@ function jouer(nom) {
   if (muted || !b || !b.ok) return false;
   const a = b.pool[b.idx++ % b.pool.length];
   try { a.pause(); a.currentTime = 0; } catch (e) {}
+  marquerSon(a.duration);
   a.play().catch(function () {});
   return true;
 }
@@ -430,8 +516,19 @@ if (window.speechSynthesis) {
   speechSynthesis.onvoiceschanged = choisirVoix;
 }
 
+/* Instant auquel le dernier son de l’app se terminera. La voix s’y
+   réfère : une consigne prononcée par-dessus un glouglou devient
+   inintelligible, et c’est justement le son qu’on veut faire entendre. */
+let finDuSon = 0;
+function marquerSon(dureeSecondes) {
+  if (!dureeSecondes || isNaN(dureeSecondes)) return;
+  finDuSon = Math.max(finDuSon, Date.now() + dureeSecondes * 1000);
+}
+
 function dire(texte, delai) {
   if (muted || !window.speechSynthesis) return;
+  /* on ne parle jamais par-dessus un son : on attend qu’il soit fini */
+  const attente = Math.max(delai || 0, finDuSon - Date.now() + 120);
   setTimeout(function () {
     if (muted) return;
     speechSynthesis.cancel();
@@ -441,7 +538,7 @@ function dire(texte, delai) {
     u.rate = 0.85;   /* un peu lent : on articule */
     u.pitch = 1.1;
     speechSynthesis.speak(u);
-  }, delai || 0);
+  }, attente);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -463,6 +560,7 @@ function amorcer(a) {
 function startApp() {
   pool.forEach(amorcer);
   SONS.forEach(function (nom) { banque[nom].pool.forEach(amorcer); });
+  amorcer(lecteurPhoneme);
   try { ac(); } catch (e) {}
   document.getElementById('unlock').classList.add('hidden');
 }
@@ -493,13 +591,18 @@ const ACTS = [
   { id: 'compte',     titre: 'COMPTE LES DINDES',  icone: '🔢', nom: 'Compte les Dindes',  sous: 'Une, deux, trois…',           flex: true },
   { id: 'ferme',      titre: 'LA FERME DE ROULLIEEE',  icone: '🐄', nom: 'La Ferme de Roullieee',  sous: 'Qui fait ce bruit ?',         flex: false },
   { id: 'couleurs',   titre: 'LES COULEURS',       icone: '🎨', nom: 'Les Couleurs',       sous: 'Habille la dinde !',          flex: true },
+  { id: 'sons',       titre: 'LES SONS',          icone: '👂', nom: 'Les Sons de Roullieee', sous: 'La voix de la maîtresse', flex: true },
   { id: 'lire',       titre: 'JE LIS AVEC ROULLIEEE',  icone: '🔤', nom: 'Je Lis avec Roullieee',  sous: 'Le mot et son image',          flex: true },
   { id: 'ranger',     titre: 'RANGE LES DINDES',   icone: '📏', nom: 'Range les Dindes',   sous: 'De la plus petite à la plus grande', flex: true },
   { id: 'memory',     titre: 'LE MEMORY',          icone: '🃏', nom: 'Le Memory des Dindes', sous: 'Retrouve les paires !',      flex: false },
   { id: 'chemin',     titre: 'LE CHEMIN',          icone: '🧭', nom: 'Le Chemin de Roullieee', sous: 'Ramène la dinde chez elle', flex: true },
-  { id: 'espace',     titre: 'DEDANS OU DEHORS', icone: '🧺', nom: 'Dedans ou Dehors ?', sous: 'Où est la dinde ?',        flex: true },
-  { id: 'temps',      titre: 'AVANT OU APRÈS',   icone: '⏳', nom: 'Avant ou Après ?',   sous: 'L’ordre des choses',       flex: true },
+  { id: 'espace',     titre: 'OÙ EST LA DINDE ?', icone: '🗺️', nom: 'Où est la dinde ?', sous: 'Dans, sur, sous, à gauche…',        flex: true },
+  { id: 'temps',      titre: 'DANS L’ORDRE',     icone: '⏳', nom: 'Histoires dans l’ordre', sous: 'Qu’est-ce qui vient après ?',       flex: true },
   { id: 'suites',     titre: 'LES SUITES',       icone: '🔗', nom: 'Les Suites',         sous: 'Devine ce qui vient après', flex: true },
+  { id: 'formes',     titre: 'LES FORMES',       icone: '🔷', nom: 'Les Formes du jardin', sous: 'Rond, carré, triangle…', flex: true },
+  { id: 'compare',    titre: 'PLUS OU MOINS',    icone: '⚖️', nom: 'Plus, moins, autant',  sous: 'Quel nid en a le plus ?', flex: true },
+  { id: 'marche',     titre: 'LE MARCHÉ',        icone: '🛒', nom: 'Le Marché de Roullieee', sous: 'Paie avec les bonnes pièces', flex: true },
+  { id: 'puzzle',     titre: 'LE PUZZLE',        icone: '🧩', nom: 'Le Puzzle',              sous: 'Remets les morceaux en place', flex: true },
   /* page de crédits : atteinte par le lien du bas, pas par une carte */
   { id: 'credits',    titre: 'SONS & CRÉDITS',     icone: 'ℹ️', nom: 'Sons & crédits',     sous: '',                            flex: false, horsMenu: true }
 ];
@@ -520,7 +623,7 @@ const BARRES = {
   dindophone: 'dindoNiveaux', cache: 'cacheNiveaux', compte: 'compteNiveaux',
   ferme: 'fermeNiveaux', couleurs: 'couleursNiveaux', lire: 'lireNiveaux',
   ranger: 'rangerNiveaux', memory: 'memoryNiveaux',
-  espace: 'espaceNiveaux', temps: 'tempsNiveaux', suites: 'suitesNiveaux'
+  sons: 'sonsNiveaux', formes: 'formesNiveaux', compare: 'compareNiveaux', marche: 'marcheNiveaux', puzzle: 'puzzleNiveaux', espace: 'espaceNiveaux', temps: 'tempsNiveaux', suites: 'suitesNiveaux'
 };
 
 function openAct(id) {
@@ -548,6 +651,11 @@ function openAct(id) {
   if (id === 'espace')     resetEspace();
   if (id === 'temps')      resetTemps();
   if (id === 'suites')     resetSuites();
+  if (id === 'sons')       resetSons();
+  if (id === 'formes')     resetFormes();
+  if (id === 'compare')    resetCompare();
+  if (id === 'marche')     resetMarche();
+  if (id === 'puzzle')     resetPuzzle();
   window.scrollTo(0, 0);
 }
 
@@ -626,6 +734,19 @@ function majNiveaux(zoneId, mod) {
   });
 }
 
+/* Mélange de Fisher-Yates. Le raccourci sort(() => Math.random() - 0.5)
+   est biaisé : un élément placé en tête y reste beaucoup plus souvent.
+   Mesuré sur 800 tirages, la bonne réponse sortait en 1re position 237
+   fois contre 52 en dernière — de quoi réussir sans écouter. */
+function melanger(liste) {
+  const t = liste.slice();
+  for (let i = t.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = t[i]; t[i] = t[j]; t[j] = tmp;
+  }
+  return t;
+}
+
 /* tire un élément au hasard, en évitant si possible le précédent :
    deux fois la même consigne d'affilée déroute les enfants */
 function tirageSansRepetition(liste, precedent) {
@@ -647,6 +768,80 @@ function bravo(delaiSuite, suite) {
 function raté(el) {
   glou(0.5);
   if (el) replay(el, 'shake');
+}
+
+/* ══════════════════════════════════════════════════════════
+   GLISSER-DÉPOSER — socle partagé
+   Pointer Events : un seul code pour le doigt, le stylet et la souris.
+   Le toucher simple continue de fonctionner partout : maintenir un
+   contact précis pendant plusieurs secondes reste hors de portée de
+   certains élèves, le glissement est un confort, pas un passage obligé.
+   ══════════════════════════════════════════════════════════ */
+let glisse = null;          /* glissement en cours */
+let ignorerClic = false;    /* un vrai glissement ne doit pas déclencher le clic */
+
+function surligner(zone, actif) {
+  if (!zone) return;
+  zone.classList.toggle('ring-4', actif);
+  zone.classList.toggle('ring-amber-300', actif);
+}
+
+/* el : l'élément qu'on prend. charge : ce qu'il transporte.
+   auDepot(charge, zone) : appelé quand on lâche sur une zone [data-depot]. */
+function rendreGlissable(el, charge, auDepot) {
+  el.style.touchAction = 'none';
+
+  el.addEventListener('pointerdown', function (ev) {
+    if (ev.button !== undefined && ev.button !== 0) return;
+    const r = el.getBoundingClientRect();
+    const fantome = el.cloneNode(true);
+    fantome.className = el.className + ' pointer-events-none';
+    fantome.style.cssText += ';position:fixed;z-index:300;opacity:.92;margin:0';
+    fantome.style.left = r.left + 'px';
+    fantome.style.top = r.top + 'px';
+    fantome.style.width = r.width + 'px';
+    fantome.style.height = r.height + 'px';
+    fantome.style.transform = 'scale(1.1)';
+    document.body.appendChild(fantome);
+
+    glisse = { el: el, charge: charge, auDepot: auDepot, fantome: fantome,
+               dx: ev.clientX - r.left, dy: ev.clientY - r.top,
+               x0: ev.clientX, y0: ev.clientY, bouge: false, zone: null };
+    el.style.opacity = '0.35';
+    try { el.setPointerCapture(ev.pointerId); } catch (e) {}
+  });
+
+  el.addEventListener('pointermove', function (ev) {
+    if (!glisse || glisse.el !== el) return;
+    /* quelques pixels de tolérance : un doigt tremble, ce n'est pas
+       une intention de déplacer */
+    if (!glisse.bouge &&
+        Math.abs(ev.clientX - glisse.x0) < 8 && Math.abs(ev.clientY - glisse.y0) < 8) return;
+    glisse.bouge = true;
+    glisse.fantome.style.left = (ev.clientX - glisse.dx) + 'px';
+    glisse.fantome.style.top = (ev.clientY - glisse.dy) + 'px';
+
+    glisse.fantome.style.visibility = 'hidden';
+    const sous = document.elementFromPoint(ev.clientX, ev.clientY);
+    glisse.fantome.style.visibility = '';
+    const zone = sous && sous.closest ? sous.closest('[data-depot]') : null;
+    if (zone !== glisse.zone) { surligner(glisse.zone, false); surligner(zone, true); glisse.zone = zone; }
+  });
+
+  const lacher = function (ev) {
+    if (!glisse || glisse.el !== el) return;
+    const g = glisse;
+    glisse = null;
+    g.fantome.remove();
+    g.el.style.opacity = '';
+    surligner(g.zone, false);
+    if (!g.bouge) return;                 /* simple toucher : on laisse le clic agir */
+    ignorerClic = true;
+    setTimeout(function () { ignorerClic = false; }, 60);
+    if (g.zone) g.auDepot(g.charge, g.zone);
+  };
+  el.addEventListener('pointerup', lacher);
+  el.addEventListener('pointercancel', lacher);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -991,12 +1186,12 @@ function questionCombien() {
   document.getElementById('compteConsigne').textContent = 'Combien y a-t-il de dindes ?';
 
   /* trois propositions : la bonne et deux voisines plausibles */
-  const choix = [compteCible];
+  let choix = [compteCible];
   while (choix.length < 3) {
     const c = Math.max(1, Math.min(MAX_COUNT, compteCible + (Math.floor(Math.random() * 5) - 2)));
     if (choix.indexOf(c) < 0) choix.push(c);
   }
-  choix.sort(function () { return Math.random() - 0.5; });
+  choix = melanger(choix);
 
   const z = document.getElementById('compteChoix');
   z.innerHTML = '';
@@ -1257,8 +1452,7 @@ function toucherCouleur(c, b) {
   if (n === 0) {
     peindrePlumes(c.hex, true);
     document.getElementById('couleurNom').textContent = c.nom;
-    glou(0.8 + Math.random() * 0.6);
-    dire(c.nom, 500);
+    dire(c.nom, 300);
     return;
   }
 
@@ -1290,25 +1484,47 @@ poserNiveaux('couleursNiveaux', 'couleurs',
 /* ══════════════════════════════════════════════════════════
    7. JE LIS AVEC ROULLIEEE
    Niveau 1 : image → mot écrit et prononcé (exposition à l'écrit).
-   Niveau 2 : mot écrit → l'enfant trouve l'image. C'est de la
-   lecture véritable, pas seulement de l'exposition.
-   Niveau 3 : une lettre → trouver un mot qui commence par elle.
+   Niveau 2 : mot écrit → l'enfant trouve l'image. Lecture globale.
+   Niveau 3 : le SON du début, puis « comme dans dinde ». C'est la
+     formulation de classe, et elle évite le piège du nom de la lettre :
+     épeler « dé-i-enne-dé-eu » ne mène à rien, le son mène au mot.
+   Niveau 4 : on entend le son seul, il faut trouver le mot.
+
+   « graphie » est la ou LES lettres qui font ce son : pour CHAT c'est
+   « CH », pas « C ». Mettre « C » en avant serait un contresens.
    ══════════════════════════════════════════════════════════ */
 const IMAGIER = [
-  { e: '🦃', mot: 'DINDE',  lu: 'dinde' },
-  { e: '🥚', mot: 'ŒUF',    lu: 'œuf' },
-  { e: '🐄', mot: 'VACHE',  lu: 'vache' },
-  { e: '🐈', mot: 'CHAT',   lu: 'chat' },
-  { e: '🐔', mot: 'POULE',  lu: 'poule' },
-  { e: '🦆', mot: 'CANARD', lu: 'canard' },
-  { e: '🍎', mot: 'POMME',  lu: 'pomme' },
-  { e: '🌙', mot: 'LUNE',   lu: 'lune' }
+  { e: '🦃', mot: 'DINDE',  lu: 'dinde',  son: 'd',  graphie: 'D' },
+  { e: '🐄', mot: 'VACHE',  lu: 'vache',  son: 'v',  graphie: 'V' },
+  { e: '🐈', mot: 'CHAT',   lu: 'chat',   son: 'ch', graphie: 'CH' },
+  { e: '🐔', mot: 'POULE',  lu: 'poule',  son: 'p',  graphie: 'P' },
+  { e: '🦆', mot: 'CANARD', lu: 'canard', son: 'k',  graphie: 'C' },
+  { e: '🍎', mot: 'POMME',  lu: 'pomme',  son: 'p',  graphie: 'P' },
+  { e: '🌙', mot: 'LUNE',   lu: 'lune',   son: 'l',  graphie: 'L' },
+  { e: '🐁', mot: 'SOURIS', lu: 'souris', son: 's',  graphie: 'S' },
+  { e: '🦊', mot: 'RENARD', lu: 'renard', son: 'r',  graphie: 'R' },
+  { e: '🏠', mot: 'MAISON', lu: 'maison', son: 'm',  graphie: 'M' },
+  { e: '🎈', mot: 'BALLON', lu: 'ballon', son: 'b',  graphie: 'B' },
+  { e: '🐢', mot: 'TORTUE', lu: 'tortue', son: 't',  graphie: 'T' },
+  { e: '🌻', mot: 'FLEUR',  lu: 'fleur',  son: 'f',  graphie: 'F' },
+  { e: '🎩', mot: 'CHAPEAU', lu: 'chapeau', son: 'ch', graphie: 'CH' },
+  { e: '🐸', mot: 'GRENOUILLE', lu: 'grenouille', son: 'g', graphie: 'G' },
+  { e: '🚗', mot: 'VOITURE', lu: 'voiture', son: 'v', graphie: 'V' },
+  { e: '🥕', mot: 'CAROTTE', lu: 'carotte', son: 'k', graphie: 'C' },
+  { e: '🍌', mot: 'BANANE', lu: 'banane', son: 'b',  graphie: 'B' },
+  { e: '🐑', mot: 'MOUTON', lu: 'mouton', son: 'm',  graphie: 'M' },
+  /* œuf commence par un son que la maîtresse n’a pas enregistré :
+     il reste dans les deux premiers niveaux, pas dans ceux du son */
+  { e: '🥚', mot: 'ŒUF',    lu: 'œuf',    son: null, graphie: 'Œ' }
 ];
+/* les mots utilisables pour le travail sur les sons */
+const IMAGIER_SONS = IMAGIER.filter(function (m) { return m.son; });
 
 let lireCible = null;
 
-function motColore(mot) {
-  return '<span class="text-orange-400">' + mot.charAt(0) + '</span>' + mot.slice(1);
+function motColore(m) {
+  const n = m.graphie.length;
+  return '<span class="text-orange-400">' + m.mot.slice(0, n) + '</span>' + m.mot.slice(n);
 }
 
 function afficheLire(emoji, motHtml, minuscule) {
@@ -1321,64 +1537,113 @@ function afficheLire(emoji, motHtml, minuscule) {
 
 function demanderImage() {
   lireCible = tirageSansRepetition(IMAGIER, lireCible);
-  afficheLire('👇', motColore(lireCible.mot), lireCible.mot.toLowerCase());
+  construireImagier();
+  afficheLire('👇', motColore(lireCible), lireCible.mot.toLowerCase());
   dire('Trouve : ' + lireCible.lu, 300);
 }
 
-function demanderLettre() {
-  lireCible = tirageSansRepetition(IMAGIER, lireCible);
-  const L = lireCible.mot.charAt(0);
-  afficheLire('👇', '<span class="text-orange-400">' + L + '</span>', L.toLowerCase());
-  dire('Quel mot commence par ' + L + ' ?', 300);
+/* niveau 4 : on fait entendre le son, et rien d'autre */
+function demanderSonInitial() {
+  lireCible = tirageSansRepetition(IMAGIER_SONS, lireCible);
+  construireImagier();
+  afficheLire('👂', '?', '');
+  document.getElementById('lireConsigne').textContent = 'Quel mot commence par ce son ?';
+  setTimeout(function () { jouerPhoneme(lireCible.son); }, 450);
+}
+
+function rejouerSonLire() {
+  if (lireCible && lireCible.son) jouerPhoneme(lireCible.son);
 }
 
 function resetLire() {
   const n = niveau('lire');
   lireCible = null;
+  document.getElementById('lireRejouer').classList.toggle('hidden', n !== 3);
+  construireImagier();
+
   if (n === 0) {
     afficheLire('👇', '?', '');
+    document.getElementById('lireConsigne').textContent = 'Touche une image';
   } else if (n === 1) {
+    document.getElementById('lireConsigne').textContent = 'Trouve l’image de ce mot';
     demanderImage();
+  } else if (n === 2) {
+    afficheLire('👇', '?', '');
+    document.getElementById('lireConsigne').textContent = 'Touche une image pour entendre son premier son';
   } else {
-    demanderLettre();
+    demanderSonInitial();
   }
+}
+
+/* niveau 3 : le son, puis le mot qui l'ancre */
+function montrerSonPuisMot(m) {
+  afficheLire(m.e, '<span class="text-orange-400">' + m.graphie + '</span>', '');
+  document.getElementById('lireConsigne').textContent = 'Écoute…';
+  jouerPhoneme(m.son, function () {
+    document.getElementById('lireConsigne').textContent = '…comme dans';
+    afficheLire(m.e, motColore(m), m.mot.toLowerCase());
+    dire('comme dans ' + m.lu, 150);
+  });
 }
 
 function toucherImage(m, b) {
   const n = niveau('lire');
 
   if (n === 0) {
-    afficheLire(m.e, motColore(m.mot), m.mot.toLowerCase());
-    glou(1.2);
-    dire(m.lu, 450);
+    afficheLire(m.e, motColore(m), m.mot.toLowerCase());
+    dire(m.lu, 250);
     return;
   }
 
-  /* au niveau 3 plusieurs mots peuvent partager la même initiale :
-     on accepte toute réponse dont la première lettre correspond */
-  const juste = n === 1 ? (m === lireCible)
-                        : (m.mot.charAt(0) === lireCible.mot.charAt(0));
+  if (n === 1) {
+    if (m === lireCible) {
+      afficheLire(m.e, motColore(m), m.mot.toLowerCase());
+      dire('Bravo ! ' + m.lu, 250);
+      bravo(2000, demanderImage);
+    } else { raté(b); }
+    return;
+  }
 
-  if (juste) {
-    afficheLire(m.e, motColore(m.mot), m.mot.toLowerCase());
+  if (n === 2) { montrerSonPuisMot(m); replay(b, 'wiggle'); return; }
+
+  /* niveau 4 : plusieurs mots peuvent commencer par le même son
+     (poule et pomme), on accepte les deux */
+  if (m.son === lireCible.son) {
+    afficheLire(m.e, motColore(m), m.mot.toLowerCase());
+    document.getElementById('lireConsigne').textContent = 'BRAVO ! ' + m.mot;
     dire('Bravo ! ' + m.lu, 250);
-    bravo(2000, n === 1 ? demanderImage : demanderLettre);
+    bravo(2400, demanderSonInitial);
   } else {
     raté(b);
+    setTimeout(rejouerSonLire, 400);
   }
 }
 
-IMAGIER.forEach(function (m) {
-  const b = document.createElement('button');
-  b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl shadow-xl text-4xl sm:text-6xl py-3 sm:py-5';
-  b.textContent = m.e;
-  b.setAttribute('aria-label', m.lu);
-  b.onclick = function () { toucherImage(m, b); };
-  document.getElementById('lireGrid').appendChild(b);
-});
+/* aux niveaux du son, les mots sans phonème enregistré sont écartés */
+function construireImagier() {
+  const n = niveau('lire');
+  /* vingt images d’un coup sont illisibles : au-delà de la découverte on
+     n’en propose que huit, dont la bonne réponse */
+  let liste = n >= 2 ? IMAGIER_SONS : IMAGIER;
+  if (n >= 1 && lireCible) {
+    const autres = melanger(liste.filter(function (m) { return m !== lireCible; }));
+    liste = melanger([lireCible].concat(autres.slice(0, 7)));
+  }
+  const g = document.getElementById('lireGrid');
+  g.innerHTML = '';
+  liste.forEach(function (m) {
+    const b = document.createElement('button');
+    b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl shadow-xl text-4xl sm:text-6xl py-3 sm:py-5';
+    b.textContent = m.e;
+    b.setAttribute('aria-label', m.lu);
+    b.onclick = function () { toucherImage(m, b); };
+    g.appendChild(b);
+  });
+}
 
 poserNiveaux('lireNiveaux', 'lire',
-  ['1. Découvrir', '2. Trouve l’image', '3. Première lettre'], resetLire);
+  ['1. Découvrir', '2. Trouve l’image', '3. Le son du début', '4. Écoute le son'],
+  resetLire);
 
 /* ══════════════════════════════════════════════════════════
    8. RANGE LES DINDES — sériation
@@ -1440,7 +1705,7 @@ function resetRanger() {
 
   const pool = document.getElementById('rangerPool');
   pool.innerHTML = '';
-  const melange = rangerTailles.slice().sort(function () { return Math.random() - 0.5; });
+  const melange = melanger(rangerTailles);
   melange.forEach(function (t) {
     const b = document.createElement('button');
     b.className = 'tap leading-none';
@@ -1513,9 +1778,8 @@ function resetMemory() {
   memoryTrouvees = 0;
   memoryBloque = false;
 
-  const auHasard = function () { return Math.random() - 0.5; };
-  const faces = MEMORY_FACES.slice().sort(auHasard).slice(0, cfg.paires);
-  const cartes = faces.concat(faces).sort(auHasard);
+  const faces = melanger(MEMORY_FACES).slice(0, cfg.paires);
+  const cartes = melanger(faces.concat(faces));
 
   const g = document.getElementById('memoryGrid');
   g.style.gridTemplateColumns = 'repeat(' + cfg.colonnes + ', minmax(0, 1fr))';
@@ -1886,169 +2150,210 @@ function bouger(dx, dy) {
   glou(1.1);
 }
 /* ══════════════════════════════════════════════════════════
-   11. DEDANS OU DEHORS ? — notions spatiales
-   Deux objets de référence SÉPARÉS, sans quoi les notions se
-   chevauchent : posée sur une boîte, une dinde est « dessus »…
-   mais aussi « dehors ». Ici dedans/dehors se jugent par rapport à
-   une boîte, dessus/dessous par rapport à une table. Chaque question
-   n'a donc qu'une seule bonne réponse.
-   L'enfant ne touche pas un mot mais l'IMAGE qui correspond : c'est
-   la situation spatiale qu'il doit lire, pas une étiquette.
+   11. OÙ EST LA DINDE ? — notions spatiales
+   Cinq décors, chacun avec SON objet de référence. C'est ce qui lève
+   l'ambiguïté : posée sur une boîte, une dinde est « sur »… mais
+   aussi « en dehors ». En séparant les décors, chaque question n'a
+   qu'une seule bonne réponse.
+   L'enfant ne choisit pas un mot : il POSE la dinde à l'endroit dit.
+   (structure des décors reprise de la version « ateliers »)
    ══════════════════════════════════════════════════════════ */
-const SCENES = {
-  dedans:  { objet: 'boite', x: 38, y: 52, mot: 'DEDANS',  lu: 'dedans' },
-  dehors:  { objet: 'boite', x: 85, y: 52, mot: 'DEHORS',  lu: 'dehors' },
-  dessus:  { objet: 'table', x: 50, y: 30, mot: 'DESSUS',  lu: 'dessus' },
-  dessous: { objet: 'table', x: 50, y: 71, mot: 'DESSOUS', lu: 'dessous' }
+const DECORS = {
+  boite: {
+    objet: 'la boîte',
+    decor: '<div class="absolute left-1/2 -translate-x-1/2 rounded-lg border-[6px] border-amber-400 bg-[#3d2408]" style="top:34%;width:46%;height:40%"></div>',
+    zones: [
+      { id: 'dans',   mot: 'DANS',      lu: 'dans la boîte',       style: 'left:29%;top:38%;width:42%;height:32%' },
+      { id: 'dehors', mot: 'EN DEHORS', lu: 'en dehors de la boîte', style: 'left:3%;top:42%;width:22%;height:36%' },
+      { id: 'dehors', mot: 'EN DEHORS', lu: 'en dehors de la boîte', style: 'right:3%;top:42%;width:22%;height:36%' }
+    ]
+  },
+  table: {
+    objet: 'la table',
+    decor: '<div class="absolute left-1/2 -translate-x-1/2 rounded bg-amber-400" style="top:38%;width:62%;height:7%"></div>' +
+           '<div class="absolute bg-amber-400" style="left:26%;top:45%;width:7px;height:30%"></div>' +
+           '<div class="absolute bg-amber-400" style="right:26%;top:45%;width:7px;height:30%"></div>',
+    zones: [
+      { id: 'sur',  mot: 'SUR',  lu: 'sur la table',  style: 'left:22%;top:12%;width:56%;height:24%' },
+      { id: 'sous', mot: 'SOUS', lu: 'sous la table', style: 'left:31%;top:48%;width:38%;height:28%' }
+    ]
+  },
+  arbre: {
+    objet: "l'arbre",
+    decor: '<div class="absolute left-1/2 -translate-x-1/2 leading-none" style="top:24%;font-size:min(22vw,6rem)">🌳</div>',
+    zones: [
+      { id: 'gauche', mot: 'À GAUCHE', lu: "à gauche de l'arbre", style: 'left:3%;top:38%;width:28%;height:40%' },
+      { id: 'droite', mot: 'À DROITE', lu: "à droite de l'arbre", style: 'right:3%;top:38%;width:28%;height:40%' }
+    ]
+  },
+  arbres: {
+    objet: 'les deux arbres',
+    decor: '<div class="absolute leading-none" style="left:20%;top:26%;font-size:min(16vw,4.4rem)">🌳</div>' +
+           '<div class="absolute leading-none" style="right:20%;top:26%;font-size:min(16vw,4.4rem)">🌳</div>',
+    zones: [
+      { id: 'gauche', mot: 'À GAUCHE', lu: 'à gauche des arbres', style: 'left:1%;top:42%;width:18%;height:34%' },
+      { id: 'entre',  mot: 'ENTRE',    lu: 'entre les deux arbres', style: 'left:41%;top:42%;width:18%;height:34%' },
+      { id: 'droite', mot: 'À DROITE', lu: 'à droite des arbres', style: 'right:1%;top:42%;width:18%;height:34%' }
+    ]
+  },
+  maison: {
+    objet: 'la maison',
+    /* la dinde « derrière » est partiellement masquée par le mur, celle de
+       « devant » le recouvre : l'empilement rend la notion visible */
+    decor: '<div class="absolute left-1/2 -translate-x-1/2 leading-none" style="top:26%;font-size:min(24vw,6.5rem);z-index:3">🏠</div>',
+    zones: [
+      { id: 'derriere', mot: 'DERRIÈRE', lu: 'derrière la maison', style: 'left:56%;top:30%;width:22%;height:22%', z: 2 },
+      { id: 'devant',   mot: 'DEVANT',   lu: 'devant la maison',   style: 'left:28%;top:62%;width:44%;height:28%', z: 4 }
+    ]
+  }
 };
 const ESPACE_NIVEAUX = [
-  { cles: ['dedans', 'dehors', 'dessus', 'dessous'], libre: true },
-  { cles: ['dedans', 'dehors'],                      libre: false },
-  { cles: ['dessus', 'dessous'],                     libre: false },
-  { cles: ['dedans', 'dehors', 'dessus', 'dessous'], libre: false }
+  { decors: ['boite', 'table', 'arbre', 'arbres', 'maison'], libre: true },
+  { decors: ['boite', 'table'],    libre: false },
+  { decors: ['arbre', 'arbres'],   libre: false },
+  { decors: ['maison', 'boite'],   libre: false },
+  { decors: ['boite', 'table', 'arbre', 'arbres', 'maison'], libre: false }
 ];
-let espaceCible = null;
+let espaceDecor = 'boite', espaceCible = null, espaceTour = 0;
 
-/* dessine une mini-scène : l'objet de référence, puis la dinde placée */
-function dessinerScene(hote, cle) {
-  const s = SCENES[cle];
-  hote.innerHTML = '';
-
-  if (s.objet === 'boite') {
-    const b = document.createElement('div');
-    b.className = 'absolute rounded-xl border-4 border-amber-400 bg-[#3d2408]';
-    b.style.left = '10%'; b.style.top = '30%';
-    b.style.width = '54%'; b.style.height = '46%';
-    hote.appendChild(b);
-  } else {
-    const plateau = document.createElement('div');
-    plateau.className = 'absolute rounded bg-amber-400';
-    plateau.style.left = '12%'; plateau.style.top = '48%';
-    plateau.style.width = '76%'; plateau.style.height = '7%';
-    hote.appendChild(plateau);
-    [18, 76].forEach(function (lx) {
-      const pied = document.createElement('div');
-      pied.className = 'absolute bg-amber-400';
-      pied.style.left = lx + '%'; pied.style.top = '55%';
-      pied.style.width = '6%'; pied.style.height = '30%';
-      hote.appendChild(pied);
-    });
-  }
-
-  /* le centrage est porté par un conteneur jamais animé : une animation
-     sur le même élément écraserait la propriété transform */
-  const d = document.createElement('div');
-  d.className = 'absolute leading-none';
-  d.style.left = s.x + '%';
-  d.style.top = s.y + '%';
-  d.style.transform = 'translate(-50%, -50%)';
-  d.style.fontSize = 'min(11vw, 3rem)';
-  d.textContent = '🦃';
-  hote.appendChild(d);
-}
-
-function construireCartes() {
-  const cfg = ESPACE_NIVEAUX[niveau('espace')];
-  const g = document.getElementById('espaceGrid');
-  g.innerHTML = '';
-
-  /* l'ordre change à chaque question : sinon l'enfant retient une place
-     au lieu de lire la situation */
-  const ordre = cfg.cles.slice().sort(function () { return Math.random() - 0.5; });
-  ordre.forEach(function (cle) {
-    const b = document.createElement('button');
-    b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-[1.5rem] shadow-xl p-2 flex flex-col items-center';
-    b.dataset.cle = cle;
-    b.setAttribute('aria-label', SCENES[cle].lu);
-
-    const scene = document.createElement('div');
-    scene.className = 'relative w-full';
-    scene.style.height = 'min(26vw, 8rem)';
-    dessinerScene(scene, cle);
-    b.appendChild(scene);
-
-    /* le mot n'est affiché qu'en découverte : sinon la réponse est donnée */
-    if (cfg.libre) {
-      const t = document.createElement('span');
-      t.className = 'font-bold text-sm sm:text-lg text-amber-200 mt-1';
-      t.textContent = SCENES[cle].mot;
-      b.appendChild(t);
-    }
-
-    b.onclick = function () { toucherCarte(cle, b); };
-    g.appendChild(b);
+function zonesUniques(nomDecor) {
+  const vues = {};
+  return DECORS[nomDecor].zones.filter(function (z) {
+    if (vues[z.id]) return false;
+    vues[z.id] = true;
+    return true;
   });
 }
 
-function demanderPosition() {
+function dessinerDecor(nomDecor, cibleId) {
+  const d = DECORS[nomDecor];
+  const sc = document.getElementById('espaceScene');
+  sc.innerHTML = d.decor;
+
+  d.zones.forEach(function (z) {
+    const zone = document.createElement('button');
+    zone.className = 'tap absolute rounded-xl border-4 border-dashed border-amber-300/50 flex items-center justify-center leading-none';
+    zone.style.cssText += z.style;
+    zone.style.zIndex = z.z || 2;
+    zone.style.fontSize = 'min(13vw,3.4rem)';
+    zone.dataset.id = z.id;
+    zone.dataset.depot = z.id;          /* cible de dépôt pour le glissement */
+    zone.setAttribute('aria-label', z.lu);
+    zone.textContent = (cibleId && z.id === cibleId) ? '🦃' : '';
+    zone.onclick = function () { if (!ignorerClic) toucherZone(z, zone); };
+    sc.appendChild(zone);
+  });
+
+  /* la dinde à poser : on peut la glisser dans une zone, ou toucher la zone */
+  const aPoser = document.getElementById('espaceDindeAPoser');
+  const placee = !!cibleId;
+  aPoser.classList.toggle('invisible', placee);
+  if (!placee) {
+    aPoser.onclick = null;
+    rendreGlissable(aPoser, null, function (_, zone) {
+      const z = d.zones.find(function (x) { return x.id === zone.dataset.depot; });
+      if (z) toucherZone(z, zone);
+    });
+  }
+}
+
+function questionEspace() {
   const cfg = ESPACE_NIVEAUX[niveau('espace')];
-  espaceCible = tirageSansRepetition(cfg.cles, espaceCible);
-  construireCartes();
-  const s = SCENES[espaceCible];
+  espaceDecor = cfg.decors[espaceTour++ % cfg.decors.length];
+  const choix = zonesUniques(espaceDecor);
+  espaceCible = tirageSansRepetition(choix, espaceCible);
+  dessinerDecor(espaceDecor, null);
   document.getElementById('espaceConsigne').innerHTML =
-    'Montre la dinde qui est <span class="text-orange-400">' + s.mot + '</span>';
-  dire('Montre la dinde qui est ' + s.lu, 350);
+    'Mets la dinde <span class="text-orange-400">' + espaceCible.mot + '</span>';
+  dire('Mets la dinde ' + espaceCible.lu, 350);
 }
 
 function resetEspace() {
-  if (ESPACE_NIVEAUX[niveau('espace')].libre) {
-    espaceCible = null;
-    construireCartes();
-    document.getElementById('espaceConsigne').textContent = 'Touche une image pour entendre le mot';
+  const cfg = ESPACE_NIVEAUX[niveau('espace')];
+  espaceTour = 0;
+  espaceCible = null;
+  if (cfg.libre) {
+    espaceDecor = cfg.decors[0];
+    dessinerDecor(espaceDecor, null);
+    document.getElementById('espaceConsigne').textContent = 'Touche un endroit : la dinde s’y pose';
+    document.getElementById('espaceSuivant').classList.remove('hidden');
   } else {
-    demanderPosition();
+    document.getElementById('espaceSuivant').classList.add('hidden');
+    questionEspace();
   }
 }
 
-function toucherCarte(cle, b) {
-  const s = SCENES[cle];
+/* en découverte, on passe d'un décor à l'autre à la demande */
+function decorSuivant() {
+  const cfg = ESPACE_NIVEAUX[niveau('espace')];
+  espaceDecor = cfg.decors[++espaceTour % cfg.decors.length];
+  dessinerDecor(espaceDecor, null);
+  document.getElementById('espaceConsigne').textContent = 'Touche un endroit : la dinde s’y pose';
+  glou(1.1);
+}
 
+function toucherZone(z, el) {
   if (ESPACE_NIVEAUX[niveau('espace')].libre) {
-    replay(b, 'wiggle');
-    document.getElementById('espaceConsigne').textContent = 'La dinde est ' + s.lu;
-    glou(1.1);
-    dire(s.lu, 300);
+    dessinerDecor(espaceDecor, z.id);
+    document.getElementById('espaceConsigne').textContent = 'La dinde est ' + z.lu;
+    dire(z.lu, 250);
     return;
   }
-
-  if (cle === espaceCible) {
-    replay(b, 'pop');
-    document.getElementById('espaceConsigne').textContent = 'BRAVO ! ' + s.mot;
-    dire('Bravo ! ' + s.lu, 250);
-    bravo(2400, demanderPosition);
+  if (z.id === espaceCible.id) {
+    dessinerDecor(espaceDecor, z.id);
+    document.getElementById('espaceConsigne').textContent = 'BRAVO ! ' + espaceCible.mot;
+    dire('Bravo ! ' + z.lu, 250);
+    bravo(2400, questionEspace);
   } else {
-    raté(b);
+    raté(el);
   }
 }
 
 poserNiveaux('espaceNiveaux', 'espace',
-  ['1. Découvrir', '2. Dedans / Dehors', '3. Dessus / Dessous', '4. Les 4 mots'],
+  ['1. Découvrir', '2. Dans / Sur / Sous', '3. Gauche / Droite / Entre', '4. Devant / Derrière', '5. Tout mélangé'],
   resetEspace);
 
 /* ══════════════════════════════════════════════════════════
-   12. AVANT OU APRÈS ? — notions temporelles
-   Niveau 1 : une histoire en 3 images, on la parcourt dans l'ordre.
-   Niveau 2 : les 3 images sont mélangées, il faut les remettre en
-   ordre — même geste que Range les Dindes, transposé au temps.
-   Niveau 3 : les jours de la semaine (quel jour vient après… ?).
+   12. HISTOIRES DANS L'ORDRE — notions temporelles
+   Les suites viennent de « Petits Pas », graduées par année : trois
+   images en accueil, quatre puis cinq ensuite. Remettre une histoire
+   en ordre demande de se représenter une succession, pas seulement
+   de reconnaître des images.
+   Dernier niveau : les jours de la semaine.
    ══════════════════════════════════════════════════════════ */
 const HISTOIRES = [
-  { titre: 'la dinde',   etapes: [{ e: '🥚', l: "l'œuf" }, { e: '🐣', l: 'le poussin' }, { e: '🦃', l: 'la dinde' }] },
-  { titre: "l'arbre",    etapes: [{ e: '🌰', l: 'la graine' }, { e: '🌱', l: 'la pousse' }, { e: '🌳', l: "l'arbre" }] },
-  { titre: 'la journée', etapes: [{ e: '🌅', l: 'le matin' }, { e: '☀️', l: 'le midi' }, { e: '🌙', l: 'la nuit' }] },
-  { titre: 'la pluie',   etapes: [{ e: '☁️', l: 'le nuage' }, { e: '🌧️', l: 'la pluie' }, { e: '🌈', l: "l'arc-en-ciel" }] }
+  /* 3 étapes */
+  { n: 3, titre: "l'œuf et la poule",  etapes: [['🥚', "l'œuf"], ['🐣', 'le poussin sort'], ['🐔', 'la poule']] },
+  { n: 3, titre: "l'arbre",            etapes: [['🌰', 'la graine'], ['🌱', 'la petite pousse'], ['🌳', 'le grand arbre']] },
+  { n: 3, titre: 'le bonhomme de neige', etapes: [['🌨️', 'il neige'], ['⛄', 'on le construit'], ['💧', 'il fond']] },
+  { n: 3, titre: 'le gâteau',          etapes: [['🥣', 'on mélange'], ['🎂', 'il est cuit'], ['🍰', 'on le mange']] },
+  { n: 3, titre: 'la pomme',           etapes: [['🌸', 'la fleur'], ['🍏', 'la pomme verte'], ['🍎', 'la pomme mûre']] },
+  { n: 3, titre: 'la pluie',           etapes: [['☁️', 'le nuage'], ['🌧️', 'la pluie'], ['🌈', "l'arc-en-ciel"]] },
+  /* 4 étapes */
+  { n: 4, titre: "l'œuf et la poule",  etapes: [['🥚', "l'œuf"], ['🐣', 'le poussin sort'], ['🐥', 'il grandit'], ['🐔', 'la poule']] },
+  { n: 4, titre: "l'arbre",            etapes: [['🌰', 'la graine'], ['🌱', 'la pousse'], ['🌿', 'la jeune plante'], ['🌳', "l'arbre"]] },
+  { n: 4, titre: 'on grandit',         etapes: [['👶', 'le bébé'], ['🧒', "l'enfant"], ['🧑', "l'adulte"], ['🧓', 'la personne âgée']] },
+  { n: 4, titre: 'se laver les mains', etapes: [['💧', 'je mouille'], ['🧼', 'je savonne'], ['🚰', 'je rince'], ['🧻', "j'essuie"]] },
+  { n: 4, titre: 'les saisons',        etapes: [['🍂', "l'automne"], ['❄️', "l'hiver"], ['🌷', 'le printemps'], ['☀️', "l'été"]] },
+  { n: 4, titre: 'du blé au pain',     etapes: [['🌱', 'on sème'], ['🌾', 'le blé pousse'], ['🚜', 'on récolte'], ['🥖', 'le pain']] },
+  { n: 4, titre: 'la lettre',          etapes: [['✏️', "j'écris"], ['✉️', "l'enveloppe"], ['📮', 'je poste'], ['📬', 'elle arrive']] },
+  /* 5 étapes */
+  { n: 5, titre: 'le gâteau',          etapes: [['🥚', 'on casse les œufs'], ['🥣', 'on mélange'], ['🔥', 'on cuit'], ['🎂', 'les bougies'], ['🍰', 'on partage']] },
+  { n: 5, titre: 'se laver les mains', etapes: [['💧', 'je mouille'], ['🧼', 'je savonne'], ['👐', 'je frotte'], ['🚰', 'je rince'], ['🧻', "j'essuie"]] }
 ];
 const JOURS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
-const RANGS = ['D’abord', 'Ensuite', 'À la fin'];
+const RANGS = ['D’abord', 'Ensuite', 'Puis', 'Et puis', 'À la fin'];
+/* niveau -> nombre d'étapes ; le dernier niveau passe aux jours */
+const TEMPS_NIVEAUX = [3, 3, 4, 5, 0];
 
 let histoire = null, tempsPlaces = [], jourIndex = 0, jourSens = 'après';
 
-function caseFrise(contenu, grande) {
+function caseFrise(contenu, total) {
   const d = document.createElement('div');
   d.className = 'pop bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl flex items-center justify-center leading-none shrink-0';
-  d.style.width = grande ? 'min(24vw,7rem)' : 'min(20vw,6rem)';
-  d.style.height = d.style.width;
-  d.style.fontSize = grande ? 'min(13vw,3.6rem)' : 'min(11vw,3rem)';
+  const t = 'min(' + (72 / total).toFixed(1) + 'vw, 6rem)';
+  d.style.width = t; d.style.height = t;
+  d.style.fontSize = 'calc(' + t + ' * 0.55)';
   d.textContent = contenu;
   return d;
 }
@@ -2056,39 +2361,39 @@ function caseFrise(contenu, grande) {
 function dessinerFrise() {
   const f = document.getElementById('tempsFrise');
   f.innerHTML = '';
+  const total = histoire ? histoire.etapes.length : 3;
   tempsPlaces.forEach(function (et, i) {
     if (i) {
-      const fleche = document.createElement('div');
-      fleche.className = 'text-orange-400 text-2xl sm:text-4xl shrink-0';
-      fleche.textContent = '→';
-      f.appendChild(fleche);
+      const fl = document.createElement('div');
+      fl.className = 'text-orange-400 text-xl sm:text-3xl shrink-0';
+      fl.textContent = '→';
+      f.appendChild(fl);
     }
-    f.appendChild(caseFrise(et.e, false));
+    f.appendChild(caseFrise(et[0], total));
   });
 }
 
-/* ─── niveaux 1 et 2 : une histoire en trois images ─── */
 function nouvelleHistoire() {
-  histoire = tirageSansRepetition(HISTOIRES, histoire);
+  const combien = TEMPS_NIVEAUX[niveau('temps')];
+  const possibles = HISTOIRES.filter(function (h) { return h.n === combien; });
+  histoire = tirageSansRepetition(possibles, histoire);
   tempsPlaces = [];
   dessinerFrise();
-  document.getElementById('tempsLegende').textContent = '';
+  document.getElementById('tempsLegende').textContent = histoire.titre;
   document.getElementById('tempsConsigne').textContent = niveau('temps') === 0
     ? 'Touche les images dans l’ordre'
     : 'Qu’est-ce qui vient en premier ?';
 
   const g = document.getElementById('tempsGrid');
-  g.style.gridTemplateColumns = 'repeat(3, minmax(0, 1fr))';
+  g.style.gridTemplateColumns = 'repeat(' + Math.min(combien, 5) + ', minmax(0, 1fr))';
   g.innerHTML = '';
-  /* au niveau 1 on garde l'ordre naturel, au niveau 2 on mélange */
-  const ordre = niveau('temps') === 0
-    ? histoire.etapes.slice()
-    : histoire.etapes.slice().sort(function () { return Math.random() - 0.5; });
+  /* niveau 1 : ordre naturel (on montre la suite) ; ensuite mélangé */
+  const ordre = niveau('temps') === 0 ? histoire.etapes.slice() : melanger(histoire.etapes);
   ordre.forEach(function (et) {
     const b = document.createElement('button');
-    b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl shadow-xl text-4xl sm:text-6xl py-4';
-    b.textContent = et.e;
-    b.setAttribute('aria-label', et.l);
+    b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl shadow-xl text-3xl sm:text-5xl py-3';
+    b.textContent = et[0];
+    b.setAttribute('aria-label', et[1]);
     b.onclick = function () { toucherEtape(et, b); };
     g.appendChild(b);
   });
@@ -2102,26 +2407,27 @@ function toucherEtape(et, b) {
   b.disabled = true;
   b.style.opacity = '0.3';
   dessinerFrise();
-  glou(0.9 + (tempsPlaces.length - 1) * 0.25);
+  glou(0.85 + (tempsPlaces.length - 1) * 0.2);
   feathers(4);
 
-  const rang = RANGS[tempsPlaces.length - 1];
-  document.getElementById('tempsLegende').textContent = rang + ' : ' + et.l;
-  dire(rang + ', ' + et.l, 200);
+  const rang = RANGS[Math.min(tempsPlaces.length - 1, RANGS.length - 1)];
+  const dernier = tempsPlaces.length === histoire.etapes.length;
+  document.getElementById('tempsLegende').textContent =
+    (dernier ? 'À la fin' : rang) + ' : ' + et[1];
+  dire((dernier ? 'à la fin' : rang) + ', ' + et[1], 200);
 
-  if (tempsPlaces.length < histoire.etapes.length) {
+  if (!dernier) {
     document.getElementById('tempsConsigne').textContent = 'Et après ?';
   } else {
     document.getElementById('tempsConsigne').textContent = 'BRAVO ! C’est dans l’ordre !';
     pleuvoir(30, ['🦃', '🪶', '⭐', '🎉']);
-    setTimeout(function () { if (niveau('temps') !== 2) nouvelleHistoire(); }, 2600);
+    setTimeout(function () { if (TEMPS_NIVEAUX[niveau('temps')]) nouvelleHistoire(); }, 2800);
   }
 }
 
-/* ─── niveau 3 : les jours de la semaine ─── */
+/* ─── dernier niveau : les jours de la semaine ─── */
 function questionJour() {
   jourSens = Math.random() < 0.5 ? 'après' : 'avant';
-  /* on évite les bords selon le sens, pour que la réponse existe */
   jourIndex = jourSens === 'après'
     ? Math.floor(Math.random() * (JOURS.length - 1))
     : 1 + Math.floor(Math.random() * (JOURS.length - 1));
@@ -2131,7 +2437,6 @@ function questionJour() {
     'Quel jour vient <span class="text-orange-400">' + jourSens.toUpperCase() + '</span> ' + JOURS[jourIndex] + ' ?';
   dire('Quel jour vient ' + jourSens + ' ' + JOURS[jourIndex] + ' ?', 300);
 
-  /* la frise montre la semaine, avec le jour de référence mis en avant */
   const f = document.getElementById('tempsFrise');
   f.innerHTML = '';
   const ligne = document.createElement('div');
@@ -2146,13 +2451,12 @@ function questionJour() {
   f.appendChild(ligne);
   document.getElementById('tempsLegende').textContent = '';
 
-  /* trois propositions : la bonne et deux autres jours */
-  const choix = [bon];
+  let choix = [bon];
   while (choix.length < 3) {
     const j = JOURS[Math.floor(Math.random() * JOURS.length)];
     if (choix.indexOf(j) < 0 && j !== JOURS[jourIndex]) choix.push(j);
   }
-  choix.sort(function () { return Math.random() - 0.5; });
+  choix = melanger(choix);
 
   const g = document.getElementById('tempsGrid');
   g.style.gridTemplateColumns = 'repeat(3, minmax(0, 1fr))';
@@ -2164,26 +2468,24 @@ function questionJour() {
     b.onclick = function () {
       if (j === bon) {
         document.getElementById('tempsLegende').textContent = jourSens === 'après'
-          ? JOURS[jourIndex] + ' → ' + j
-          : j + ' → ' + JOURS[jourIndex];
+          ? JOURS[jourIndex] + ' → ' + j : j + ' → ' + JOURS[jourIndex];
         document.getElementById('tempsConsigne').textContent = 'BRAVO ! ' + j;
         dire('Bravo ! ' + j, 250);
-        bravo(2200, questionJour);
-      } else {
-        raté(b);
-      }
+        bravo(2400, questionJour);
+      } else { raté(b); }
     };
     g.appendChild(b);
   });
 }
 
 function resetTemps() {
-  if (niveau('temps') === 2) questionJour();
+  if (TEMPS_NIVEAUX[niveau('temps')] === 0) questionJour();
   else nouvelleHistoire();
 }
 
 poserNiveaux('tempsNiveaux', 'temps',
-  ['1. L’histoire', '2. Remets en ordre', '3. Les jours'], resetTemps);
+  ['1. Découvrir', '2. 3 images', '3. 4 images', '4. 5 images', '5. Les jours'],
+  resetTemps);
 
 /* ══════════════════════════════════════════════════════════
    13. LES SUITES DE ROULLIEEE — algorithmes
@@ -2235,7 +2537,7 @@ function nouvelleSuite() {
   suiteMotif = SUITE_MOTIFS[n];
   /* on tire autant de jetons différents que le motif en demande */
   const distincts = Math.max.apply(null, suiteMotif) + 1;
-  suiteJetons = SUITE_JETONS.slice().sort(function () { return Math.random() - 0.5; }).slice(0, distincts);
+  suiteJetons = melanger(SUITE_JETONS).slice(0, distincts);
 
   /* on montre deux répétitions complètes du motif, puis on coupe :
      l'enfant a de quoi repérer la régularité avant de deviner */
@@ -2250,13 +2552,13 @@ function nouvelleSuite() {
   dessinerSuite();
 
   /* propositions : la bonne, plus les autres jetons du motif et un intrus */
-  const choix = [suiteAttendu];
+  let choix = [suiteAttendu];
   suiteJetons.forEach(function (j) { if (choix.indexOf(j) < 0) choix.push(j); });
   const reste = SUITE_JETONS.filter(function (j) { return choix.indexOf(j) < 0; });
   while (choix.length < 3 && reste.length) {
     choix.push(reste.splice(Math.floor(Math.random() * reste.length), 1)[0]);
   }
-  choix.sort(function () { return Math.random() - 0.5; });
+  choix = melanger(choix);
 
   const g = document.getElementById('suitesGrid');
   g.style.gridTemplateColumns = 'repeat(' + choix.length + ', minmax(0, 1fr))';
@@ -2290,6 +2592,734 @@ function resetSuites() { nouvelleSuite(); }
 
 poserNiveaux('suitesNiveaux', 'suites',
   ['1. AB AB', '2. ABC ABC', '3. AABB'], resetSuites);
+/* ══════════════════════════════════════════════════════════
+   14. LES SONS DE ROULLIEEE — conscience phonologique
+   Enregistrements de la voix de la maîtresse. On travaille le SON de
+   la lettre, jamais son nom : lire « dinde » avec les noms donne
+   « dé-i-enne-dé-eu », qui ne mène nulle part. Le son, lui, mène au
+   mot. Les lettres d'abord, les groupes de lettres ensuite.
+   ══════════════════════════════════════════════════════════ */
+const PHON_LETTRES = [
+  { f: 'a', l: 'a', M: 'A' },
+  { f: 'e', l: 'e', M: 'E' },
+  { f: 'e_accent_aigu',  l: 'é', M: 'É' },
+  { f: 'e_accent_grave', l: 'è', M: 'È' },
+  { f: 'i', l: 'i', M: 'I' },
+  { f: 'o', l: 'o', M: 'O' },
+  { f: 'u', l: 'u', M: 'U' },
+  { f: 'b', l: 'b', M: 'B' },
+  { f: 'd', l: 'd', M: 'D' },
+  { f: 'f', l: 'f', M: 'F' },
+  { f: 'g', l: 'g', M: 'G' },
+  { f: 'j', l: 'j', M: 'J' },
+  { f: 'k', l: 'c / k', M: '' },
+  { f: 'l', l: 'l', M: 'L' },
+  { f: 'm', l: 'm', M: 'M' },
+  { f: 'n', l: 'n', M: 'N' },
+  { f: 'p', l: 'p', M: 'P' },
+  { f: 'r', l: 'r', M: 'R' },
+  { f: 's', l: 's', M: 'S' },
+  { f: 't', l: 't', M: 'T' },
+  { f: 'v', l: 'v', M: 'V' },
+  { f: 'z', l: 'z', M: 'Z' }
+];
+/* la maîtresse a regroupé les graphies qui font le même son : « on » et
+   « om » s'écrivent différemment mais s'entendent pareil */
+const PHON_GROUPES = [
+  { f: 'ch', l: 'ch', M: '' },
+  { f: 'gn', l: 'gn', M: '' },
+  { f: 'ou', l: 'ou', M: '' },
+  { f: 'oi', l: 'oi', M: '' },
+  { f: 'on', l: 'on / om', M: '' },
+  { f: 'an', l: 'an / en', M: '' },
+  { f: 'in', l: 'in / ain / ein', M: '' },
+  { f: 'au', l: 'au / eau', M: '' },
+  { f: 'eu', l: 'eu', M: '' },
+  { f: 'eur', l: 'eur', M: '' },
+  { f: 'euil', l: 'euil', M: '' },
+  { f: 'ill', l: 'ill', M: '' },
+  { f: 'ouill', l: 'ouill', M: '' }
+];
+const SONS_NIVEAUX = [
+  { liste: PHON_LETTRES, ecoute: false, colonnes: 4 },
+  { liste: PHON_LETTRES, ecoute: true,  colonnes: 3 },
+  { liste: PHON_GROUPES, ecoute: false, colonnes: 3 },
+  { liste: PHON_GROUPES, ecoute: true,  colonnes: 3 }
+];
+const NB_CHOIX = 6;
+
+/* un seul lecteur suffit : deux phonèmes ne se superposent jamais. Il est
+   amorcé au démarrage comme les autres, ce qui le débloque sur téléphone —
+   changer son src ensuite ne le reverrouille pas. */
+const lecteurPhoneme = new Audio('sons/phonemes/a.mp3?v=' + VERSION_SONS);
+lecteurPhoneme.preload = 'auto';
+
+let phonCible = null;
+
+function jouerPhoneme(f, auFini) {
+  /* même muet, la suite doit se déclencher : sinon l'enchaînement
+     « le son… comme dans dinde » resterait bloqué */
+  if (muted) { if (auFini) setTimeout(auFini, 300); return; }
+  try { lecteurPhoneme.pause(); } catch (e) {}
+  lecteurPhoneme.onended = auFini || null;
+  lecteurPhoneme.src = 'sons/phonemes/' + f + '.mp3?v=' + VERSION_SONS;
+  lecteurPhoneme.currentTime = 0;
+  lecteurPhoneme.play().then(function () { marquerSon(lecteurPhoneme.duration); })
+    .catch(function () { if (auFini) auFini(); });
+}
+
+function rejouerPhoneme() {
+  if (phonCible) jouerPhoneme(phonCible.f);
+}
+
+function carteSon(p, surClic) {
+  const b = document.createElement('button');
+  b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl shadow-xl py-3 px-1 flex flex-col items-center justify-center';
+  b.style.minHeight = '9vh';
+  b.dataset.f = p.f;
+  b.setAttribute('aria-label', 'le son ' + p.l);
+  b.innerHTML = '<span class="font-bold text-amber-100 leading-none" style="font-size:min(7vw,2rem)">' + p.l + '</span>' +
+    (p.M ? '<span class="text-amber-400 font-bold leading-none mt-1" style="font-size:min(4.5vw,1.2rem)">' + p.M + '</span>' : '');
+  b.onclick = function () { surClic(p, b); };
+  return b;
+}
+
+function questionSon() {
+  const cfg = SONS_NIVEAUX[niveau('sons')];
+  phonCible = tirageSansRepetition(cfg.liste, phonCible);
+
+  /* la bonne réponse plus cinq autres, l'ensemble mélangé */
+  let choix = [phonCible];
+  const reste = melanger(cfg.liste.filter(function (p) { return p !== phonCible; }));
+  while (choix.length < Math.min(NB_CHOIX, cfg.liste.length)) choix.push(reste.pop());
+  choix = melanger(choix);
+
+  const g = document.getElementById('sonsGrid');
+  g.style.gridTemplateColumns = 'repeat(' + cfg.colonnes + ', minmax(0, 1fr))';
+  g.innerHTML = '';
+  choix.forEach(function (p) { g.appendChild(carteSon(p, repondreSon)); });
+
+  document.getElementById('sonsConsigne').textContent = 'Écoute… puis touche ce que tu entends';
+  setTimeout(function () { jouerPhoneme(phonCible.f); }, 500);
+}
+
+function repondreSon(p, b) {
+  if (p === phonCible) {
+    replay(b, 'pop');
+    document.getElementById('sonsConsigne').textContent = 'BRAVO ! C’est « ' + p.l +' »';
+    glou(1.4);
+    feathers(6);
+    setTimeout(function () { if (niveau('sons') % 2 === 1) questionSon(); }, 2200);
+  } else {
+    raté(b);
+    setTimeout(rejouerPhoneme, 400);   /* on réécoute, on ne perd rien */
+  }
+}
+
+function resetSons() {
+  const cfg = SONS_NIVEAUX[niveau('sons')];
+  document.getElementById('sonsRejouer').classList.toggle('hidden', !cfg.ecoute);
+
+  if (cfg.ecoute) { questionSon(); return; }
+
+  /* tableau de sons : l'enfant explore librement, rien ne lui est demandé */
+  phonCible = null;
+  const g = document.getElementById('sonsGrid');
+  g.style.gridTemplateColumns = 'repeat(' + cfg.colonnes + ', minmax(0, 1fr))';
+  g.innerHTML = '';
+  cfg.liste.forEach(function (p) {
+    g.appendChild(carteSon(p, function (q, b) {
+      jouerPhoneme(q.f);
+      replay(b, 'wiggle');
+      document.getElementById('sonsConsigne').textContent = 'le son « ' + q.l + ' »';
+    }));
+  });
+  document.getElementById('sonsConsigne').textContent = 'Touche pour entendre le son';
+}
+
+poserNiveaux('sonsNiveaux', 'sons',
+  ['1. Les lettres', '2. Écoute la lettre', '3. Les groupes', '4. Écoute le groupe'],
+  resetSons);
+/* ══════════════════════════════════════════════════════════
+   15. LES FORMES DU JARDIN
+   Les formes changent de COULEUR, de TAILLE et d'ORIENTATION à
+   chaque tirage. C'est le point essentiel : un carré penché reste un
+   carré, et un enfant qui reconnaît « le grand bleu » n'a pas
+   reconnu la forme. (principe repris de la version « ateliers »)
+   ══════════════════════════════════════════════════════════ */
+const COULEURS_FORMES = ['#ea580c', '#16a34a', '#2563eb', '#7c3aed', '#db2777', '#0891b2', '#ca8a04'];
+
+function polyRegulier(k, r) {
+  const pts = [];
+  for (let i = 0; i < k; i++) {
+    const t = -Math.PI / 2 + i * 2 * Math.PI / k;
+    pts.push((50 + r * Math.cos(t)).toFixed(1) + ',' + (50 + r * Math.sin(t)).toFixed(1));
+  }
+  return pts.join(' ');
+}
+
+const FORMES = [
+  { id: 'rond',      nom: 'le rond',      base: true,
+    dit: 'Le rond est tout rond : il n’a pas de coin.',
+    trace: function () { return '<circle cx="50" cy="50" r="38"/>'; } },
+  { id: 'carre',     nom: 'le carré',     base: true,
+    dit: 'Le carré a quatre côtés pareils et quatre coins.',
+    trace: function () { return '<rect x="16" y="16" width="68" height="68" rx="3"/>'; } },
+  { id: 'triangle',  nom: 'le triangle',  base: true,
+    dit: 'Le triangle a trois côtés et trois coins.',
+    /* plusieurs tracés : un triangle n'est pas toujours posé sur sa base */
+    trace: function (v) {
+      const t = ['50,12 90,84 10,84', '15,85 15,20 85,85', '35,12 88,84 8,70', '50,8 72,90 28,90'];
+      return '<polygon points="' + t[(v || 0) % t.length] + '"/>';
+    } },
+  { id: 'rectangle', nom: 'le rectangle', base: true,
+    dit: 'Le rectangle a quatre côtés : deux longs et deux courts.',
+    trace: function () { return '<rect x="8" y="30" width="84" height="40" rx="3"/>'; } },
+  { id: 'ovale',     nom: "l'ovale",      base: true,
+    dit: 'L’ovale a la forme d’un œuf : il n’a pas de coin.',
+    trace: function () { return '<ellipse cx="50" cy="50" rx="27" ry="40"/>'; } },
+  { id: 'etoile',    nom: "l'étoile",     base: false,
+    dit: 'L’étoile a cinq pointes.',
+    trace: function () {
+      const p = [];
+      for (let i = 0; i < 10; i++) {
+        const r = i % 2 ? 17 : 42, a = -Math.PI / 2 + i * Math.PI / 5;
+        p.push((50 + r * Math.cos(a)).toFixed(1) + ',' + (50 + r * Math.sin(a)).toFixed(1));
+      }
+      return '<polygon points="' + p.join(' ') + '"/>';
+    } },
+  { id: 'losange',   nom: 'le losange',   base: false,
+    dit: 'Le losange a quatre côtés pareils, penché comme un cerf-volant.',
+    trace: function () { return '<polygon points="50,8 78,50 50,92 22,50"/>'; } },
+  { id: 'hexagone',  nom: "l'hexagone",   base: false,
+    dit: 'L’hexagone a six côtés, comme une alvéole d’abeille.',
+    trace: function () { return '<polygon points="' + polyRegulier(6, 40) + '"/>'; } }
+];
+const FORMES_BASE = FORMES.filter(function (f) { return f.base; });
+const FORMES_NIVEAUX = [
+  { liste: FORMES_BASE, libre: true,  varie: false },
+  { liste: FORMES_BASE, libre: false, varie: false },
+  { liste: FORMES_BASE, libre: false, varie: true },
+  { liste: FORMES,      libre: false, varie: true }
+];
+let formeCible = null;
+
+/* varie = couleur, taille et rotation tirées au sort */
+function svgForme(f, varie) {
+  const couleur = varie ? COULEURS_FORMES[Math.floor(Math.random() * COULEURS_FORMES.length)] : '#ea580c';
+  const rot = varie ? [0, 0, 18, -25, 35, 90, 160][Math.floor(Math.random() * 7)] : 0;
+  const ech = varie ? 0.68 + Math.random() * 0.32 : 1;
+  const variante = Math.floor(Math.random() * 4);
+  return '<svg viewBox="0 0 100 100" class="w-full h-full" aria-hidden="true">' +
+    '<g transform="translate(50 50) rotate(' + rot + ') scale(' + ech.toFixed(2) + ') translate(-50 -50)" fill="' + couleur + '">' +
+    f.trace(variante) + '</g></svg>';
+}
+
+function carteForme(f, varie, surClic) {
+  const b = document.createElement('button');
+  b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl shadow-xl p-2 flex items-center justify-center';
+  b.style.height = 'min(26vw, 8rem)';
+  b.dataset.id = f.id;
+  b.setAttribute('aria-label', f.nom);
+  b.innerHTML = svgForme(f, varie);
+  b.onclick = function () { surClic(f, b); };
+  return b;
+}
+
+function questionForme() {
+  const cfg = FORMES_NIVEAUX[niveau('formes')];
+  formeCible = tirageSansRepetition(cfg.liste, formeCible);
+
+  let choix = [formeCible];
+  const reste = melanger(cfg.liste.filter(function (f) { return f !== formeCible; }));
+  while (choix.length < Math.min(4, cfg.liste.length)) choix.push(reste.pop());
+  choix = melanger(choix);
+
+  const g = document.getElementById('formesGrid');
+  g.style.gridTemplateColumns = 'repeat(2, minmax(0, 1fr))';
+  g.innerHTML = '';
+  choix.forEach(function (f) { g.appendChild(carteForme(f, cfg.varie, repondreForme)); });
+
+  document.getElementById('formesConsigne').innerHTML =
+    'Touche <span class="text-orange-400">' + formeCible.nom.toUpperCase() + '</span>';
+  dire('Touche ' + formeCible.nom, 300);
+}
+
+function repondreForme(f, b) {
+  if (f === formeCible) {
+    replay(b, 'pop');
+    document.getElementById('formesConsigne').textContent = 'BRAVO ! ' + f.nom;
+    document.getElementById('formesDit').textContent = f.dit;
+    dire('Bravo ! ' + f.nom, 250);
+    bravo(2600, questionForme);
+  } else {
+    raté(b);
+  }
+}
+
+function resetFormes() {
+  const cfg = FORMES_NIVEAUX[niveau('formes')];
+  formeCible = null;
+  document.getElementById('formesDit').textContent = '';
+  if (!cfg.libre) { questionForme(); return; }
+
+  const g = document.getElementById('formesGrid');
+  g.style.gridTemplateColumns = 'repeat(2, minmax(0, 1fr))';
+  g.innerHTML = '';
+  cfg.liste.forEach(function (f) {
+    g.appendChild(carteForme(f, false, function (x, b) {
+      replay(b, 'wiggle');
+      document.getElementById('formesConsigne').textContent = x.nom;
+      document.getElementById('formesDit').textContent = x.dit;
+      dire(x.nom + '. ' + x.dit, 250);
+    }));
+  });
+  document.getElementById('formesConsigne').textContent = 'Touche une forme';
+}
+
+poserNiveaux('formesNiveaux', 'formes',
+  ['1. Découvrir', '2. Trouve la forme', '3. Couleurs mêlées', '4. Formes difficiles'],
+  resetFormes);
+
+/* ══════════════════════════════════════════════════════════
+   16. PLUS, MOINS, AUTANT — comparer des quantités
+   Comparer vient AVANT compter : on voit qu'un nid est plus garni
+   sans savoir dire combien.
+     1. plus      — écarts nets
+     2. moins     — l'inverse, plus difficile à formuler
+     3. autant ?  — répondre oui ou non
+     4. équilibre — on DÉPLACE des dindes jusqu'à en avoir autant
+     5. compte bien — quantités voisines, dindes en désordre
+   L'équilibre est le seul niveau où l'enfant agit sur les quantités
+   au lieu de les juger : il fabrique l'égalité au lieu de la constater.
+   ══════════════════════════════════════════════════════════ */
+const COMPARE_NIVEAUX = [
+  { mode: 'choisir',  question: 'plus',   desordre: false },
+  { mode: 'choisir',  question: 'moins',  desordre: false },
+  { mode: 'autant',   question: 'autant', desordre: false },
+  { mode: 'equilibre', question: '',      desordre: false },
+  { mode: 'choisir',  question: 'mixte',  desordre: true }
+];
+let cmpA = 3, cmpB = 5, cmpQuestion = 'plus', cmpFini = false;
+
+function dessinerNid(cote, n, desordre) {
+  const z = document.getElementById('nid' + cote + 'Zone');
+  z.innerHTML = '';
+  const equilibre = COMPARE_NIVEAUX[niveau('compare')].mode === 'equilibre';
+  z.style.height = 'min(34vw, 11rem)';
+  z.className = desordre ? 'relative w-full' : 'flex flex-wrap justify-center content-start gap-1 w-full';
+
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement(equilibre ? 'button' : 'span');
+    s.className = 'leading-none' + (equilibre ? ' tap' : '');
+    s.style.fontSize = 'min(7vw, 2rem)';
+    s.textContent = '🦃';
+    if (desordre) {
+      s.classList.add('absolute');
+      s.style.left = (6 + (i % 4) * 23 + (i * 7 % 9)) + '%';
+      s.style.top = (6 + Math.floor(i / 4) * 23 + (i * 5 % 9)) + '%';
+    }
+    if (equilibre) {
+      /* on peut glisser une dinde vers l'autre nid, ou la toucher */
+      s.setAttribute('aria-label', 'dinde du nid ' + cote);
+      s.onclick = function () { if (!ignorerClic) deplacerDinde(cote); };
+      rendreGlissable(s, cote, function (depart, zone) {
+        if (zone.dataset.depot !== depart) deplacerDinde(depart);
+      });
+    }
+    z.appendChild(s);
+  }
+}
+
+function deplacerDinde(depuis) {
+  if (cmpFini || COMPARE_NIVEAUX[niveau('compare')].mode !== 'equilibre') return;
+  if (depuis === 'A' && cmpA > 0) { cmpA--; cmpB++; }
+  else if (depuis === 'B' && cmpB > 0) { cmpB--; cmpA++; }
+  else { glou(0.45); return; }
+  glou(1.1);
+  dessinerNid('A', cmpA, false);
+  dessinerNid('B', cmpB, false);
+  montrerNombres(false);
+}
+
+function montrerNombres(montrer) {
+  document.getElementById('nidANum').textContent = montrer ? cmpA : '';
+  document.getElementById('nidBNum').textContent = montrer ? cmpB : '';
+}
+
+function verifierEquilibre() {
+  if (cmpFini) return;
+  if (cmpA === cmpB) {
+    cmpFini = true;
+    montrerNombres(true);
+    document.getElementById('compareConsigne').textContent =
+      'BRAVO ! ' + cmpA + ' et ' + cmpB + ' : autant dans les deux !';
+    dire('Bravo ! Autant dans les deux nids !', 350);
+    bravo(2800, questionCompare);
+  } else {
+    document.getElementById('compareConsigne').textContent =
+      'Pas encore : ' + (cmpA > cmpB ? 'le nid A en a trop' : 'le nid B en a trop');
+    raté(document.getElementById('compareValider'));
+  }
+}
+
+function choisirNid(cote) {
+  const cfg = COMPARE_NIVEAUX[niveau('compare')];
+  if (cmpFini || cfg.mode !== 'choisir') return;
+  const gagnant = cmpQuestion === 'plus' ? (cmpA > cmpB ? 'A' : 'B') : (cmpA < cmpB ? 'A' : 'B');
+  const el = document.getElementById('nid' + cote);
+  if (cote === gagnant) {
+    cmpFini = true;
+    montrerNombres(true);
+    el.classList.add('border-green-400');
+    document.getElementById('compareConsigne').textContent =
+      'BRAVO ! ' + cmpA + ' et ' + cmpB + ' : le nid ' + cote + ' en a ' + cmpQuestion;
+    dire('Bravo !', 300);
+    bravo(2800, questionCompare);
+  } else { raté(el); }
+}
+
+function repondreAutant(oui, el) {
+  if (cmpFini) return;
+  const egal = cmpA === cmpB;
+  if (oui === egal) {
+    cmpFini = true;
+    montrerNombres(true);
+    document.getElementById('compareConsigne').textContent = egal
+      ? 'BRAVO ! ' + cmpA + ' et ' + cmpB + ' : autant dans les deux !'
+      : 'BRAVO ! ' + cmpA + ' et ' + cmpB + ' : ce n’est pas pareil.';
+    dire('Bravo !', 300);
+    bravo(2800, questionCompare);
+  } else { raté(el); }
+}
+
+function questionCompare() {
+  const n = niveau('compare');
+  const cfg = COMPARE_NIVEAUX[n];
+  cmpFini = false;
+  montrerNombres(false);
+  document.getElementById('nidA').classList.remove('border-green-400');
+  document.getElementById('nidB').classList.remove('border-green-400');
+  document.getElementById('compareValider').classList.toggle('hidden', cfg.mode !== 'equilibre');
+
+  if (cfg.mode === 'equilibre') {
+    /* total pair, sinon l'égalité est impossible à atteindre */
+    const total = 4 + 2 * Math.floor(Math.random() * 5);
+    const ecart = 1 + Math.floor(Math.random() * Math.min(3, total / 2 - 1));
+    cmpA = total / 2 + ecart; cmpB = total / 2 - ecart;
+    if (Math.random() < 0.5) { const t = cmpA; cmpA = cmpB; cmpB = t; }
+    cmpQuestion = '';
+  } else if (cfg.question === 'mixte') {
+    cmpA = 6 + Math.floor(Math.random() * 7);
+    cmpB = cmpA + (Math.random() < 0.5 ? 1 : -1);
+    cmpQuestion = Math.random() < 0.5 ? 'plus' : 'moins';
+  } else if (cfg.mode === 'autant') {
+    cmpA = 1 + Math.floor(Math.random() * 7);
+    cmpB = Math.random() < 0.5 ? cmpA : 1 + Math.floor(Math.random() * 7);
+    cmpQuestion = 'autant';
+  } else {
+    cmpA = 1 + Math.floor(Math.random() * 7);
+    do { cmpB = 1 + Math.floor(Math.random() * 7); } while (cmpB === cmpA);
+    cmpQuestion = cfg.question;
+  }
+
+  dessinerNid('A', cmpA, cfg.desordre);
+  dessinerNid('B', cmpB, cfg.desordre);
+
+  const extra = document.getElementById('compareBoutons');
+  extra.innerHTML = '';
+  if (cfg.mode === 'equilibre') {
+    document.getElementById('compareConsigne').innerHTML =
+      'Fais <span class="text-orange-400">AUTANT</span> de dindes dans les deux nids — glisse-les !';
+    dire('Fais autant de dindes dans les deux nids', 350);
+  } else if (cfg.mode === 'autant') {
+    document.getElementById('compareConsigne').innerHTML =
+      'Y a-t-il <span class="text-orange-400">AUTANT</span> de dindes dans les deux nids ?';
+    dire('Y a-t-il autant de dindes dans les deux nids ?', 350);
+    [['✅ Oui, autant', true], ['❌ Non, pas pareil', false]].forEach(function (p) {
+      const b = document.createElement('button');
+      b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl shadow-xl font-bold text-base sm:text-xl text-amber-100 px-5 py-4';
+      b.textContent = p[0];
+      b.onclick = function () { repondreAutant(p[1], b); };
+      extra.appendChild(b);
+    });
+  } else {
+    document.getElementById('compareConsigne').innerHTML =
+      'Touche le nid où il y a <span class="text-orange-400">' + cmpQuestion.toUpperCase() +
+      '</span> de dindes' + (cfg.desordre ? ' <span class="text-amber-400">(compte bien !)</span>' : '');
+    dire('Où y a-t-il ' + cmpQuestion + ' de dindes ?', 350);
+  }
+}
+
+function resetCompare() { questionCompare(); }
+
+poserNiveaux('compareNiveaux', 'compare',
+  ['1. Le plus', '2. Le moins', '3. Autant ?', '4. Équilibre', '5. Compte bien'], resetCompare);
+
+/* ══════════════════════════════════════════════════════════
+   17. LE MARCHÉ DE ROULLIEEE
+   Chaque article a un prix FIXE : l'enfant finit par le connaître,
+   comme au vrai marché. Les pièces valent 1 ou 2, ce qui fait passer
+   du comptage à la composition. Le dernier niveau présente DEUX
+   articles : il faut additionner avant de payer.
+   Les pièces posées restent visibles et se reprennent d'un toucher.
+   (prix et principe repris de la version « ateliers »)
+   ══════════════════════════════════════════════════════════ */
+const ARTICLES = [
+  { e: '🪶', nom: 'une plume',   p: 1 }, { e: '🌸', nom: 'une fleur',   p: 1 },
+  { e: '🌾', nom: 'du grain',    p: 2 }, { e: '🥕', nom: 'une carotte', p: 2 },
+  { e: '🥚', nom: 'un œuf',      p: 3 }, { e: '🧀', nom: 'du fromage',  p: 3 },
+  { e: '🍎', nom: 'une pomme',   p: 4 }, { e: '🍯', nom: 'du miel',     p: 4 },
+  { e: '🎩', nom: 'un chapeau',  p: 5 }, { e: '📕', nom: 'un livre',    p: 5 },
+  { e: '🧺', nom: 'un panier',   p: 6 }, { e: '🧣', nom: 'une écharpe', p: 7 },
+  { e: '☂️', nom: 'un parapluie', p: 8 }, { e: '🎒', nom: 'un cartable', p: 9 }
+];
+const MARCHE_NIVEAUX = [
+  { libre: true,  valeurs: [1],    nb: 1, maxPrix: 5 },
+  { libre: false, valeurs: [1],    nb: 1, maxPrix: 5 },
+  { libre: false, valeurs: [1, 2], nb: 1, maxPrix: 9 },
+  { libre: false, valeurs: [1, 2], nb: 2, maxPrix: 9 }   /* deux articles : on additionne */
+];
+const COULEUR_PIECE = { 1: '#fde68a', 2: '#fbbf24' };
+let marcheArts = [], marchePrix = 0, marcheDonne = [], marcheFini = false;
+
+function sommeDonnee() {
+  return marcheDonne.reduce(function (s, v) { return s + v; }, 0);
+}
+
+function majPlateau() {
+  const z = document.getElementById('marchePlateau');
+  z.innerHTML = '';
+  marcheDonne.forEach(function (v, i) {
+    const b = document.createElement('button');
+    b.className = 'tap rounded-full border-2 border-amber-700 font-bold text-[#4a2c0b] flex items-center justify-center';
+    b.style.background = COULEUR_PIECE[v];
+    b.style.width = 'min(11vw,2.6rem)'; b.style.height = b.style.width;
+    b.style.fontSize = 'min(6vw,1.3rem)';
+    b.textContent = v;
+    b.setAttribute('aria-label', 'reprendre la pièce de ' + v);
+    /* une pièce posée par erreur se reprend d'un simple toucher */
+    b.onclick = function () {
+      if (marcheFini) return;
+      marcheDonne.splice(i, 1);
+      glou(0.6);
+      majPlateau();
+    };
+    z.appendChild(b);
+  });
+  document.getElementById('marcheCompte').textContent =
+    sommeDonnee() + ' sur ' + marchePrix;
+}
+
+function poserPiece(v) {
+  if (marcheFini || marcheDonne.length >= 14) { glou(0.45); return; }
+  marcheDonne.push(v);
+  glou(0.85 + Math.min(sommeDonnee(), 10) * 0.05);
+  majPlateau();
+}
+
+function payer() {
+  if (marcheFini) return;
+  const s = sommeDonnee();
+  if (s === marchePrix) {
+    marcheFini = true;
+    document.getElementById('marcheConsigne').textContent = 'BRAVO ! C’est le compte juste !';
+    pleuvoir(25, ['🪙', '🦃', '⭐']);
+    dire('Bravo ! C’est le compte juste !', 400);
+    bravo(2800, questionMarche);
+  } else {
+    document.getElementById('marcheConsigne').textContent =
+      s < marchePrix ? 'Il manque ' + (marchePrix - s) + ' …' : 'Il y a ' + (s - marchePrix) + ' de trop…';
+    raté(document.getElementById('marchePayer'));
+    dire('Tu as donné ' + s, 300);
+  }
+}
+
+function questionMarche() {
+  const cfg = MARCHE_NIVEAUX[niveau('marche')];
+  const pool = melanger(ARTICLES.filter(function (a) { return a.p <= cfg.maxPrix; }));
+  marcheArts = cfg.nb === 1 ? [pool[0]]
+    : [pool[0], pool.find(function (a) { return a !== pool[0] && a.p + pool[0].p <= 12; }) || pool[1]];
+  marchePrix = marcheArts.reduce(function (s, a) { return s + a.p; }, 0);
+  marcheDonne = [];
+  marcheFini = false;
+
+  const etal = document.getElementById('marcheEtal');
+  etal.innerHTML = '';
+  marcheArts.forEach(function (a) {
+    const d = document.createElement('div');
+    d.className = 'bg-[#5c3a1f] border-4 border-amber-400 rounded-2xl px-3 py-2 text-center';
+    d.innerHTML = '<div style="font-size:min(14vw,3.4rem)" class="leading-none">' + a.e + '</div>' +
+      '<div class="text-amber-200 text-xs sm:text-base">' + a.nom + '</div>' +
+      '<div class="text-orange-300 font-bold text-sm sm:text-lg">🪙 ' + a.p + '</div>';
+    etal.appendChild(d);
+  });
+
+  document.getElementById('marchePrix').innerHTML = marcheArts.length > 1
+    ? '<span class="text-amber-300">' + marcheArts.map(function (a) { return a.p; }).join(' + ') +
+      ' = </span><span class="text-orange-400 font-bold" style="font-size:min(11vw,2.8rem)">' + marchePrix + '</span>'
+    : '<span class="text-orange-400 font-bold" style="font-size:min(11vw,2.8rem)">' + marchePrix + '</span>';
+
+  const bac = document.getElementById('marcheBac');
+  bac.innerHTML = '';
+  cfg.valeurs.forEach(function (v) {
+    const b = document.createElement('button');
+    b.className = 'tap rounded-full border-4 border-amber-700 font-bold text-[#4a2c0b] flex items-center justify-center shadow-xl';
+    b.style.background = COULEUR_PIECE[v];
+    b.style.width = 'min(17vw,4.5rem)'; b.style.height = b.style.width;
+    b.style.fontSize = 'min(9vw,2rem)';
+    b.textContent = v;
+    b.setAttribute('aria-label', 'poser une pièce de ' + v);
+    b.onclick = function () { poserPiece(v); };
+    bac.appendChild(b);
+  });
+
+  majPlateau();
+  document.getElementById('marcheConsigne').textContent = marcheArts.length > 1
+    ? 'Paie les DEUX articles' : 'Paie ' + marcheArts[0].nom;
+  dire(marcheArts.length > 1 ? 'Paie les deux articles' : 'Paie ' + marcheArts[0].nom, 350);
+}
+
+function resetMarche() {
+  const cfg = MARCHE_NIVEAUX[niveau('marche')];
+  document.getElementById('marchePayer').classList.toggle('hidden', cfg.libre);
+  document.getElementById('marcheBac').classList.toggle('hidden', cfg.libre);
+  document.getElementById('marchePlateauBoite').classList.toggle('hidden', cfg.libre);
+
+  if (!cfg.libre) { questionMarche(); return; }
+
+  /* l'étal : on découvre les articles et leur prix */
+  marcheFini = true;
+  marcheDonne = [];
+  document.getElementById('marchePrix').innerHTML = '';
+  const etal = document.getElementById('marcheEtal');
+  etal.innerHTML = '';
+  ARTICLES.forEach(function (a) {
+    const b = document.createElement('button');
+    b.className = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl px-2 py-2 text-center';
+    b.innerHTML = '<div style="font-size:min(9vw,2.2rem)" class="leading-none">' + a.e + '</div>' +
+      '<div class="text-orange-300 font-bold text-xs sm:text-sm">🪙 ' + a.p + '</div>';
+    b.setAttribute('aria-label', a.nom + ', ' + a.p);
+    b.onclick = function () {
+      replay(b, 'wiggle');
+      document.getElementById('marcheConsigne').textContent = a.nom + ' : ' + a.p + ' pièce' + (a.p > 1 ? 's' : '');
+      dire(a.nom + ', ' + a.p + ' pièce' + (a.p > 1 ? 's' : ''), 200);
+    };
+    etal.appendChild(b);
+  });
+  document.getElementById('marcheConsigne').textContent = 'Touche un article pour connaître son prix';
+}
+
+poserNiveaux('marcheNiveaux', 'marche',
+  ['1. L’étal', '2. Pièces de 1', '3. Pièces de 1 et 2', '4. Deux articles'], resetMarche);
+
+/* ══════════════════════════════════════════════════════════
+   18. LE PUZZLE DE ROULLIEEE
+   Les pièces démarrent mélangées DANS la grille : on les échange deux
+   à deux, par glissement ou par deux touchers. Aucune place n'est
+   interdite, donc aucun son d'erreur — on range comme on veut, et la
+   fanfare ne part que lorsque tout est à sa place.
+   ══════════════════════════════════════════════════════════ */
+const PUZZLE_IMAGES = [
+  { f: 'Dindromakus.jpg', nom: 'Dindromakus' },
+  { f: 'Rulie.jpg',       nom: 'Roullieee' },
+  { f: 'belgicus.jpg',    nom: 'le Dindonus Belgicus' },
+  { f: 'dddv.jpg',        nom: 'la Dinde Dingue Verte' }
+];
+const PUZZLE_NIVEAUX = [{ c: 2, l: 2 }, { c: 3, l: 2 }, { c: 3, l: 3 }, { c: 4, l: 3 }];
+let puzImage = null, puzCols = 2, puzLignes = 2;
+let puzPlan = [], puzChoisie = null, puzGagne = false;
+
+function fondMorceau(el, i) {
+  el.style.backgroundImage = "url('" + puzImage.f + "')";
+  el.style.backgroundSize = (puzCols * 100) + '% ' + (puzLignes * 100) + '%';
+  const x = puzCols > 1 ? (i % puzCols) * 100 / (puzCols - 1) : 0;
+  const y = puzLignes > 1 ? Math.floor(i / puzCols) * 100 / (puzLignes - 1) : 0;
+  el.style.backgroundPosition = x + '% ' + y + '%';
+}
+
+function dessinerPuzzle() {
+  const g = document.getElementById('puzzlePlateau');
+  g.style.gridTemplateColumns = 'repeat(' + puzCols + ', 1fr)';
+  g.innerHTML = '';
+  puzPlan.forEach(function (morceau, place) {
+    const c = document.createElement('button');
+    c.className = 'tap rounded-lg border-2 border-orange-800 bg-cover' +
+      (puzChoisie === place ? ' ring-4 ring-amber-300' : '') +
+      (puzGagne ? ' border-green-400' : '');
+    c.style.aspectRatio = '1';
+    c.dataset.depot = place;          /* cible de dépôt pour le glissement */
+    fondMorceau(c, morceau);
+    c.setAttribute('aria-label', 'case ' + (place + 1));
+    c.onclick = function () { if (!ignorerClic) toucherCase(place); };
+    rendreGlissable(c, place, function (depart, zone) {
+      echanger(depart, Number(zone.dataset.depot));
+    });
+    g.appendChild(c);
+  });
+}
+
+function echanger(a, b) {
+  if (puzGagne || a === b) { puzChoisie = null; dessinerPuzzle(); return; }
+  const t = puzPlan[a]; puzPlan[a] = puzPlan[b]; puzPlan[b] = t;
+  puzChoisie = null;
+  glou(1.15);
+  dessinerPuzzle();
+  verifierPuzzle();
+}
+
+function toucherCase(place) {
+  if (puzGagne) return;
+  if (puzChoisie === null) {
+    puzChoisie = place;
+    glou(1.3);
+    document.getElementById('puzzleConsigne').textContent = 'Maintenant touche la case où l’échanger';
+    dessinerPuzzle();
+    return;
+  }
+  echanger(puzChoisie, place);
+  document.getElementById('puzzleConsigne').textContent = 'Glisse une pièce, ou touche-en deux';
+}
+
+function verifierPuzzle() {
+  const fini = puzPlan.every(function (morceau, place) { return morceau === place; });
+  if (!fini) return;
+  puzGagne = true;
+  dessinerPuzzle();
+  document.getElementById('puzzleConsigne').textContent = 'BRAVO ! ' + puzImage.nom + ' est complet !';
+  pleuvoir(40, ['🦃', '🪶', '⭐', '🎉']);
+  /* la fanfare : le seul retour sonore marqué de ce module */
+  for (let k = 0; k < 5; k++) setTimeout(function () { glou(0.9 + k * 0.2); }, k * 170);
+  dire('Bravo ! Le puzzle est fini !', 1100);
+  setTimeout(resetPuzzle, 3600);
+}
+
+function resetPuzzle() {
+  const cfg = PUZZLE_NIVEAUX[niveau('puzzle')];
+  puzCols = cfg.c; puzLignes = cfg.l;
+  puzImage = tirageSansRepetition(PUZZLE_IMAGES, puzImage);
+  puzChoisie = null;
+  puzGagne = false;
+
+  const n = puzCols * puzLignes;
+  const places = Array.from({ length: n }, function (_, i) { return i; });
+  /* on remélange tant que le hasard donne la solution toute faite */
+  let garde = 0;
+  do { puzPlan = melanger(places); garde++; }
+  while (garde < 40 && puzPlan.every(function (m, p) { return m === p; }));
+
+  fondMorceau(document.getElementById('puzzleModele'), -1);
+  const mod = document.getElementById('puzzleModele');
+  mod.style.backgroundImage = "url('" + puzImage.f + "')";
+  mod.style.backgroundSize = 'cover';
+  mod.style.backgroundPosition = 'center';
+
+  dessinerPuzzle();
+  document.getElementById('puzzleConsigne').textContent = 'Glisse une pièce, ou touche-en deux';
+}
+
+poserNiveaux('puzzleNiveaux', 'puzzle',
+  ['1. 4 pièces', '2. 6 pièces', '3. 9 pièces', '4. 12 pièces'], resetPuzzle);
 </script>
 </body>
 </html>

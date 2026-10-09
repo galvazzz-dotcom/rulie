@@ -6,3 +6,9 @@ node_modules/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Outil local d'enregistrement — ne doit pas etre publie sur le site
+outils/
+
+# Brouillons de travail — inspiration uniquement, ne doivent pas etre publies
+sidework/
