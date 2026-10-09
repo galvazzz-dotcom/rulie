@@ -361,6 +361,60 @@ body{font-family:'Comic Neue',system-ui,sans-serif;-webkit-tap-highlight-color:t
     </div>
   </div>
 </section>
+
+<!-- ═══════════ 19. COMBIEN ? ═══════════ -->
+<section id="act-combien" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="combienNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="combienConsigne" class="text-center text-lg sm:text-2xl font-bold text-amber-200 mb-1 min-h-[1.8rem] px-2"></p>
+  <div id="combienScene" class="w-full max-w-xl flex items-center justify-center mb-2" style="min-height:min(34vw,9rem)"></div>
+  <p id="combienDit" class="text-center text-sm sm:text-base text-amber-300 mb-2 min-h-[1.6rem] px-3"></p>
+  <div id="combienGrid" class="grid gap-3 sm:gap-5 w-full max-w-xl content-center"></div>
+</section>
+
+<!-- ═══════════ 20. GRAND OU PETIT ? ═══════════ -->
+<section id="act-tailles" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="taillesNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="taillesConsigne" class="text-center text-lg sm:text-2xl font-bold text-amber-200 mb-1 min-h-[1.8rem] px-2"></p>
+  <div id="taillesScene" class="w-full max-w-xl flex items-center justify-center mb-2" style="min-height:min(26vw,7rem)"></div>
+  <p id="taillesDit" class="text-center text-sm sm:text-base text-amber-300 mb-2 min-h-[1.6rem] px-3"></p>
+  <div id="taillesGrid" class="grid gap-3 sm:gap-5 w-full max-w-xl content-center items-end"></div>
+</section>
+
+<!-- ═══════════ 21. MON CORPS ═══════════ -->
+<section id="act-corps" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="corpsNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="corpsConsigne" class="text-center text-lg sm:text-2xl font-bold text-amber-200 mb-1 min-h-[1.8rem] px-2"></p>
+  <div id="corpsScene" class="w-full max-w-xl flex items-center justify-center mb-2" style="min-height:min(26vw,7rem)"></div>
+  <p id="corpsDit" class="text-center text-sm sm:text-base text-amber-300 mb-2 min-h-[1.6rem] px-3"></p>
+  <div id="corpsGrid" class="grid gap-3 sm:gap-5 w-full max-w-xl content-center"></div>
+</section>
+
+<!-- ═══════════ 22. PETITS PROBLÈMES ═══════════ -->
+<section id="act-problemes" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="problemesNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="problemesConsigne" class="text-center text-base sm:text-xl font-bold text-amber-200 mb-1 min-h-[2.6rem] px-2"></p>
+  <div id="problemesScene" class="w-full max-w-xl flex items-center justify-center mb-2" style="min-height:min(30vw,8rem)"></div>
+  <p id="problemesDit" class="text-center text-sm sm:text-base text-amber-300 mb-2 min-h-[1.6rem] px-3"></p>
+  <div id="problemesGrid" class="grid gap-3 sm:gap-5 w-full max-w-xl content-center"></div>
+</section>
+
+<!-- ═══════════ 23. DANS QUELLE POUBELLE ? ═══════════ -->
+<section id="act-poubelle" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="poubelleNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="poubelleConsigne" class="text-center text-lg sm:text-2xl font-bold text-amber-200 mb-1 min-h-[1.8rem] px-2"></p>
+  <div id="poubelleScene" class="w-full max-w-xl flex items-center justify-center mb-2" style="min-height:min(26vw,7rem)"></div>
+  <p id="poubelleDit" class="text-center text-sm sm:text-base text-amber-300 mb-2 min-h-[1.6rem] px-3"></p>
+  <div id="poubelleGrid" class="grid gap-3 sm:gap-5 w-full max-w-xl content-center"></div>
+</section>
+
+<!-- ═══════════ 24. ATTENTION, DANGER ! ═══════════ -->
+<section id="act-danger" class="hidden flex-col items-center p-3 sm:p-6" style="min-height:calc(100dvh - 74px)">
+  <div id="dangerNiveaux" class="flex gap-2 flex-wrap justify-center mb-2"></div>
+  <p id="dangerConsigne" class="text-center text-base sm:text-xl font-bold text-amber-200 mb-1 min-h-[2.6rem] px-2"></p>
+  <div id="dangerScene" class="w-full max-w-xl flex items-center justify-center mb-2" style="min-height:min(26vw,7rem)"></div>
+  <p id="dangerDit" class="text-center text-sm sm:text-base text-amber-300 mb-2 min-h-[1.6rem] px-3"></p>
+  <div id="dangerGrid" class="grid gap-3 sm:gap-5 w-full max-w-xl content-center"></div>
+</section>
 <script>
 /* ══════════════════════════════════════════════════════════
    1. SON ÉCHANTILLONNÉ — le vrai glouglou de la dinde
@@ -502,6 +556,31 @@ function noise(o) {
 }
 
 /* ══════════════════════════════════════════════════════════
+   4. LES PETITS PAS DE ROULLIEEE — l'accusé de réception
+   Un glouglou dure près d'une demi-seconde et occupe tout le spectre
+   de la voix : utilisé comme « bravo » ou comme « pas tout à fait »,
+   il recouvre le mot prononcé juste après — or dans ces modules le mot
+   EST la leçon. Le pas de la dinde tient en 70 ms, bien plus bas que
+   la voix : on l'entend, et la phrase reste intelligible.
+   Le glouglou reste là où il est la récompense elle-même : les
+   fanfares de fin (cache-cache, memory, puzzle) et les trois modules
+   qui font justement crier la dinde.
+   ══════════════════════════════════════════════════════════ */
+function petitPas(hauteur, retard, force) {
+  const h = hauteur || 1, f = force === undefined ? 1 : force;
+  /* le choc de la patte : un souffle bref et sourd */
+  noise({ lp: 820 * h, dur: 0.07, peak: 0.15 * f, delay: retard || 0 });
+  /* le poids de la dinde : une note basse qui tombe */
+  osc({ from: 160 * h, to: 72 * h, dur: 0.1, peak: 0.13 * f, type: 'sine', delay: retard || 0 });
+}
+
+/* trois pas qui trottinent en montant : « c'est bon, on continue » */
+function pasContents() { petitPas(1, 0); petitPas(1.14, 0.1); petitPas(1.34, 0.21, 0.9); }
+
+/* un seul pas qui bute : ni échec, ni sanction, juste « pas là » */
+function pasHesitant() { petitPas(0.76, 0, 0.9); }
+
+/* ══════════════════════════════════════════════════════════
    3. PAROLE — le nom lu à voix haute
    Voix française du téléphone. Rien à installer, rien à charger.
    ══════════════════════════════════════════════════════════ */
@@ -603,6 +682,12 @@ const ACTS = [
   { id: 'compare',    titre: 'PLUS OU MOINS',    icone: '⚖️', nom: 'Plus, moins, autant',  sous: 'Quel nid en a le plus ?', flex: true },
   { id: 'marche',     titre: 'LE MARCHÉ',        icone: '🛒', nom: 'Le Marché de Roullieee', sous: 'Paie avec les bonnes pièces', flex: true },
   { id: 'puzzle',     titre: 'LE PUZZLE',        icone: '🧩', nom: 'Le Puzzle',              sous: 'Remets les morceaux en place', flex: true },
+  { id: 'combien',   titre: 'COMBIEN ?',         icone: '🧮', nom: 'Combien ?',          sous: 'Compte, et trouve le nombre', flex: true },
+  { id: 'tailles',   titre: 'GRAND OU PETIT ?',  icone: '🐘', nom: 'Grand ou petit ?',   sous: 'Grand, long, lourd…',         flex: true },
+  { id: 'corps',     titre: 'MON CORPS',         icone: '🖐️', nom: 'Mon corps',          sous: 'Et celui de Roullieee !',     flex: true },
+  { id: 'problemes', titre: 'PETITS PROBLÈMES',  icone: '➕', nom: 'Petits problèmes',   sous: 'On ajoute, on enlève…',       flex: true },
+  { id: 'poubelle',  titre: 'QUELLE POUBELLE ?', icone: '♻️', nom: 'Dans quelle poubelle ?', sous: 'Roullieee trie ses déchets', flex: true },
+  { id: 'danger',    titre: 'ATTENTION, DANGER !', icone: '🚦', nom: 'Attention, danger !', sous: 'Le feu, la rue, la maison',   flex: true },
   /* page de crédits : atteinte par le lien du bas, pas par une carte */
   { id: 'credits',    titre: 'SONS & CRÉDITS',     icone: 'ℹ️', nom: 'Sons & crédits',     sous: '',                            flex: false, horsMenu: true }
 ];
@@ -623,7 +708,9 @@ const BARRES = {
   dindophone: 'dindoNiveaux', cache: 'cacheNiveaux', compte: 'compteNiveaux',
   ferme: 'fermeNiveaux', couleurs: 'couleursNiveaux', lire: 'lireNiveaux',
   ranger: 'rangerNiveaux', memory: 'memoryNiveaux',
-  sons: 'sonsNiveaux', formes: 'formesNiveaux', compare: 'compareNiveaux', marche: 'marcheNiveaux', puzzle: 'puzzleNiveaux', espace: 'espaceNiveaux', temps: 'tempsNiveaux', suites: 'suitesNiveaux'
+  sons: 'sonsNiveaux', formes: 'formesNiveaux', compare: 'compareNiveaux', marche: 'marcheNiveaux', puzzle: 'puzzleNiveaux', espace: 'espaceNiveaux', temps: 'tempsNiveaux', suites: 'suitesNiveaux',
+  combien: 'combienNiveaux', tailles: 'taillesNiveaux', corps: 'corpsNiveaux',
+  problemes: 'problemesNiveaux', poubelle: 'poubelleNiveaux', danger: 'dangerNiveaux'
 };
 
 function openAct(id) {
@@ -656,6 +743,12 @@ function openAct(id) {
   if (id === 'compare')    resetCompare();
   if (id === 'marche')     resetMarche();
   if (id === 'puzzle')     resetPuzzle();
+  if (id === 'combien')    resetCombien();
+  if (id === 'tailles')    resetTailles();
+  if (id === 'corps')      resetCorps();
+  if (id === 'problemes')  resetProblemes();
+  if (id === 'poubelle')   resetPoubelle();
+  if (id === 'danger')     resetDanger();
   window.scrollTo(0, 0);
 }
 
@@ -757,16 +850,18 @@ function tirageSansRepetition(liste, precedent) {
   return choix;
 }
 
-/* réponse juste : son qui monte, plumes, et on enchaîne */
+/* réponse juste : la dinde trottine, les plumes tombent, et on enchaîne.
+   Le trottinement a remplacé le glouglou : presque tous les modules
+   prononcent un mot dans la foulée, et le glouglou le recouvrait. */
 function bravo(delaiSuite, suite) {
-  glou(1.4);
+  pasContents();
   feathers(6);
   if (suite) setTimeout(suite, delaiSuite || 1100);
 }
 
-/* réponse fausse : jamais d'échec, juste un rebond et un son grave */
+/* réponse fausse : jamais d'échec, juste un rebond et un pas qui bute */
 function raté(el) {
-  glou(0.5);
+  pasHesitant();
   if (el) replay(el, 'shake');
 }
 
@@ -2407,7 +2502,9 @@ function toucherEtape(et, b) {
   b.disabled = true;
   b.style.opacity = '0.3';
   dessinerFrise();
-  glou(0.85 + (tempsPlaces.length - 1) * 0.2);
+  /* un pas par étape placée, de plus en plus haut : on entend qu'on
+     avance, sans couvrir « deuxièmement, le poussin sort de l'œuf » */
+  petitPas(1 + (tempsPlaces.length - 1) * 0.16);
   feathers(4);
 
   const rang = RANGS[Math.min(tempsPlaces.length - 1, RANGS.length - 1)];
@@ -2576,7 +2673,7 @@ function nouvelleSuite() {
           document.getElementById('suitesFrise').appendChild(caseSuite(x.e, false));
         });
         document.getElementById('suitesConsigne').textContent = 'BRAVO ! ' + j.l;
-        glou(1.4);
+        pasContents();
         feathers(6);
         dire('Bravo !', 250);
         setTimeout(nouvelleSuite, 2000);
@@ -2707,7 +2804,8 @@ function repondreSon(p, b) {
   if (p === phonCible) {
     replay(b, 'pop');
     document.getElementById('sonsConsigne').textContent = 'BRAVO ! C’est « ' + p.l +' »';
-    glou(1.4);
+    /* surtout pas de glouglou ici : c'est le module où l'on écoute */
+    pasContents();
     feathers(6);
     setTimeout(function () { if (niveau('sons') % 2 === 1) questionSon(); }, 2200);
   } else {
@@ -3320,6 +3418,1019 @@ function resetPuzzle() {
 
 poserNiveaux('puzzleNiveaux', 'puzzle',
   ['1. 4 pièces', '2. 6 pièces', '3. 9 pièces', '4. 12 pièces'], resetPuzzle);
+
+/* ══════════════════════════════════════════════════════════
+   SOCLE DES MODULES À QUESTIONS
+   Six modules fonctionnent exactement pareil : une consigne, une
+   scène facultative, puis des cartes dont une seule est la bonne.
+   Le mécanisme est écrit ici une fois pour toutes — niveaux, bravo,
+   relance — et chaque module ne décrit plus que son contenu.
+   (principe et contenus repris de « Petits Pas »)
+   ══════════════════════════════════════════════════════════ */
+const CLASSE_CARTE = 'tap bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl shadow-xl ' +
+  'p-2 sm:p-3 flex flex-col items-center justify-center gap-1';
+
+function zoneQ(mod, suffixe) { return document.getElementById(mod + suffixe); }
+
+/* une carte de réponse : son contenu, si elle est juste, son nom parlé */
+function carte(html, bon, nom) { return { html: html, bon: !!bon, nom: nom || '' }; }
+
+/* « Touche <b>la main</b>. » -> « Touche la main. »
+   La balise devient une espace, sinon deux mots se collent ; on
+   recolle ensuite la ponctuation, sinon la consigne lue finit par
+   « dix œufs . Combien… » */
+function texteSimple(html) {
+  return String(html).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ')
+    .replace(/\s+([.,])/g, '$1').trim();   /* pas ; : ! ? : en français l'espace avant est correcte */
+}
+
+/* « combien d'œufs », pas « combien de œufs » : la voix de synthèse lit
+   ce qu'on lui donne, et un enfant dys entend la faute. */
+function deOuD(mot) {
+  return /^[aeiouéèêëàâîïôöûüùœy]/i.test(mot) ? 'd’' + mot : 'de ' + mot;
+}
+
+/* taille d'emoji proportionnelle : le rapport entre deux cartes doit
+   rester le même sur un téléphone et sur le téléviseur de la classe */
+function tailleEmoji(t) {
+  return 'min(' + (t / 4.5).toFixed(2) + 'vw, ' + Math.round(t * 1.6) + 'px)';
+}
+function gros(e, t) {
+  return '<span class="leading-none" style="font-size:' + tailleEmoji(t || 44) + '">' + e + '</span>';
+}
+function sousTitre(t) {
+  return '<span class="text-amber-200 text-xs sm:text-base text-center leading-tight">' + t + '</span>';
+}
+function grosChiffre(n) {
+  return '<span class="title-font text-orange-400 leading-none" style="font-size:min(14vw,3.6rem)">' + n + '</span>';
+}
+
+/* q = { consigne, dire, scene, choix, fixe, colonnes, bravo, suite, delai } */
+function poserQuestion(mod, q) {
+  const cons = zoneQ(mod, 'Consigne');
+  cons.innerHTML = q.consigne;
+  zoneQ(mod, 'Dit').textContent = '';
+
+  /* La zone de scène a une hauteur réservée pour que rien ne saute
+     quand une image apparaît. Les questions qui n'en ont pas la
+     replient : sur un téléphone, 100 px de vide, c'est une rangée de
+     cartes en moins sous la ligne de flottaison. */
+  const sc = zoneQ(mod, 'Scene');
+  sc.innerHTML = q.scene || '';
+  sc.style.minHeight = q.scene ? '' : '0px';
+  sc.style.marginBottom = q.scene ? '' : '0px';
+
+  const g = zoneQ(mod, 'Grid');
+  g.style.gridTemplateColumns = 'repeat(' + (q.colonnes || 2) + ', minmax(0, 1fr))';
+  g.innerHTML = '';
+
+  /* Si la maîtresse change de niveau ou quitte le module pendant la
+     fanfare, l'enchaînement ne doit pas écraser son choix. */
+  const niveauPose = niveau(mod);
+  function encoreLa() {
+    return niveauPose === niveau(mod) &&
+      !document.getElementById('act-' + mod).classList.contains('hidden');
+  }
+
+  /* fixe : l'ordre porte du sens — les nombres rangés, oui avant non */
+  const choix = q.fixe ? q.choix : melanger(q.choix);
+  let repondu = false;
+
+  choix.forEach(function (c) {
+    const b = document.createElement('button');
+    b.className = CLASSE_CARTE;
+    b.style.minHeight = 'min(26vw, 7rem)';
+    b.innerHTML = c.html;
+    if (c.nom) b.setAttribute('aria-label', c.nom);
+    b.onclick = function () {
+      if (repondu) return;
+      if (!c.bon) { raté(b); return; }
+      repondu = true;
+      b.classList.add('border-green-400');
+      replay(b, 'pop');
+      cons.textContent = 'BRAVO !';
+      zoneQ(mod, 'Dit').textContent = q.bravo || '';
+      dire('Bravo ! ' + (q.bravo || ''), 250);
+      bravo(q.delai || 2700, function () { if (encoreLa() && q.suite) q.suite(); });
+    };
+    g.appendChild(b);
+  });
+
+  if (q.dire !== null) dire(q.dire || texteSimple(q.consigne), 350);
+}
+
+/* Niveau 1 de chaque module : rien n'est demandé. L'enfant touche, ça
+   parle. C'est là que le vocabulaire s'installe. */
+function poserDecouverte(mod, consigne, cartes, colonnes) {
+  zoneQ(mod, 'Consigne').textContent = consigne;
+  zoneQ(mod, 'Dit').textContent = '';
+  /* ici la place reste réservée : une image va s'afficher au premier
+     toucher, et les cartes ne doivent pas descendre sous le doigt */
+  const sc = zoneQ(mod, 'Scene');
+  sc.innerHTML = '';
+  sc.style.minHeight = '';
+  sc.style.marginBottom = '';
+
+  const g = zoneQ(mod, 'Grid');
+  g.style.gridTemplateColumns = 'repeat(' + (colonnes || 2) + ', minmax(0, 1fr))';
+  g.innerHTML = '';
+
+  cartes.forEach(function (c) {
+    const b = document.createElement('button');
+    b.className = CLASSE_CARTE;
+    b.style.minHeight = 'min(26vw, 7rem)';
+    b.innerHTML = c.html;
+    if (c.nom) b.setAttribute('aria-label', c.nom);
+    b.onclick = function () {
+      replay(b, 'wiggle');
+      petitPas(1.25);                 /* un petit pas, rien de plus : on écoute le mot */
+      if (c.scene !== undefined) zoneQ(mod, 'Scene').innerHTML = c.scene;
+      zoneQ(mod, 'Dit').textContent = c.dit || '';
+      dire(c.dire || c.nom, 200);
+    };
+    g.appendChild(b);
+  });
+}
+
+/* Des nombres proches de n : les intrus doivent obliger à compter, pas
+   se deviner (3 contre 9, on répond sans regarder).
+   Les cartes restent rangées du plus petit au plus grand : c'est une
+   bande numérique, pas une loterie. Mais tirer les intrus autour de n
+   met alors la bonne réponse au milieu presque à chaque fois — mesuré
+   sur 400 tirages à 4 cartes : 268 fois la 2e, 4 fois la 1re, jamais
+   la 4e. On tire donc d'abord SA PLACE, puis on remplit autour. */
+function nombresVoisins(n, combien, mini, maxi) {
+  const places = [];
+  for (let p = 0; p < combien; p++) {
+    /* p nombres sous n et combien-1-p au-dessus : la place tient-elle ? */
+    if (n - p >= mini && n + (combien - 1 - p) <= maxi) places.push(p);
+  }
+  if (!places.length) {
+    /* intervalle plus étroit que le nombre de cartes : on prend ce qu'il y a */
+    const liste = [];
+    for (let k = mini; k <= maxi && liste.length < combien; k++) liste.push(k);
+    return liste;
+  }
+  const place = places[Math.floor(Math.random() * places.length)];
+
+  /* Les écarts valent 1 ou 2 — sinon quatre nombres consécutifs, c'est
+     trop serré. Mais un écart de 2 pris trop tôt mangeait la place des
+     suivants et ramenait la bonne réponse vers le milieu : on ne
+     s'autorise le 2 que s'il reste de quoi loger ceux d'après. */
+  const liste = [n];
+  let v = n;
+  for (let i = 0; i < place; i++) {
+    const restant = place - i - 1;
+    let d = 1 + Math.floor(Math.random() * 2);
+    if (v - d - restant < mini) d = 1;
+    v -= d;
+    liste.push(v);
+  }
+  v = n;
+  while (liste.length < combien) {
+    const restant = combien - liste.length - 1;
+    let d = 1 + Math.floor(Math.random() * 2);
+    if (v + d + restant > maxi) d = 1;
+    v += d;
+    liste.push(v);
+  }
+
+  return liste.sort(function (a, b) { return a - b; });
+}
+
+/* ─── collections d'objets ─── */
+function enLigne(e, n, t) {
+  let h = '';
+  for (let i = 0; i < n; i++) h += gros(e, t || 30);
+  return '<div class="flex flex-wrap justify-center items-center gap-1">' + h + '</div>';
+}
+
+/* en vrac : les objets ne sont pas alignés, il FAUT les pointer un par
+   un. C'est le vrai dénombrement ; en ligne, on récite. */
+function enVrac(e, n, t) {
+  const cols = n <= 6 ? 3 : 4;
+  const total = cols * Math.ceil(Math.max(n + 2, Math.ceil(n * 1.5)) / cols);
+  const places = [];
+  for (let i = 0; i < total; i++) places.push(i);
+  const pris = melanger(places).slice(0, n);
+  let h = '';
+  for (let i = 0; i < total; i++) {
+    if (pris.indexOf(i) < 0) { h += '<span></span>'; continue; }
+    const dx = Math.floor(Math.random() * 11) - 5;
+    const dy = Math.floor(Math.random() * 11) - 5;
+    const rot = Math.floor(Math.random() * 29) - 14;
+    h += '<span class="leading-none" style="font-size:' + tailleEmoji(t || 30) +
+      ';transform:translate(' + dx + 'px,' + dy + 'px) rotate(' + rot + 'deg)">' + e + '</span>';
+  }
+  return '<div class="grid justify-items-center items-center gap-1" ' +
+    'style="grid-template-columns:repeat(' + cols + ',minmax(0,1fr))">' + h + '</div>';
+}
+
+/* la face du dé : une quantité se reconnaît d'un coup d'œil, sans
+   compter, quand elle est toujours disposée pareil */
+const POINTS_DE = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
+function faceDe(n) {
+  if (!POINTS_DE[n]) return '';
+  let h = '';
+  for (let i = 0; i < 9; i++) {
+    h += '<i class="rounded-full ' + (POINTS_DE[n].indexOf(i) >= 0 ? 'bg-[#4a2c0b]' : '') +
+      '" style="width:min(2.4vw,.6rem);height:min(2.4vw,.6rem)"></i>';
+  }
+  return '<span class="grid gap-1 bg-amber-200 rounded-lg p-2" ' +
+    'style="grid-template-columns:repeat(3,auto)">' + h + '</span>';
+}
+
+/* ══════════════════════════════════════════════════════════
+   19. COMBIEN ?
+   Dénombrer, c'est pointer chaque objet une fois et une seule, puis
+   retenir le dernier mot dit. D'où les trois représentations du
+   nombre — la collection, la face du dé, le chiffre — et le passage
+   obligé par le vrac : en ligne, l'enfant récite sans dénombrer.
+   Le dernier niveau retourne la question : le nombre est donné, c'est
+   la collection qu'il faut trouver.
+   ══════════════════════════════════════════════════════════ */
+const OBJETS_COMBIEN = [
+  ['🦃', 'dinde', 'dindes', 'f'], ['🥚', 'œuf', 'œufs', 'm'], ['🪶', 'plume', 'plumes', 'f'],
+  ['🌽', 'épi de maïs', 'épis de maïs', 'm'], ['🌾', 'brin de blé', 'brins de blé', 'm'],
+  ['🍎', 'pomme', 'pommes', 'f'], ['🥕', 'carotte', 'carottes', 'f'], ['🌸', 'fleur', 'fleurs', 'f'],
+  ['🐛', 'chenille', 'chenilles', 'f'], ['🐞', 'coccinelle', 'coccinelles', 'f'],
+  ['🐌', 'escargot', 'escargots', 'm'], ['🍂', 'feuille', 'feuilles', 'f'],
+  ['🌰', 'marron', 'marrons', 'm'], ['🐣', 'poussin', 'poussins', 'm'],
+  ['🍄', 'champignon', 'champignons', 'm'], ['⭐', 'étoile', 'étoiles', 'f']
+].map(function (o) { return { e: o[0], s: o[1], p: o[2], g: o[3] }; });
+
+/* « une dinde », « un œuf », « trois œufs » */
+function quantite(n, o) {
+  if (n === 0) return o.g === 'f' ? 'aucune ' + o.s : 'aucun ' + o.s;
+  return n === 1 ? (o.g === 'f' ? 'une ' : 'un ') + o.s : n + ' ' + o.p;
+}
+
+const COMBIEN_NIVEAUX = [
+  { libre: true },
+  { mini: 1, maxi: 5,  nb: 3, de: true,  vrac: false },
+  { mini: 1, maxi: 10, nb: 3, de: false, vrac: true },
+  { mini: 4, maxi: 15, nb: 4, de: false, vrac: true, inverse: true }
+];
+let cbnObjet = null;
+
+function nouvelleQuestionCombien() {
+  const cfg = COMBIEN_NIVEAUX[niveau('combien')];
+  cbnObjet = tirageSansRepetition(OBJETS_COMBIEN, cbnObjet);
+  const o = cbnObjet;
+  const n = cfg.mini + Math.floor(Math.random() * (cfg.maxi - cfg.mini + 1));
+
+  if (cfg.inverse) {
+    /* le nombre est écrit en grand : on cherche la boîte qui en a autant */
+    const boites = nombresVoisins(n, cfg.nb, cfg.mini, cfg.maxi);
+    poserQuestion('combien', {
+      consigne: 'Touche la boîte où il y a <span class="text-orange-400">' + n + '</span> ' +
+        (n > 1 ? o.p : o.s),
+      dire: 'Touche la boîte où il y a ' + quantite(n, o),
+      scene: grosChiffre(n),
+      colonnes: 2,
+      choix: boites.map(function (k) { return carte(enVrac(o.e, k, 20), k === n, quantite(k, o)); }),
+      bravo: 'Il y a ' + quantite(n, o) + '.',
+      suite: nouvelleQuestionCombien
+    });
+    return;
+  }
+
+  const mot = n > 1 ? o.p : o.s;
+  const elide = deOuD(mot).charAt(0) === 'd' && deOuD(mot).charAt(1) === '’';
+  poserQuestion('combien', {
+    consigne: 'Combien ' + (elide ? 'd’' : 'de ') +
+      '<span class="text-orange-400">' + mot + '</span> ?',
+    dire: 'Combien ' + deOuD(o.p) + ' ?',
+    scene: cfg.vrac ? enVrac(o.e, n, 34) : enLigne(o.e, n, 34),
+    colonnes: cfg.nb,
+    fixe: true,                     /* les nombres restent rangés du plus petit au plus grand */
+    choix: nombresVoisins(n, cfg.nb, cfg.mini, cfg.maxi).map(function (k) {
+      return carte(cfg.de ? faceDe(k) + grosChiffre(k) : grosChiffre(k), k === n, String(k));
+    }),
+    bravo: 'Il y a ' + quantite(n, o) + '.',
+    suite: nouvelleQuestionCombien
+  });
+}
+
+function resetCombien() {
+  if (!COMBIEN_NIVEAUX[niveau('combien')].libre) { nouvelleQuestionCombien(); return; }
+
+  /* découverte : on touche un nombre, on voit la quantité apparaître */
+  cbnObjet = OBJETS_COMBIEN[Math.floor(Math.random() * OBJETS_COMBIEN.length)];
+  const o = cbnObjet;
+  const cartes = [];
+  for (let k = 1; k <= 6; k++) {
+    cartes.push({
+      html: faceDe(k) + grosChiffre(k),
+      nom: String(k),
+      scene: enLigne(o.e, k, 34),
+      dit: quantite(k, o).charAt(0).toUpperCase() + quantite(k, o).slice(1),
+      dire: quantite(k, o)
+    });
+  }
+  poserDecouverte('combien', 'Touche un nombre', cartes, 3);
+  zoneQ('combien', 'Scene').innerHTML = enLigne(o.e, 1, 34);
+}
+
+poserNiveaux('combienNiveaux', 'combien',
+  ['1. Découvrir', '2. Jusqu’à 5', '3. Jusqu’à 10', '4. La bonne boîte'], resetCombien);
+
+/* ══════════════════════════════════════════════════════════
+   20. GRAND OU PETIT ?
+   Trois comparaisons qu'on confond vite : la TAILLE (grand/petit),
+   la LONGUEUR (long/court, à hauteur égale) et le POIDS
+   (lourd/léger). Les animaux du niveau « lourd » sont dessinés à des
+   tailles tirées au sort : sinon l'enfant répond à la taille et on
+   croit qu'il a compris le poids.
+   ══════════════════════════════════════════════════════════ */
+const OBJETS_TAILLE = [
+  ['🦃', 'dinde', 'f'], ['🥚', 'œuf', 'm'], ['🌳', 'arbre', 'm'], ['🏠', 'maison', 'f'],
+  ['🐭', 'souris', 'f'], ['🐘', 'éléphant', 'm'], ['🌸', 'fleur', 'f'], ['⭐', 'étoile', 'f'],
+  ['🎈', 'ballon', 'm'], ['🐈', 'chat', 'm'], ['🍎', 'pomme', 'f'], ['🦒', 'girafe', 'f']
+];
+/* du plus léger au plus lourd — l'ordre EST la donnée */
+const ANIMAUX_POIDS = [
+  ['🐜', 'la fourmi'], ['🐌', 'l’escargot'], ['🐭', 'la souris'], ['🐞', 'la coccinelle'],
+  ['🐔', 'la poule'], ['🦃', 'la dinde'], ['🐑', 'le mouton'], ['🐖', 'le cochon'],
+  ['🐄', 'la vache'], ['🐴', 'le cheval'], ['🐘', 'l’éléphant']
+];
+const TEINTES_PLUMES = ['#ea580c', '#f59e0b', '#16a34a', '#2563eb', '#7c3aed', '#db2777', '#0891b2'];
+
+/* une plume couchée : même hauteur pour toutes, seule la longueur
+   change. Comparer des longueurs suppose un alignement commun. */
+function svgPlume(longueur, couleur) {
+  const x0 = 192 - longueur;
+  const mi = x0 + longueur * 0.45;
+  /* hauteur plafonnée, sinon sur un écran large quatre plumes pleine
+     largeur débordent de l'écran. xMaxYMid garde le bord droit collé
+     à droite : c'est lui qui rend les longueurs comparables. */
+  return '<svg viewBox="0 0 200 42" preserveAspectRatio="xMaxYMid meet" class="w-full" ' +
+    'style="height:min(16vw,4rem)" aria-hidden="true">' +
+    '<path d="M' + x0.toFixed(0) + ' 21 Q' + mi.toFixed(0) + ' 1 192 21 Q' + mi.toFixed(0) + ' 41 ' +
+    x0.toFixed(0) + ' 21 Z" fill="' + couleur + '"/>' +
+    '<path d="M' + x0.toFixed(0) + ' 21 H194" stroke="#fcd9a0" stroke-width="3"/></svg>';
+}
+
+/* La découverte montre toujours LES DEUX objets, celui qu'on vient de
+   toucher mis en avant : « petit » tout seul ne veut rien dire, c'est
+   la comparaison qui porte le mot. */
+function scenePaire(gauche, droite, choisi) {
+  const boite = function (contenu, actif) {
+    return '<span class="flex items-center justify-center rounded-2xl p-2 ' +
+      (actif ? 'ring-4 ring-amber-300 bg-[#5c3a1f]' : 'opacity-40') + '" ' +
+      'style="min-width:min(24vw,6.5rem);min-height:min(24vw,6.5rem)">' + contenu + '</span>';
+  };
+  return '<div class="flex items-end justify-center gap-4">' +
+    boite(gauche, choisi === 0) + boite(droite, choisi === 1) + '</div>';
+}
+/* les plumes se comparent empilées : même bord droit, donc seule la
+   longueur distingue les deux */
+function scenePlumes(choisi) {
+  const ligne = function (long, actif) {
+    return '<span class="block rounded-xl p-1 ' + (actif ? 'ring-4 ring-amber-300' : 'opacity-40') +
+      '">' + svgPlume(long, '#ea580c') + '</span>';
+  };
+  return '<div class="flex flex-col gap-2 w-full" style="max-width:min(90vw,24rem)">' +
+    ligne(58, choisi === 0) + ligne(186, choisi === 1) + '</div>';
+}
+
+const TAILLES_NIVEAUX = [
+  { libre: true },
+  { type: 'taille',   nb: 3 },
+  { type: 'longueur', nb: 4 },
+  { type: 'poids',    nb: 3 },
+  { type: 'mele',     nb: 4 }
+];
+
+/* tire `combien` valeurs distinctes d'une liste */
+function tirer(liste, combien) { return melanger(liste).slice(0, combien); }
+
+function questionTaille(nb) {
+  const o = OBJETS_TAILLE[Math.floor(Math.random() * OBJETS_TAILLE.length)];
+  const tailles = tirer([26, 38, 52, 68, 86], nb);
+  const grand = Math.random() < 0.5;
+  const cible = grand ? Math.max.apply(null, tailles) : Math.min.apply(null, tailles);
+  const fem = o[2] === 'f';
+  const adj = grand ? (fem ? 'grande' : 'grand') : (fem ? 'petite' : 'petit');
+  const nom = (fem ? 'la ' : 'le ') + 'plus ' + adj + ' ' + o[1];
+  return {
+    consigne: 'Touche ' + (fem ? 'la ' : 'le ') + '<span class="text-orange-400">PLUS ' +
+      adj.toUpperCase() + '</span> ' + o[1],
+    dire: 'Touche ' + nom,
+    colonnes: nb,
+    choix: tailles.map(function (t) {
+      return carte(gros(o[0], t), t === cible, t === cible ? nom : o[1]);
+    }),
+    bravo: 'C’est ' + nom + '.'
+  };
+}
+
+function questionLongueur(nb) {
+  const longueurs = tirer([58, 84, 110, 136, 162, 186], nb);
+  const longue = Math.random() < 0.5;
+  const cible = longue ? Math.max.apply(null, longueurs) : Math.min.apply(null, longueurs);
+  const teintes = melanger(TEINTES_PLUMES);
+  const nom = longue ? 'la plus longue plume' : 'la plus courte plume';
+  return {
+    consigne: 'Touche la plume la <span class="text-orange-400">PLUS ' +
+      (longue ? 'LONGUE' : 'COURTE') + '</span>',
+    dire: 'Touche ' + nom,
+    colonnes: 1,
+    choix: longueurs.map(function (l, i) {
+      return carte(svgPlume(l, teintes[i % teintes.length]), l === cible,
+        l === cible ? nom : 'une plume');
+    }),
+    bravo: 'C’est ' + nom + '.'
+  };
+}
+
+function questionPoids(nb) {
+  const rangs = tirer(ANIMAUX_POIDS.map(function (a, i) { return i; }), nb);
+  const lourd = Math.random() < 0.5;
+  const cible = lourd ? Math.max.apply(null, rangs) : Math.min.apply(null, rangs);
+  return {
+    consigne: 'Qui est le <span class="text-orange-400">PLUS ' +
+      (lourd ? 'LOURD' : 'LÉGER') + '</span> ?',
+    dire: 'Qui est le plus ' + (lourd ? 'lourd' : 'léger') + ' ?',
+    colonnes: nb,
+    choix: rangs.map(function (i) {
+      const a = ANIMAUX_POIDS[i];
+      /* taille au hasard : le poids ne se lit pas sur l'image */
+      return carte(gros(a[0], 34 + Math.floor(Math.random() * 26)) + sousTitre(a[1]),
+        i === cible, a[1]);
+    }),
+    bravo: 'C’est ' + ANIMAUX_POIDS[cible][1] + '.'
+  };
+}
+
+function nouvelleQuestionTailles() {
+  const cfg = TAILLES_NIVEAUX[niveau('tailles')];
+  const type = cfg.type === 'mele'
+    ? ['taille', 'longueur', 'poids'][Math.floor(Math.random() * 3)]
+    : cfg.type;
+  const q = type === 'longueur' ? questionLongueur(cfg.nb)
+    : type === 'poids' ? questionPoids(Math.min(cfg.nb, 3))
+      : questionTaille(cfg.nb);
+  q.suite = nouvelleQuestionTailles;
+  poserQuestion('tailles', q);
+}
+
+function resetTailles() {
+  if (!TAILLES_NIVEAUX[niveau('tailles')].libre) { nouvelleQuestionTailles(); return; }
+
+  /* découverte : les six mots, chacun montré par son contraire */
+  const dindes = [gros('🦃', 26), gros('🦃', 86)];
+  const betes = [gros('🐜', 40), gros('🐘', 52)];
+  poserDecouverte('tailles', 'Touche pour entendre le mot', [
+    { html: gros('🦃', 26) + sousTitre('petit'), nom: 'petit',
+      scene: scenePaire(dindes[0], dindes[1], 0),
+      dit: 'La petite dinde.', dire: 'petit, la petite dinde' },
+    { html: gros('🦃', 86) + sousTitre('grand'), nom: 'grand',
+      scene: scenePaire(dindes[0], dindes[1], 1),
+      dit: 'La grande dinde.', dire: 'grand, la grande dinde' },
+    { html: svgPlume(58, '#ea580c') + sousTitre('courte'), nom: 'courte',
+      scene: scenePlumes(0),
+      dit: 'La plume courte.', dire: 'courte, la plume courte' },
+    { html: svgPlume(186, '#ea580c') + sousTitre('longue'), nom: 'longue',
+      scene: scenePlumes(1),
+      dit: 'La plume longue.', dire: 'longue, la plume longue' },
+    { html: gros('🐜', 44) + sousTitre('léger'), nom: 'léger',
+      scene: scenePaire(betes[0], betes[1], 0),
+      dit: 'La fourmi est légère : je la porte sur un doigt.', dire: 'léger, la fourmi est légère' },
+    { html: gros('🐘', 44) + sousTitre('lourd'), nom: 'lourd',
+      scene: scenePaire(betes[0], betes[1], 1),
+      dit: 'L’éléphant est lourd : personne ne peut le porter.', dire: 'lourd, l’éléphant est lourd' }
+  ], 3);   /* trois colonnes : six cartes sur deux rangées tiennent sur un écran de TV */
+  zoneQ('tailles', 'Scene').innerHTML = scenePaire(dindes[0], dindes[1], -1);
+}
+
+poserNiveaux('taillesNiveaux', 'tailles',
+  ['1. Découvrir', '2. Grand ou petit', '3. Long ou court', '4. Lourd ou léger', '5. Tout mêlé'],
+  resetTailles);
+
+/* ══════════════════════════════════════════════════════════
+   21. MON CORPS
+   On nomme d'abord, on désigne ensuite, et seulement après on
+   explique à quoi ça sert — c'est l'ordre dans lequel le vocabulaire
+   se fixe. La ligne du bas compare avec Roullieee : elle a un bec et
+   des ailes, et c'est en voyant la différence qu'on retient sa main.
+   ══════════════════════════════════════════════════════════ */
+const CORPS = {
+  oeil:    { e: '👁️', nom: 'l’œil',      dinde: 'Roullieee a deux yeux, comme toi.' },
+  nez:     { e: '👃', nom: 'le nez',      dinde: 'Roullieee n’a pas de nez : il a un bec.' },
+  bouche:  { e: '👄', nom: 'la bouche',   dinde: 'Roullieee n’a pas de bouche : son bec fait glou-glou.' },
+  main:    { e: '✋', nom: 'la main',     dinde: 'Roullieee n’a pas de mains : il a des ailes.' },
+  pied:    { e: '🦶', nom: 'le pied',     dinde: 'Roullieee a deux pattes, comme toi deux pieds.' },
+  oreille: { e: '👂', nom: 'l’oreille',   dinde: 'Les oreilles de Roullieee sont cachées sous ses plumes.' },
+  jambe:   { e: '🦵', nom: 'la jambe',    dinde: 'Roullieee a de longues pattes pour courir.' },
+  bras:    { e: '💪', nom: 'le bras',     dinde: 'Les bras de Roullieee, ce sont ses ailes.' },
+  dent:    { e: '🦷', nom: 'la dent',     dinde: 'Roullieee n’a aucune dent ! Il avale les grains tout rond.' },
+  langue:  { e: '👅', nom: 'la langue',   dinde: 'Roullieee a une langue, mais il ne lèche pas les glaces.' },
+  cerveau: { e: '🧠', nom: 'le cerveau',  dinde: 'Le cerveau de Roullieee est tout petit.' },
+  os:      { e: '🦴', nom: 'l’os',        dinde: 'Les os de Roullieee sont creux : c’est plus léger pour voler.' }
+};
+const CORPS_FACILE = ['oeil', 'nez', 'bouche', 'main', 'pied', 'oreille', 'jambe', 'bras'];
+const CORPS_TOUT = Object.keys(CORPS);
+
+/* [question, partie attendue, parties à ne pas proposer comme intrus] */
+const QUESTIONS_CORPS = [
+  ['Avec quoi sens-tu l’odeur des fleurs ?', 'nez', []],
+  ['Avec quoi entends-tu le glouglou de Roullieee ?', 'oreille', []],
+  ['Avec quoi regardes-tu les images d’un livre ?', 'oeil', []],
+  ['Avec quoi caresses-tu les plumes de Roullieee ?', 'main', ['bras']],
+  ['Avec quoi marches-tu ?', 'pied', ['jambe']],
+  ['Avec quoi manges-tu ta tartine ?', 'bouche', ['langue', 'dent']]
+];
+const QUESTIONS_CORPS_DUR = QUESTIONS_CORPS.concat([
+  ['Qu’est-ce qu’on brosse le matin et le soir ?', 'dent', ['langue', 'bouche']],
+  ['Qu’est-ce qui nous tient debout, à l’intérieur du corps ?', 'os', ['jambe', 'pied']],
+  ['Avec quoi réfléchis-tu ?', 'cerveau', []],
+  ['Qu’est-ce qui est dans la bouche et qui sert à goûter ?', 'langue', ['dent', 'bouche']]
+]);
+
+const CORPS_NIVEAUX = [
+  { libre: true },
+  { liste: CORPS_FACILE, nb: 3, questions: null },
+  { liste: CORPS_FACILE, nb: 4, questions: QUESTIONS_CORPS },
+  { liste: CORPS_TOUT,   nb: 4, questions: QUESTIONS_CORPS_DUR }
+];
+let corpsCible = null;
+
+function carteCorps(id) {
+  return gros(CORPS[id].e, 40) + sousTitre(CORPS[id].nom);
+}
+
+function nouvelleQuestionCorps() {
+  const cfg = CORPS_NIVEAUX[niveau('corps')];
+
+  /* une question sur deux porte sur l'usage, pas sur le nom */
+  if (cfg.questions && Math.random() < 0.5) {
+    const q = cfg.questions[Math.floor(Math.random() * cfg.questions.length)];
+    const interdits = q[2].concat([q[1]]);
+    const intrus = tirer(cfg.liste.filter(function (id) {
+      return interdits.indexOf(id) < 0;
+    }), cfg.nb - 1);
+    poserQuestion('corps', {
+      consigne: q[0],
+      choix: [q[1]].concat(intrus).map(function (id) {
+        return carte(carteCorps(id), id === q[1], CORPS[id].nom);
+      }),
+      bravo: 'C’est ' + CORPS[q[1]].nom + '. ' + CORPS[q[1]].dinde,
+      suite: nouvelleQuestionCorps
+    });
+    return;
+  }
+
+  corpsCible = tirageSansRepetition(cfg.liste, corpsCible);
+  const cible = corpsCible;
+  poserQuestion('corps', {
+    consigne: 'Montre <span class="text-orange-400">' + CORPS[cible].nom.toUpperCase() + '</span>',
+    dire: 'Montre ' + CORPS[cible].nom,
+    choix: [cible].concat(tirer(cfg.liste.filter(function (id) { return id !== cible; }), cfg.nb - 1))
+      .map(function (id) { return carte(carteCorps(id), id === cible, CORPS[id].nom); }),
+    bravo: CORPS[cible].nom + '. ' + CORPS[cible].dinde,
+    suite: nouvelleQuestionCorps
+  });
+}
+
+function resetCorps() {
+  corpsCible = null;
+  if (!CORPS_NIVEAUX[niveau('corps')].libre) { nouvelleQuestionCorps(); return; }
+
+  poserDecouverte('corps', 'Touche une partie du corps',
+    ['oeil', 'nez', 'bouche', 'oreille', 'main', 'pied'].map(function (id) {
+      return {
+        html: carteCorps(id), nom: CORPS[id].nom,
+        /* en grand dans la scène : visible depuis le fond de la classe */
+        scene: gros(CORPS[id].e, 76),
+        dit: CORPS[id].dinde, dire: CORPS[id].nom + '. ' + CORPS[id].dinde
+      };
+    }), 3);
+  zoneQ('corps', 'Scene').innerHTML = gros('🦃', 76);
+}
+
+poserNiveaux('corpsNiveaux', 'corps',
+  ['1. Découvrir', '2. Montre la partie', '3. À quoi ça sert ?', '4. Tout le corps'], resetCorps);
+
+/* ══════════════════════════════════════════════════════════
+   22. PETITS PROBLÈMES
+   Ajouter, enlever, compléter. La scène montre l'histoire : les
+   objets qui arrivent sont encadrés en pointillé, ceux qui partent
+   s'effacent. L'enfant peut donc répondre en comptant ce qu'il voit,
+   avant de savoir calculer — c'est le but.
+   ══════════════════════════════════════════════════════════ */
+/* Pas n'importe quel objet ici : l'énoncé dit que Roullieee en apporte
+   ou qu'on en enlève, et « Roullieee apporte trois dindes » ou « on
+   enlève deux étoiles » feraient buter l'enfant sur l'absurdité au
+   lieu de le faire compter. On garde ce qu'on ramasse dans un jardin. */
+const PROBLEMES_OBJETS = OBJETS_COMBIEN.filter(function (o) {
+  return ['œuf', 'plume', 'épi de maïs', 'brin de blé', 'pomme', 'carotte',
+          'fleur', 'feuille', 'marron', 'champignon'].indexOf(o.s) >= 0;
+});
+
+const PROBLEMES_NIVEAUX = [
+  { libre: true },
+  { types: ['ajout'],                          maxi: 5  },
+  { types: ['retrait'],                        maxi: 5  },
+  { types: ['ajout', 'retrait'],               maxi: 10 },
+  { types: ['ajout', 'retrait', 'complement'], maxi: 10 }
+];
+let pbObjet = null;
+
+function boiteObjets(contenu, pointille) {
+  return '<div class="flex flex-wrap justify-center items-center gap-1 bg-[#5c3a1f] rounded-2xl px-2 py-2 border-4 ' +
+    (pointille ? 'border-amber-300 border-dashed' : 'border-orange-700') + '">' + contenu + '</div>';
+}
+function signe(s) {
+  return '<span class="title-font text-orange-400 leading-none" style="font-size:min(11vw,2.8rem)">' + s + '</span>';
+}
+
+function nouvelleQuestionProblemes() {
+  const cfg = PROBLEMES_NIVEAUX[niveau('problemes')];
+  pbObjet = tirageSansRepetition(PROBLEMES_OBJETS, pbObjet);
+  const o = pbObjet;
+  const type = cfg.types[Math.floor(Math.random() * cfg.types.length)];
+  let consigne, parle, scene, rep;
+
+  if (type === 'ajout') {
+    const a = 1 + Math.floor(Math.random() * (cfg.maxi - 2));
+    const b = 1 + Math.floor(Math.random() * Math.min(cfg.maxi <= 5 ? 2 : 4, cfg.maxi - a));
+    rep = a + b;
+    consigne = 'Il y a ' + quantite(a, o) + '. Roullieee en apporte ' +
+      (b === 1 ? (o.g === 'f' ? 'une' : 'un') : b) +
+      '. <span class="text-orange-400">Combien y en a-t-il maintenant ?</span>';
+    scene = '<div class="flex items-center justify-center gap-2 flex-wrap">' +
+      boiteObjets(enLigne(o.e, a, 26), false) + signe('+') + boiteObjets(enLigne(o.e, b, 26), true) +
+      '</div>';
+  } else if (type === 'retrait') {
+    const a = 2 + Math.floor(Math.random() * (cfg.maxi - 1));
+    const b = 1 + Math.floor(Math.random() * Math.min(cfg.maxi <= 5 ? 2 : 4, a - 1));
+    rep = a - b;
+    /* « on en enlève » et non « Roullieee en emporte » : apporte et
+       emporte ne se distinguent que d'un son, et ce sont justement
+       ces deux-là qu'il ne faut pas confondre. */
+    consigne = 'Il y a ' + quantite(a, o) + '. On en enlève ' +
+      (b === 1 ? (o.g === 'f' ? 'une' : 'un') : b) +
+      '. <span class="text-orange-400">Combien en reste-t-il ?</span>';
+    let dedans = '';
+    for (let i = 0; i < a; i++) {
+      dedans += '<span class="leading-none" style="font-size:' + tailleEmoji(26) +
+        (i >= a - b ? ';opacity:.22;transform:rotate(28deg)' : '') + '">' + o.e + '</span>';
+    }
+    scene = '<div class="flex items-center justify-center">' + boiteObjets(dedans, false) + '</div>';
+  } else {
+    const a = 3 + Math.floor(Math.random() * 7);
+    rep = 10 - a;
+    consigne = 'La boîte de Roullieee tient <span class="text-orange-400">10 œufs</span>. ' +
+      'Combien en manque-t-il ?';
+    let cases = '';
+    for (let i = 0; i < 10; i++) {
+      cases += '<span class="flex items-center justify-center rounded-lg ' +
+        (i < a ? '' : 'border-2 border-dashed border-amber-700') +
+        '" style="height:' + tailleEmoji(30) + ';font-size:' + tailleEmoji(26) + '">' +
+        (i < a ? '🥚' : '') + '</span>';
+    }
+    scene = '<div class="grid gap-1 bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl p-2" ' +
+      'style="grid-template-columns:repeat(5,minmax(0,1fr))">' + cases + '</div>';
+  }
+
+  parle = texteSimple(consigne);
+  poserQuestion('problemes', {
+    consigne: consigne, dire: parle, scene: scene, colonnes: 4, fixe: true,
+    choix: nombresVoisins(rep, 4, 0, cfg.maxi + 2).map(function (k) {
+      return carte(grosChiffre(k), k === rep, String(k));
+    }),
+    bravo: type === 'complement' ? 'Il en manque ' + rep + '.' : 'Il y en a ' + rep + '.',
+    suite: nouvelleQuestionProblemes
+  });
+}
+
+function resetProblemes() {
+  pbObjet = null;
+  if (!PROBLEMES_NIVEAUX[niveau('problemes')].libre) { nouvelleQuestionProblemes(); return; }
+
+  /* découverte : on voit l'histoire se dérouler, sans rien devoir dire */
+  const o = PROBLEMES_OBJETS[Math.floor(Math.random() * PROBLEMES_OBJETS.length)];
+  poserDecouverte('problemes', 'Touche pour voir l’histoire', [
+    { html: signe('+') + sousTitre('on ajoute'), nom: 'on ajoute',
+      scene: '<div class="flex items-center justify-center gap-2">' +
+        boiteObjets(enLigne(o.e, 2, 26), false) + signe('+') + boiteObjets(enLigne(o.e, 1, 26), true) +
+        '</div>',
+      dit: 'Deux, et encore un : ça fait trois.',
+      dire: 'On ajoute. Deux, et encore un, ça fait trois.' },
+    { html: signe('–') + sousTitre('on enlève'), nom: 'on enlève',
+      scene: '<div class="flex items-center justify-center">' + boiteObjets(
+        '<span class="leading-none" style="font-size:' + tailleEmoji(26) + '">' + o.e + '</span>' +
+        '<span class="leading-none" style="font-size:' + tailleEmoji(26) + '">' + o.e + '</span>' +
+        '<span class="leading-none" style="font-size:' + tailleEmoji(26) + ';opacity:.22;transform:rotate(28deg)">' + o.e + '</span>',
+        false) + '</div>',
+      dit: 'Trois, et on en enlève un : il en reste deux.',
+      dire: 'On enlève. Trois, et on en enlève un, il en reste deux.' },
+    { html: gros('🥚', 40) + sousTitre('la boîte de 10'), nom: 'la boîte de dix',
+      scene: (function () {
+        let c = '';
+        for (let i = 0; i < 10; i++) {
+          c += '<span class="flex items-center justify-center rounded-lg ' +
+            (i < 8 ? '' : 'border-2 border-dashed border-amber-700') +
+            '" style="height:' + tailleEmoji(30) + ';font-size:' + tailleEmoji(26) + '">' +
+            (i < 8 ? '🥚' : '') + '</span>';
+        }
+        return '<div class="grid gap-1 bg-[#5c3a1f] border-4 border-orange-500 rounded-2xl p-2" ' +
+          'style="grid-template-columns:repeat(5,minmax(0,1fr))">' + c + '</div>';
+      })(),
+      dit: 'Huit œufs dans la boîte : il en manque deux.',
+      dire: 'La boîte de dix. Huit œufs : il en manque deux.' }
+  ], 3);
+}
+
+poserNiveaux('problemesNiveaux', 'problemes',
+  ['1. Découvrir', '2. On ajoute', '3. On enlève', '4. Les deux', '5. Remplir la boîte'],
+  resetProblemes);
+
+/* ══════════════════════════════════════════════════════════
+   23. DANS QUELLE POUBELLE ?
+   Les bacs sont ceux de Wallonie et de Bruxelles : sac bleu PMC,
+   papiers-cartons, bulle à verre, compost. On commence à deux bacs
+   bien distincts — l'emballage et l'épluchure — et on en ajoute un
+   par niveau. La couleur du bac est un repère volontaire : c'est
+   celui que l'enfant retrouvera à la maison.
+   ══════════════════════════════════════════════════════════ */
+const POUBELLES = {
+  pmc:     { nom: 'le sac bleu PMC',     court: 'PMC',      couleur: '#1e6fd9', icone: '🧴',
+             dit: 'Le sac bleu PMC : les bouteilles en plastique, les boîtes en métal et les briques.' },
+  papier:  { nom: 'les papiers-cartons', court: 'Papiers',  couleur: '#eab308', icone: '📄',
+             dit: 'Les papiers-cartons : tout ce qui est en papier ou en carton.' },
+  verre:   { nom: 'la bulle à verre',    court: 'Verre',    couleur: '#16a34a', icone: '🍾',
+             dit: 'La bulle à verre : les bouteilles et les bocaux en verre.' },
+  compost: { nom: 'le compost',          court: 'Compost',  couleur: '#b8762c', icone: '🍂',
+             dit: 'Le compost : les restes de fruits et de légumes. Roullieee adore y picorer !' }
+};
+const DECHETS = [
+  ['🥫', 'la boîte de conserve', 'pmc'], ['🧃', 'la brique de jus', 'pmc'],
+  ['🧴', 'le flacon en plastique', 'pmc'], ['🥤', 'la bouteille en plastique', 'pmc'],
+  ['📰', 'le journal', 'papier'], ['📦', 'la boîte en carton', 'papier'],
+  ['✉️', 'l’enveloppe', 'papier'], ['📄', 'la feuille de papier', 'papier'],
+  ['🍾', 'la bouteille en verre', 'verre'], ['🍯', 'le pot de confiture', 'verre'],
+  ['🍌', 'la peau de banane', 'compost'], ['🍎', 'le trognon de pomme', 'compost'],
+  ['🥚', 'la coquille d’œuf', 'compost'], ['🍂', 'les feuilles mortes', 'compost'],
+  ['🥕', 'les épluchures de carotte', 'compost']
+];
+const POUBELLE_NIVEAUX = [
+  { libre: true },
+  { bacs: ['pmc', 'compost'] },
+  { bacs: ['pmc', 'papier', 'compost'] },
+  { bacs: ['pmc', 'papier', 'verre', 'compost'] }
+];
+let pbDechet = null;
+
+function svgPoubelle(id) {
+  const p = POUBELLES[id];
+  return '<span class="flex flex-col items-center" aria-hidden="true">' +
+    '<span class="rounded-t-lg" style="width:min(16vw,4.2rem);height:min(3vw,.8rem);' +
+    'background:' + p.couleur + ';filter:brightness(.8)"></span>' +
+    '<span class="rounded-b-xl flex items-center justify-center text-white" ' +
+    'style="width:min(13.5vw,3.6rem);height:min(16vw,4.2rem);margin-top:2px;background:' + p.couleur +
+    ';font-size:min(7vw,1.8rem)">♻</span></span>';
+}
+
+function nouvelleQuestionPoubelle() {
+  const bacs = POUBELLE_NIVEAUX[niveau('poubelle')].bacs;
+  const possibles = DECHETS.filter(function (d) { return bacs.indexOf(d[2]) >= 0; });
+  pbDechet = tirageSansRepetition(possibles, pbDechet);
+  const d = pbDechet;
+  const pluriel = d[1].indexOf('les ') === 0;
+
+  poserQuestion('poubelle', {
+    consigne: (pluriel ? 'Où vont ' : 'Où va ') + '<span class="text-orange-400">' + d[1] + '</span> ?',
+    scene: gros(d[0], 76),
+    colonnes: Math.min(bacs.length, 4),
+    choix: bacs.map(function (b) {
+      return carte(svgPoubelle(b) + sousTitre(POUBELLES[b].court), b === d[2], POUBELLES[b].nom);
+    }),
+    bravo: d[1].charAt(0).toUpperCase() + d[1].slice(1) + (pluriel ? ' vont' : ' va') +
+      ' dans ' + POUBELLES[d[2]].nom + '.',
+    suite: nouvelleQuestionPoubelle
+  });
+}
+
+function resetPoubelle() {
+  pbDechet = null;
+  if (!POUBELLE_NIVEAUX[niveau('poubelle')].libre) { nouvelleQuestionPoubelle(); return; }
+
+  poserDecouverte('poubelle', 'Touche une poubelle',
+    Object.keys(POUBELLES).map(function (id) {
+      return {
+        html: svgPoubelle(id) + sousTitre(POUBELLES[id].court),
+        nom: POUBELLES[id].nom,
+        scene: gros(POUBELLES[id].icone, 76),
+        dit: POUBELLES[id].dit,
+        dire: POUBELLES[id].dit
+      };
+    }), 4);
+}
+
+poserNiveaux('poubelleNiveaux', 'poubelle',
+  ['1. Découvrir', '2. Deux poubelles', '3. Trois poubelles', '4. Quatre poubelles'],
+  resetPoubelle);
+
+/* ══════════════════════════════════════════════════════════
+   24. ATTENTION, DANGER !
+   Le seul module où la bonne réponse protège vraiment. Donc : aucune
+   mise en scène qui fasse peur, aucune image de blessure, et un
+   énoncé toujours formulé à la première personne — « je traverse »,
+   « je n'y touche pas » — parce que c'est la phrase que l'enfant doit
+   pouvoir se redire tout seul au bord du trottoir.
+   ══════════════════════════════════════════════════════════ */
+const DANGERS = [
+  ['🔪', 'le couteau'], ['🔌', 'la prise électrique'], ['💊', 'les médicaments'],
+  ['🔥', 'le feu'], ['🕯️', 'la bougie allumée'], ['🧴', 'le produit de nettoyage'],
+  ['🍳', 'la poêle qui chauffe'], ['✂️', 'les ciseaux pointus']
+];
+const SANS_DANGER = [
+  ['🧸', 'le nounours'], ['📚', 'les livres'], ['🧩', 'le puzzle'], ['🎈', 'le ballon'],
+  ['🥄', 'la cuillère'], ['🧦', 'les chaussettes'], ['🖍️', 'les crayons de couleur'],
+  ['🚗', 'la petite voiture'], ['🪶', 'la plume de Roullieee'], ['⚽', 'le ballon de foot']
+];
+
+/* le signal pour piétons : debout sur le rouge, qui marche sur le vert */
+function svgFeu(vert) {
+  const lampe = function (emoji, allumee, couleur) {
+    return '<span class="rounded-full flex items-center justify-center" style="width:min(17vw,4.4rem);' +
+      'height:min(17vw,4.4rem);font-size:min(9vw,2.2rem);background:' + (allumee ? couleur : '#2b2b2b') +
+      ';opacity:' + (allumee ? '1' : '.35') + '">' + emoji + '</span>';
+  };
+  return '<div class="flex flex-col items-center gap-2 bg-[#241503] border-4 border-amber-700 rounded-2xl p-3" ' +
+    'role="img" aria-label="Feu pour piétons ' + (vert ? 'vert' : 'rouge') + '">' +
+    lampe('🧍', !vert, '#dc2626') + lampe('🚶', vert, '#16a34a') + '</div>';
+}
+
+/* trois façons de traverser : une seule est la bonne */
+function svgRue(cas) {
+  /* le piéton est cerné d'une ombre : sans elle il disparaît sur les
+     bandes blanches du passage, justement là où il faut le voir */
+  const OMBRE = ';filter:drop-shadow(0 0 3px rgba(0,0,0,.8))';
+  let dedans = '';
+  if (cas === 'passage') {
+    for (let i = 0; i < 5; i++) {
+      dedans += '<span class="absolute bg-amber-100 rounded-sm" style="left:' + (34 + i * 7) +
+        '%;top:18%;width:4%;height:64%"></span>';
+    }
+    dedans += '<span class="absolute" style="left:44%;top:26%;font-size:min(9vw,2.2rem)' + OMBRE + '">🚶</span>';
+  } else if (cas === 'voitures') {
+    dedans += '<span class="absolute" style="left:8%;top:30%;font-size:min(8vw,2rem)">🚗</span>' +
+      '<span class="absolute" style="left:42%;top:26%;font-size:min(9vw,2.2rem)' + OMBRE + '">🚶</span>' +
+      '<span class="absolute" style="left:72%;top:30%;font-size:min(8vw,2rem)">🚙</span>';
+  } else {
+    dedans += '<span class="absolute" style="left:24%;top:26%;font-size:min(9vw,2.2rem)' + OMBRE + '">🚶</span>' +
+      '<span class="absolute" style="left:70%;top:30%;font-size:min(8vw,2rem)">🚗</span>' +
+      '<span class="absolute bg-amber-100" style="left:0;top:49%;width:100%;height:3%;opacity:.6"></span>';
+  }
+  return '<span class="relative block w-full rounded-xl bg-[#3f3f46] overflow-hidden" ' +
+    'style="height:min(26vw,6.5rem)" aria-hidden="true">' + dedans + '</span>';
+}
+
+const DANGER_NIVEAUX = [
+  { libre: true },
+  { types: ['feu', 'feu', 'main'] },
+  { types: ['danger'], intrus: 2 },
+  { types: ['feu', 'danger', 'traverser', 'gilet'], intrus: 3 },
+  { types: ['danger', 'traverser', 'urgence', 'inconnu', 'gilet'], intrus: 3 }
+];
+
+function questionFeu() {
+  const vert = Math.random() < 0.5;
+  return {
+    consigne: 'Le petit bonhomme est <span class="text-orange-400">' +
+      (vert ? 'VERT' : 'ROUGE') + '</span>. Qu’est-ce que je fais ?',
+    dire: 'Le petit bonhomme est ' + (vert ? 'vert' : 'rouge') + '. Qu’est-ce que je fais ?',
+    scene: svgFeu(vert), fixe: true, colonnes: 2,
+    choix: [
+      carte(gros('🚶', 40) + sousTitre('Je traverse'), vert, 'je traverse'),
+      carte(gros('✋', 40) + sousTitre('J’attends'), !vert, 'j’attends')
+    ],
+    bravo: vert
+      ? 'Le bonhomme est vert : je traverse en regardant bien à gauche et à droite.'
+      : 'Le bonhomme est rouge : j’attends sur le trottoir.'
+  };
+}
+
+function questionDanger(nbIntrus) {
+  const d = DANGERS[Math.floor(Math.random() * DANGERS.length)];
+  const ok = tirer(SANS_DANGER, nbIntrus);
+  return {
+    consigne: 'Qu’est-ce qui est <span class="text-orange-400">DANGEREUX</span> ? Je n’y touche pas !',
+    colonnes: 2,
+    choix: [d].concat(ok).map(function (x) {
+      return carte(gros(x[0], 40) + sousTitre(x[1]), x === d, x[1]);
+    }),
+    bravo: 'Attention, ' + d[1] + ' : c’est dangereux, je n’y touche pas.'
+  };
+}
+
+function nouvelleQuestionDanger() {
+  const cfg = DANGER_NIVEAUX[niveau('danger')];
+  const type = cfg.types[Math.floor(Math.random() * cfg.types.length)];
+  let q;
+
+  if (type === 'feu') {
+    q = questionFeu();
+  } else if (type === 'danger') {
+    q = questionDanger(cfg.intrus || 2);
+  } else if (type === 'main') {
+    q = {
+      consigne: 'Pour traverser la rue, je donne la main à…',
+      colonnes: 3,
+      choix: [
+        carte(gros('🧑', 40) + sousTitre('un adulte'), true, 'un adulte'),
+        carte(gros('🐶', 40) + sousTitre('mon chien'), false, 'mon chien'),
+        carte(gros('🦃', 40) + sousTitre('Roullieee'), false, 'Roullieee')
+      ],
+      bravo: 'Je donne la main à un adulte. Roullieee, lui, reste à la ferme !'
+    };
+  } else if (type === 'traverser') {
+    const cas = [
+      ['passage', 'au passage pour piétons'],
+      ['voitures', 'entre les voitures'],
+      ['milieu', 'au milieu de la rue']
+    ];
+    q = {
+      consigne: 'Où est-ce qu’on <span class="text-orange-400">traverse</span> la rue ?',
+      colonnes: 1,
+      choix: cas.map(function (c) {
+        return carte(svgRue(c[0]) + sousTitre(c[1]), c[0] === 'passage', c[1]);
+      }),
+      bravo: 'On traverse au passage pour piétons, avec un adulte.'
+    };
+  } else if (type === 'gilet') {
+    q = {
+      consigne: 'Quand il fait sombre, qu’est-ce que je mets pour être <span class="text-orange-400">bien vu</span> ?',
+      colonnes: 3,
+      choix: [
+        carte(gros('🦺', 40) + sousTitre('le gilet fluo'), true, 'le gilet fluo'),
+        carte(gros('🕶️', 40) + sousTitre('les lunettes de soleil'), false, 'les lunettes de soleil'),
+        carte(gros('🎩', 40) + sousTitre('le chapeau'), false, 'le chapeau')
+      ],
+      bravo: 'Le gilet fluo, pour que les voitures me voient de loin.'
+    };
+  } else if (type === 'urgence') {
+    q = {
+      consigne: 'Quel numéro faut-il appeler en cas d’<span class="text-orange-400">urgence</span> ?',
+      dire: 'Quel numéro faut-il appeler en cas d’urgence ?',
+      /* surtout pas d'ordre fixe : rangés, le 112 tombait toujours en
+         2e position et on apprenait la place au lieu du numéro */
+      colonnes: 4,
+      choix: ['12', '112', '121', '211'].map(function (n) {
+        return carte(grosChiffre(n), n === '112', n.split('').join(' '));
+      }),
+      bravo: 'En cas d’urgence, on appelle le 112 : un, un, deux.'
+    };
+  } else {
+    q = {
+      consigne: 'Une personne que tu ne connais pas te propose des bonbons pour la suivre. Que fais-tu ?',
+      colonnes: 2,          /* mélangées : la bonne réponse n'est pas toujours la première */
+      choix: [
+        carte(gros('🙅', 40) + sousTitre('Je dis non et je vais voir un adulte que je connais'),
+          true, 'je dis non et je vais voir un adulte que je connais'),
+        carte(gros('🍬', 40) + sousTitre('Je la suis'), false, 'je la suis')
+      ],
+      bravo: 'Je dis non, et je vais tout de suite voir un adulte que je connais.'
+    };
+  }
+
+  q.suite = nouvelleQuestionDanger;
+  q.delai = 3400;              /* la phrase à retenir est longue : on lui laisse le temps */
+  poserQuestion('danger', q);
+}
+
+function resetDanger() {
+  if (!DANGER_NIVEAUX[niveau('danger')].libre) { nouvelleQuestionDanger(); return; }
+
+  poserDecouverte('danger', 'Touche pour apprendre', [
+    { html: gros('🧍', 40) + sousTitre('bonhomme rouge'), nom: 'le bonhomme rouge',
+      scene: svgFeu(false), dit: 'Rouge : j’attends sur le trottoir.',
+      dire: 'Le bonhomme est rouge. J’attends sur le trottoir.' },
+    { html: gros('🚶', 40) + sousTitre('bonhomme vert'), nom: 'le bonhomme vert',
+      scene: svgFeu(true), dit: 'Vert : je traverse en regardant bien.',
+      dire: 'Le bonhomme est vert. Je traverse en regardant bien à gauche et à droite.' },
+    { html: gros('🙌', 40) + sousTitre('la main de l’adulte'), nom: 'la main de l’adulte',
+      scene: gros('🧑', 58), dit: 'Je donne toujours la main à un adulte.',
+      dire: 'Pour traverser, je donne toujours la main à un adulte.' },
+    { html: gros('🦺', 40) + sousTitre('le gilet fluo'), nom: 'le gilet fluo',
+      scene: gros('🦺', 58), dit: 'Le gilet fluo : les voitures me voient de loin.',
+      dire: 'Le gilet fluo. Les voitures me voient de loin.' },
+    { html: gros('🛑', 40) + sousTitre('je n’y touche pas'), nom: 'je n’y touche pas',
+      scene: '<div class="flex gap-2 flex-wrap justify-center">' +
+        gros('🔪', 34) + gros('🔌', 34) + gros('💊', 34) + gros('🔥', 34) + '</div>',
+      dit: 'Le couteau, la prise, les médicaments, le feu : je n’y touche pas.',
+      dire: 'Le couteau, la prise électrique, les médicaments, le feu. Je n’y touche pas.' },
+    { html: grosChiffre('112') + sousTitre('le numéro d’urgence'), nom: 'le cent douze',
+      scene: grosChiffre('112'), dit: 'En cas d’urgence : le 112.',
+      dire: 'Le numéro d’urgence : un, un, deux.' }
+  ], 3);
+}
+
+poserNiveaux('dangerNiveaux', 'danger',
+  ['1. Découvrir', '2. Le feu', '3. Les dangers', '4. Dans la rue', '5. Tout mêlé'], resetDanger);
 </script>
 </body>
 </html>
