@@ -1,0 +1,2379 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#3ec5f0">
+<title>🚜 La Ferme de Roullieee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lilita+One&display=swap" rel="stylesheet">
+<style>
+:root{--encre:#3b2412;--creme:#fff8e7;--or:#ffd23f}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#3ec5f0}
+body{font-family:'Fredoka',system-ui,sans-serif;color:var(--encre);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;color:inherit;background:none;padding:0}
+.cache{display:none!important}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+
+/* ── bulles au-dessus des objets 3D ── */
+#bulles{position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden}
+.bulle{position:absolute;left:0;top:0;pointer-events:auto;will-change:transform}
+.bulle .in{position:relative;display:flex;align-items:center;justify-content:center;gap:3px;min-width:50px;height:50px;padding:0 9px;border-radius:999px;background:#fff;
+  font-size:27px;font-weight:700;box-shadow:0 4px 0 rgba(0,0,0,.18),0 6px 14px rgba(0,0,0,.2);border:3px solid #fff;white-space:nowrap}
+.bulle .in::after{content:'';position:absolute;left:50%;bottom:-11px;transform:translateX(-50%);border:9px solid transparent;border-top-color:#fff;border-bottom:0}
+.bulle .in small{font-size:17px}
+.bulle.faim .in{background:#f1f5f9;opacity:.94;font-size:24px}
+.bulle.pret .in{background:linear-gradient(#fff6b0,#ffd23f);animation:saute .7s ease-in-out infinite alternate}
+.bulle.pret .in::after{border-top-color:#ffd23f}
+.bulle.lock .in{background:#7c4a1d;color:#fff;font-size:19px;border-color:#ffd23f}
+.bulle.lock .in::after{border-top-color:#7c4a1d}
+.bulle.pad .in{background:linear-gradient(#bbf7d0,#4ade80);font-size:22px;border-color:#fff}
+.bulle.pad .in::after{border-top-color:#4ade80}
+.bulle.pad.sur .in{animation:saute .35s ease-in-out infinite alternate}
+.bulle.vente .in{background:linear-gradient(#ffe46b,#ffb300);font-size:20px}
+.bulle.vente .in::after{border-top-color:#ffb300}
+.bulle.info .in{font-size:20px;height:44px}
+.bulle.plein .in{background:#ef4444;color:#fff;font-size:18px;animation:saute .3s ease-in-out infinite alternate}
+.bulle.plein .in::after{border-top-color:#ef4444}
+.bulle.cmd .in{font-size:22px;background:#fff;border-color:#3a86ff;height:auto;min-height:50px;padding:4px 10px}
+.bulle.cmd .in::after{border-top-color:#3a86ff}
+.bulle .ok{color:#16a34a}
+@keyframes saute{from{transform:translateY(0) scale(1)}to{transform:translateY(-8px) scale(1.06)}}
+#parole{position:absolute;left:0;top:0;max-width:min(80vw,26rem);background:#fff;border:4px solid var(--or);border-radius:22px;padding:12px 16px;font-size:clamp(17px,2.4vmin + 8px,24px);font-weight:600;
+  box-shadow:0 8px 20px rgba(0,0,0,.25);pointer-events:auto;z-index:6}
+#parole::after{content:'';position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:12px solid transparent;border-top-color:var(--or);border-bottom:0}
+
+/* ── joystick ── */
+#joy{position:fixed;z-index:9;width:130px;height:130px;margin:-65px 0 0 -65px;border-radius:50%;background:rgba(255,255,255,.25);border:4px solid rgba(255,255,255,.7);pointer-events:none}
+#joyK{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#ffd23f);box-shadow:0 4px 10px rgba(0,0,0,.3)}
+
+/* ── HUD ── */
+#hud{position:fixed;inset:0;pointer-events:none;z-index:10}
+#hud > *{pointer-events:auto}
+.haut-gauche{position:absolute;left:max(10px,env(safe-area-inset-left));top:max(10px,env(safe-area-inset-top));display:flex;align-items:center}
+.niveau{position:relative;z-index:2;width:70px;height:70px;display:flex;align-items:center;justify-content:center;font-family:'Lilita One';font-size:30px;color:#fff;
+  text-shadow:0 2px 0 #b45309,0 0 6px rgba(0,0,0,.25);filter:drop-shadow(0 4px 0 rgba(0,0,0,.2))}
+.niveau::before{content:'';position:absolute;inset:0;background:linear-gradient(#ffe46b,#ffb300);
+  clip-path:polygon(50% 0%,61% 33%,97% 35%,68% 57%,79% 92%,50% 72%,21% 92%,32% 57%,3% 35%,39% 33%);z-index:-1}
+.xp{position:relative;margin-left:-14px;width:min(34vw,180px);height:30px;background:rgba(59,36,18,.7);border:3px solid #fff;border-radius:999px;overflow:hidden}
+.xp-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(#7dd3fc,#2563eb);border-radius:999px;transition:width .5s}
+.xp span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;text-shadow:0 1px 0 rgba(0,0,0,.5)}
+.haut-droite{position:absolute;right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));display:flex;gap:8px;align-items:center}
+.pieces{display:flex;align-items:center;gap:6px;height:48px;padding:0 16px 0 6px;background:rgba(59,36,18,.7);border:3px solid #fff;border-radius:999px;color:#fff;font-size:24px;font-weight:700}
+.pieces .ic{font-size:32px;line-height:1}
+.pieces.vibre{animation:vibre .4s}
+.petit{width:48px;height:48px;border-radius:16px;background:linear-gradient(#fff,#e9e2d0);border:3px solid #fff;font-size:24px;box-shadow:0 4px 0 #b9ab8a}
+.petit:active{transform:translateY(3px);box-shadow:0 1px 0 #b9ab8a}
+.petit.off{opacity:.5}
+#cmd{position:absolute;left:50%;top:max(72px,calc(env(safe-area-inset-top) + 66px));transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.95);
+  border:4px solid #3a86ff;border-radius:999px;padding:5px 16px;font-size:24px;font-weight:700;box-shadow:0 5px 0 rgba(0,0,0,.15);white-space:nowrap}
+#cmd .q{font-size:16px}
+#cmd .ok{color:#16a34a}
+#cmd .gain{font-size:18px;color:#b45309}
+.bas-gauche,.bas-droite{position:absolute;bottom:max(14px,env(safe-area-inset-bottom));display:flex;gap:12px}
+.bas-gauche{left:max(12px,env(safe-area-inset-left))}
+.bas-droite{right:max(12px,env(safe-area-inset-right))}
+.rond{position:relative;width:84px;height:84px;border-radius:50%;border:4px solid #fff;font-size:40px;line-height:1;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:0 6px 0 rgba(0,0,0,.25),0 10px 18px rgba(0,0,0,.2);transition:transform .1s}
+.rond:active{transform:translateY(4px) scale(.96)}
+.rond small{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);background:#fff;color:var(--encre);font-size:13px;font-weight:700;border-radius:999px;padding:2px 8px;white-space:nowrap;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.rond.vert{background:linear-gradient(#7ee36b,#2fa52a)}
+.rond.jaune{background:linear-gradient(#ffe46b,#ffb300)}
+.rond.vibre,.vibre{animation:vibre .45s}
+@keyframes vibre{0%,100%{transform:scale(1)}40%{transform:scale(1.18)}70%{transform:scale(.95)}}
+@media (max-width:560px){
+  .rond{width:70px;height:70px;font-size:32px}
+  .pieces{font-size:20px;height:44px}
+  .petit{width:44px;height:44px;font-size:21px}
+  #cmd{font-size:19px;padding:4px 12px}
+}
+
+/* ── message ── */
+#toast{position:fixed;left:50%;top:max(130px,calc(env(safe-area-inset-top) + 124px));transform:translateX(-50%) scale(.8);opacity:0;z-index:30;pointer-events:none;
+  background:#fff;border:4px solid var(--or);border-radius:999px;padding:10px 22px;font-size:clamp(17px,2vmin + 10px,24px);font-weight:700;text-align:center;max-width:90vw;
+  box-shadow:0 8px 20px rgba(0,0,0,.25);transition:opacity .2s,transform .2s}
+#toast.on{opacity:1;transform:translateX(-50%) scale(1)}
+.flotte{position:fixed;z-index:20;pointer-events:none;font-weight:700;font-size:30px;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.35),0 0 8px rgba(0,0,0,.3);
+  transform:translate(-50%,-50%);animation:flotte 1.2s ease-out forwards;white-space:nowrap}
+@keyframes flotte{0%{opacity:0;margin-top:10px}15%{opacity:1}100%{opacity:0;margin-top:-80px}}
+.vole{position:fixed;z-index:25;pointer-events:none;font-size:36px;line-height:1;transform:translate(-50%,-50%);transition:transform .7s cubic-bezier(.45,-0.35,.6,1),opacity .7s}
+.coeur{position:fixed;z-index:20;pointer-events:none;font-size:26px;animation:coeur 1s ease-out forwards}
+@keyframes coeur{0%{opacity:0;transform:translate(-50%,0) scale(.4)}20%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),-90px) scale(1.2)}}
+.confetti{position:fixed;top:-20px;z-index:60;width:12px;height:18px;border-radius:3px;pointer-events:none;animation:confetti linear forwards}
+@keyframes confetti{to{transform:translateY(110vh) rotate(900deg)}}
+
+/* ── fenêtres ── */
+#modal{position:fixed;inset:0;z-index:40;background:rgba(20,40,60,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+.panel{position:relative;width:min(94vw,620px);max-height:88vh;display:flex;flex-direction:column;background:var(--creme);border:6px solid var(--or);border-radius:32px;
+  box-shadow:0 18px 40px rgba(0,0,0,.35);animation:pop .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.ruban{align-self:center;margin-top:-30px;background:linear-gradient(#ffb14a,#ff7a1a);color:#fff;font-family:'Lilita One';font-size:clamp(24px,4vmin + 10px,36px);
+  padding:6px 34px;border-radius:18px;border:4px solid #fff;box-shadow:0 5px 0 #c2410c;text-shadow:0 3px 0 rgba(0,0,0,.2);white-space:nowrap}
+.panel .x{position:absolute;right:-14px;top:-14px;width:54px;height:54px;border-radius:50%;background:linear-gradient(#ff8a7a,#d63c3c);color:#fff;border:4px solid #fff;font-size:24px;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+#mCorps{overflow-y:auto;padding:18px 18px 22px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:16px;padding:8px 18px;font-size:19px;font-weight:700;color:#fff;
+  background:linear-gradient(#7ee36b,#2fa52a);box-shadow:0 4px 0 #1d6f1a;text-shadow:0 2px 0 rgba(0,0,0,.2);min-height:46px}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #1d6f1a}
+.btn.jaune{background:linear-gradient(#ffe46b,#ffb300);color:var(--encre);text-shadow:none;box-shadow:0 4px 0 #b45309}
+.btn.rouge{background:linear-gradient(#ff8a7a,#d63c3c);box-shadow:0 4px 0 #991b1b}
+.centre{text-align:center}
+.grosse-etoile{font-size:110px;line-height:1;animation:tourne 1.2s ease-in-out infinite alternate}
+@keyframes tourne{from{transform:rotate(-12deg) scale(1)}to{transform:rotate(12deg) scale(1.12)}}
+.debloque{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:12px 0}
+.debloque div{background:#fff;border-radius:18px;padding:8px 14px;font-weight:700;border:3px solid #f1d9a8}
+.debloque .em{font-size:44px;display:block}
+.plan{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;max-width:460px;margin:0 auto}
+.parcelle{position:relative;aspect-ratio:1;border-radius:18px;border:4px solid #fff;box-shadow:0 4px 0 rgba(0,0,0,.2);color:#fff;font-weight:700;font-size:15px;
+  background:repeating-linear-gradient(0deg,#7b4a26 0 17%,#5e381c 17% 23%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-shadow:0 2px 0 rgba(0,0,0,.4)}
+.parcelle:active{transform:scale(.94)}
+.parcelle .em{font-size:44px;line-height:1.1;text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.parcelle .encore{position:absolute;right:5px;top:3px;font-size:18px;background:rgba(255,255,255,.85);border-radius:999px;padding:1px 4px}
+.parcelle.verrou{filter:grayscale(1);opacity:.45}
+.rapides{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.aide-liste{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center;font-size:18px;font-weight:600;text-align:left}
+.aide-liste .em{font-size:36px}
+
+/* ── écran titre ── */
+#titre{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:20px;text-align:center;
+  background:radial-gradient(ellipse at 50% 40%,rgba(255,255,255,.25),rgba(30,90,140,.55))}
+#titre h1{margin:0;font-family:'Lilita One';font-size:clamp(44px,9vw,96px);line-height:.95;color:#fff;
+  text-shadow:0 5px 0 #d97706,0 9px 0 #92400e,0 14px 24px rgba(0,0,0,.35)}
+#titre h1 span{display:inline-block;animation:lettre 1.4s ease-in-out infinite}
+@keyframes lettre{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+#titre .sous{font-size:clamp(18px,3vw,26px);font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35)}
+#jouer{font-family:'Lilita One';font-size:clamp(32px,6vw,52px);color:#fff;padding:14px 56px;border-radius:30px;border:6px solid #fff;
+  background:linear-gradient(#7ee36b,#2fa52a);box-shadow:0 9px 0 #1d6f1a,0 16px 28px rgba(0,0,0,.3);text-shadow:0 3px 0 rgba(0,0,0,.25);animation:respire 1.2s ease-in-out infinite}
+#jouer:disabled{filter:grayscale(1);animation:none;opacity:.8}
+@keyframes respire{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+#charge{color:#fff;font-weight:700;text-shadow:0 2px 0 rgba(0,0,0,.35);min-height:1.2em}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="bulles"><div id="parole" class="cache"></div></div>
+<div id="joy" class="cache"><div id="joyK"></div></div>
+
+<div id="hud" class="cache">
+  <div class="haut-gauche">
+    <div class="niveau" id="niv">1</div>
+    <div class="xp"><div class="xp-fill" id="xpFill"></div><span id="xpTxt">0 / 20</span></div>
+  </div>
+  <div id="cmd"></div>
+  <div class="haut-droite">
+    <div class="pieces" id="bourse"><span class="ic">🪙</span><b id="pieces">0</b></div>
+    <button class="petit" id="bMusique" aria-label="Musique">🎵</button>
+    <button class="petit" id="bSon" aria-label="Son">🔊</button>
+    <button class="petit" id="bReglages" aria-label="Réglages">⚙️</button>
+  </div>
+  <div class="bas-gauche">
+    <button class="rond vert" id="bChamps" aria-label="Choisir ce qui pousse dans chaque champ">🌱<small>Champs</small></button>
+  </div>
+  <div class="bas-droite">
+    <button class="rond jaune" id="bAide" aria-label="Aide">💡<small>Aide</small></button>
+  </div>
+</div>
+<div id="toast"></div>
+
+<div id="modal" class="cache">
+  <div class="panel">
+    <div class="ruban" id="mTitre"></div>
+    <button class="x" id="mX" aria-label="Fermer">✖</button>
+    <div id="mCorps"></div>
+  </div>
+</div>
+
+<div id="titre">
+  <h1><span>La</span> <span style="animation-delay:.1s">Ferme</span> <span style="animation-delay:.2s">de</span><br><span style="animation-delay:.3s">Roullieee</span></h1>
+  <div class="sous">👩‍🌾 Promène Roullieee dans sa ferme ! 🧺</div>
+  <button id="jouer" disabled>▶ JOUER</button>
+  <div id="charge">Chargement de la ferme…</div>
+</div>
+
+<script>
+setTimeout(function () {
+  if (!window.__fermeOK) document.getElementById('charge').textContent = 'La 3D n’a pas pu se charger. Vérifie la connexion internet puis recharge la page.';
+}, 15000);
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+window.__fermeOK = true;
+
+/* ══════════════════════════════════════════════════════════
+   LA FERME DE ROULLIEEE — version « balade »
+   On dirige Roullieee : glisser le doigt (joystick) ou toucher un
+   endroit (elle y va seule en contournant les obstacles).
+   Tout se fait en marchant, comme dans les jeux mobiles « idle » :
+   - traverser un champ mûr : la récolte s'empile sur son dos ;
+   - traverser un champ vide : elle sème ce qui est prévu pour ce champ ;
+   - passer à l'auge : la bonne nourriture y tombe, les bêtes mangent ;
+   - passer à la caisse : œufs, lait… s'empilent sur son dos ;
+   - passer derrière le camion : il prend ce que la commande demande ;
+   - s'arrêter 1,5 s sur un carré vert : les pièces y coulent et on achète.
+   ══════════════════════════════════════════════════════════ */
+
+const BASE = '';              /* les sons de la classe sont à côté, dans docs/sons/ */
+const CLE = 'fermeRoullieeeBalade.v1';
+
+const $ = s => document.querySelector(s);
+const calque = $('#bulles');
+const rand = (a, b) => a + Math.random() * (b - a);
+const randi = (a, b) => Math.floor(rand(a, b + 1));
+const pick = l => l[Math.floor(Math.random() * l.length)];
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const melange = l => { const t = l.slice(); for (let i = t.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [t[i], t[j]] = [t[j], t[i]]; } return t; };
+const maintenant = () => Date.now();
+
+/* ══════════ DONNÉES DU JEU ══════════ */
+const ITEMS = {
+  ble:     { e: '🌾', nom: 'Blé', val: 2 },
+  mais:    { e: '🌽', nom: 'Maïs', val: 3 },
+  carotte: { e: '🥕', nom: 'Carottes', val: 3 },
+  oeuf:    { e: '🥚', nom: 'Œufs', val: 5 },
+  lait:    { e: '🥛', nom: 'Lait', val: 8 },
+  truffe:  { e: '🍄', nom: 'Truffes', val: 11 },
+  laine:   { e: '🧶', nom: 'Laine', val: 10 },
+  /* produits transformés dans les stands */
+  yaourt:  { e: '🥣', nom: 'Yaourts', val: 20 },
+  pull:    { e: '🧥', nom: 'Pulls', val: 30 }
+};
+/* Les stands : on y dépose la matière première, ils la transforment
+   tout seuls, et on vient chercher le produit fini. */
+const ATELIERS = {
+  yaourt: { nom: 'Yaourterie', a: 'à la yaourterie', entree: 'lait', sortie: 'yaourt', duree: 8, niv: 3, prix: 120, x: 2.2, z: -14.6, fab: () => fabYaourterie() },
+  pull:   { nom: 'Atelier de pulls', a: 'à l’atelier de pulls', entree: 'laine', sortie: 'pull', duree: 10, niv: 4, prix: 180, x: 15, z: -14.4, fab: () => fabAtelierPulls() }
+};
+const ENTREE_MAX = 6, SORTIE_MAX = 8;
+/* le cultivateur : un aide qu'on recrute */
+const FERMIER = { prix: 120, niv: 2, pad: [-14.6, -11.4], repos: [-14.6, -10.6], porte: 4, vitesse: 4.5 };
+const CULTURES = {
+  ble:     { e: '🌾', nom: 'Blé', du: 'du blé', de: 'de blé', duree: 15, niv: 1, recolte: 3 },
+  mais:    { e: '🌽', nom: 'Maïs', du: 'du maïs', de: 'de maïs', duree: 25, niv: 2, recolte: 3 },
+  carotte: { e: '🥕', nom: 'Carotte', du: 'des carottes', de: 'de carottes', duree: 20, niv: 3, recolte: 3 }
+};
+const ANIMAUX = {
+  poule:  { e: '🐔', nom: 'Poule', les: 'les poules', mange: 'ble', donne: 'oeuf', duree: 12, niv: 1, prix: 25, max: 6, vitesse: 1.3 },
+  vache:  { e: '🐄', nom: 'Vache', les: 'les vaches', mange: 'mais', donne: 'lait', duree: 20, niv: 2, prix: 70, max: 4, vitesse: .6 },
+  cochon: { e: '🐖', nom: 'Cochon', les: 'les cochons', mange: 'carotte', donne: 'truffe', duree: 25, niv: 3, prix: 110, max: 4, vitesse: .8 },
+  mouton: { e: '🐑', nom: 'Mouton', les: 'les moutons', mange: 'ble', donne: 'laine', duree: 25, niv: 4, prix: 160, max: 4, vitesse: .7 }
+};
+/* chaque enclos : son auge (à remplir) et sa caisse (à vider), dehors,
+   contre la barrière ; et le carré d'achat d'une bête de plus */
+const ENCLOS = {
+  poulailler: { x: 5.2,   z: -5.2, w: 10.4, d: 7.8, sol: '#e9d38a', barriere: '#fff3dc', espece: 'poule',  auge: [2.6, -.65],  caisse: [7.8, -.65],  pad: [5.2, 1.5] },
+  pre:        { x: 19.5,  z: -5.2, w: 13,   d: 9.1, sol: '#9bd770', barriere: '#b07a45', espece: 'vache',  auge: [16.5, 0],    caisse: [22.5, 0],    pad: [19.5, 2] },
+  porcherie:  { x: 6.5,   z: 10.4, w: 10.4, d: 7.8, sol: '#a87a4f', barriere: '#b07a45', espece: 'cochon', auge: [3.9, 5.85],  caisse: [9.1, 5.85],  pad: [-.6, 10.4] },
+  bergerie:   { x: 20.15, z: 10.4, w: 11.7, d: 7.8, sol: '#a5dc7c', barriere: '#fff3dc', espece: 'mouton', auge: [17.4, 5.85], caisse: [22.8, 5.85], pad: [27.8, 10.4] }
+};
+const AUGE_MAX = 8, CAISSE_MAX = 12;
+/* Expérience cumulée pour chaque niveau. Volontairement lente : une
+   nouveauté toutes les quelques séances, pas toutes les deux minutes. */
+const PALIERS = [0, 60, 170, 350, 640, 1050, 1650, 2400, 3450, 4800];
+function palier(i) { return i < PALIERS.length ? PALIERS[i] : PALIERS[PALIERS.length - 1] + (i - PALIERS.length + 1) * 1500; }
+const NOUVEAUTES = {
+  2: [['🌽', 'Maïs'], ['🐄', 'Vaches'], ['👨‍🌾', 'Cultivateur']],
+  3: [['🥕', 'Carottes'], ['🐖', 'Cochons'], ['🥣', 'Yaourterie']],
+  4: [['🐑', 'Moutons'], ['🧥', 'Atelier de pulls'], ['🌈', 'Arc-en-ciel']],
+  5: [['🦃', 'Statue Dindromakus']]
+};
+/* prix des champs 7 à 12 (les 6 premiers sont offerts) */
+const PRIX_CHAMPS = [30, 60, 100, 150, 200, 260];
+const NB_CHAMPS = 12;
+/* Chaque bête de plus d'une même espèce coûte plus cher (×1,4) :
+   la 3e poule achetée coûte bien plus que la 1re. */
+const BETES_DEPART = { poule: 2 };
+function prixBete(esp) {
+  const n = Math.max(0, S.animaux.filter(a => a.esp === esp).length - (BETES_DEPART[esp] || 0));
+  return Math.round(ANIMAUX[esp].prix * Math.pow(1.4, n) / 5) * 5;
+}
+const PRIX_PANIER = { 6: 35, 10: 70, 14: 120, 18: 180 };
+const DECOS = [
+  { id: 'fleurs',   e: '🌷', nom: 'Fleurs',      prix: 10,  niv: 1, faire: () => fabFleurs() },
+  { id: 'arbre',    e: '🌳', nom: 'Arbre',       prix: 15,  niv: 1, faire: () => fabArbre(true) },
+  { id: 'banc',     e: '🪑', nom: 'Banc',        prix: 20,  niv: 1, faire: () => fabBanc() },
+  { id: 'chien',    e: '🐕', nom: 'Médor',       prix: 45,  niv: 2, faire: () => fabChien(), suit: true, son: 'chien' },
+  { id: 'ballons',  e: '🎈', nom: 'Ballons',     prix: 30,  niv: 2, faire: () => fabBallons() },
+  { id: 'chat',     e: '🐈', nom: 'Minou',       prix: 45,  niv: 2, faire: () => fabChat(), promene: true, son: 'chat' },
+  { id: 'fontaine', e: '⛲', nom: 'Fontaine',    prix: 80,  niv: 3, faire: () => fabFontaine() },
+  { id: 'epouv',    e: '🎃', nom: 'Épouvantail', prix: 40,  niv: 3, faire: () => fabEpouvantail() },
+  { id: 'arc',      e: '🌈', nom: 'Arc-en-ciel', prix: 120, niv: 4, faire: () => fabArcEnCiel() },
+  { id: 'dindo',    e: '🦃', nom: 'Dindromakus', prix: 200, niv: 5, faire: () => fabStatue(), glou: true }
+];
+const SPOTS_DECO = [[-10.4, -16.6], [21.45, -16.1], [-0.4, 17.9], [13, 17.2],
+  [24, 17.4], [-15, 17.4], [-26.8, 16.1], [11.8, -12], [26.8, -13.8], [-1.6, -4.2]];
+const CLIENTS = [['👵', 'Mamie Jo'], ['👨‍🍳', 'Le boulanger'], ['👧', 'Lila'], ['👴', 'Papi Marcel'], ['👩‍🏫', 'La maîtresse'], ['🧒', 'Léo'], ['👩‍🌾', 'La voisine']];
+const VENTE = [-18.2, -11.6];     /* carré de vente devant la grange */
+const PAD_PANIER = [-27, -3.4];   /* carré « panier plus grand » */
+const ZONE_CAMION = [-19.5, 9.2]; /* derrière le camion : là où l'on envoie Roullieee */
+const DEPART = [-6.5, -3.9];
+
+/* ══════════ SAUVEGARDE SUR LA TABLETTE ══════════ */
+function etatNeuf() {
+  const t = maintenant();
+  return {
+    v: 1, pieces: 10, xp: 0, niveau: 1, prochainId: 10, capacite: 6, graine: 'ble',
+    porte: [],
+    /* prevu : ce qu'on sème dans ce champ (choisi par l'enfant, bouton 🌱 Champs) */
+    champs: Array.from({ length: NB_CHAMPS }, (_, i) => i < 3 ? { c: 'ble', t0: t - 30000, t1: t - 1000, reste: 3, prevu: 'ble' } : { c: null, t0: 0, t1: 0, reste: 0, prevu: 'ble' }),
+    champsAchetes: 6,
+    animaux: [{ id: 1, esp: 'poule', pret: 0 }, { id: 2, esp: 'poule', pret: 0 }],
+    auges: { poulailler: 0, pre: 0, porcherie: 0, bergerie: 0 },
+    caisses: { poulailler: 0, pre: 0, porcherie: 0, bergerie: 0 },
+    ateliers: { yaourt: { achete: false, entree: 0, sortie: 0, fin: 0 }, pull: { achete: false, entree: 0, sortie: 0, fin: 0 } },
+    fermier: false,
+    commande: null, pads: {}, placesPads: {}, deco: [],
+    musique: true, son: true
+  };
+}
+function charger() {
+  try {
+    const o = JSON.parse(localStorage.getItem(CLE) || 'null');
+    if (o && o.v === 1) {
+      const n = etatNeuf();
+      for (const k in n) if (o[k] === undefined) o[k] = n[k];
+      /* anciennes parties : une seule graine pour tous les champs, et 9 champs au plus */
+      while (o.champs.length < NB_CHAMPS) o.champs.push({ c: null, t0: 0, t1: 0, reste: 0, prevu: 'ble' });
+      o.champs.forEach(c => { if (!c.prevu) c.prevu = o.graine || 'ble'; });
+      /* les anciens emplacements de déco ont été renumérotés */
+      if (o.deco.some(d => d.place >= SPOTS_DECO.length)) o.deco.forEach((d, i) => { d.place = i % SPOTS_DECO.length; });
+      o.placesPads = {};
+      return o;
+    }
+  } catch (e) {}
+  return etatNeuf();
+}
+let S = charger();
+let attenteSauve = null, gele = false;
+function sauver() {
+  if (gele) return;
+  clearTimeout(attenteSauve);
+  attenteSauve = setTimeout(() => { try { localStorage.setItem(CLE, JSON.stringify(S)); } catch (e) {} }, 300);
+}
+
+/* ══════════ SONS ══════════ */
+let AC = null;
+function ac() { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); return AC; }
+function osc(o) {
+  if (!S.son) return;
+  const A = ac(), t0 = A.currentTime + (o.d || 0), dur = o.dur || .2;
+  const n = A.createOscillator(), g = A.createGain();
+  n.type = o.type || 'sine';
+  n.frequency.setValueAtTime(o.f, t0);
+  if (o.f2) n.frequency.exponentialRampToValueAtTime(o.f2, t0 + dur);
+  let s = n;
+  if (o.lp) { const f = A.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = o.lp; n.connect(f); s = f; }
+  if (o.vib) { const l = A.createOscillator(), lg = A.createGain(); l.frequency.value = o.vib; lg.gain.value = o.vibp || 20; l.connect(lg); lg.connect(n.frequency); l.start(t0); l.stop(t0 + dur); }
+  g.gain.setValueAtTime(.0001, t0);
+  g.gain.linearRampToValueAtTime(o.v || .2, t0 + Math.min(.03, dur / 4));
+  g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+  s.connect(g); g.connect(A.destination);
+  n.start(t0); n.stop(t0 + dur + .05);
+}
+function bruit(o) {
+  if (!S.son) return;
+  const A = ac(), t0 = A.currentTime + (o.d || 0), dur = o.dur || .2;
+  const buf = A.createBuffer(1, Math.ceil(A.sampleRate * dur), A.sampleRate), d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  const s = A.createBufferSource(), f = A.createBiquadFilter(), g = A.createGain();
+  s.buffer = buf; f.type = o.hp ? 'highpass' : 'lowpass'; f.frequency.value = o.hp || o.lp || 1000;
+  g.gain.setValueAtTime(o.v || .2, t0); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+  s.connect(f); f.connect(g); g.connect(A.destination); s.start(t0); s.stop(t0 + dur);
+}
+let hauteurPile = 0;
+const SFX = {
+  plop:    () => osc({ f: 420, f2: 900, dur: .12, v: .2 }),
+  pop:     () => osc({ f: 700, f2: 1400, dur: .1, v: .16 }),
+  /* chaque objet empilé sonne un peu plus aigu : on « entend » la pile monter */
+  pile:    () => osc({ f: 520 + hauteurPile * 45, dur: .09, v: .15, type: 'triangle' }),
+  pose:    () => osc({ f: 760 - hauteurPile * 25, f2: 380, dur: .1, v: .14, type: 'triangle' }),
+  piece:   (d = 0) => { osc({ f: 1320, dur: .08, d, v: .12 }); osc({ f: 1980, dur: .18, d: d + .05, v: .09 }); },
+  non:     () => osc({ f: 220, f2: 160, dur: .25, v: .2, type: 'square', lp: 900 }),
+  miam:    () => { for (let i = 0; i < 3; i++) bruit({ lp: 2500, dur: .06, d: i * .12, v: .2 }); },
+  achat:   () => [523, 659, 784, 1046].forEach((f, i) => osc({ f, dur: .18, d: i * .08, v: .15, type: 'triangle' })),
+  niveau:  () => [523, 659, 784, 1046, 784, 1046, 1318].forEach((f, i) => osc({ f, dur: .22, d: i * .11, v: .16, type: 'triangle' })),
+  klaxon:  () => { osc({ f: 440, dur: .16, v: .14, type: 'square', lp: 1500 }); osc({ f: 440, dur: .22, d: .22, v: .14, type: 'square', lp: 1500 }); },
+  vroum:   () => osc({ f: 60, f2: 110, dur: 1.2, v: .25, type: 'sawtooth', lp: 380, vib: 12, vibp: 8 }),
+  pluie:   () => bruit({ hp: 2200, dur: 2.5, v: .07 }),
+  feuilles:() => bruit({ hp: 1500, dur: .45, v: .1 }),
+  pas:     () => bruit({ lp: 500, dur: .05, v: .05 }),
+  poule:   () => { [0, .13, .25].forEach((d, i) => osc({ f: 820 - i * 40, f2: 560, dur: .08, d, type: 'square', lp: 2000, v: .09 })); osc({ f: 1150, f2: 700, dur: .3, d: .4, type: 'square', lp: 2400, v: .1 }); },
+  cochon:  () => [0, .35].forEach(d => { bruit({ lp: 450, dur: .28, d, v: .2 }); osc({ f: 135, f2: 95, dur: .28, d, type: 'sawtooth', lp: 520, vib: 28, vibp: 25, v: .22 }); }),
+  vache:   () => { if (!jouer('vache')) osc({ f: 175, f2: 105, dur: 1.1, type: 'sawtooth', lp: 700, vib: 5, vibp: 7, v: .28 }); },
+  mouton:  () => { if (!jouer('mouton')) osc({ f: 440, f2: 380, dur: .85, type: 'sawtooth', lp: 1500, vib: 17, vibp: 40, v: .18 }); },
+  canard:  () => { if (!jouer('canard')) [0, .25].forEach(d => osc({ f: 350, f2: 250, dur: .17, d, type: 'sawtooth', lp: 2000, v: .22 })); },
+  chien:   () => { if (!jouer('chien')) [0, .3].forEach(d => osc({ f: 300, f2: 140, dur: .15, d, type: 'square', lp: 1300, v: .25 })); },
+  chat:    () => { if (!jouer('chat')) osc({ f: 480, f2: 900, dur: .5, type: 'sawtooth', lp: 1700, v: .18 }); }
+};
+const banque = {};
+['vache', 'mouton', 'canard', 'chien', 'chat'].forEach(nom => {
+  const a = new Audio(BASE + 'sons/' + nom + '.mp3');
+  a.preload = 'auto';
+  banque[nom] = { a, ok: true };
+  a.addEventListener('error', () => { banque[nom].ok = false; });
+});
+function jouer(nom) {
+  const b = banque[nom];
+  if (!S.son || !b || !b.ok) return !S.son;
+  try { b.a.pause(); b.a.currentTime = 0; } catch (e) {}
+  b.a.play().catch(() => {});
+  return true;
+}
+const glouA = new Audio(BASE + 'glou.mp3');
+glouA.preload = 'auto';
+function glou() { if (!S.son) return; try { glouA.pause(); glouA.currentTime = 0; } catch (e) {} glouA.play().catch(() => {}); }
+function amorcer(a) { const v = a.volume; a.volume = 0; a.play().then(() => { a.pause(); a.currentTime = 0; a.volume = v; }).catch(() => { a.volume = v; }); }
+
+let voixFR = null;
+function choisirVoix() { if (!window.speechSynthesis) return; voixFR = speechSynthesis.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith('fr')) || null; }
+if (window.speechSynthesis) { choisirVoix(); speechSynthesis.onvoiceschanged = choisirVoix; }
+function dire(t) {
+  if (!S.son || !window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(t.replace(/[^\p{L}\p{N}\s'’!?.,]/gu, ''));
+  if (voixFR) u.voice = voixFR;
+  u.lang = 'fr-FR'; u.rate = .95; u.pitch = 1.15;
+  speechSynthesis.speak(u);
+}
+
+/* Old MacDonald — air traditionnel du domaine public, joué tout doux */
+const NOTE = { G3: 196, C3: 131, G4: 392, A4: 440, C5: 523, D5: 587, E5: 659 };
+const AIR = [['C5', 1], ['C5', 1], ['C5', 1], ['G4', 1], ['A4', 1], ['A4', 1], ['G4', 2], ['E5', 1], ['E5', 1], ['D5', 1], ['D5', 1], ['C5', 3], ['G4', 1],
+  ['C5', 1], ['C5', 1], ['C5', 1], ['G4', 1], ['A4', 1], ['A4', 1], ['G4', 2], ['E5', 1], ['E5', 1], ['D5', 1], ['D5', 1], ['C5', 4]];
+let musiqueT = 0, musiqueI = 0, musiqueMinuteur = null;
+function note(A, f, t, v, dur, type) {
+  const o = A.createOscillator(), g = A.createGain(); o.type = type; o.frequency.value = f;
+  g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(v, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  o.connect(g); g.connect(A.destination); o.start(t); o.stop(t + dur + .05);
+}
+function planifierMusique() {
+  const A = ac(), noire = 60 / 128;
+  while (musiqueT < A.currentTime + .4) {
+    const [n, d] = AIR[musiqueI % AIR.length];
+    note(A, NOTE[n], musiqueT, .045, Math.min(d * noire, .5), 'triangle');
+    for (let k = 0; k < d; k++) note(A, (musiqueI + k) % 2 ? NOTE.G3 : NOTE.C3, musiqueT + k * noire, .05, .3, 'sine');
+    musiqueT += d * noire;
+    musiqueI++;
+  }
+}
+function majMusique() {
+  clearInterval(musiqueMinuteur);
+  $('#bMusique').classList.toggle('off', !S.musique);
+  if (!S.musique || !AC) return;
+  musiqueT = Math.max(musiqueT, AC.currentTime + .1);
+  musiqueMinuteur = setInterval(planifierMusique, 150);
+}
+
+/* ══════════════════════════════════════════════════════════
+   LA SCÈNE 3D
+   ══════════════════════════════════════════════════════════ */
+const canvas = $('#c');
+const tactile = matchMedia('(pointer: coarse)').matches;
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, tactile ? 1.6 : 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#8fdcf7');
+scene.fog = new THREE.Fog('#8fdcf7', 60, 150);
+const camera = new THREE.PerspectiveCamera(40, 1, .5, 400);
+scene.add(new THREE.HemisphereLight('#ffffff', '#7fb35a', 1.7));
+const soleil = new THREE.DirectionalLight('#fff1d6', 2.3);
+soleil.position.set(28, 50, 23);
+soleil.castShadow = true;
+soleil.shadow.mapSize.set(tactile ? 1024 : 2048, tactile ? 1024 : 2048);
+Object.assign(soleil.shadow.camera, { left: -44, right: 44, top: 44, bottom: -44, near: 5, far: 140 });
+soleil.shadow.bias = -.0008;
+scene.add(soleil);
+
+const matCache = new Map();
+function mat(c) { let m = matCache.get(c); if (!m) { m = new THREE.MeshLambertMaterial({ color: c, flatShading: true }); matCache.set(c, m); } return m; }
+const geoCache = new Map();
+function geo(cle, fab) { if (!geoCache.has(cle)) geoCache.set(cle, fab()); return geoCache.get(cle); }
+const Bx = (w, h, d) => geo(`b${w}_${h}_${d}`, () => new THREE.BoxGeometry(w, h, d));
+const Cy = (rt, rb, h, s = 10) => geo(`c${rt}_${rb}_${h}_${s}`, () => new THREE.CylinderGeometry(rt, rb, h, s));
+const Sp = (r, w = 10, h = 8) => geo(`s${r}_${w}_${h}`, () => new THREE.SphereGeometry(r, w, h));
+const Co = (r, h, s = 8) => geo(`o${r}_${h}_${s}`, () => new THREE.ConeGeometry(r, h, s));
+const Ic = (r, d = 0) => geo(`i${r}_${d}`, () => new THREE.IcosahedronGeometry(r, d));
+const Pr = (w, h, d) => geo(`p${w}_${h}_${d}`, () => {
+  const s = new THREE.Shape(); s.moveTo(-w / 2, 0); s.lineTo(w / 2, 0); s.lineTo(0, h); s.closePath();
+  const g = new THREE.ExtrudeGeometry(s, { depth: d, bevelEnabled: false }); g.translate(0, 0, -d / 2); return g;
+});
+function P(g, c, x = 0, y = 0, z = 0, ns) {
+  const m = new THREE.Mesh(g, mat(c));
+  m.position.set(x, y, z); m.castShadow = !ns; m.receiveShadow = true;
+  return m;
+}
+function grp(...e) { const g = new THREE.Group(); e.forEach(x => g.add(x)); return g; }
+function rectArrondi(w, d, r) {
+  const s = new THREE.Shape(), x = -w / 2, y = -d / 2;
+  s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+  s.lineTo(x + w, y + d - r); s.quadraticCurveTo(x + w, y + d, x + w - r, y + d);
+  s.lineTo(x + r, y + d); s.quadraticCurveTo(x, y + d, x, y + d - r);
+  s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+  return s;
+}
+function dalle(w, d, r, ep, couleurs, yHaut) {
+  const g = new THREE.ExtrudeGeometry(rectArrondi(w, d, r), { depth: ep, bevelEnabled: false, curveSegments: 10 });
+  g.rotateX(-Math.PI / 2); g.translate(0, yHaut - ep, 0);
+  const m = new THREE.Mesh(g, couleurs.map(c => mat(c))); m.receiveShadow = true;
+  return m;
+}
+
+/* ══════════ L'ÎLE ══════════ */
+const eau = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), new THREE.MeshLambertMaterial({ color: '#3ec5f0' }));
+eau.rotation.x = -Math.PI / 2; eau.position.y = -.55; eau.receiveShadow = true; scene.add(eau);
+const ecume = new THREE.Mesh(new THREE.ShapeGeometry(rectArrondi(69, 53, 13), 10), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: .35 }));
+ecume.rotation.x = -Math.PI / 2; ecume.position.y = -.52; scene.add(ecume);
+/* l'île : 60 × 44 m */
+scene.add(dalle(65, 49, 11, .8, ['#f6dca0', '#e9c27a'], -.25));
+scene.add(dalle(60, 44, 9, 1.2, ['#7ccf4f', '#8b5a2b'], 0));
+for (let i = 0; i < 40; i++) {
+  const t = new THREE.Mesh(Cy(rand(.8, 2), rand(.8, 2), .02, 7), mat(pick(['#6fc046', '#86d95a'])));
+  t.position.set(rand(-26, 26), .011, rand(-19, 19)); t.receiveShadow = true; scene.add(t);
+}
+function chemin(x, z, w, d) { const m = P(Bx(w, .05, d), '#e2c08d', x, .03, z, true); scene.add(m); }
+chemin(0, 4.8, 55, 2.2); chemin(-19.5, 13.4, 2.4, 17.2); chemin(-3.9, -4.4, 1.6, 17); chemin(-18.2, -11.7, 1.8, 2.6);
+for (let z = 22; z < 60; z += .62) scene.add(P(Bx(2.6, .16, .5), z % 2 > 1 ? '#b98552' : '#a8743f', -19.5, .02, z, true));
+for (let z = 23; z < 60; z += 4) for (const x of [-20.9, -18.1]) scene.add(P(Cy(.14, .14, 1.4, 6), '#7a4a24', x, -.3, z, true));
+
+/* ══════════════════════════════════════════════════════════
+   LES MODÈLES — formes simples, style « low-poly »
+   ══════════════════════════════════════════════════════════ */
+function fabGrange() {
+  const g = grp(P(Bx(6, 3.6, 5), '#d64545', 0, 1.8, 0), P(Pr(7, 2.6, 5.8), '#7a2b26', 0, 3.6, 0), P(Bx(6.1, .25, 5.1), '#ffffff', 0, 3.62, 0),
+    P(Bx(2.8, 2.8, .12), '#ffffff', 0, 1.4, 2.52), P(Bx(2.4, 2.5, .14), '#9b2c2c', 0, 1.3, 2.55),
+    P(Bx(1.4, 1.1, .12), '#ffffff', 0, 4.6, 2.9), P(Bx(1.1, .85, .14), '#5a2a12', 0, 4.6, 2.92));
+  for (const r of [.78, -.78]) { const b = P(Bx(.16, 3.3, .06), '#ffffff', 0, 1.3, 2.64, true); b.rotation.z = r; g.add(b); }
+  for (const x of [-2.2, 2.2]) g.add(P(Bx(.9, .9, .1), '#ffffff', x, 2.4, 2.52, true), P(Bx(.7, .7, .12), '#ffd27a', x, 2.4, 2.53, true));
+  g.add(P(Bx(1.2, .8, .8), '#f2c94c', 3.7, .4, 2.0), P(Bx(1.2, .8, .8), '#e9b93c', 3.8, .4, 1.0), P(Bx(1.2, .8, .8), '#f2c94c', 3.75, 1.2, 1.5));
+  return g;
+}
+function fabMaison() {
+  const g = grp(P(Bx(5.2, .4, 4.2), '#b08968', 0, .2, 0), P(Bx(5, 3.2, 4), '#fbe3c0', 0, 1.8, 0), P(Pr(5.9, 2.3, 4.7), '#e76f51', 0, 3.4, 0),
+    P(Bx(1, 1.8, .1), '#8a4b2a', 0, 1.3, 2.03), P(Sp(.07, 6, 4), '#ffd23f', .3, 1.3, 2.1, true), P(Bx(.6, 1.6, .6), '#b5523b', 1.4, 4.6, -.6));
+  for (const x of [-1.55, 1.55]) {
+    g.add(P(Bx(.95, .95, .1), '#ffffff', x, 2.1, 2.02, true), P(Bx(.75, .75, .12), '#8ecae6', x, 2.1, 2.03, true), P(Bx(1, .2, .3), '#8a4b2a', x, 1.55, 2.12, true));
+    for (let k = -1; k <= 1; k++) g.add(P(Sp(.1, 6, 4), pick(['#ef476f', '#ffd166', '#f78c6b', '#c77dff']), x + k * .3, 1.72, 2.12, true));
+  }
+  const fumee = [];
+  for (let i = 0; i < 4; i++) {
+    const s = new THREE.Mesh(Sp(.35, 7, 5), new THREE.MeshLambertMaterial({ color: '#ffffff', transparent: true, opacity: .8, flatShading: true }));
+    s.userData.t = i / 4; g.add(s); fumee.push(s);
+  }
+  g.userData.fumee = fumee;
+  return g;
+}
+function fabMoulin() {
+  const g = grp(P(Cy(1.0, 1.6, 6, 8), '#f4efe6', 0, 3, 0), P(Cy(1.08, 1.12, .3, 8), '#c0392b', 0, 4.4, 0, true),
+    P(Bx(.8, 1.3, .1), '#7a4a24', 0, .65, 1.48, true), P(Co(1.4, 1.6, 8), '#c0392b', 0, 6.8, 0));
+  const moyeu = P(Cy(.25, .25, .6, 8), '#5a3a22', 0, 5.8, 1.15); moyeu.rotation.x = Math.PI / 2; g.add(moyeu);
+  const pales = new THREE.Group(); pales.position.set(0, 5.8, 1.5);
+  for (let i = 0; i < 4; i++) {
+    const b = new THREE.Group(); b.rotation.z = i * Math.PI / 2;
+    b.add(P(Bx(.12, 3.2, .1), '#8a5a3c', 0, 1.6, 0), P(Bx(.7, 2.6, .05), '#fff7e6', .38, 1.9, 0));
+    pales.add(b);
+  }
+  g.add(pales); g.userData.pales = pales;
+  return g;
+}
+function fabPoulailler() {
+  const g = grp(P(Bx(2.2, 1.3, 1.8), '#f6c445', 0, 1.35, 0), P(Pr(2.7, 1, 2.2), '#d64545', 0, 2.0, 0), P(Bx(.5, .6, .1), '#4a2c0b', 0, 1.2, .92, true));
+  for (const x of [-.9, .9]) for (const z of [-.7, .7]) g.add(P(Cy(.08, .08, .7, 6), '#7a4a24', x, .35, z));
+  const r = P(Bx(.5, .06, 1.3), '#a0703c', 0, .45, 1.45); r.rotation.x = .55; g.add(r);
+  return g;
+}
+function fabBarriere(w, d, c) {
+  const g = new THREE.Group();
+  const cote = (x0, z0, x1, z1) => {
+    const long = Math.hypot(x1 - x0, z1 - z0), n = Math.max(1, Math.round(long / 1.5));
+    for (let i = 0; i <= n; i++) { const t = i / n; g.add(P(Bx(.16, .9, .16), c, x0 + (x1 - x0) * t, .45, z0 + (z1 - z0) * t)); }
+    for (const y of [.35, .7]) { const r = P(Bx(long, .1, .08), c, (x0 + x1) / 2, y, (z0 + z1) / 2, true); r.rotation.y = Math.atan2(-(z1 - z0), x1 - x0); g.add(r); }
+  };
+  const a = w / 2, b = d / 2;
+  cote(-a, -b, a, -b); cote(a, -b, a, b); cote(a, b, -a, b); cote(-a, b, -a, -b);
+  return g;
+}
+function fabArbre(rond = true) {
+  const g = grp(P(Cy(.22, .32, 1.6, 6), '#8a5a3c', 0, .8, 0));
+  if (rond) {
+    g.add(P(Ic(1.3), '#4caf50', 0, 2.5, 0), P(Ic(.85), '#66bb6a', .55, 3.0, .3));
+    for (let i = 0; i < 4; i++) { const a = rand(0, 6.28); g.add(P(Sp(.13, 6, 4), '#e53935', Math.cos(a) * 1.15, rand(2.1, 2.9), Math.sin(a) * 1.15, true)); }
+  } else g.add(P(Co(1.4, 1.9, 7), '#2e7d32', 0, 2.1, 0), P(Co(1.05, 1.6, 7), '#388e3c', 0, 3.0, 0), P(Co(.7, 1.3, 7), '#43a047', 0, 3.8, 0));
+  return g;
+}
+function fabFleurs() {
+  const g = new THREE.Group();
+  for (let i = 0; i < 7; i++) {
+    const x = rand(-.6, .6), z = rand(-.6, .6);
+    g.add(P(Cy(.025, .025, .45, 4), '#3f8f2f', x, .22, z, true), P(Sp(.13, 6, 4), pick(['#ef476f', '#ffd166', '#f78c6b', '#c77dff', '#4cc9f0', '#ffffff']), x, .5, z, true));
+  }
+  return g;
+}
+function fabRocher() { const r = P(geo('roc', () => new THREE.DodecahedronGeometry(.6)), '#a8a29e', 0, .3, 0); r.scale.set(rand(.8, 1.4), rand(.6, 1), rand(.8, 1.3)); return grp(r); }
+function fabBanc() {
+  const g = grp(P(Bx(1.8, .12, .5), '#b5793e', 0, .55, 0), P(Bx(1.8, .5, .1), '#b5793e', 0, .9, -.22));
+  for (const x of [-.75, .75]) g.add(P(Bx(.1, .55, .45), '#5a3a22', x, .27, 0));
+  return g;
+}
+function fabBallons() {
+  const g = new THREE.Group(), b = [];
+  [['#ef4444', -.4, 2.6], ['#3b82f6', .3, 3.0], ['#facc15', 0, 2.3], ['#22c55e', .5, 2.4]].forEach(([c, x, y], i) => {
+    g.add(P(Cy(.015, .015, y, 3), '#ffffff', x * .3, y / 2, 0, true));
+    const s = P(Sp(.38, 10, 8), c, x, y, i % 2 ? .2 : -.2); s.scale.y = 1.15; g.add(s); b.push(s);
+  });
+  g.userData.ballons = b;
+  return g;
+}
+function fabFontaine() {
+  const g = grp(P(Cy(1.4, 1.5, .5, 12), '#cbd5e1', 0, .25, 0), P(Cy(1.2, 1.2, .1, 12), '#4fc3f7', 0, .52, 0, true), P(Cy(.2, .25, 1.4, 8), '#cbd5e1', 0, 1.2, 0),
+    P(Cy(.6, .3, .25, 10), '#cbd5e1', 0, 1.95, 0), P(Cy(.5, .5, .06, 10), '#4fc3f7', 0, 2.06, 0, true));
+  const gouttes = [];
+  for (let i = 0; i < 8; i++) { const s = P(Sp(.07, 5, 4), '#bfe9ff', 0, 2.2, 0, true); s.userData.a = i / 8 * Math.PI * 2; s.userData.t = i / 8; g.add(s); gouttes.push(s); }
+  g.userData.gouttes = gouttes;
+  return g;
+}
+function fabEpouvantail() {
+  const g = grp(P(Cy(.08, .08, 2.6, 5), '#8a5a3c', 0, 1.3, 0), P(Bx(1.8, .12, .12), '#8a5a3c', 0, 1.9, 0), P(Bx(.8, .9, .4), '#3b82f6', 0, 1.75, 0),
+    P(Sp(.32, 8, 6), '#e9c46a', 0, 2.5, 0), P(Cy(.55, .55, .05, 10), '#a16207', 0, 2.72, 0), P(Cy(.25, .32, .4, 8), '#a16207', 0, 2.92, 0),
+    P(Sp(.05, 5, 4), '#222', -.1, 2.55, .29, true), P(Sp(.05, 5, 4), '#222', .1, 2.55, .29, true));
+  for (const x of [-.8, .8]) g.add(P(Bx(.3, .3, .3), '#facc15', x, 1.9, 0, true));
+  return g;
+}
+function fabArcEnCiel() {
+  const g = new THREE.Group();
+  ['#ef4444', '#f97316', '#facc15', '#22c55e', '#3b82f6', '#8b5cf6'].forEach((c, i) => {
+    const t = new THREE.Mesh(geo('arc' + i, () => new THREE.TorusGeometry(2.6 - i * .22, .12, 5, 24, Math.PI)), mat(c));
+    t.position.y = .1; t.castShadow = true; g.add(t);
+  });
+  g.add(P(Ic(.55), '#ffffff', -2.05, .3, 0), P(Ic(.5), '#ffffff', 2.05, .3, 0), P(Ic(.4), '#ffffff', -1.6, .25, .3), P(Ic(.4), '#ffffff', 1.6, .25, .3));
+  return g;
+}
+function fabDinde(echelle = 1) {
+  const g = new THREE.Group();
+  const c = P(Sp(.55, 10, 8), '#7b4a2a', 0, .85, 0); c.scale.set(1, 1, 1.1); g.add(c);
+  const ev = new THREE.Group(); ev.position.set(0, .95, -.45);
+  ['#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#8e24aa', '#e53935'].forEach((col, i) => {
+    const p = new THREE.Group(); p.rotation.z = -1.2 + i * .4; p.add(P(Bx(.3, 1.3, .06), col, 0, .65, 0)); ev.add(p);
+  });
+  g.add(ev);
+  const bec = P(Co(.06, .16, 4), '#f4b400', 0, 1.4, .8); bec.rotation.x = Math.PI / 2;
+  g.add(P(Cy(.1, .13, .45, 6), '#a7c4d8', 0, 1.2, .45), P(Sp(.2, 8, 6), '#a7c4d8', 0, 1.42, .55), bec,
+    P(Sp(.08, 6, 4), '#e53935', .02, 1.27, .72), P(Sp(.04, 5, 4), '#111', -.1, 1.48, .7, true), P(Sp(.04, 5, 4), '#111', .1, 1.48, .7, true));
+  for (const x of [-.18, .18]) g.add(P(Cy(.04, .04, .4, 5), '#f4a261', x, .2, 0));
+  g.scale.setScalar(echelle);
+  g.userData.eventail = ev;
+  return g;
+}
+function fabStatue() {
+  const g = grp(P(Cy(1.3, 1.5, .8, 10), '#d6d3d1', 0, .4, 0), P(Cy(1.1, 1.1, .2, 10), '#a8a29e', 0, .9, 0));
+  const d = fabDinde(2.1); d.position.y = 1; g.add(d);
+  g.userData.eventail = d.userData.eventail;
+  return g;
+}
+/* Roullieee, avec des articulations pour marcher */
+function fabRoullieee() {
+  const g = new THREE.Group();
+  const jambe = s => { const p = new THREE.Group(); p.position.set(s * .14, .7, 0); p.add(P(Cy(.1, .1, .7, 6), '#1e3a8a', 0, -.35, 0), P(Bx(.17, .12, .3), '#5a3a22', 0, -.66, .05)); return p; };
+  const jg = jambe(-1), jd = jambe(1);
+  const corps = new THREE.Group();
+  corps.add(P(Cy(.3, .55, 1.0, 10), '#ea580c', 0, 1.15, 0), P(Cy(.25, .3, .4, 10), '#fef3c7', 0, 1.75, 0),
+    P(Sp(.32, 10, 8), '#f6c9a0', 0, 2.2, 0), P(Sp(.34, 10, 8), '#7a3e16', 0, 2.27, -.08),
+    P(Sp(.13, 6, 4), '#7a3e16', -.33, 1.98, -.08), P(Sp(.13, 6, 4), '#7a3e16', .33, 1.98, -.08),
+    P(Cy(.62, .62, .05, 14), '#e9c46a', 0, 2.5, 0), P(Cy(.3, .34, .32, 12), '#e9c46a', 0, 2.68, 0), P(Cy(.35, .35, .09, 12), '#ef4444', 0, 2.57, 0, true),
+    P(Sp(.045, 5, 4), '#111', -.11, 2.24, .29, true), P(Sp(.045, 5, 4), '#111', .11, 2.24, .29, true),
+    P(Sp(.06, 5, 4), '#f28b82', -.18, 2.12, .25, true), P(Sp(.06, 5, 4), '#f28b82', .18, 2.12, .25, true),
+    /* la hotte en osier où s'empile la récolte */
+    P(Bx(.6, .5, .3), '#b07a45', 0, 1.4, -.42), P(Bx(.64, .08, .34), '#8a5a3c', 0, 1.66, -.42, true));
+  const bras = s => { const p = new THREE.Group(); p.position.set(s * .36, 1.85, 0); p.rotation.z = s * .35; p.add(P(Cy(.07, .07, .6, 5), '#f6c9a0', 0, -.3, 0)); return p; };
+  const bg = bras(-1), bd = bras(1);
+  corps.add(bg, bd);
+  const pile = new THREE.Group(); pile.position.set(0, 1.7, -.42);
+  corps.add(pile);
+  g.add(jg, jd, corps);
+  g.userData = { jg, jd, bg, bd, corps, pile };
+  return g;
+}
+function fabTracteur() {
+  const g = grp(P(Bx(1.2, .7, 1.6), '#e63946', 0, .95, -.2), P(Bx(1.0, .65, 1.1), '#e63946', 0, .9, 1.1), P(Bx(.8, .45, .06), '#6b7280', 0, .9, 1.67, true),
+    P(Bx(1.3, .08, 1.15), '#f1faee', 0, 2.1, -.3), P(Bx(.5, .12, .5), '#333', 0, 1.35, -.4, true), P(Cy(.06, .06, .8, 6), '#6b7280', .35, 1.6, 1.15, true));
+  for (const x of [-.6, .6]) for (const z of [-.8, .2]) g.add(P(Cy(.04, .04, 1.0, 4), '#333', x, 1.6, z, true));
+  const roues = [];
+  for (const [x, z, r, l] of [[-.78, -.45, .62, .38], [.78, -.45, .62, .38], [-.62, 1.2, .36, .26], [.62, 1.2, .36, .26]]) {
+    const w = new THREE.Group(); w.position.set(x, r, z);
+    const p = P(Cy(r, r, l, 14), '#2b2b2b'); p.rotation.z = Math.PI / 2; w.add(p);
+    const h = P(Cy(r * .45, r * .45, l + .02, 8), '#ffd23f', 0, 0, 0, true); h.rotation.z = Math.PI / 2; w.add(h);
+    g.add(w); roues.push(w);
+  }
+  g.userData.roues = roues;
+  return g;
+}
+function fabCamion() {
+  const g = grp(P(Bx(1.5, .3, 4), '#374151', 0, .55, 0), P(Bx(1.6, 1.3, 1.3), '#3a86ff', 0, 1.3, 1.25), P(Bx(1.4, .55, .1), '#bde0fe', 0, 1.6, 1.92, true),
+    P(Bx(1.7, .4, 2.5), '#a8743f', 0, .9, -.65), P(Bx(1.7, .5, .1), '#8a5a3c', 0, 1.3, -1.9), P(Bx(.1, .5, 2.5), '#8a5a3c', -.8, 1.3, -.65), P(Bx(.1, .5, 2.5), '#8a5a3c', .8, 1.3, -.65),
+    P(Sp(.12, 6, 4), '#fff6b0', -.55, 1.0, 1.93, true), P(Sp(.12, 6, 4), '#fff6b0', .55, 1.0, 1.93, true));
+  for (const x of [-.8, .8]) for (const z of [-1.3, 1.25]) { const r = P(Cy(.42, .42, .3, 12), '#222', x, .42, z); r.rotation.z = Math.PI / 2; g.add(r); }
+  const charge = new THREE.Group(); charge.position.set(0, 1.1, -.65); g.add(charge);
+  g.userData.charge = charge;
+  return g;
+}
+function fabCanard() {
+  const g = new THREE.Group();
+  const c = P(Sp(.32, 9, 7), '#ffffff', 0, .22, 0); c.scale.set(1, .75, 1.3); g.add(c);
+  const q = P(Co(.12, .28, 5), '#ffffff', 0, .35, -.42); q.rotation.x = -2.2;
+  g.add(P(Sp(.19, 8, 6), '#ffffff', 0, .55, .3), P(Bx(.16, .06, .22), '#ffb300', 0, .52, .52), q,
+    P(Sp(.035, 5, 4), '#111', -.1, .6, .44, true), P(Sp(.035, 5, 4), '#111', .1, .6, .44, true));
+  return g;
+}
+function fabPoule() {
+  const g = new THREE.Group();
+  const c = P(Sp(.42, 10, 8), '#ffffff', 0, .62, 0); c.scale.set(1, .9, 1.15); g.add(c);
+  const bec = P(Co(.08, .2, 5), '#ffa000', 0, 1.0, .62, true); bec.rotation.x = Math.PI / 2;
+  const q = P(Co(.22, .42, 6), '#f5f5f5', 0, .88, -.45); q.rotation.x = -.6;
+  g.add(P(Sp(.25, 8, 6), '#ffffff', 0, 1.02, .33), P(Bx(.07, .17, .24), '#e53935', 0, 1.3, .3), bec,
+    P(Sp(.06, 5, 4), '#e53935', 0, .88, .52, true), P(Sp(.04, 5, 4), '#111', -.13, 1.07, .48, true), P(Sp(.04, 5, 4), '#111', .13, 1.07, .48, true), q);
+  for (const s of [-1, 1]) { const a = P(Sp(.26, 7, 5), '#eeeeee', s * .38, .66, 0); a.scale.set(.3, .65, .95); g.add(a); }
+  for (const x of [-.13, .13]) g.add(P(Cy(.035, .035, .32, 4), '#ffa000', x, .16, 0));
+  return g;
+}
+function fabVache() {
+  const g = grp(P(Bx(1.3, 1.0, 2.2), '#ffffff', 0, 1.25, 0), P(Bx(.8, .75, .75), '#ffffff', 0, 1.6, 1.35), P(Bx(.82, .36, .32), '#f4a6b7', 0, 1.36, 1.75),
+    P(Sp(.24, 8, 6), '#f4a6b7', 0, .72, -.35));
+  [[.66, 1.3, .3, .05, .4, .6], [-.66, 1.4, -.5, .05, .45, .55], [.66, 1.1, -.6, .05, .3, .4], [0, 1.76, -.2, .55, .04, .7], [-.66, 1.05, .6, .05, .3, .35]]
+    .forEach(([x, y, z, w, h, d]) => g.add(P(Bx(w, h, d), '#2b2b2b', x, y, z, true)));
+  for (const s of [-1, 1]) g.add(P(Co(.07, .3, 5), '#f3e9d2', s * .3, 2.08, 1.3), P(Bx(.3, .12, .16), '#ffffff', s * .52, 1.75, 1.25, true), P(Sp(.05, 5, 4), '#111', s * .22, 1.75, 1.73, true));
+  for (const x of [-.4, .4]) for (const z of [-.75, .75]) g.add(P(Bx(.25, .8, .25), '#ffffff', x, .4, z), P(Bx(.27, .14, .27), '#4b3621', x, .07, z, true));
+  const q = P(Cy(.03, .03, .8, 4), '#ffffff', 0, 1.2, -1.2, true); q.rotation.x = .35; g.add(q, P(Sp(.09, 5, 4), '#2b2b2b', 0, .85, -1.32, true));
+  return g;
+}
+function fabCochon() {
+  const g = new THREE.Group();
+  const c = P(Sp(.7, 12, 10), '#f7a8b8', 0, .85, 0); c.scale.set(1, .85, 1.3); g.add(c);
+  const n = P(Cy(.22, .24, .18, 10), '#f48aa3', 0, .9, 1.0); n.rotation.x = Math.PI / 2; g.add(n);
+  g.add(P(Sp(.04, 5, 4), '#8a3a50', -.07, .92, 1.1, true), P(Sp(.04, 5, 4), '#8a3a50', .07, .92, 1.1, true),
+    P(Sp(.045, 5, 4), '#111', -.24, 1.15, .82, true), P(Sp(.045, 5, 4), '#111', .24, 1.15, .82, true));
+  for (const s of [-1, 1]) { const o = P(Co(.15, .28, 4), '#f48aa3', s * .32, 1.42, .55); o.rotation.z = -s * .35; g.add(o); }
+  for (const x of [-.35, .35]) for (const z of [-.45, .45]) g.add(P(Cy(.12, .12, .4, 7), '#f48aa3', x, .2, z));
+  const q = new THREE.Mesh(geo('queue', () => new THREE.TorusGeometry(.1, .03, 5, 10, 5)), mat('#f48aa3')); q.position.set(0, 1.0, -.92); g.add(q);
+  return g;
+}
+function fabMouton() {
+  const g = new THREE.Group(), laine = new THREE.Group();
+  [[0, 1.0, 0], [.35, .95, .3], [-.35, .95, .3], [.35, .95, -.3], [-.35, .95, -.3], [0, 1.25, .1], [0, 1.0, .45], [0, 1.0, -.45], [0, 1.25, -.25]]
+    .forEach(([x, y, z]) => laine.add(P(Ic(.42), '#fbfbf7', x, y, z)));
+  g.add(laine, P(Bx(.38, .45, .45), '#3b3b3b', 0, 1.15, .82), P(Sp(.05, 5, 4), '#ffffff', -.12, 1.22, 1.05, true), P(Sp(.05, 5, 4), '#ffffff', .12, 1.22, 1.05, true));
+  for (const s of [-1, 1]) g.add(P(Bx(.26, .08, .13), '#3b3b3b', s * .29, 1.26, .78, true));
+  for (const x of [-.24, .24]) for (const z of [-.33, .33]) g.add(P(Cy(.07, .07, .6, 5), '#3b3b3b', x, .3, z));
+  g.userData.laine = laine;
+  return g;
+}
+function fabChien() {
+  const g = grp(P(Bx(.55, .5, 1.0), '#c58b4e', 0, .6, 0), P(Bx(.5, .48, .5), '#c58b4e', 0, .98, .6), P(Bx(.3, .22, .26), '#e6c39a', 0, .88, .92),
+    P(Bx(.12, .09, .06), '#222', 0, .96, 1.06, true), P(Sp(.04, 5, 4), '#111', -.12, 1.06, .86, true), P(Sp(.04, 5, 4), '#111', .12, 1.06, .86, true));
+  for (const s of [-1, 1]) g.add(P(Bx(.12, .3, .2), '#7a4b26', s * .29, .98, .55, true));
+  for (const x of [-.17, .17]) for (const z of [-.33, .33]) g.add(P(Bx(.14, .4, .14), '#c58b4e', x, .2, z));
+  const q = P(Cy(.04, .03, .45, 4), '#c58b4e', 0, .85, -.6, true); q.rotation.x = -.8; g.add(q);
+  g.userData.queue = q;
+  return g;
+}
+function fabChat() {
+  const g = grp(P(Bx(.42, .4, .8), '#9e9e9e', 0, .5, 0), P(Bx(.42, .38, .38), '#9e9e9e', 0, .82, .48),
+    P(Sp(.04, 5, 4), '#3f6212', -.1, .86, .68, true), P(Sp(.04, 5, 4), '#3f6212', .1, .86, .68, true), P(Sp(.03, 4, 3), '#f48aa3', 0, .78, .68, true));
+  for (const s of [-1, 1]) g.add(P(Co(.09, .18, 4), '#9e9e9e', s * .13, 1.08, .48, true));
+  for (const x of [-.13, .13]) for (const z of [-.28, .28]) g.add(P(Cy(.05, .05, .32, 4), '#9e9e9e', x, .16, z));
+  const q = P(Cy(.04, .03, .7, 4), '#9e9e9e', 0, .85, -.48, true); q.rotation.x = -.3; g.add(q);
+  g.userData.queue = q;
+  return g;
+}
+function fabNuage() {
+  const g = new THREE.Group();
+  [[0, 0, 0, 1.6], [1.5, -.2, .2, 1.2], [-1.5, -.2, -.1, 1.25], [.6, .7, 0, 1.1], [-.7, .6, .2, 1.0]]
+    .forEach(([x, y, z, r]) => { const s = new THREE.Mesh(Sp(r, 9, 7), mat('#ffffff')); s.position.set(x, y, z); g.add(s); });
+  return g;
+}
+const COULEUR_MUR = { ble: '#f2c14e', mais: '#ffd54f', carotte: '#ff8c2a' };
+function fabPlantes(c) {
+  const g = new THREE.Group(), tetes = [];
+  for (let r = -1; r <= 1; r++) for (let k = -1; k <= 1; k++) {
+    const x = k * 1.05 + rand(-.1, .1), z = r * 1.05 + rand(-.1, .1);
+    if (c === 'ble') {
+      g.add(P(Cy(.035, .05, 1.0, 5), '#7cb342', x, .5, z, true));
+      const t = P(Co(.15, .55, 6), '#a5d36b', x, 1.2, z, true); g.add(t); tetes.push(t);
+    } else if (c === 'mais') {
+      g.add(P(Cy(.06, .08, 1.6, 6), '#6aa84f', x, .8, z, true), P(Co(.28, .8, 4), '#7cc35a', x, .55, z, true));
+      const t = P(Cy(.11, .09, .45, 6), '#9ccc65', x + .1, 1.15, z, true); g.add(t); tetes.push(t);
+    } else {
+      g.add(P(Co(.22, .65, 5), '#5fb34a', x, .38, z, true), P(Co(.15, .5, 5), '#6cc254', x + .1, .3, z + .08, true));
+      const t = P(Co(.15, .38, 6), '#9ccc65', x, .02, z, true); t.rotation.x = Math.PI; g.add(t); tetes.push(t);
+    }
+  }
+  g.position.y = .35;
+  return { g, tetes };
+}
+/* les petits objets qu'on empile sur le dos de Roullieee */
+function fabMini(k) {
+  const g = new THREE.Group();
+  if (k === 'ble') g.add(P(Bx(.55, .2, .32), '#f2c14e', 0, 0, 0, true), P(Bx(.12, .22, .34), '#b45309', 0, 0, 0, true));
+  else if (k === 'mais') { const m = P(Cy(.11, .11, .52, 8), '#ffd54f', 0, 0, 0, true); m.rotation.z = Math.PI / 2; g.add(m, P(Bx(.3, .05, .26), '#7cc35a', -.1, -.08, 0, true)); }
+  else if (k === 'carotte') { const m = P(Co(.12, .5, 6), '#ff8c2a', 0, 0, 0, true); m.rotation.z = Math.PI / 2; const f = P(Co(.07, .2, 4), '#5fb34a', -.33, 0, 0, true); f.rotation.z = Math.PI / 2; g.add(m, f); }
+  else if (k === 'oeuf') { const m = P(Sp(.14, 8, 6), '#fff7e6', 0, 0, 0, true); m.scale.set(1, .85, 1.25); g.add(m); }
+  else if (k === 'lait') g.add(P(Cy(.13, .13, .24, 8), '#ffffff', 0, 0, 0, true), P(Cy(.07, .07, .06, 6), '#3a86ff', 0, .14, 0, true));
+  else if (k === 'truffe') g.add(P(Ic(.15), '#5b3a29', 0, 0, 0, true));
+  else if (k === 'yaourt') g.add(P(Cy(.14, .11, .24, 10), '#fff7ed', 0, 0, 0, true), P(Cy(.145, .145, .04, 10), '#f9a8d4', 0, .13, 0, true));
+  else if (k === 'pull') {
+    g.add(P(Bx(.42, .18, .36), '#ef4444', 0, 0, 0, true), P(Bx(.12, .14, .3), '#ef4444', -.27, -.01, .02, true), P(Bx(.12, .14, .3), '#ef4444', .27, -.01, .02, true),
+      P(Bx(.44, .05, .06), '#fde68a', 0, .03, .16, true));
+  }
+  else g.add(P(Ic(.16), '#fbfbf7', 0, 0, 0, true));
+  return g;
+}
+/* les deux stands de transformation : un comptoir, un auvent rayé,
+   une machine qui tourne pendant le travail et un plateau de produits finis */
+function fabStand(couleur, fond, machine, produit) {
+  const g = grp(P(Bx(3.4, 2.4, .2), fond, 0, 1.2, -.9), P(Bx(3.4, 1, 1.1), '#ffffff', 0, .5, .55), P(Bx(3.5, .1, 1.2), couleur, 0, 1.05, .55, true));
+  for (const x of [-1.65, 1.65]) g.add(P(Cy(.07, .07, 2.9, 6), '#8a5a3c', x, 1.45, 1.05));
+  for (let i = 0; i < 7; i++) { const b = P(Bx(.5, .08, 1.5), i % 2 ? '#ffffff' : couleur, -1.5 + i * .5, 2.95, .45); b.rotation.x = .22; g.add(b); }
+  machine.position.set(-.85, 1.1, -.1); g.add(machine);
+  const plateau = new THREE.Group(); plateau.position.set(.75, 1.2, .55); g.add(plateau);
+  const enseigne = grp(P(Bx(1.4, .7, .1), '#ffffff', 0, 0, 0), P(Bx(1.5, .8, .06), couleur, 0, 0, -.06, true));
+  const m = fabMini(produit); m.scale.setScalar(2.2); m.position.z = .15; enseigne.add(m);
+  enseigne.position.set(0, 3.55, .3); g.add(enseigne);
+  g.userData.plateau = plateau;
+  return g;
+}
+function fabYaourterie() {
+  const cuve = grp(P(Cy(.6, .55, .9, 12), '#e5e7eb', 0, .45, 0), P(Cy(.62, .62, .08, 12), '#94a3b8', 0, .92, 0, true));
+  const helice = grp(P(Cy(.05, .05, .9, 5), '#64748b', 0, .3, 0), P(Bx(.5, .06, .08), '#64748b', 0, -.1, 0, true));
+  helice.position.y = .9; cuve.add(helice);
+  const g = fabStand('#3a86ff', '#bfdbfe', cuve, 'yaourt');
+  g.userData.anim = helice; g.userData.axe = 'y';
+  return g;
+}
+function fabAtelierPulls() {
+  const rouet = new THREE.Group();
+  rouet.add(P(Bx(.7, .12, .4), '#8a5a3c', 0, .06, 0), P(Cy(.05, .05, .8, 5), '#8a5a3c', 0, .45, 0));
+  const roue = new THREE.Group(); roue.position.set(0, .85, 0);
+  roue.add(new THREE.Mesh(geo('roue', () => new THREE.TorusGeometry(.42, .05, 5, 16)), mat('#a16207')));
+  for (let i = 0; i < 4; i++) { const r = P(Bx(.04, .8, .04), '#a16207', 0, 0, 0, true); r.rotation.z = i * Math.PI / 4; roue.add(r); }
+  rouet.add(roue, P(Ic(.2), '#fbfbf7', .45, .7, 0));
+  const g = fabStand('#ec4899', '#fbcfe8', rouet, 'pull');
+  g.userData.anim = roue; g.userData.axe = 'z';
+  return g;
+}
+/* avant l'achat : un petit chantier entouré d'une corde */
+function fabChantier() {
+  const g = new THREE.Group();
+  for (const [x, z] of [[-1.7, -1], [1.7, -1], [1.7, 1.2], [-1.7, 1.2]]) g.add(P(Cy(.07, .07, 1, 5), '#8a5a3c', x, .5, z));
+  for (const [x, z, l, r] of [[0, -1, 3.4, 0], [0, 1.2, 3.4, 0], [-1.7, .1, 2.2, Math.PI / 2], [1.7, .1, 2.2, Math.PI / 2]]) {
+    const c = P(Bx(l, .06, .06), '#facc15', x, .8, z, true); c.rotation.y = r; g.add(c);
+  }
+  g.add(P(Bx(.7, .5, .7), '#c98b4b', -.6, .25, 0), P(Bx(.6, .45, .6), '#e0a96d', .5, .22, .2), P(Bx(1.2, .12, .4), '#a8743f', .2, .06, -.5));
+  return g;
+}
+/* le cultivateur : même squelette que Roullieee (pour la même marche) */
+function fabFermier() {
+  const g = new THREE.Group();
+  const jambe = s => { const p = new THREE.Group(); p.position.set(s * .15, .7, 0); p.add(P(Cy(.11, .11, .7, 6), '#1d4ed8', 0, -.35, 0), P(Bx(.18, .12, .3), '#3b2412', 0, -.66, .05)); return p; };
+  const jg = jambe(-1), jd = jambe(1);
+  const corps = new THREE.Group();
+  corps.add(P(Cy(.34, .36, .9, 10), '#1d4ed8', 0, 1.1, 0), P(Cy(.33, .35, .5, 10), '#dc2626', 0, 1.75, 0),
+    P(Bx(.08, .5, .05), '#1d4ed8', -.18, 1.75, .32, true), P(Bx(.08, .5, .05), '#1d4ed8', .18, 1.75, .32, true),
+    P(Sp(.3, 10, 8), '#e8b98f', 0, 2.25, 0), P(Sp(.24, 8, 6), '#7a4a24', 0, 2.08, .1),
+    P(Cy(.62, .62, .05, 14), '#e9c46a', 0, 2.5, 0), P(Cy(.3, .34, .32, 12), '#e9c46a', 0, 2.68, 0), P(Cy(.35, .35, .09, 12), '#7a4a24', 0, 2.57, 0, true),
+    P(Sp(.045, 5, 4), '#111', -.11, 2.3, .27, true), P(Sp(.045, 5, 4), '#111', .11, 2.3, .27, true),
+    P(Bx(.6, .5, .3), '#b07a45', 0, 1.45, -.45), P(Bx(.64, .08, .34), '#8a5a3c', 0, 1.71, -.45, true));
+  const bras = s => { const p = new THREE.Group(); p.position.set(s * .4, 1.95, 0); p.rotation.z = s * .3; p.add(P(Cy(.08, .08, .6, 5), '#dc2626', 0, -.3, 0)); return p; };
+  const bg = bras(-1), bd = bras(1);
+  corps.add(bg, bd);
+  const pile = new THREE.Group(); pile.position.set(0, 1.75, -.45);
+  corps.add(pile);
+  g.add(jg, jd, corps);
+  g.userData = { jg, jd, bg, bd, corps, pile };
+  return g;
+}
+function fabPiece() { const m = P(Cy(.18, .18, .05, 10), '#ffd23f', 0, 0, 0, true); m.rotation.x = Math.PI / 2; return grp(m); }
+function fabAuge() { return grp(P(Bx(1.6, .45, .65), '#8a5a3c', 0, .22, 0), P(Bx(1.4, .1, .45), '#5a3a22', 0, .4, 0, true)); }
+function fabCaisse() {
+  const g = grp(P(Bx(1.3, .6, .9), '#c98b4b', 0, .3, 0));
+  for (const x of [-.55, .55]) g.add(P(Bx(.08, .62, .92), '#8a5a3c', x, .31, 0, true));
+  return g;
+}
+/* carré d'achat : on reste dessus et les pièces y coulent */
+const TAILLE_PAD = 2.4;
+function remplirPad(j, k) { j.scale.z = Math.max(.001, k); j.position.z = -((TAILLE_PAD - .15) / 2) * (1 - k); }
+function fabPad(couleur = '#4ade80') {
+  const g = new THREE.Group(), L = TAILLE_PAD;
+  for (let s = 0; s < 4; s++) {
+    const cote = new THREE.Group(); cote.rotation.y = s * Math.PI / 2;
+    for (let k = 0; k < 4; k++) cote.add(P(Bx(.42, .05, .1), '#ffffff', -L / 2 + .3 + k * .6, .05, -L / 2, true));
+    g.add(cote);
+  }
+  const fond = new THREE.Mesh(Bx(L - .15, .02, L - .15), new THREE.MeshLambertMaterial({ color: couleur, transparent: true, opacity: .35 }));
+  fond.position.y = .03; g.add(fond);
+  const jauge = P(Bx(L - .15, .03, L - .15), couleur, 0, .04, 0, true); jauge.castShadow = false; jauge.scale.z = .001; g.add(jauge);
+  g.userData.jauge = jauge;
+  return g;
+}
+function fabFleche() {
+  const g = grp(P(Co(.55, .9, 4), '#ffd23f', 0, 0, 0, true), P(Bx(.36, .9, .36), '#ffd23f', 0, .85, 0, true));
+  g.children[0].rotation.x = Math.PI;
+  return g;
+}
+
+/* ══════════════════════════════════════════════════════════
+   LE MONDE
+   ══════════════════════════════════════════════════════════ */
+const entites = [], cibles = [];
+function entite(obj, opts) {
+  const e = Object.assign({ obj }, opts);
+  obj.userData.ent = e;
+  cibles.push(obj); entites.push(e);
+  if (e.etatBulle) e.el = creerBulle(e);
+  return e;
+}
+function retirerEntite(e) {
+  const i = entites.indexOf(e); if (i >= 0) entites.splice(i, 1);
+  const j = cibles.indexOf(e.obj); if (j >= 0) cibles.splice(j, 1);
+  if (e.el) e.el.remove();
+  scene.remove(e.obj);
+}
+function poser(obj, x, z, ry = 0) { obj.position.set(x, 0, z); obj.rotation.y = ry; scene.add(obj); return obj; }
+
+/* obstacles pour la marche (rectangles, cercles, ellipses, segments) */
+const OBST = [];
+const ARBRES = [[-26.65, -11.7, 1], [-25.35, -18.2, 0], [-12.35, -20.3, 1], [-1.3, -20.3, 0], [4.2, -20.15, 1], [12.35, -19.8, 0], [17.2, -20.15, 1], [24.7, -19, 0],
+  [28.1, -8.45, 1], [28.2, 2.9, 0], [-28.1, .65, 1], [-27.8, 8.3, 0], [-2.9, 20.3, 1], [7.8, 19.9, 0], [16.9, 20.3, 1], [-12.35, 20.15, 0]];
+ARBRES.forEach(([x, z, rond]) => {
+  const a = poser(fabArbre(!!rond), x, z, rand(0, 6)), s = rand(.85, 1.25);
+  a.scale.setScalar(s);
+  OBST.push({ c: [x, z, .7 * s] });
+  entite(a, { type: 'arbre', vers: () => [x, z], prochainePiece: 0, secoue: 0 });
+});
+[[-27.3, 13], [11.05, -18.2], [-15.6, -20.5], [28.3, -15.6], [-7.15, 20.5]].forEach(([x, z]) => { poser(fabRocher(), x, z, rand(0, 6)); OBST.push({ c: [x, z, .6] }); });
+[[-11.2, -11], [-1.95, -11], [12, 2.9], [-25.5, 4], [28, 15.5], [-10.4, 7.8]].forEach(([x, z]) => poser(fabFleurs(), x, z));
+
+const grange = poser(fabGrange(), -18.2, -15.6);
+OBST.push({ r: [-21.5, -18.4, -13.8, -12.9] });
+entite(grange, { type: 'grange', vers: () => VENTE });
+const maison = poser(fabMaison(), -3.9, -15.1);
+OBST.push({ r: [-6.6, -17.3, -1.2, -12.9] });
+entite(maison, { type: 'maison', vers: () => [-3.9, -12.2] });
+const moulin = poser(fabMoulin(), 7.8, -15.1);
+OBST.push({ c: [7.8, -15.1, 1.7] });
+const eMoulin = entite(moulin, { type: 'moulin', vers: () => [7.8, -12.6], vitesse: .6 });
+
+/* la mare (un peu agrandie) */
+const MARE = [-8.45, 12.35];
+const mare = new THREE.Group(); mare.position.set(MARE[0], 0, MARE[1]); mare.scale.setScalar(1.2);
+mare.add(P(Cy(3.6, 3.6, .06, 24), '#f6dca0', 0, .02, 0, true), P(Cy(3.1, 3.1, .08, 24), '#4fc3f7', 0, .05, 0, true));
+mare.children.forEach(m => m.scale.z = .8);
+for (const [x, z] of [[1.2, .9], [-1.6, -.5], [.4, -1.4]]) mare.add(P(Cy(.4, .4, .03, 8), '#43a047', x, .1, z, true));
+for (let i = 0; i < 6; i++) { const a = -2.4 + i * .18; mare.add(P(Cy(.04, .04, 1.2, 4), '#3f8f2f', Math.cos(a) * 3.2, .6, Math.sin(a) * 2.6, true), P(Cy(.07, .07, .3, 5), '#7a4a24', Math.cos(a) * 3.2, 1.2, Math.sin(a) * 2.6, true)); }
+scene.add(mare);
+OBST.push({ e: [MARE[0], MARE[1], 4.1, 3.4] });
+const canards = [];
+for (let i = 0; i < 3; i++) {
+  const c = fabCanard(); c.position.set(MARE[0], .08, MARE[1]); scene.add(c);
+  canards.push(entite(c, { type: 'canard', vers: () => [MARE[0], MARE[1] - 4.2], phase: i * 2.1, r: 1.7 + i * .6 }));
+}
+
+const tracteur = poser(fabTracteur(), -23.4, 4.6, Math.PI / 2);
+const eTracteur = entite(tracteur, { type: 'tracteur', vers: () => [tracteur.position.x, 2.9], sens: 1, pause: 0, klaxonne: false });
+
+const camion = poser(fabCamion(), -19.5, 12.4);
+OBST.push({ r: [-20.5, 10.3, -18.5, 14.5] });
+const eCamion = entite(camion, { type: 'camion', vers: () => ZONE_CAMION, parti: false, haut: 3.2,
+  etatBulle: () => {
+    const c = S.commande;
+    if (!c || eCamion.parti) return null;
+    return { t: c.items.map(i => `${ITEMS[i.k].e}<small class="${i.fait >= i.n ? 'ok' : ''}">${i.fait}/${i.n}</small>`).join(' '), c: 'cmd' };
+  } });
+
+/* carré de vente devant la grange */
+const padVente = fabPad('#ffb300');
+poser(padVente, VENTE[0], VENTE[1]);
+padVente.userData.jauge.scale.z = 1;
+const eVente = entite(padVente, { type: 'vente', vers: () => VENTE, haut: 1.4, etatBulle: () => ({ t: '🪙 <small>Vendre</small>', c: 'vente' }) });
+
+/* nuages : on les touche, ils viennent arroser les champs */
+const nuages = [];
+for (let i = 0; i < 3; i++) {
+  const n = fabNuage(); n.position.set(-34 + i * 29, 6.5 + i * .6, -27 - i * 2); n.scale.setScalar(1.1 - i * .1); scene.add(n);
+  nuages.push(entite(n, { type: 'nuage', x0: n.position.clone(), occupe: false, repos: 0 }));
+}
+const pluie = new THREE.Group(); pluie.visible = false;
+for (let i = 0; i < 70; i++) { const g = P(Bx(.05, .6, .05), '#7cc6ff', rand(-7.5, 7.5), rand(0, 7), rand(-6.5, 6.5), true); g.castShadow = false; pluie.add(g); }
+scene.add(pluie);
+
+const papillons = [];
+for (let i = 0; i < 4; i++) {
+  const p = new THREE.Group(), c = pick(['#f472b6', '#facc15', '#60a5fa', '#a78bfa']);
+  const l = grp(P(Bx(.3, .02, .25), c, .16, 0, 0, true)), r = grp(P(Bx(.3, .02, .25), c, -.16, 0, 0, true));
+  p.add(l, r, P(Bx(.05, .05, .3), '#3b2412', 0, 0, 0, true));
+  p.userData = { l, r, cx: rand(-20, 20), cz: rand(-13, 16), ph: rand(0, 6) };
+  scene.add(p); papillons.push(p);
+}
+
+/* les enclos, leurs auges et leurs caisses */
+const eAuges = {}, eCaisses = {};
+function dehors(E, x, z) { return [x, z > E.z ? z + 1.1 : z - 1.1]; }
+for (const [id, E] of Object.entries(ENCLOS)) {
+  const g = new THREE.Group(); g.position.set(E.x, 0, E.z);
+  g.add(P(Bx(E.w - .3, .04, E.d - .3), E.sol, 0, .03, 0, true));
+  if (id === 'porcherie') { const b = P(Cy(1.8, 1.8, .05, 12), '#6b4226', 1.2, .06, .6, true); b.scale.z = .6; g.add(b); }
+  g.add(fabBarriere(E.w, E.d, E.barriere));
+  if (id === 'poulailler') { const p = fabPoulailler(); p.position.set(E.w / 2 - 1.6, 0, -E.d / 2 + 1.3); g.add(p); }
+  scene.add(g);
+  const a = E.w / 2, b = E.d / 2;
+  [[-a, -b, a, -b], [a, -b, a, b], [a, b, -a, b], [-a, b, -a, -b]].forEach(([x0, z0, x1, z1]) => OBST.push({ s: [E.x + x0, E.z + z0, E.x + x1, E.z + z1, .12] }));
+  const K = ANIMAUX[E.espece];
+  const auge = poser(fabAuge(), E.auge[0], E.auge[1]);
+  const contenuAuge = new THREE.Group(); contenuAuge.position.y = .5; auge.add(contenuAuge);
+  OBST.push({ r: [E.auge[0] - .8, E.auge[1] - .33, E.auge[0] + .8, E.auge[1] + .33] });
+  eAuges[id] = entite(auge, { type: 'auge', id, E, K, haut: 1.6, contenu: contenuAuge, sig: '', vers: () => dehors(E, E.auge[0], E.auge[1]),
+    etatBulle: () => {
+      if (S.niveau < K.niv || !S.animaux.some(x => x.esp === E.espece)) return null;
+      const n = S.auges[id];
+      if (!n) return S.animaux.some(x => x.esp === E.espece && !x.pret) ? { t: '💭' + ITEMS[K.mange].e, c: 'faim' } : null;
+      return { t: ITEMS[K.mange].e + '<small>' + n + '</small>', c: 'info' };
+    } });
+  const caisse = poser(fabCaisse(), E.caisse[0], E.caisse[1]);
+  const contenuCaisse = new THREE.Group(); contenuCaisse.position.y = .68; caisse.add(contenuCaisse);
+  OBST.push({ r: [E.caisse[0] - .65, E.caisse[1] - .45, E.caisse[0] + .65, E.caisse[1] + .45] });
+  eCaisses[id] = entite(caisse, { type: 'caisse', id, E, K, haut: 1.7, contenu: contenuCaisse, sig: '', vers: () => dehors(E, E.caisse[0], E.caisse[1]),
+    etatBulle: () => S.caisses[id] ? { t: ITEMS[K.donne].e + '<small>' + S.caisses[id] + '</small>', c: 'pret' } : null });
+}
+
+/* les stands : visibles une fois achetés, un chantier avant */
+const eAteliers = {};
+for (const [id, A] of Object.entries(ATELIERS)) {
+  const stand = poser(A.fab(), A.x, A.z), chantier = poser(fabChantier(), A.x, A.z);
+  OBST.push({ r: [A.x - 1.8, A.z - 1.1, A.x + 1.8, A.z + 1.3] });
+  eAteliers[id] = entite(stand, { type: 'atelier', id, A, chantier, haut: 4.3, sig: '', vers: () => [A.x, A.z + 2.6],
+    etatBulle: () => {
+      const T = S.ateliers[id];
+      if (T.sortie) return { t: ITEMS[A.sortie].e + '<small>' + T.sortie + '</small>', c: 'pret' };
+      if (T.entree || T.fin) return { t: ITEMS[A.entree].e + '<small>' + T.entree + '</small> → ⏳', c: 'info' };
+      return { t: ITEMS[A.entree].e + ' → ' + ITEMS[A.sortie].e, c: 'faim' };
+    } });
+}
+function majAteliers() {
+  for (const [id, e] of Object.entries(eAteliers)) { const ok = S.ateliers[id].achete; e.obj.visible = ok; e.chantier.visible = !ok; }
+}
+majAteliers();
+
+/* les champs : 3 colonnes de 3, puis une 4e colonne (champs 10 à 12) */
+const POS_CHAMPS = [];
+for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) POS_CHAMPS.push([-22.2 + c * 4.4, -7.8 + r * 4.4]);
+for (let r = 0; r < 3; r++) POS_CHAMPS.push([-9, -7.8 + r * 4.4]);
+const DEMI_CHAMP = 1.8;   /* un champ fait 3,6 m de côté */
+const eChamps = POS_CHAMPS.map(([x, z], i) => {
+  const g = new THREE.Group(); g.position.set(x, 0, z);
+  const terre = P(Bx(3.6, .35, 3.6), '#7b4a26', 0, .175, 0);
+  g.add(terre);
+  for (let k = -1; k <= 1; k++) g.add(P(Bx(3.3, .1, .45), '#5e381c', 0, .37, k * 1.1, true));
+  /* petit panneau planté dans le coin : ce qu'on sème dans ce champ */
+  const panneau = grp(P(Cy(.06, .06, 1.2, 5), '#8a5a3c', 0, .6, 0), P(Bx(1.05, .62, .1), '#fff8e7', 0, 1.2, 0), P(Bx(1.15, .72, .06), '#8a5a3c', 0, 1.2, -.05, true));
+  const etiquette = new THREE.Group(); etiquette.position.set(0, 1.75, 0); panneau.add(etiquette);
+  panneau.position.set(-1.55, .35, -1.55);
+  g.add(panneau);
+  scene.add(g);
+  return entite(g, { type: 'champ', i, haut: 2.2, plantes: null, tetes: [], mur: false, etiquette, vers: () => [x, z],
+    etatBulle: () => {
+      if (i >= S.champsAchetes) return null;
+      const p = S.champs[i];
+      /* terre vide : on montre ce qui sera semé quand Roullieee passera */
+      if (!p.c) return { t: '🌱' + CULTURES[p.prevu || 'ble'].e, c: 'faim' };
+      return maintenant() >= p.t1 ? { t: CULTURES[p.c].e, c: 'pret' } : null;
+    } });
+});
+
+/* ══════════ ROULLIEEE ET SES COMPAGNONS ══════════ */
+const joueur = fabRoullieee();
+poser(joueur, DEPART[0], DEPART[1]);
+const pileGroupe = joueur.userData.pile;
+const eJoueur = entite(joueur, { type: 'joueur', haut: 3,
+  etatBulle: () => {
+    eJoueur.haut = 3.1 + Math.min(S.porte.length, 24) * .27;
+    if (S.porte.length >= S.capacite) return { t: 'PLEIN !', c: 'plein' };
+    return S.porte.length ? { t: '🧺 <small>' + S.porte.length + '/' + S.capacite + '</small>', c: 'info' } : null;
+  } });
+const dinde = poser(grp(fabDinde(.6)), DEPART[0] - 1.5, DEPART[1] + 1);
+const eDinde = entite(dinde, { type: 'dinde' });
+/* le cultivateur, caché tant qu'on ne l'a pas recruté */
+const fermier = poser(fabFermier(), FERMIER.repos[0], FERMIER.repos[1]);
+fermier.visible = !!S.fermier;
+const eFermier = entite(fermier, { type: 'fermier' });
+
+/* ══════════════════════════════════════════════════════════
+   LA MARCHE — une grille de cases de 50 cm : libre ou bloquée.
+   Le joystick glisse le long des obstacles ; le toucher calcule
+   un chemin (A*) qui les contourne.
+   ══════════════════════════════════════════════════════════ */
+const GR = .5, GX0 = -31, GZ0 = -23, GW = 124, GH = 92, RAYON = .45;
+const bloc = new Uint8Array(GW * GH), atteignable = new Uint8Array(GW * GH);
+const idx = (i, j) => j * GW + i;
+const cel = (x, z) => [Math.floor((x - GX0) / GR), Math.floor((z - GZ0) / GR)];
+const centreCel = n => [GX0 + ((n % GW) + .5) * GR, GZ0 + (Math.floor(n / GW) + .5) * GR];
+function dansIle(x, z, m) {
+  const hw = 30 - m, hd = 22 - m, r = Math.max(.5, 9 - m);
+  const dx = Math.max(Math.abs(x) - (hw - r), 0), dz = Math.max(Math.abs(z) - (hd - r), 0);
+  return dx * dx + dz * dz <= r * r;
+}
+function distSegment(px, pz, x0, z0, x1, z1) {
+  const vx = x1 - x0, vz = z1 - z0, t = clamp(((px - x0) * vx + (pz - z0) * vz) / (vx * vx + vz * vz), 0, 1);
+  return Math.hypot(px - (x0 + vx * t), pz - (z0 + vz * t));
+}
+function construireGrille() {
+  for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
+    const [x, z] = centreCel(idx(i, j));
+    let b = !dansIle(x, z, 1.0);
+    for (let k = 0; !b && k < OBST.length; k++) {
+      const o = OBST[k];
+      if (o.r) b = x > o.r[0] - RAYON && x < o.r[2] + RAYON && z > o.r[1] - RAYON && z < o.r[3] + RAYON;
+      else if (o.c) b = Math.hypot(x - o.c[0], z - o.c[1]) < o.c[2] + RAYON;
+      else if (o.e) b = Math.pow((x - o.e[0]) / (o.e[2] + RAYON), 2) + Math.pow((z - o.e[1]) / (o.e[3] + RAYON), 2) < 1;
+      else if (o.s) b = distSegment(x, z, o.s[0], o.s[1], o.s[2], o.s[3]) < o.s[4] + RAYON;
+    }
+    bloc[idx(i, j)] = b ? 1 : 0;
+  }
+  /* toutes les cases qu'on peut rejoindre depuis le départ */
+  atteignable.fill(0);
+  const [si, sj] = cel(DEPART[0], DEPART[1]), file = [idx(si, sj)];
+  atteignable[file[0]] = 1;
+  while (file.length) {
+    const n = file.pop(), i = n % GW, j = Math.floor(n / GW);
+    for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const a = i + di, b = j + dj;
+      if (a < 0 || b < 0 || a >= GW || b >= GH) continue;
+      const m = idx(a, b);
+      if (!bloc[m] && !atteignable[m]) { atteignable[m] = 1; file.push(m); }
+    }
+  }
+}
+construireGrille();
+function libre(x, z) {
+  const [i, j] = cel(x, z);
+  return i >= 0 && j >= 0 && i < GW && j < GH && atteignable[idx(i, j)] === 1;
+}
+function celProche(x, z) {
+  const [i0, j0] = cel(x, z);
+  let best = -1, bd = 1e9;
+  for (let r = 0; r <= 14 && best < 0; r++) {
+    for (let j = j0 - r; j <= j0 + r; j++) for (let i = i0 - r; i <= i0 + r; i++) {
+      if (i < 0 || j < 0 || i >= GW || j >= GH || !atteignable[idx(i, j)]) continue;
+      const [cx, cz] = centreCel(idx(i, j)), d = Math.hypot(cx - x, cz - z);
+      if (d < bd) { bd = d; best = idx(i, j); }
+    }
+  }
+  return best;
+}
+const VOISINS = [[1, 0, 1], [-1, 0, 1], [0, 1, 1], [0, -1, 1], [1, 1, 1.414], [1, -1, 1.414], [-1, 1, 1.414], [-1, -1, 1.414]];
+function trouverChemin(x0, z0, x1, z1) {
+  const s = celProche(x0, z0), g = celProche(x1, z1);
+  if (s < 0 || g < 0) return null;
+  const N = GW * GH, cout = new Float32Array(N).fill(Infinity), vient = new Int32Array(N).fill(-1), vu = new Uint8Array(N), tas = [];
+  const pousser = (f, n) => { tas.push([f, n]); let i = tas.length - 1; while (i > 0) { const p = (i - 1) >> 1; if (tas[p][0] <= tas[i][0]) break; [tas[p], tas[i]] = [tas[i], tas[p]]; i = p; } };
+  const tirer = () => { const t = tas[0], d = tas.pop(); if (tas.length) { tas[0] = d; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < tas.length && tas[l][0] < tas[m][0]) m = l; if (r < tas.length && tas[r][0] < tas[m][0]) m = r; if (m === i) break; [tas[m], tas[i]] = [tas[i], tas[m]]; i = m; } } return t; };
+  const gi = g % GW, gj = Math.floor(g / GW);
+  const h = (i, j) => { const a = Math.abs(i - gi), b = Math.abs(j - gj); return Math.max(a, b) + .414 * Math.min(a, b); };
+  cout[s] = 0; pousser(h(s % GW, Math.floor(s / GW)), s);
+  while (tas.length) {
+    const n = tirer()[1];
+    if (n === g) break;
+    if (vu[n]) continue;
+    vu[n] = 1;
+    const i = n % GW, j = Math.floor(n / GW);
+    for (const [di, dj, c] of VOISINS) {
+      const a = i + di, b = j + dj;
+      if (a < 0 || b < 0 || a >= GW || b >= GH) continue;
+      const m = idx(a, b);
+      if (!atteignable[m] || vu[m]) continue;
+      if (di && dj && (!atteignable[idx(i + di, j)] || !atteignable[idx(i, j + dj)])) continue;
+      const nc = cout[n] + c;
+      if (nc < cout[m]) { cout[m] = nc; vient[m] = n; pousser(nc + h(a, b), m); }
+    }
+  }
+  if (g !== s && vient[g] < 0) return null;
+  const pts = [];
+  for (let n = g; n !== s && n >= 0; n = vient[n]) pts.push(centreCel(n));
+  pts.reverse();
+  if (libre(x1, z1)) pts.push([x1, z1]);
+  return lisser([x0, z0], pts);
+}
+function voit(a, b) {
+  const d = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.ceil(d / .2);
+  for (let k = 1; k <= n; k++) { const t = k / n; if (!libre(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t)) return false; }
+  return true;
+}
+/* on coupe les virages inutiles : du point actuel, on vise le plus loin visible */
+function lisser(depart, pts) {
+  const out = [];
+  let cur = depart, i = 0;
+  while (i < pts.length) {
+    let loin = i;
+    for (let k = Math.min(pts.length - 1, i + 40); k > i; k--) if (voit(cur, pts[k])) { loin = k; break; }
+    out.push(pts[loin]); cur = pts[loin]; i = loin + 1;
+  }
+  return out;
+}
+
+/* ══════════════════════════════════════════════════════════
+   PETITES ANIMATIONS
+   ══════════════════════════════════════════════════════════ */
+const anims = [];
+let horloge = 0;
+function animer(duree, f, fin) { anims.push({ t0: horloge, duree, f, fin }); }
+const sortie = k => 1 + 2.7 * Math.pow(k - 1, 3) + 1.7 * Math.pow(k - 1, 2);
+function rebond(o) {
+  if (!o || o.userData.rebond) return;
+  o.userData.rebond = true;
+  const s0 = o.scale.x;
+  animer(.45, k => { const s = 1 + Math.sin(k * Math.PI) * .22 * (1 - k * .4); o.scale.set(s0 * s, s0 * (2 - s), s0 * s); }, () => { o.scale.setScalar(s0); o.userData.rebond = false; });
+}
+function apparaitre(o) { o.scale.setScalar(.01); animer(.6, k => o.scale.setScalar(Math.max(.01, sortie(k))), () => o.scale.setScalar(1)); }
+function secouer(o) { const r0 = o.rotation.z; animer(.6, k => { o.rotation.z = r0 + Math.sin(k * Math.PI * 6) * .08 * (1 - k); }, () => { o.rotation.z = r0; }); }
+/* un objet 3D vole en cloche d'un point à un autre (la cible peut bouger) */
+function lancer(obj, depart, versFn, duree, fin) {
+  scene.add(obj);
+  obj.position.copy(depart);
+  const v = new THREE.Vector3();
+  animer(duree, k => {
+    v.copy(versFn());
+    obj.position.lerpVectors(depart, v, k);
+    obj.position.y += Math.sin(k * Math.PI) * 1.6;
+    obj.rotation.y = k * 6;
+  }, () => { scene.remove(obj); fin && fin(); });
+}
+
+/* ══════════════════════════════════════════════════════════
+   CAMÉRA — elle suit Roullieee ; pincer pour zoomer
+   ══════════════════════════════════════════════════════════ */
+const cam = { cible: new THREE.Vector3(DEPART[0], 0, DEPART[1]), dist: 30, tangage: .95, lacet: .32 };
+let distBase = 30;
+function placerCamera() {
+  const h = cam.dist * Math.cos(cam.tangage);
+  camera.position.set(cam.cible.x + h * Math.sin(cam.lacet), cam.dist * Math.sin(cam.tangage), cam.cible.z + h * Math.cos(cam.lacet));
+  camera.lookAt(cam.cible);
+  scene.fog.near = cam.dist + 25; scene.fog.far = cam.dist + 110;
+}
+function redimensionner() {
+  renderer.setSize(innerWidth, innerHeight, false);
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  distBase = camera.aspect < 1 ? clamp(30 / camera.aspect * .95, 30, 55) : 30;
+  cam.dist = distBase;
+}
+redimensionner(); placerCamera();
+addEventListener('resize', () => { redimensionner(); placerCamera(); });
+
+const rayon = new THREE.Raycaster(), ndc = new THREE.Vector2(), plan = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), ptSol = new THREE.Vector3();
+function versNdc(x, y) { ndc.set(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1); }
+function solSous(x, y, out) { versNdc(x, y); rayon.setFromCamera(ndc, camera); return rayon.ray.intersectPlane(plan, out); }
+
+/* ── le doigt : joystick si on glisse, destination si on touche ── */
+const doigts = new Map();
+let geste = null;
+const joy = { actif: false, x0: 0, y0: 0, dx: 0, dy: 0 };
+const JOY_R = 58;
+canvas.addEventListener('pointerdown', ev => {
+  canvas.setPointerCapture(ev.pointerId);
+  doigts.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+  if (doigts.size === 1) geste = { x0: ev.clientX, y0: ev.clientY, t0: performance.now(), multi: false };
+  else { if (geste) geste.multi = true; arreterJoy(); }
+});
+canvas.addEventListener('pointermove', ev => {
+  const d = doigts.get(ev.pointerId);
+  if (!d) return;
+  if (doigts.size === 2) {
+    const [p, q] = [...doigts.values()], avant = Math.hypot(p.x - q.x, p.y - q.y);
+    d.x = ev.clientX; d.y = ev.clientY;
+    const [p2, q2] = [...doigts.values()], apres = Math.hypot(p2.x - q2.x, p2.y - q2.y);
+    if (apres > 0) { cam.dist = clamp(cam.dist * avant / apres, 16, distBase * 1.8); placerCamera(); }
+    return;
+  }
+  d.x = ev.clientX; d.y = ev.clientY;
+  if (!geste || geste.multi) return;
+  const dx = ev.clientX - geste.x0, dy = ev.clientY - geste.y0;
+  if (!joy.actif && Math.hypot(dx, dy) > 14) {
+    joy.actif = true; joy.x0 = geste.x0; joy.y0 = geste.y0;
+    $('#joy').style.left = joy.x0 + 'px'; $('#joy').style.top = joy.y0 + 'px';
+    $('#joy').classList.remove('cache');
+    trajet = null; quandArrive = null;
+  }
+  if (joy.actif) {
+    const l = Math.hypot(dx, dy), k = l > JOY_R ? JOY_R / l : 1;
+    joy.dx = dx * k / JOY_R; joy.dy = dy * k / JOY_R;
+    $('#joyK').style.transform = `translate(${dx * k}px,${dy * k}px)`;
+  }
+});
+function arreterJoy() { joy.actif = false; joy.dx = joy.dy = 0; $('#joy').classList.add('cache'); $('#joyK').style.transform = ''; }
+function finDoigt(ev) {
+  doigts.delete(ev.pointerId);
+  if (doigts.size === 0) {
+    if (geste && !geste.multi && !joy.actif && performance.now() - geste.t0 < 600) toucher(ev.clientX, ev.clientY);
+    arreterJoy();
+    geste = null;
+  }
+}
+canvas.addEventListener('pointerup', finDoigt);
+canvas.addEventListener('pointercancel', finDoigt);
+canvas.addEventListener('wheel', ev => { ev.preventDefault(); cam.dist = clamp(cam.dist * (1 + ev.deltaY * .001), 16, distBase * 1.8); placerCamera(); }, { passive: false });
+/* au clavier aussi (pratique sur l'ordinateur de la classe) */
+const touches = new Set();
+addEventListener('keydown', ev => { touches.add(ev.key.toLowerCase()); if (ev.key.startsWith('Arrow')) ev.preventDefault(); });
+addEventListener('keyup', ev => touches.delete(ev.key.toLowerCase()));
+
+/* ── toucher un objet : Roullieee y va, puis agit ── */
+let trajet = null, quandArrive = null;
+const anneau = new THREE.Mesh(new THREE.TorusGeometry(.6, .08, 6, 24), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true }));
+anneau.rotation.x = -Math.PI / 2; anneau.visible = false; scene.add(anneau);
+function trouver(x, y) {
+  versNdc(x, y); rayon.setFromCamera(ndc, camera);
+  for (const h of rayon.intersectObjects(cibles, true)) {
+    let o = h.object;
+    while (o && !o.userData.ent) o = o.parent;
+    if (o && o.visible) return o.userData.ent;
+  }
+  return null;
+}
+function toucher(x, y) {
+  ac();
+  fermerParole();
+  const e = trouver(x, y);
+  if (e && e.type === 'nuage') { pleuvoir(e); return; }
+  if (e && e.type === 'dinde') { rebond(dinde); glou(); coeurs(dinde, 1.2, ['🪶', '❤️']); return; }
+  if (e && e.type === 'fermier') { rebond(fermier); SFX.pop(); flotter(fermier, 'Bonjour ! 👋', 3.2); return; }
+  if (e && e.type === 'joueur') { rebond(joueur); SFX.pop(); return; }
+  let dest;
+  if (e && e.vers) dest = e.vers();
+  else if (solSous(x, y, ptSol)) dest = [ptSol.x, ptSol.z];
+  else return;
+  allerVers(dest[0], dest[1], e && ARRIVEES[e.type] ? () => ARRIVEES[e.type](e) : null);
+}
+function allerVers(x, z, fin) {
+  const p = joueur.position, ch = trouverChemin(p.x, p.z, x, z);
+  if (!ch) { SFX.non(); return; }
+  trajet = ch; quandArrive = fin;
+  const dernier = ch[ch.length - 1] || [p.x, p.z];
+  anneau.position.set(dernier[0], .06, dernier[1]); anneau.visible = true; anneau.scale.setScalar(1); anneau.material.opacity = 1;
+  animer(.6, k => { anneau.scale.setScalar(1 + k * .6); anneau.material.opacity = 1 - k; }, () => { anneau.visible = false; });
+  SFX.pop();
+}
+/* ce qui se passe en arrivant devant certaines choses */
+const ARRIVEES = {
+  maison(e) { rebond(maison); maison.userData.fumee.forEach(s => s.userData.vite = 3); flotter(maison, 'Toc toc ! 🚪', 5.5); SFX.pop(); },
+  moulin(e) { e.vitesse = 6; SFX.vroum(); flotter(moulin, '💨 Whoosh !', 8); },
+  canard(e) { SFX.canard(); canards.forEach(c => { const o = c.obj; animer(.5, k => { o.position.y = .08 + Math.sin(k * Math.PI) * .8; }); }); },
+  tracteur() { SFX.klaxon(); flotter(tracteur, 'Tut tut ! 🚜', 2.8); },
+  deco(e) { rebond(e.obj); if (e.D.son) SFX[e.D.son](); else if (e.D.glou) glou(); else SFX.pop(); coeurs(e.obj, 1.5, ['✨', '💖', '⭐']); },
+  arbre(e) { secouerArbre(e, true); }
+};
+
+/* ══════════ BULLES, TEXTES, MESSAGES ══════════ */
+function creerBulle(e) {
+  const el = document.createElement('div');
+  el.className = 'bulle cache';
+  el.innerHTML = '<div class="in"></div>';
+  el.addEventListener('pointerup', ev => {
+    ev.stopPropagation(); ac();
+    if (e.type === 'joueur') return;
+    const d = e.vers ? e.vers() : [e.obj.position.x, e.obj.position.z];
+    allerVers(d[0], d[1], ARRIVEES[e.type] ? () => ARRIVEES[e.type](e) : null);
+  });
+  calque.appendChild(el);
+  e.cle = '';
+  return el;
+}
+const proj = new THREE.Vector3();
+function ecranDe(obj, haut = 0) {
+  proj.set(0, haut, 0); obj.localToWorld(proj); proj.project(camera);
+  return { x: (proj.x * .5 + .5) * innerWidth, y: (-proj.y * .5 + .5) * innerHeight, devant: proj.z < 1 };
+}
+function majBulles() {
+  for (const e of entites) {
+    if (!e.el) continue;
+    const st = e.obj.visible ? e.etatBulle() : null;
+    const cle = st ? st.t + '|' + st.c : '';
+    if (cle !== e.cle) {
+      e.cle = cle;
+      e.el.classList.toggle('cache', !st);
+      if (st) { e.el.className = 'bulle ' + st.c; e.el.firstChild.innerHTML = st.t; }
+    }
+    if (!st) continue;
+    const p = ecranDe(e.obj, (e.haut || 2) / (e.obj.scale.y || 1));
+    if (!p.devant || p.x < -80 || p.x > innerWidth + 80 || p.y < -80 || p.y > innerHeight + 80) { e.el.style.visibility = 'hidden'; continue; }
+    e.el.style.visibility = '';
+    e.el.style.transform = `translate3d(${p.x}px,${p.y}px,0) translate(-50%,-100%)`;
+  }
+  const par = $('#parole');
+  if (!par.classList.contains('cache')) {
+    const p = ecranDe(joueur, eJoueur.haut + 1);
+    par.style.transform = `translate3d(${p.x}px,${p.y}px,0) translate(-50%,-100%)`;
+  }
+}
+function flotter(obj, texte, haut = 2) {
+  const p = ecranDe(obj, haut), el = document.createElement('div');
+  el.className = 'flotte'; el.textContent = texte; el.style.left = p.x + 'px'; el.style.top = p.y + 'px';
+  document.body.appendChild(el); setTimeout(() => el.remove(), 1300);
+}
+function coeurs(obj, haut = 1.5, choix = ['❤️', '💛', '✨']) {
+  const p = ecranDe(obj, haut);
+  for (let i = 0; i < 4; i++) {
+    const el = document.createElement('div');
+    el.className = 'coeur'; el.textContent = pick(choix);
+    el.style.left = p.x + 'px'; el.style.top = p.y + 'px'; el.style.setProperty('--dx', rand(-50, 50) + 'px'); el.style.animationDelay = i * .1 + 's';
+    document.body.appendChild(el); setTimeout(() => el.remove(), 1500);
+  }
+}
+function versHud(emoji, obj, haut, versSel, fin) {
+  const p = ecranDe(obj, haut), c = $(versSel).getBoundingClientRect(), el = document.createElement('div');
+  el.className = 'vole'; el.textContent = emoji; el.style.left = p.x + 'px'; el.style.top = p.y + 'px';
+  document.body.appendChild(el);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    el.style.transform = `translate(-50%,-50%) translate(${c.left + c.width / 2 - p.x}px,${c.top + c.height / 2 - p.y}px) scale(.5)`;
+    el.style.opacity = '.5';
+  }));
+  setTimeout(() => { el.remove(); const b = $(versSel); b.classList.remove('vibre'); void b.offsetWidth; b.classList.add('vibre'); fin && fin(); }, 720);
+}
+let toastT = null, dernierToast = '', dernierToastT = 0;
+function message(t, parle) {
+  /* le même message n'est pas répété en boucle quand on reste au même endroit */
+  if (t === dernierToast && maintenant() - dernierToastT < 5000) return;
+  dernierToast = t; dernierToastT = maintenant();
+  const el = $('#toast');
+  el.textContent = t; el.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 2600);
+  if (parle) dire(parle === true ? t : parle);
+}
+function confettis(n = 70) {
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti'; c.style.left = rand(0, 100) + 'vw';
+    c.style.background = pick(['#ef4444', '#facc15', '#22c55e', '#3b82f6', '#a855f7', '#f97316']);
+    c.style.animationDuration = rand(2, 3.5) + 's'; c.style.animationDelay = rand(0, .6) + 's';
+    document.body.appendChild(c); setTimeout(() => c.remove(), 4500);
+  }
+}
+function vibrer(ms = 15) { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} }
+let paroleT = null;
+function parler(t) {
+  const p = $('#parole');
+  p.textContent = t; p.classList.remove('cache');
+  dire(t);
+  clearTimeout(paroleT); paroleT = setTimeout(fermerParole, Math.max(5000, t.length * 80));
+}
+function fermerParole() { $('#parole').classList.add('cache'); }
+$('#parole').addEventListener('pointerup', fermerParole);
+
+/* ══════════ HUD ══════════ */
+let piecesAffichees = S.pieces;
+function majHud() {
+  $('#niv').textContent = S.niveau;
+  const a = palier(S.niveau - 1), b = palier(S.niveau);
+  $('#xpFill').style.width = clamp((S.xp - a) / (b - a) * 100, 0, 100) + '%';
+  $('#xpTxt').textContent = (S.xp - a) + ' / ' + (b - a);
+  $('#bSon').textContent = S.son ? '🔊' : '🔇';
+  $('#bSon').classList.toggle('off', !S.son);
+  $('#bMusique').classList.toggle('off', !S.musique);
+  const c = S.commande;
+  $('#cmd').innerHTML = !c ? '' : eCamion.parti ? '🚚 <span class="q">revient bientôt…</span>'
+    : '🚚 ' + c.items.map(i => `${ITEMS[i.k].e}<span class="q ${i.fait >= i.n ? 'ok' : ''}">${i.fait}/${i.n}</span>`).join(' ') + ` <span class="gain">→ 🪙${c.pieces}</span>`;
+}
+function majPieces() {
+  const d = S.pieces - piecesAffichees;
+  if (d) piecesAffichees += Math.sign(d) * Math.max(1, Math.round(Math.abs(d) / 6));
+  $('#pieces').textContent = piecesAffichees;
+}
+function gagnerXP(n) {
+  S.xp += n;
+  while (S.xp >= palier(S.niveau)) {
+    S.niveau++;
+    S.pieces += 10 * S.niveau;
+    const nv = S.niveau;
+    setTimeout(() => fenetreNiveau(nv), 600);
+  }
+  majHud();
+}
+
+/* ══════════════════════════════════════════════════════════
+   LA PILE SUR LE DOS DE ROULLIEEE
+   ══════════════════════════════════════════════════════════ */
+let enVolPile = 0, sigPile = '';
+function majPile() {
+  const n = Math.max(0, S.porte.length - enVolPile);
+  const sig = S.porte.slice(0, n).join(',');
+  if (sig === sigPile) return;
+  sigPile = sig;
+  while (pileGroupe.children.length) pileGroupe.remove(pileGroupe.children[0]);
+  S.porte.slice(0, n).forEach((k, i) => { const m = fabMini(k); m.position.y = i * .27 + .12; pileGroupe.add(m); });
+  hauteurPile = n;
+}
+const tmpV = new THREE.Vector3();
+function hautDePile() { tmpV.set(0, S.porte.length * .27 + .2, 0); return pileGroupe.localToWorld(tmpV.clone()); }
+function plein() { return S.porte.length >= S.capacite; }
+function prendre(k, depart) {
+  S.porte.push(k); enVolPile++;
+  lancer(fabMini(k), depart, hautDePile, .38, () => { enVolPile--; majPile(); SFX.pile(); });
+}
+function deposer(k, versFn) {
+  const i = S.porte.lastIndexOf(k);
+  if (i < 0) return false;
+  S.porte.splice(i, 1);
+  const depart = hautDePile();
+  majPile(); SFX.pose();
+  lancer(fabMini(k), depart, versFn, .38);
+  return true;
+}
+
+/* ══════════════════════════════════════════════════════════
+   CE QUE ROULLIEEE FAIT EN PASSANT
+   Un objet à la fois, toutes les 0,12 s : on voit chaque objet voler.
+   ══════════════════════════════════════════════════════════ */
+let cadence = 0, cadencePad = 0, alertePleinT = 0;
+function alertePlein() {
+  if (maintenant() < alertePleinT) return;
+  alertePleinT = maintenant() + 5000;
+  SFX.non();
+  message('🧺 Ton panier est plein ! Va livrer le camion 🚚 ou vendre à la grange 🪙', 'Ton panier est plein !');
+}
+function pos3(x, z, y = .6) { return new THREE.Vector3(x, y, z); }
+/* rayons d'action, larges : un enfant n'a pas à viser au centimètre */
+const RAYON_AUGE = 2.6, PORTEE_CAMION = 2.4, DEMI_PAD = TAILLE_PAD / 2;
+/* le camion prend la marchandise de n'importe quel côté : derrière,
+   à gauche ou à droite (distance au rectangle du camion, pas à un point) */
+function presDuCamion(p) {
+  const dx = Math.max(Math.abs(p.x - camion.position.x) - .85, 0), dz = Math.max(Math.abs(p.z - camion.position.z) - 2, 0);
+  return Math.hypot(dx, dz) < PORTEE_CAMION;
+}
+function zones(dt) {
+  const p = joueur.position, t = maintenant();
+  cadencePad -= dt;
+  if (cadencePad <= 0) { cadencePad = .05; payerPads(); }
+  cadence -= dt;
+  if (cadence > 0) return;
+  cadence = .12;
+
+  /* champs : semer ou récolter */
+  for (let i = 0; i < S.champsAchetes; i++) {
+    const [fx, fz] = POS_CHAMPS[i];
+    if (Math.abs(p.x - fx) > DEMI_CHAMP + .1 || Math.abs(p.z - fz) > DEMI_CHAMP + .1) continue;
+    const c = S.champs[i];
+    if (!c.c) { const g = c.prevu || 'ble'; if (S.niveau >= CULTURES[g].niv) planter(i, g); return; }
+    if (t < c.t1) return;
+    if (plein()) { alertePlein(); return; }
+    prendre(cueillir(i), pos3(fx + rand(-.8, .8), fz + rand(-.8, .8), .8));
+    gagnerXP(1);
+    return;
+  }
+  /* les stands : on y dépose le lait ou la laine, on reprend les produits finis */
+  for (const [id, A] of Object.entries(ATELIERS)) {
+    const T = S.ateliers[id];
+    if (!T.achete || Math.hypot(p.x - A.x, p.z - (A.z + 2.6)) > RAYON_AUGE) continue;
+    if (T.entree < ENTREE_MAX && S.porte.includes(A.entree)) {
+      const ou = pos3(A.x - .85, A.z, 2);
+      if (deposer(A.entree, () => ou)) { T.entree++; sauver(); }
+      return;
+    }
+    if (T.sortie > 0) {
+      if (plein()) { alertePlein(); return; }
+      T.sortie--;
+      prendre(A.sortie, pos3(A.x + .75, A.z + .55, 1.3));
+      gagnerXP(2); sauver();
+      return;
+    }
+  }
+  /* auges et caisses */
+  for (const [id, E] of Object.entries(ENCLOS)) {
+    const K = ANIMAUX[E.espece];
+    if (!S.animaux.some(a => a.esp === E.espece)) continue;
+    if (Math.hypot(p.x - E.auge[0], p.z - E.auge[1]) < RAYON_AUGE && S.auges[id] < AUGE_MAX && S.porte.includes(K.mange)) {
+      const ou = pos3(E.auge[0] + rand(-.5, .5), E.auge[1], .5);
+      if (deposer(K.mange, () => ou)) { S.auges[id]++; sauver(); }
+      return;
+    }
+    if (Math.hypot(p.x - E.caisse[0], p.z - E.caisse[1]) < RAYON_AUGE && S.caisses[id] > 0) {
+      if (plein()) { alertePlein(); return; }
+      S.caisses[id]--;
+      prendre(K.donne, pos3(E.caisse[0], E.caisse[1], .8));
+      gagnerXP(1); sauver();
+      return;
+    }
+  }
+  /* le camion prend ce que demande la commande */
+  const c = S.commande;
+  if (c && !eCamion.parti && presDuCamion(p)) {
+    const it = c.items.find(i => i.fait < i.n && S.porte.includes(i.k));
+    if (it) {
+      const ou = new THREE.Vector3(rand(-.5, .5), 1.2, -.6);
+      deposer(it.k, () => camion.localToWorld(ou.clone()));
+      it.fait++;
+      majCharge();
+      if (c.items.every(i => i.fait >= i.n)) livrer();
+      sauver(); majHud();
+      return;
+    }
+    if (c.items.some(i => i.fait < i.n) && S.porte.length === 0) message('🚚 Le camion attend : ' + c.items.filter(i => i.fait < i.n).map(i => ITEMS[i.k].e + ' ' + (i.n - i.fait)).join('  '));
+  }
+  /* vente à la grange */
+  if (Math.abs(p.x - VENTE[0]) < DEMI_PAD && Math.abs(p.z - VENTE[1]) < DEMI_PAD && S.porte.length) {
+    const k = S.porte[S.porte.length - 1], v = ITEMS[k].val;
+    deposer(k, () => pos3(VENTE[0], VENTE[1] - 1.6, 1.2));
+    S.pieces += v;
+    if (Math.random() < .5) SFX.piece();
+    flotter(padVente, '+' + v + ' 🪙', 1.2);
+    sauver();
+  }
+}
+
+/* ── champs ── */
+/* prend une poignée dans un champ mûr (Roullieee ou le cultivateur) ;
+   le champ redevient de la terre quand tout est ramassé */
+function cueillir(i) {
+  const c = S.champs[i], k = c.c;
+  c.reste = (c.reste || CULTURES[k].recolte) - 1;
+  if (c.reste <= 0) { S.champs[i] = { c: null, t0: 0, t1: 0, reste: 0, prevu: c.prevu }; poserPlantes(eChamps[i]); rebond(eChamps[i].obj); vibrer(20); }
+  sauver();
+  return k;
+}
+function poserPlantes(e) {
+  if (e.plantes) { e.obj.remove(e.plantes); e.plantes = null; e.tetes = []; }
+  const p = S.champs[e.i];
+  if (!p.c) return;
+  const f = fabPlantes(p.c);
+  e.plantes = f.g; e.tetes = f.tetes; e.mur = false;
+  e.obj.add(f.g);
+}
+/* le panneau du champ montre la culture prévue */
+function majEtiquette(e) {
+  const g = e.etiquette;
+  while (g.children.length) g.remove(g.children[0]);
+  const m = fabMini(S.champs[e.i].prevu || 'ble'); m.scale.setScalar(1.9); g.add(m);
+}
+function majChamps() { eChamps.forEach(e => { e.obj.visible = e.i < S.champsAchetes; majEtiquette(e); }); }
+majChamps();
+eChamps.forEach(poserPlantes);
+function planter(i, c) {
+  const C = CULTURES[c], t = maintenant();
+  S.champs[i] = { c, t0: t, t1: t + C.duree * 1000, reste: C.recolte, prevu: S.champs[i].prevu || c };
+  poserPlantes(eChamps[i]);
+  SFX.plop(); rebond(eChamps[i].obj);
+  sauver();
+}
+
+/* ── commandes et camion ── */
+function nouvelleCommande(facile) {
+  const dispo = Object.keys(CULTURES).filter(c => CULTURES[c].niv <= S.niveau);
+  new Set(S.animaux.map(a => a.esp)).forEach(esp => dispo.push(ANIMAUX[esp].donne));
+  for (const [id, A] of Object.entries(ATELIERS)) if (S.ateliers[id].achete) dispo.push(A.sortie);
+  const types = facile ? ['ble'] : melange(dispo).slice(0, Math.min(dispo.length, randi(1, S.niveau >= 3 ? 3 : 2)));
+  /* les produits transformés valent cher : on en demande peu */
+  const items = types.map(k => ({ k, n: facile ? 3 : (k === 'yaourt' || k === 'pull') ? randi(1, 2) : randi(2, S.niveau < 3 ? 4 : 5), fait: 0 }));
+  const val = items.reduce((s, i) => s + ITEMS[i.k].val * i.n, 0);
+  const qui = pick(CLIENTS);
+  return { items, pieces: Math.round(val * 1.6), xp: Math.max(3, Math.round(val / 2)), qui: qui[0], nom: qui[1] };
+}
+if (!S.commande) { S.commande = nouvelleCommande(true); sauver(); }
+function majCharge() {
+  const ch = camion.userData.charge;
+  while (ch.children.length) ch.remove(ch.children[0]);
+  if (!S.commande || eCamion.parti) return;
+  let n = 0;
+  S.commande.items.forEach(i => { for (let k = 0; k < i.fait; k++, n++) { const m = fabMini(i.k); m.position.set((n % 3 - 1) * .45, Math.floor(n / 3) * .25, (Math.floor(n / 3) % 2) * .3 - .4); ch.add(m); } });
+}
+majCharge();
+function livrer() {
+  const c = S.commande;
+  S.pieces += c.pieces;
+  gagnerXP(c.xp);
+  S.commande = nouvelleCommande();
+  sauver();
+  SFX.achat(); vibrer(40);
+  message(`🚚 Bravo ! ${c.qui} ${c.nom} te donne ${c.pieces} 🪙 !`, `Bravo ! Commande livrée !`);
+  flotter(camion, '+' + c.pieces + ' 🪙', 3.5);
+  setTimeout(() => flotter(camion, '+' + c.xp + ' ⭐', 2.8), 300);
+  for (let i = 0; i < Math.min(8, Math.ceil(c.pieces / 4)); i++) setTimeout(() => versHud('🪙', camion, 2.5, '#bourse', () => SFX.piece()), 200 + i * 110);
+  confettis(40);
+  const e = eCamion;
+  e.parti = true;
+  setTimeout(() => {
+    SFX.klaxon(); setTimeout(SFX.vroum, 200);
+    animer(2.4, k => { camion.position.z = 12.4 + k * k * 40; }, () => {
+      camion.visible = false;
+      setTimeout(() => {
+        camion.visible = true; camion.rotation.y = Math.PI;
+        majHud();
+        animer(2.4, k => { const s = 1 - (1 - k) * (1 - k); camion.position.z = 52.4 - s * 40; }, () => {
+          animer(.6, k => { camion.rotation.y = Math.PI * (1 - k); }, () => { e.parti = false; majCharge(); majHud(); SFX.klaxon(); });
+        });
+      }, 1800);
+    });
+  }, 500);
+  majHud();
+}
+
+/* ── carrés d'achat ── */
+const pads = new Map();
+function placeDeco(id) {
+  if (S.placesPads[id] !== undefined) return S.placesPads[id];
+  const prises = new Set([...S.deco.map(d => d.place), ...Object.values(S.placesPads)]);
+  const i = SPOTS_DECO.findIndex((_, k) => !prises.has(k));
+  if (i >= 0) S.placesPads[id] = i;
+  return i;
+}
+function listePads() {
+  const l = [];
+  if (S.champsAchetes < NB_CHAMPS) {
+    const i = S.champsAchetes;
+    l.push({ id: 'champ' + i, x: POS_CHAMPS[i][0], z: POS_CHAMPS[i][1], e: '🟫', prix: PRIX_CHAMPS[i - 6], niv: 1,
+      fait: () => { S.champsAchetes++; majChamps(); apparaitre(eChamps[i].obj); message('🌱 Nouveau champ !'); } });
+  }
+  for (const [id, E] of Object.entries(ENCLOS)) {
+    const K = ANIMAUX[E.espece], n = S.animaux.filter(a => a.esp === E.espece).length;
+    if (n < K.max) l.push({ id: 'bete-' + E.espece, x: E.pad[0], z: E.pad[1], e: K.e, prix: prixBete(E.espece), niv: K.niv, fait: () => ajouterBete(E.espece) });
+  }
+  for (const [id, A] of Object.entries(ATELIERS)) {
+    if (S.ateliers[id].achete) continue;
+    l.push({ id: 'atelier-' + id, x: A.x, z: A.z + 2.6, e: ITEMS[A.sortie].e, prix: A.prix, niv: A.niv,
+      fait: () => {
+        S.ateliers[id].achete = true; majAteliers(); apparaitre(eAteliers[id].obj); glou();
+        message(`${ITEMS[A.sortie].e} ${A.nom} ! Apporte ${ITEMS[A.entree].e} pour faire ${ITEMS[A.sortie].e}`, A.nom + ' !');
+      } });
+  }
+  if (!S.fermier) l.push({ id: 'fermier', x: FERMIER.pad[0], z: FERMIER.pad[1], e: '👨‍🌾', prix: FERMIER.prix, niv: FERMIER.niv,
+    fait: () => {
+      S.fermier = true; fermier.visible = true; fermier.position.set(FERMIER.repos[0], 0, FERMIER.repos[1]); apparaitre(fermier); coeurs(fermier, 2.6);
+      message('👨‍🌾 Le cultivateur arrive ! Il sème, récolte et nourrit les bêtes.', 'Le cultivateur arrive ! Il va t’aider.');
+    } });
+  if (PRIX_PANIER[S.capacite]) l.push({ id: 'panier', x: PAD_PANIER[0], z: PAD_PANIER[1], e: '🧺', prix: PRIX_PANIER[S.capacite], niv: 1,
+    fait: () => { S.capacite += 4; message(`🧺 Panier plus grand : ${S.capacite} places !`, 'Panier plus grand !'); } });
+  const achetees = new Set(S.deco.map(d => d.id));
+  DECOS.filter(D => !achetees.has(D.id)).slice(0, 1).forEach(D => {
+    const place = placeDeco('deco-' + D.id);
+    if (place < 0) return;
+    l.push({ id: 'deco-' + D.id, x: SPOTS_DECO[place][0], z: SPOTS_DECO[place][1], e: D.e, prix: D.prix, niv: D.niv,
+      fait: () => { delete S.placesPads['deco-' + D.id]; const d = { id: D.id, place }; S.deco.push(d); creerDeco(d, true); } });
+  });
+  return l;
+}
+function syncPads() {
+  const l = listePads(), ids = new Set(l.map(p => p.id));
+  for (const [id, e] of pads) if (!ids.has(id)) { retirerEntite(e); pads.delete(id); }
+  for (const def of l) {
+    let e = pads.get(def.id);
+    if (!e) {
+      const o = poser(fabPad(), def.x, def.z);
+      e = entite(o, { type: 'pad', def, haut: 1.3, vers: () => [e.def.x, e.def.z],
+        etatBulle: () => {
+          if (S.niveau < e.def.niv) return { t: e.def.e + ' 🔒<small>Niv. ' + e.def.niv + '</small>', c: 'lock' };
+          /* sablier pendant les 1,5 s d'attente : « ne bouge plus… » */
+          if (e.dessus && padJusteAchete !== e.def.id && (e.immobile || 0) < ATTENTE_ACHAT) return { t: e.def.e + ' ⏳', c: 'pad sur' };
+          return { t: e.def.e + ' <small>🪙' + (e.def.prix - (S.pads[e.def.id] || 0)) + '</small>', c: 'pad' + (e.dessus ? ' sur' : '') };
+        } });
+      pads.set(def.id, e);
+    }
+    e.def = def;
+    e.obj.position.set(def.x, 0, def.z);
+    const k = (S.pads[def.id] || 0) / def.prix, j = e.obj.userData.jauge;
+    remplirPad(j, k);
+  }
+  sauver();
+}
+/* après un achat, il faut sortir du carré avant d'en racheter un :
+   sinon un enfant qui reste planté dessus vide sa bourse sans le vouloir */
+let padJusteAchete = null;
+/* On n'achète qu'en restant immobile sur le carré : traverser un carré
+   en courant vers autre chose ne dépense rien. */
+const ATTENTE_ACHAT = 1.5;
+function payerPads() {
+  const p = joueur.position;
+  for (const e of pads.values()) {
+    const d = e.def, dessus = Math.abs(p.x - d.x) < DEMI_PAD && Math.abs(p.z - d.z) < DEMI_PAD;
+    e.dessus = dessus;
+    if (!dessus) { e.immobile = 0; if (padJusteAchete === d.id) padJusteAchete = null; continue; }
+    if (padJusteAchete === d.id) return;
+    e.immobile = vitesseJoueur < .3 ? (e.immobile || 0) + .05 : 0;
+    if (e.immobile < ATTENTE_ACHAT) return;
+    if (S.niveau < d.niv) { message(`🔒 Il faut être au niveau ${d.niv} !`); return; }
+    const deja = S.pads[d.id] || 0;
+    if (S.pieces <= 0) { message(`🪙 Il manque ${d.prix - deja} pièces !`, 'Il manque des pièces !'); return; }
+    const pas = Math.min(Math.max(1, Math.ceil(d.prix / 25)), S.pieces, d.prix - deja);
+    S.pieces -= pas;
+    S.pads[d.id] = deja + pas;
+    if ((S.pads[d.id] | 0) % 2 === 0) { lancer(fabPiece(), hautDePile(), () => pos3(d.x, d.z, .1), .3); SFX.piece(); }
+    const k = S.pads[d.id] / d.prix, j = e.obj.userData.jauge;
+    remplirPad(j, k);
+    if (S.pads[d.id] >= d.prix) {
+      delete S.pads[d.id];
+      padJusteAchete = d.id;
+      SFX.achat(); confettis(40); vibrer(50);
+      d.fait();
+      syncPads(); majHud();
+    }
+    sauver();
+    return;
+  }
+}
+
+/* ══════════ ANIMAUX ══════════ */
+const FAB_BETE = { poule: fabPoule, vache: fabVache, cochon: fabCochon, mouton: fabMouton };
+const ENCLOS_DE = Object.fromEntries(Object.entries(ENCLOS).map(([id, E]) => [E.espece, id]));
+function placeLibre(E, marge = 1) { return new THREE.Vector3(E.x + rand(-E.w / 2 + marge, E.w / 2 - marge), 0, E.z + rand(-E.d / 2 + marge, E.d / 2 - marge)); }
+function creerBete(a, apparition) {
+  const id = ENCLOS_DE[a.esp], E = ENCLOS[id], K = ANIMAUX[a.esp];
+  const racine = new THREE.Group(), corps = FAB_BETE[a.esp]();
+  racine.add(corps);
+  racine.position.copy(placeLibre(E));
+  racine.rotation.y = rand(0, 6.28);
+  scene.add(racine);
+  const e = entite(racine, { type: 'bete', a, K, E, id, corps, cible: placeLibre(E), attente: rand(0, 2),
+    vers: () => S.caisses[id] ? dehors(E, E.caisse[0], E.caisse[1]) : dehors(E, E.auge[0], E.auge[1]) });
+  if (apparition) { apparaitre(racine); coeurs(racine, 1.5); }
+  return e;
+}
+S.animaux.forEach(a => creerBete(a));
+function ajouterBete(esp) {
+  const a = { id: S.prochainId++, esp, pret: 0 };
+  S.animaux.push(a);
+  creerBete(a, true);
+  SFX[esp]();
+  const NOUVEAU = { poule: 'Une nouvelle poule', vache: 'Une nouvelle vache', cochon: 'Un nouveau cochon', mouton: 'Un nouveau mouton' };
+  message(`${ANIMAUX[esp].e} ${NOUVEAU[esp]} !`, NOUVEAU[esp] + ' !');
+}
+const angle = (a, b, k) => { let d = b - a; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; return a + d * k; };
+function mangeoire(E) { return new THREE.Vector3(E.auge[0] + rand(-.5, .5), 0, clamp(E.auge[1], E.z - E.d / 2 + .8, E.z + E.d / 2 - .8)); }
+function bougerBete(e, dt, t) {
+  const a = e.a, K = e.K, E = e.E, id = e.id, p = e.obj.position, now = maintenant();
+  /* produit prêt : il saute dans la caisse */
+  if (a.pret && now >= a.pret && S.caisses[id] < CAISSE_MAX) {
+    a.pret = 0; S.caisses[id]++; sauver();
+    lancer(fabMini(K.donne), pos3(p.x, p.z, 1), () => pos3(E.caisse[0], E.caisse[1], .9), .7);
+    rebond(e.obj);
+  }
+  /* faim et de quoi manger : direction l'auge */
+  if (!a.pret && S.auges[id] > 0 && !e.versAuge) { e.versAuge = true; e.cible = mangeoire(E); e.attente = 0; }
+  if (e.attente > 0) {
+    e.attente -= dt;
+    if (a.esp === 'poule') e.corps.rotation.x = (t * 1.7 + a.id) % 1.6 < .3 ? .45 : 0;
+    p.y = 0;
+  } else {
+    const dx = e.cible.x - p.x, dz = e.cible.z - p.z, d = Math.hypot(dx, dz);
+    if (d < .2) {
+      if (e.versAuge) {
+        e.versAuge = false;
+        if (!a.pret && S.auges[id] > 0) {
+          S.auges[id]--; a.pret = now + K.duree * 1000; sauver();
+          SFX.miam(); coeurs(e.obj, 1.6); setTimeout(() => SFX[a.esp](), 250);
+          e.corps.rotation.x = .3; e.attente = 1.2;
+        }
+      } else e.attente = rand(1.5, 5);
+      e.cible = placeLibre(E);
+    } else {
+      const s = Math.min(d, K.vitesse * (e.versAuge ? 1.8 : 1) * dt);
+      p.x += dx / d * s; p.z += dz / d * s;
+      e.obj.rotation.y = angle(e.obj.rotation.y, Math.atan2(dx, dz), .12);
+      p.y = a.esp === 'poule' ? Math.abs(Math.sin(t * 12 + a.id)) * .12 : Math.abs(Math.sin(t * 6 + a.id)) * .05;
+      e.corps.rotation.x = 0;
+    }
+  }
+  if (a.esp === 'mouton') {
+    const k = !a.pret ? .72 : clamp(1 - (a.pret - now) / (K.duree * 1000), 0, 1) * .45 + .72;
+    e.corps.userData.laine.scale.setScalar(k);
+  }
+}
+
+/* ══════════ DÉCORATIONS ══════════ */
+function creerDeco(d, apparition) {
+  const D = DECOS.find(x => x.id === d.id), [x, z] = SPOTS_DECO[d.place];
+  const o = poser(D.faire(), x, z, D.id === 'arc' ? 0 : rand(-.5, .5));
+  const e = entite(o, { type: 'deco', D, vers: () => [o.position.x, o.position.z + 1.2], maison: new THREE.Vector3(x, 0, z), cible: new THREE.Vector3(x, 0, z), attente: 2 });
+  if (apparition) { apparaitre(o); coeurs(o, 2); if (D.glou) glou(); }
+  return e;
+}
+S.deco.forEach(d => creerDeco(d));
+function bougerCompagnon(o, cible, vitesse, dt, t, haut = .06) {
+  const p = o.position, dx = cible.x - p.x, dz = cible.z - p.z, d = Math.hypot(dx, dz);
+  if (d > .15) {
+    const s = Math.min(d, vitesse * dt);
+    p.x += dx / d * s; p.z += dz / d * s;
+    o.rotation.y = angle(o.rotation.y, Math.atan2(dx, dz), .15);
+    p.y = Math.abs(Math.sin(t * 10)) * haut;
+  } else p.y = 0;
+}
+
+/* ══════════ PLUIE MAGIQUE ══════════ */
+function pleuvoir(e) {
+  if (e.occupe) return;
+  if (maintenant() < e.repos) { flotter(e.obj, '😴 Zzz…', 0); return; }
+  e.occupe = true;
+  const o = e.obj, depart = e.x0.clone(), dessus = new THREE.Vector3(-15.6, 8.5, -3.4);
+  message('🌧️ Pluie magique ! Les plantes poussent plus vite !', 'Pluie magique !');
+  animer(1.4, k => { const s = k * k * (3 - 2 * k); o.position.lerpVectors(depart, dessus, s); }, () => {
+    pluie.visible = true; pluie.position.set(dessus.x, 0, dessus.z);
+    SFX.pluie();
+    S.champs.forEach((p, i) => { if (p.c && p.t1 > maintenant()) { p.t1 = Math.max(maintenant(), p.t1 - 10000); p.t0 -= 10000; rebond(eChamps[i].obj); } });
+    sauver();
+    setTimeout(() => {
+      pluie.visible = false;
+      animer(1.6, k => { const s = k * k * (3 - 2 * k); o.position.lerpVectors(dessus, depart, s); }, () => { e.occupe = false; e.repos = maintenant() + 25000; });
+    }, 2600);
+  });
+}
+function secouerArbre(e, force) {
+  if (!force && maintenant() < e.secoue) return;
+  e.secoue = maintenant() + 6000;
+  secouer(e.obj); SFX.feuilles();
+  coeurs(e.obj, 2.6, ['🍃', '🍂', '🍎']);
+  if (maintenant() > e.prochainePiece && Math.random() < .3) {
+    e.prochainePiece = maintenant() + 20000;
+    S.pieces += 1; sauver();
+    setTimeout(() => { SFX.piece(); flotter(e.obj, '+1 🪙', 2.5); versHud('🪙', e.obj, 2.5, '#bourse'); }, 300);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   LE CULTIVATEUR — il sème les champs vides, récolte ce dont les
+   bêtes ont besoin et le porte aux auges ; s'il lui reste quelque
+   chose sur le dos, il le vend à la grange. Il ne récolte que pour
+   les bêtes : le reste des champs est laissé aux commandes de l'enfant.
+   ══════════════════════════════════════════════════════════ */
+const F = { porte: [], trajet: null, tache: null, attente: 1, cadence: 0, phase: 0, sig: '' };
+/* une auge a-t-elle besoin de cette culture (en comptant ce qu'il porte déjà) ? */
+function aBesoinDe(k) {
+  return Object.entries(ENCLOS).some(([id, E]) => ANIMAUX[E.espece].mange === k && S.animaux.some(a => a.esp === E.espece)
+    && S.auges[id] + F.porte.filter(x => x === k).length < 4);
+}
+function fermierVers(x, z, tache) {
+  const ch = trouverChemin(fermier.position.x, fermier.position.z, x, z);
+  if (!ch) { F.attente = 2; F.tache = null; return; }
+  F.trajet = ch; F.tache = tache;
+}
+function hautPileFermier() { return fermier.userData.pile.localToWorld(new THREE.Vector3(0, F.porte.length * .27 + .2, 0)); }
+function penserFermier() {
+  const now = maintenant(), p = fermier.position;
+  if (F.porte.length) {
+    for (const [id, E] of Object.entries(ENCLOS)) {
+      if (F.porte.includes(ANIMAUX[E.espece].mange) && S.animaux.some(a => a.esp === E.espece) && S.auges[id] < AUGE_MAX) {
+        const [x, z] = dehors(E, E.auge[0], E.auge[1]);
+        return fermierVers(x, z, { type: 'auge', id });
+      }
+    }
+    return fermierVers(VENTE[0], VENTE[1], { type: 'vente' });
+  }
+  const dist = i => Math.hypot(POS_CHAMPS[i][0] - p.x, POS_CHAMPS[i][1] - p.z);
+  const proche = l => l.sort((a, b) => dist(a) - dist(b))[0];
+  const champs = [];
+  for (let i = 0; i < S.champsAchetes; i++) champs.push(i);
+  const vides = champs.filter(i => !S.champs[i].c && S.niveau >= CULTURES[S.champs[i].prevu || 'ble'].niv);
+  if (vides.length) { const i = proche(vides); return fermierVers(POS_CHAMPS[i][0], POS_CHAMPS[i][1], { type: 'semer', i }); }
+  const murs = champs.filter(i => S.champs[i].c && now >= S.champs[i].t1 && aBesoinDe(S.champs[i].c));
+  if (murs.length) { const i = proche(murs); return fermierVers(POS_CHAMPS[i][0], POS_CHAMPS[i][1], { type: 'recolter', i }); }
+  F.attente = rand(2, 4);
+  fermierVers(FERMIER.repos[0] + rand(-1.5, 1.5), FERMIER.repos[1] + rand(-.4, .4), null);
+}
+/* une étape du travail en cours ; false = travail terminé */
+function faireTache() {
+  const T = F.tache;
+  if (T.type === 'semer') { const c = S.champs[T.i]; if (!c.c) planter(T.i, c.prevu || 'ble'); return false; }
+  if (T.type === 'recolter') {
+    const c = S.champs[T.i];
+    if (!c.c || maintenant() < c.t1 || F.porte.length >= FERMIER.porte || !aBesoinDe(c.c)) return false;
+    const [fx, fz] = POS_CHAMPS[T.i], k = cueillir(T.i);
+    F.porte.push(k);
+    lancer(fabMini(k), pos3(fx + rand(-.8, .8), fz + rand(-.8, .8), .8), hautPileFermier, .38);
+    return true;
+  }
+  if (T.type === 'auge') {
+    const E = ENCLOS[T.id], k = ANIMAUX[E.espece].mange, i = F.porte.lastIndexOf(k);
+    if (i < 0 || S.auges[T.id] >= AUGE_MAX) return false;
+    F.porte.splice(i, 1); S.auges[T.id]++; sauver();
+    lancer(fabMini(k), hautPileFermier(), () => pos3(E.auge[0], E.auge[1], .5), .38);
+    return true;
+  }
+  if (T.type === 'vente') {
+    if (!F.porte.length) return false;
+    const k = F.porte.pop();
+    S.pieces += ITEMS[k].val; sauver();
+    lancer(fabMini(k), hautPileFermier(), () => pos3(VENTE[0], VENTE[1] - 1.6, 1.2), .38);
+    flotter(padVente, '+' + ITEMS[k].val + ' 🪙', 1.2);
+    return true;
+  }
+  return false;
+}
+function majFermier(dt) {
+  if (!S.fermier) return;
+  const p = fermier.position, u = fermier.userData;
+  let marche = false;
+  if (F.trajet && F.trajet.length) {
+    const [wx, wz] = F.trajet[0], dx = wx - p.x, dz = wz - p.z, d = Math.hypot(dx, dz);
+    if (d < .15) F.trajet.shift();
+    else {
+      const s = Math.min(d, FERMIER.vitesse * dt);
+      p.x += dx / d * s; p.z += dz / d * s;
+      fermier.rotation.y = angle(fermier.rotation.y, Math.atan2(dx, dz), .2);
+      marche = true;
+    }
+  } else if (F.tache) {
+    F.cadence -= dt;
+    if (F.cadence <= 0) { F.cadence = .2; if (!faireTache()) F.tache = null; }
+  } else if (F.attente > 0) F.attente -= dt;
+  else penserFermier();
+  if (marche) F.phase += dt * 10;
+  const a = marche ? Math.sin(F.phase) : 0;
+  u.jg.rotation.x = a * .7; u.jd.rotation.x = -a * .7; u.bg.rotation.x = -a * .6; u.bd.rotation.x = a * .6;
+  u.corps.position.y = marche ? Math.abs(Math.cos(F.phase)) * .08 : 0;
+  const sig = F.porte.join(',');
+  if (sig !== F.sig) {
+    F.sig = sig;
+    const g = u.pile;
+    while (g.children.length) g.remove(g.children[0]);
+    F.porte.forEach((k, i) => { const m = fabMini(k); m.position.y = i * .27 + .12; g.add(m); });
+  }
+}
+
+/* ── les stands transforment un produit à la fois ── */
+function majTravailAteliers(dt) {
+  const now = maintenant();
+  for (const [id, A] of Object.entries(ATELIERS)) {
+    const T = S.ateliers[id], e = eAteliers[id];
+    if (!T.achete) continue;
+    if (T.fin && now >= T.fin) { T.fin = 0; T.sortie++; sauver(); rebond(e.obj); SFX.pop(); }
+    if (!T.fin && T.entree > 0 && T.sortie < SORTIE_MAX) { T.entree--; T.fin = now + A.duree * 1000; sauver(); }
+    const u = e.obj.userData;
+    if (T.fin) u.anim.rotation[u.axe] += dt * 6;
+    const n = Math.min(T.sortie, 6), sig = n + '';
+    if (sig !== e.sig) {
+      e.sig = sig;
+      const g = u.plateau;
+      while (g.children.length) g.remove(g.children[0]);
+      for (let i = 0; i < n; i++) { const m = fabMini(A.sortie); m.position.set((i % 3 - 1) * .35, Math.floor(i / 3) * .25 + .1, 0); g.add(m); }
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   L'AIDE — une flèche montre quoi faire, Roullieee le dit
+   ══════════════════════════════════════════════════════════ */
+const fleche = fabFleche(); fleche.visible = false; scene.add(fleche);
+let flecheJusqua = 0, flecheX = 0, flecheZ = 0;
+function conseil() {
+  const t = maintenant(), c = S.commande;
+  if (c && !eCamion.parti && c.items.some(i => i.fait < i.n && S.porte.includes(i.k)))
+    return { t: 'Amène ' + c.items.filter(i => i.fait < i.n && S.porte.includes(i.k)).map(i => ITEMS[i.k].e).join(' ') + ' derrière le camion !', x: ZONE_CAMION[0], z: ZONE_CAMION[1] };
+  for (const [id, A] of Object.entries(ATELIERS)) {
+    const T = S.ateliers[id];
+    if (!T.achete) continue;
+    if (T.sortie && !plein()) return { t: `Des ${ITEMS[A.sortie].e} sont prêts ! Va les chercher ${A.a}.`, x: A.x, z: A.z + 2.6 };
+    if (S.porte.includes(A.entree) && T.entree < ENTREE_MAX) return { t: `Apporte ${ITEMS[A.entree].e} ${A.a} pour faire des ${ITEMS[A.sortie].e} !`, x: A.x, z: A.z + 2.6 };
+  }
+  for (const [id, E] of Object.entries(ENCLOS)) {
+    const K = ANIMAUX[E.espece];
+    if (S.caisses[id] && !plein()) return { t: `Ramasse les ${ITEMS[K.donne].e} dans la caisse !`, x: E.caisse[0], z: dehors(E, E.caisse[0], E.caisse[1])[1] };
+    if (S.porte.includes(K.mange) && S.auges[id] < 2 && S.animaux.some(a => a.esp === E.espece && !a.pret))
+      return { t: `Donne le ${ITEMS[K.mange].e} à manger : va à l’auge de ${K.les} !`, x: E.auge[0], z: dehors(E, E.auge[0], E.auge[1])[1] };
+  }
+  if (plein()) return { t: 'Ton panier est plein ! Vends à la grange 🪙', x: VENTE[0], z: VENTE[1] };
+  const mur = S.champs.findIndex((p, i) => i < S.champsAchetes && p.c && t >= p.t1);
+  if (mur >= 0) return { t: 'Marche dans le champ pour récolter ' + CULTURES[S.champs[mur].c].e + ' !', x: POS_CHAMPS[mur][0], z: POS_CHAMPS[mur][1] };
+  const faim = Object.entries(ENCLOS).find(([id, E]) => S.animaux.some(a => a.esp === E.espece && !a.pret) && !S.auges[id]);
+  if (faim) {
+    const K = ANIMAUX[faim[1].espece], C = CULTURES[K.mange], Les = K.les.replace(/^l/, 'L');
+    /* aucun champ ne fait pousser leur nourriture : il faut en prévoir un */
+    const prevu = S.champs.some((p, i) => i < S.champsAchetes && (p.prevu === K.mange || p.c === K.mange));
+    if (!prevu && !S.porte.includes(K.mange)) return { t: `${Les} ont faim ! Touche le bouton 🌱 Champs et mets ${C.du} ${C.e} dans un champ.`, x: POS_CHAMPS[0][0], z: POS_CHAMPS[0][1] };
+    const champ = S.champs.findIndex((p, i) => i < S.champsAchetes && !p.c && p.prevu === K.mange);
+    if (champ >= 0 && !S.porte.includes(K.mange)) return { t: `${Les} ont faim ! Marche dans le champ ${C.de} ${C.e} pour le semer.`, x: POS_CHAMPS[champ][0], z: POS_CHAMPS[champ][1] };
+  }
+  const vide = S.champs.findIndex((p, i) => i < S.champsAchetes && !p.c);
+  if (vide >= 0) return { t: 'Marche sur la terre pour semer des graines 🌱', x: POS_CHAMPS[vide][0], z: POS_CHAMPS[vide][1] };
+  for (const e of pads.values()) if (S.niveau >= e.def.niv && S.pieces >= e.def.prix - (S.pads[e.def.id] || 0))
+    return { t: `Tu peux acheter ${e.def.e} ! Arrête-toi sur le carré vert et ne bouge plus.`, x: e.def.x, z: e.def.z };
+  return { t: 'Ça pousse… Touche un nuage ☁️ pour faire pleuvoir !', x: nuages[0].obj.position.x, z: -22 };
+}
+function aide(parle) {
+  const c = conseil();
+  if (parle) parler(c.t); else message('💡 ' + c.t);
+  flecheX = c.x; flecheZ = c.z; flecheJusqua = maintenant() + 9000; fleche.visible = true;
+}
+
+/* ══════════════════════════════════════════════════════════
+   FENÊTRES : niveau, réglages, mode d'emploi
+   ══════════════════════════════════════════════════════════ */
+function ouvrirFenetre(titre, html) { $('#mTitre').textContent = titre; $('#mCorps').innerHTML = html; $('#modal').classList.remove('cache'); fermerParole(); arreterJoy(); }
+function fermerFenetre() { $('#modal').classList.add('cache'); }
+$('#mX').onclick = () => { SFX.pop(); fermerFenetre(); };
+$('#modal').addEventListener('pointerup', ev => { if (ev.target.id === 'modal') fermerFenetre(); });
+function fenetreNiveau(n) {
+  SFX.niveau(); glou(); confettis(90); vibrer(60);
+  const nv = NOUVEAUTES[n] || [];
+  ouvrirFenetre('Niveau ' + n + ' !', `<div class="centre"><div class="grosse-etoile">⭐</div><p style="font-size:22px;font-weight:700;margin:6px 0">Bravo ! Tu passes au niveau ${n} !</p>` +
+    (nv.length ? `<div class="debloque">${nv.map(([e, t]) => `<div><span class="em">${e}</span>${t}</div>`).join('')}</div>` : '') +
+    `<p style="font-size:20px;font-weight:700">Cadeau : +${10 * n} 🪙</p><button class="btn jaune" id="super" style="font-size:24px;padding:10px 40px">Super ! 🎉</button></div>`);
+  $('#super').onclick = fermerFenetre;
+  dire('Bravo ! Niveau ' + n + ' !');
+  syncPads(); majHud();
+}
+function fenetreReglages() {
+  ouvrirFenetre('⚙️ Réglages', `<div class="centre" style="display:flex;flex-direction:column;gap:12px;align-items:center">
+    <button class="btn jaune" id="rAide">❓ Comment on joue ?</button>
+    <button class="btn jaune" id="rMus">🎵 Musique : ${S.musique ? 'oui' : 'non'}</button>
+    <button class="btn jaune" id="rSon">🔊 Sons : ${S.son ? 'oui' : 'non'}</button>
+    <button class="btn rouge" id="rRaz">🔄 Recommencer la ferme</button>
+    <a href="${BASE}index.html" style="font-weight:700;color:#c2410c;font-size:18px">← Retour au Royaume de Roullieee</a></div>`);
+  $('#rAide').onclick = fenetreModeEmploi;
+  $('#rMus').onclick = () => { basculerMusique(); fenetreReglages(); };
+  $('#rSon').onclick = () => { basculerSon(); fenetreReglages(); };
+  let sur = false;
+  $('#rRaz').onclick = function () {
+    if (!sur) { sur = true; this.textContent = '⚠️ Touche encore pour tout effacer'; return; }
+    try { localStorage.removeItem(CLE); } catch (e) {}
+    gele = true; clearTimeout(attenteSauve); location.reload();
+  };
+}
+function fenetreModeEmploi() {
+  ouvrirFenetre('Comment on joue ?', `<div class="aide-liste">
+    <span class="em">👆</span><span>Glisse ton doigt pour faire marcher Roullieee, ou touche l’endroit où elle doit aller.</span>
+    <span class="em">🌾</span><span>Marche dans un champ mûr : la récolte s’empile sur son dos. Sur la terre vide, elle sème ce qu’indique le petit panneau.</span>
+    <span class="em">🌱</span><span>Bouton Champs : touche chaque champ pour choisir blé, maïs ou carottes.</span>
+    <span class="em">🐔</span><span>Passe à l’auge avec la bonne nourriture. Les bêtes mangent puis remplissent la caisse.</span>
+    <span class="em">🚚</span><span>Passe derrière le camion : il prend ce que la commande demande. Commande finie = des pièces !</span>
+    <span class="em">🟩</span><span>Arrête-toi sur un carré vert et ne bouge plus ⏳ : les pièces coulent dedans et tu achètes des animaux, des champs, des décorations. Chaque nouvel animal coûte un peu plus cher.</span>
+    <span class="em">🥣</span><span>Les stands : apporte le lait 🥛 à la yaourterie et la laine 🧶 à l’atelier, puis reviens chercher les yaourts et les pulls. Ils rapportent beaucoup !</span>
+    <span class="em">👨‍🌾</span><span>Le cultivateur (à recruter près de la grange) sème les champs, récolte et remplit les auges des bêtes tout seul.</span>
+    <span class="em">💡</span><span>Perdu ? Touche le bouton Aide : une flèche te montre où aller.</span></div>`);
+}
+function basculerMusique() { S.musique = !S.musique; majMusique(); majHud(); sauver(); }
+function basculerSon() { S.son = !S.son; if (!S.son && window.speechSynthesis) speechSynthesis.cancel(); majHud(); sauver(); }
+$('#bMusique').onclick = basculerMusique;
+$('#bSon').onclick = basculerSon;
+$('#bReglages').onclick = () => { SFX.pop(); fenetreReglages(); };
+$('#bAide').onclick = () => { ac(); SFX.pop(); aide(true); };
+/* toucher la commande en haut de l'écran : Roullieee file au camion */
+$('#cmd').onclick = () => { ac(); if (!eCamion.parti) allerVers(ZONE_CAMION[0], ZONE_CAMION[1]); };
+/* ── « Mes champs » : un plan des 9 champs, vu comme sur l'île.
+   Toucher un champ fait tourner sa culture (blé → maïs → carotte) ;
+   on règle ainsi 3 champs de blé, 2 de maïs, 1 de carottes en 6 touchers.
+   La culture choisie est semée la prochaine fois que Roullieee passe
+   sur la terre vide ; ce qui pousse déjà continue de pousser. ── */
+function fenetreChamps() {
+  const ok = Object.keys(CULTURES).filter(c => CULTURES[c].niv <= S.niveau);
+  let h = '<p class="centre" style="font-weight:600;margin:0 0 12px;font-size:18px">Touche un champ pour changer ce qui y pousse 🌱</p><div class="plan">';
+  /* même disposition que sur l'île : 3 colonnes, puis la 4e (champs 10 à 12) */
+  [0, 1, 2, 9, 3, 4, 5, 10, 6, 7, 8, 11].forEach(i => {
+    if (i >= S.champsAchetes) { h += '<div class="parcelle verrou"><span class="em">🔒</span></div>'; return; }
+    const p = S.champs[i], prevu = p.prevu || 'ble';
+    h += `<button class="parcelle" data-i="${i}" aria-label="Champ ${i + 1} : ${CULTURES[prevu].nom}"><span class="em">${CULTURES[prevu].e}</span>${CULTURES[prevu].nom}` +
+      (p.c && p.c !== prevu ? `<span class="encore">${CULTURES[p.c].e}</span>` : '') + '</button>';
+  });
+  h += '</div><div class="rapides">' + ok.map(c => `<button class="btn jaune" data-tout="${c}">Tout en ${CULTURES[c].e}</button>`).join('') + '</div>';
+  const bientot = Object.keys(CULTURES).filter(c => CULTURES[c].niv > S.niveau);
+  if (bientot.length) h += '<p class="centre" style="color:#7c4a1d;font-weight:600;margin:12px 0 0">' + bientot.map(c => `🔒 ${CULTURES[c].e} au niveau ${CULTURES[c].niv}`).join(' · ') + '</p>';
+  ouvrirFenetre('🌱 Mes champs', h);
+  document.querySelectorAll('#mCorps [data-i]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.i, p = S.champs[i];
+    p.prevu = ok[(ok.indexOf(p.prevu || 'ble') + 1) % ok.length];
+    majEtiquette(eChamps[i]); rebond(eChamps[i].obj);
+    SFX.pop(); sauver();
+    fenetreChamps();
+  });
+  document.querySelectorAll('#mCorps [data-tout]').forEach(b => b.onclick = () => {
+    const c = b.dataset.tout;
+    for (let i = 0; i < S.champsAchetes; i++) { S.champs[i].prevu = c; majEtiquette(eChamps[i]); }
+    SFX.plop(); sauver();
+    fenetreChamps();
+  });
+}
+$('#bChamps').onclick = () => { ac(); SFX.pop(); fenetreChamps(); };
+
+/* ══════════════════════════════════════════════════════════
+   LA BOUCLE
+   ══════════════════════════════════════════════════════════ */
+const AVANT = new THREE.Vector3(), DROITE = new THREE.Vector3(), DIR = new THREE.Vector3();
+let tPrec = performance.now(), tLent = 0, immobileDepuis = maintenant(), derniereAideAuto = 0, phasePas = 0, vitesseJoueur = 0;
+function deplacerJoueur(dt, t) {
+  const p = joueur.position, u = joueur.userData;
+  DIR.set(0, 0, 0);
+  let vitesse = 6.5;
+  /* joystick ou clavier */
+  let jx = joy.dx, jy = joy.dy;
+  if (touches.has('arrowleft') || touches.has('q') || touches.has('a')) jx = -1;
+  if (touches.has('arrowright') || touches.has('d')) jx = 1;
+  if (touches.has('arrowup') || touches.has('z') || touches.has('w')) jy = -1;
+  if (touches.has('arrowdown') || touches.has('s')) jy = 1;
+  const force = Math.min(1, Math.hypot(jx, jy));
+  if (force > .15) {
+    trajet = null; quandArrive = null;
+    AVANT.set(-Math.sin(cam.lacet), 0, -Math.cos(cam.lacet));
+    DROITE.set(Math.cos(cam.lacet), 0, -Math.sin(cam.lacet));
+    DIR.copy(DROITE).multiplyScalar(jx).addScaledVector(AVANT, -jy).normalize();
+    vitesse *= Math.max(.45, force);
+  } else if (trajet && trajet.length) {
+    const [wx, wz] = trajet[0], dx = wx - p.x, dz = wz - p.z, d = Math.hypot(dx, dz);
+    if (d < .18) {
+      trajet.shift();
+      if (!trajet.length) { trajet = null; const f = quandArrive; quandArrive = null; f && f(); }
+    } else DIR.set(dx / d, 0, dz / d);
+  }
+  let bouge = 0;
+  if (DIR.lengthSq() > 0) {
+    const pas = vitesse * dt, nx = p.x + DIR.x * pas, nz = p.z + DIR.z * pas;
+    /* on glisse le long des obstacles au lieu de rester collé */
+    if (libre(nx, nz)) { p.x = nx; p.z = nz; bouge = pas; }
+    else if (libre(nx, p.z)) { p.x = nx; bouge = pas * .7; }
+    else if (libre(p.x, nz)) { p.z = nz; bouge = pas * .7; }
+    else if (trajet) { trajet = null; quandArrive = null; }
+    joueur.rotation.y = angle(joueur.rotation.y, Math.atan2(DIR.x, DIR.z), .25);
+  }
+  /* marche : jambes, bras, petit rebond, la pile qui tangue */
+  vitesseJoueur = bouge / Math.max(dt, .001);
+  const marche = vitesseJoueur > .5;
+  if (marche) {
+    immobileDepuis = maintenant();
+    const avant = phasePas;
+    phasePas += dt * 11;
+    if (Math.floor(avant / Math.PI) !== Math.floor(phasePas / Math.PI)) SFX.pas();
+  }
+  const a = marche ? Math.sin(phasePas) : 0;
+  u.jg.rotation.x = a * .7; u.jd.rotation.x = -a * .7;
+  u.bg.rotation.x = -a * .6; u.bd.rotation.x = a * .6;
+  u.corps.position.y = marche ? Math.abs(Math.cos(phasePas)) * .1 : 0;
+  pileGroupe.rotation.x += ((marche ? -.08 : 0) + Math.sin(t * 9) * (marche ? .03 : .008) - pileGroupe.rotation.x) * .2;
+}
+function boucle(tms) {
+  requestAnimationFrame(boucle);
+  const dt = Math.min(.05, (tms - tPrec) / 1000);
+  tPrec = tms; horloge += dt;
+  const t = horloge, now = maintenant();
+
+  for (let i = anims.length - 1; i >= 0; i--) {
+    const a = anims[i], k = Math.min(1, (horloge - a.t0) / a.duree);
+    a.f(k);
+    if (k >= 1) { anims.splice(i, 1); a.fin && a.fin(); }
+  }
+  if (!$('#titre').classList.contains('cache') || !$('#modal').classList.contains('cache')) arreterJoyClavier();
+  deplacerJoueur(dt, t);
+  zones(dt);
+  majFermier(dt);
+  majTravailAteliers(dt);
+  /* la caméra suit Roullieee en douceur */
+  cam.cible.lerp(tmpV.set(joueur.position.x, 0, joueur.position.z), 1 - Math.exp(-dt * 5));
+  placerCamera();
+  /* la dinde suit Roullieee, Médor suit la dinde */
+  const derriere = new THREE.Vector3(-Math.sin(joueur.rotation.y) * 1.5, 0, -Math.cos(joueur.rotation.y) * 1.5).add(joueur.position);
+  if (dinde.position.distanceTo(derriere) > .6) bougerCompagnon(dinde, derriere, 6.5, dt, t, .15);
+  dinde.children[0].userData.eventail.rotation.z = Math.sin(t * 1.5) * .1;
+
+  for (const e of entites) {
+    if (e.type === 'bete') bougerBete(e, dt, t);
+    else if (e.type === 'champ' && e.plantes) {
+      const p = S.champs[e.i];
+      const k = clamp((now - p.t0) / (p.t1 - p.t0), 0, 1);
+      e.plantes.scale.y = .12 + .88 * k;
+      if (k >= 1 && !e.mur) { e.mur = true; e.tetes.forEach(m => m.material = mat(COULEUR_MUR[p.c])); rebond(e.obj); }
+      if (e.mur) e.plantes.rotation.z = Math.sin(t * 2 + e.i) * .025;
+    } else if (e.type === 'deco') {
+      const u = e.obj.userData;
+      if (e.D.suit) {
+        const cible = new THREE.Vector3(-Math.sin(dinde.rotation.y) * 1.3, 0, -Math.cos(dinde.rotation.y) * 1.3).add(dinde.position);
+        if (e.obj.position.distanceTo(cible) > .7) bougerCompagnon(e.obj, cible, 6.5, dt, t);
+      } else if (e.D.promene) {
+        if (e.attente > 0) e.attente -= dt;
+        else if (e.obj.position.distanceTo(e.cible) < .2) { e.attente = rand(2, 6); e.cible.set(clamp(e.maison.x + rand(-3, 3), -26, 26), 0, clamp(e.maison.z + rand(-3, 3), -19, 19)); }
+        else bougerCompagnon(e.obj, e.cible, 1.1, dt, t);
+      }
+      if (u.queue) u.queue.rotation.z = Math.sin(t * 8) * .4;
+      if (u.ballons) u.ballons.forEach((b, i) => { b.position.y += Math.sin(t * 1.5 + i) * .002; });
+      if (u.eventail) u.eventail.rotation.z = Math.sin(t * 2) * .08;
+      if (u.gouttes) u.gouttes.forEach(g => { const k = (t * .8 + g.userData.t) % 1; g.position.set(Math.cos(g.userData.a) * k * .9, 2.2 + Math.sin(k * Math.PI) * .6 - k * 1.5, Math.sin(g.userData.a) * k * .9); });
+    } else if (e.type === 'arbre') {
+      if (Math.hypot(joueur.position.x - e.obj.position.x, joueur.position.z - e.obj.position.z) < 1.8) secouerArbre(e);
+    }
+  }
+  /* contenu des auges et des caisses */
+  for (const [id, e] of Object.entries(eAuges)) {
+    const n = Math.min(S.auges[id], 6), sig = n + '';
+    if (sig !== e.sig) { e.sig = sig; while (e.contenu.children.length) e.contenu.remove(e.contenu.children[0]); for (let i = 0; i < n; i++) { const m = fabMini(e.K.mange); m.position.set(-.55 + (i % 3) * .55, Math.floor(i / 3) * .2, 0); e.contenu.add(m); } }
+  }
+  for (const [id, e] of Object.entries(eCaisses)) {
+    const n = Math.min(S.caisses[id], 9), sig = n + '';
+    if (sig !== e.sig) { e.sig = sig; while (e.contenu.children.length) e.contenu.remove(e.contenu.children[0]); for (let i = 0; i < n; i++) { const m = fabMini(e.K.donne); m.position.set(-.35 + (i % 3) * .35, Math.floor(i / 3) * .22, (i % 2) * .2 - .1); e.contenu.add(m); } }
+  }
+  /* moulin, fumée, canards, tracteur, nuages, papillons */
+  eMoulin.vitesse += (.6 - eMoulin.vitesse) * dt * .5;
+  moulin.userData.pales.rotation.z -= eMoulin.vitesse * dt;
+  maison.userData.fumee.forEach(s => {
+    const v = s.userData.vite || 1;
+    s.userData.t = (s.userData.t + dt * .25 * v) % 1;
+    if (v > 1) s.userData.vite = Math.max(1, v - dt * 1.5);
+    const k = s.userData.t;
+    s.position.set(1.4 + Math.sin(k * 5) * .2, 5.5 + k * 3, -.6 - k * .5); s.scale.setScalar(.4 + k * 1.1); s.material.opacity = .85 * (1 - k);
+  });
+  canards.forEach(c => {
+    const a = t * .35 + c.phase;
+    c.obj.position.x = MARE[0] + Math.cos(a) * c.r; c.obj.position.z = MARE[1] + Math.sin(a) * c.r * .7; c.obj.rotation.y = -a;
+    if (c.obj.position.y < .1) c.obj.position.y = .08 + Math.sin(t * 3 + c.phase) * .03;
+  });
+  /* le tracteur s'arrête pour laisser passer Roullieee */
+  const et = eTracteur, prochePlayer = tracteur.position.distanceTo(joueur.position) < 3;
+  if (prochePlayer) { if (!et.klaxonne) { et.klaxonne = true; SFX.klaxon(); } }
+  else {
+    et.klaxonne = false;
+    tracteur.position.x += et.sens * 2.2 * dt;
+    if (Math.abs(tracteur.position.x) > 25) { et.sens *= -1; tracteur.position.x = clamp(tracteur.position.x, -25, 25); }
+    tracteur.userData.roues.forEach(r => r.rotation.x += et.sens * dt * 4);
+  }
+  tracteur.rotation.y = angle(tracteur.rotation.y, et.sens > 0 ? Math.PI / 2 : -Math.PI / 2, .05);
+  for (const n of nuages) if (!n.occupe) n.obj.position.x = n.x0.x + Math.sin(t * .1 + n.x0.z) * 3;
+  if (pluie.visible) pluie.children.forEach(g => { g.position.y -= dt * 14; if (g.position.y < 0) g.position.y = 7.5; });
+  papillons.forEach(p => {
+    const u = p.userData;
+    p.position.set(u.cx + Math.sin(t * .5 + u.ph) * 4, 1.5 + Math.sin(t * 2 + u.ph) * .4, u.cz + Math.sin(t * .7 + u.ph * 2) * 3);
+    p.rotation.y = t * .5 + u.ph; u.l.rotation.z = Math.sin(t * 18) * .9; u.r.rotation.z = -Math.sin(t * 18) * .9;
+  });
+  ecume.scale.setScalar(1 + Math.sin(t * 1.2) * .012);
+  /* flèche d'aide */
+  if (fleche.visible) {
+    fleche.position.set(flecheX, 3 + Math.abs(Math.sin(t * 4)) * .7, flecheZ);
+    fleche.rotation.y = t * 2;
+    if (now > flecheJusqua || Math.hypot(joueur.position.x - flecheX, joueur.position.z - flecheZ) < 1.5) fleche.visible = false;
+  }
+  /* un enfant immobile depuis un moment reçoit un coup de pouce */
+  if ($('#titre').classList.contains('cache') && $('#modal').classList.contains('cache') && now - immobileDepuis > 12000 && now - derniereAideAuto > 25000) {
+    derniereAideAuto = now; aide(true);
+  }
+
+  renderer.render(scene, camera);
+  majBulles();
+  majPile();
+  tLent += dt;
+  if (tLent > .25) { tLent = 0; majPieces(); majHud(); }
+}
+function arreterJoyClavier() { if (joy.actif) arreterJoy(); touches.clear(); }
+syncPads();
+requestAnimationFrame(boucle);
+
+/* ══════════ DÉMARRAGE ══════════ */
+majHud();
+$('#pieces').textContent = S.pieces;
+$('#charge').textContent = '';
+$('#jouer').disabled = false;
+$('#jouer').onclick = () => {
+  ac();
+  Object.values(banque).forEach(b => amorcer(b.a));
+  amorcer(glouA);
+  $('#titre').classList.add('cache');
+  $('#hud').classList.remove('cache');
+  majMusique();
+  SFX.achat();
+  immobileDepuis = maintenant();
+  derniereAideAuto = maintenant();
+  setTimeout(() => {
+    parler('Bonjour ! Glisse ton doigt pour me faire marcher. Va dans le champ de blé pour récolter !');
+    flecheX = POS_CHAMPS[0][0]; flecheZ = POS_CHAMPS[0][1]; flecheJusqua = maintenant() + 10000; fleche.visible = true;
+  }, 600);
+};
+</script>
+</body>
+</html>
