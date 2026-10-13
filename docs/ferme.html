@@ -84,6 +84,12 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
 .rond.vibre,.vibre{animation:vibre .45s}
 @keyframes vibre{0%,100%{transform:scale(1)}40%{transform:scale(1.18)}70%{transform:scale(.95)}}
 @media (max-width:560px){
+  /* téléphone : la caméra est plus loin, les bulles plus petites pour ne pas se chevaucher */
+  .bulle .in{min-width:38px;height:38px;padding:0 6px;font-size:20px;border-width:2px}
+  .bulle .in small{font-size:13px}
+  .bulle.pad .in,.bulle.faim .in{font-size:18px}
+  .bulle.lock .in,.bulle.vente .in,.bulle.info .in,.bulle.plein .in{font-size:15px;height:34px}
+  .bulle.cmd .in{font-size:17px;min-height:38px;padding:2px 7px}
   .rond{width:70px;height:70px;font-size:32px}
   .pieces{font-size:20px;height:44px}
   .petit{width:44px;height:44px;font-size:21px}
@@ -250,11 +256,12 @@ const ATELIERS = {
 };
 const ENTREE_MAX = 6, SORTIE_MAX = 8;
 /* le cultivateur : un aide qu'on recrute */
-const FERMIER = { prix: 150, niv: 2, pad: [-14.6, -11.4], repos: [-14.6, -10.6], porte: 4, vitesse: 4.5 };
-/* l'étal, à gauche du camion : on y pose les produits de la ferme et
-   chaque camion qui arrive s'y sert tout seul. Les récoltes des champs
+const FERMIER = { prix: 150, niv: 2, pad: [-24.8, -14.6], repos: [-23.4, -13.2], porte: 4, vitesse: 4.5 };
+/* l'étal, en bas à gauche du camion (assez loin pour que sa bulle ne
+   cache pas la commande du camion) : on y pose les produits de la ferme
+   et chaque camion qui arrive s'y sert tout seul. Les récoltes des champs
    n'y vont pas : elles restent pour nourrir les bêtes. */
-const ETAL = { prix: 125, niv: 2, x: -24.8, z: 12.4, zone: [-22.3, 12.4] };
+const ETAL = { prix: 125, niv: 2, x: -26.5, z: 15.5, zone: [-24, 15.5] };
 const ETAL_PRODUITS = ['oeuf', 'lait', 'truffe', 'laine', 'yaourt', 'pull'];
 const ETAL_MAX = 6;   /* par produit */
 const CULTURES = {
@@ -282,9 +289,9 @@ const AUGE_MAX = 8, CAISSE_MAX = 12;
 const PALIERS = [0, 100, 280, 560, 1000, 1600, 2450, 3550, 5000, 6900];
 function palier(i) { return i < PALIERS.length ? PALIERS[i] : PALIERS[PALIERS.length - 1] + (i - PALIERS.length + 1) * 2200; }
 const NOUVEAUTES = {
-  2: [['🌽', 'Maïs'], ['🐄', 'Vaches'], ['👨‍🌾', 'Cultivateur'], ['🏪', 'Étal']],
+  2: [['🌽', 'Maïs'], ['🐄', 'Vaches'], ['👨‍🌾', 'Cultivateur'], ['🏪', 'Étal'], ['👟', 'Bottes bleues']],
   3: [['🥕', 'Carottes'], ['🐖', 'Cochons'], ['🥣', 'Yaourterie']],
-  4: [['🐑', 'Moutons'], ['🧥', 'Atelier de pulls'], ['🌈', 'Arc-en-ciel']],
+  4: [['🐑', 'Moutons'], ['🧥', 'Atelier de pulls'], ['🌈', 'Arc-en-ciel'], ['👟', 'Bottes dorées']],
   5: [['🦃', 'Statue Dindromakus']]
 };
 /* prix des champs 7 à 12 (les 6 premiers sont offerts) */
@@ -311,10 +318,14 @@ const DECOS = [
   { id: 'dindo',    e: '🦃', nom: 'Dindromakus', prix: 250, niv: 5, faire: () => fabStatue(), glou: true }
 ];
 const SPOTS_DECO = [[-10.4, -16.6], [21.45, -16.1], [-0.4, 17.9], [13, 17.2],
-  [24, 17.4], [-15, 17.4], [-25.6, 17.6], [11.8, -12], [26.8, -13.8], [-1.6, -4.2]];
+  [24, 17.4], [-15, 17.4], [-29.8, 16], [11.8, -12], [26.8, -13.8], [-1.6, -4.2]];
 const CLIENTS = [['👵', 'Mamie Jo'], ['👨‍🍳', 'Le boulanger'], ['👧', 'Lila'], ['👴', 'Papi Marcel'], ['👩‍🏫', 'La maîtresse'], ['🧒', 'Léo'], ['👩‍🌾', 'La voisine']];
-const VENTE = [-18.2, -11.6];     /* carré de vente devant la grange */
+const VENTE = [-18.2, -15.4];     /* carré de vente devant la grange (reculée : sa bulle passe au-dessus de celles des champs) */
 const PAD_PANIER = [-27, -3.4];   /* carré « panier plus grand » */
+/* les bottes de Roullieee : chaque paire la fait marcher plus vite */
+const PAD_BOTTES = [-27.5, 1.2];
+const VITESSES = [6.5, 7.5, 8.5, 9.5];
+const BOTTES = [{ prix: 75, niv: 1, couleur: '#ef4444' }, { prix: 160, niv: 2, couleur: '#3b82f6' }, { prix: 300, niv: 4, couleur: '#ffd23f' }];
 const ZONE_CAMION = [-19.5, 9.2]; /* derrière le camion : là où l'on envoie Roullieee */
 const DEPART = [-6.5, -3.9];
 
@@ -322,7 +333,7 @@ const DEPART = [-6.5, -3.9];
 function etatNeuf() {
   const t = maintenant();
   return {
-    v: 1, pieces: 10, xp: 0, niveau: 1, prochainId: 10, capacite: 6, graine: 'ble',
+    v: 1, pieces: 10, xp: 0, niveau: 1, prochainId: 10, capacite: 6, graine: 'ble', bottes: 0,
     porte: [],
     /* prevu : ce qu'on sème dans ce champ (choisi par l'enfant, bouton 🌱 Champs) */
     champs: Array.from({ length: NB_CHAMPS }, (_, i) => i < 3 ? { c: 'ble', t0: t - 30000, t1: t - 1000, reste: 3, prevu: 'ble' } : { c: null, t0: 0, t1: 0, reste: 0, prevu: 'ble' }),
@@ -536,17 +547,20 @@ function dalle(w, d, r, ep, couleurs, yHaut) {
 /* ══════════ L'ÎLE ══════════ */
 const eau = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), new THREE.MeshLambertMaterial({ color: '#3ec5f0' }));
 eau.rotation.x = -Math.PI / 2; eau.position.y = -.55; eau.receiveShadow = true; scene.add(eau);
-const ecume = new THREE.Mesh(new THREE.ShapeGeometry(rectArrondi(69, 53, 13), 10), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: .35 }));
-ecume.rotation.x = -Math.PI / 2; ecume.position.y = -.52; scene.add(ecume);
-/* l'île : 60 × 44 m */
-scene.add(dalle(65, 49, 11, .8, ['#f6dca0', '#e9c27a'], -.25));
-scene.add(dalle(60, 44, 9, 1.2, ['#7ccf4f', '#8b5a2b'], 0));
-for (let i = 0; i < 40; i++) {
+/* l'île : 66 × 48 m, un peu décalée vers le nord (z de -26 à 22),
+   où la grange a reculé */
+const ILE = { cz: -2, hw: 33, hd: 24, r: 9 };
+const ecume = new THREE.Mesh(new THREE.ShapeGeometry(rectArrondi(2 * ILE.hw + 9, 2 * ILE.hd + 9, 13), 10), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: .35 }));
+ecume.rotation.x = -Math.PI / 2; ecume.position.set(0, -.52, ILE.cz); scene.add(ecume);
+const sable = dalle(2 * ILE.hw + 5, 2 * ILE.hd + 5, 11, .8, ['#f6dca0', '#e9c27a'], -.25), herbe = dalle(2 * ILE.hw, 2 * ILE.hd, ILE.r, 1.2, ['#7ccf4f', '#8b5a2b'], 0);
+sable.position.z = herbe.position.z = ILE.cz;
+scene.add(sable, herbe);
+for (let i = 0; i < 46; i++) {
   const t = new THREE.Mesh(Cy(rand(.8, 2), rand(.8, 2), .02, 7), mat(pick(['#6fc046', '#86d95a'])));
-  t.position.set(rand(-26, 26), .011, rand(-19, 19)); t.receiveShadow = true; scene.add(t);
+  t.position.set(rand(-29, 29), .011, rand(-22, 18)); t.receiveShadow = true; scene.add(t);
 }
 function chemin(x, z, w, d) { const m = P(Bx(w, .05, d), '#e2c08d', x, .03, z, true); scene.add(m); }
-chemin(0, 4.8, 55, 2.2); chemin(-19.5, 13.4, 2.4, 17.2); chemin(-3.9, -4.4, 1.6, 17); chemin(-18.2, -11.7, 1.8, 2.6);
+chemin(0, 4.8, 55, 2.2); chemin(-19.5, 13.4, 2.4, 17.2); chemin(-3.9, -4.4, 1.6, 17); chemin(-18.2, -14.2, 1.8, 4.6);
 for (let z = 22; z < 60; z += .62) scene.add(P(Bx(2.6, .16, .5), z % 2 > 1 ? '#b98552' : '#a8743f', -19.5, .02, z, true));
 for (let z = 23; z < 60; z += 4) for (const x of [-20.9, -18.1]) scene.add(P(Cy(.14, .14, 1.4, 6), '#7a4a24', x, -.3, z, true));
 
@@ -687,7 +701,12 @@ function fabStatue() {
 /* Roullieee, avec des articulations pour marcher */
 function fabRoullieee() {
   const g = new THREE.Group();
-  const jambe = s => { const p = new THREE.Group(); p.position.set(s * .14, .7, 0); p.add(P(Cy(.1, .1, .7, 6), '#1e3a8a', 0, -.35, 0), P(Bx(.17, .12, .3), '#5a3a22', 0, -.66, .05)); return p; };
+  const chaussures = [];
+  const jambe = s => {
+    const p = new THREE.Group(), c = P(Bx(.17, .12, .3), '#5a3a22', 0, -.66, .05);
+    p.position.set(s * .14, .7, 0); p.add(P(Cy(.1, .1, .7, 6), '#1e3a8a', 0, -.35, 0), c); chaussures.push(c);
+    return p;
+  };
   const jg = jambe(-1), jd = jambe(1);
   const corps = new THREE.Group();
   corps.add(P(Cy(.3, .55, 1.0, 10), '#ea580c', 0, 1.15, 0), P(Cy(.25, .3, .4, 10), '#fef3c7', 0, 1.75, 0),
@@ -704,7 +723,7 @@ function fabRoullieee() {
   const pile = new THREE.Group(); pile.position.set(0, 1.7, -.42);
   corps.add(pile);
   g.add(jg, jd, corps);
-  g.userData = { jg, jd, bg, bd, corps, pile };
+  g.userData = { jg, jd, bg, bd, corps, pile, chaussures };
   return g;
 }
 function fabTracteur() {
@@ -978,19 +997,19 @@ function poser(obj, x, z, ry = 0) { obj.position.set(x, 0, z); obj.rotation.y = 
 
 /* obstacles pour la marche (rectangles, cercles, ellipses, segments) */
 const OBST = [];
-const ARBRES = [[-26.65, -11.7, 1], [-25.35, -18.2, 0], [-12.35, -20.3, 1], [-1.3, -20.3, 0], [4.2, -20.15, 1], [12.35, -19.8, 0], [17.2, -20.15, 1], [24.7, -19, 0],
-  [28.1, -8.45, 1], [28.2, 2.9, 0], [-28.1, .65, 1], [-27.8, 8.3, 0], [-2.9, 20.3, 1], [7.8, 19.9, 0], [16.9, 20.3, 1], [-12.35, 20.15, 0]];
+const ARBRES = [[-30, -12, 1], [-27.5, -21.5, 0], [-11.4, -23.4, 1], [-1.3, -22.8, 0], [4.2, -22.6, 1], [12.35, -22.4, 0], [18, -22.8, 1], [26.5, -21.5, 0],
+  [31, -8.45, 1], [31, 2.9, 0], [-31, .65, 1], [-30.5, 8.3, 0], [-2.9, 20.3, 1], [7.8, 19.9, 0], [16.9, 20.3, 1], [-12.35, 20.15, 0]];
 ARBRES.forEach(([x, z, rond]) => {
   const a = poser(fabArbre(!!rond), x, z, rand(0, 6)), s = rand(.85, 1.25);
   a.scale.setScalar(s);
   OBST.push({ c: [x, z, .7 * s] });
   entite(a, { type: 'arbre', vers: () => [x, z], prochainePiece: 0, secoue: 0 });
 });
-[[-27.3, 13], [11.05, -18.2], [-15.6, -20.5], [28.3, -15.6], [-7.15, 20.5]].forEach(([x, z]) => { poser(fabRocher(), x, z, rand(0, 6)); OBST.push({ c: [x, z, .6] }); });
+[[-31, 12.5], [10.5, -21.5], [-16.5, -24.2], [30.5, -16], [-7.15, 20.5]].forEach(([x, z]) => { poser(fabRocher(), x, z, rand(0, 6)); OBST.push({ c: [x, z, .6] }); });
 [[-11.2, -11], [-1.95, -11], [12, 2.9], [-25.5, 4], [28, 15.5], [-10.4, 7.8]].forEach(([x, z]) => poser(fabFleurs(), x, z));
 
-const grange = poser(fabGrange(), -18.2, -15.6);
-OBST.push({ r: [-21.5, -18.4, -13.8, -12.9] });
+const grange = poser(fabGrange(), -18.2, -19.4);
+OBST.push({ r: [-21.5, -22.2, -13.8, -16.7] });
 entite(grange, { type: 'grange', vers: () => VENTE });
 const maison = poser(fabMaison(), -3.9, -15.1);
 OBST.push({ r: [-6.6, -17.3, -1.2, -12.9] });
@@ -1147,6 +1166,9 @@ const eJoueur = entite(joueur, { type: 'joueur', haut: 3,
     if (S.porte.length >= S.capacite) return { t: 'PLEIN !', c: 'plein' };
     return S.porte.length ? { t: '🧺 <small>' + S.porte.length + '/' + S.capacite + '</small>', c: 'info' } : null;
   } });
+/* les bottes achetées se voient : rouges, puis bleues, puis dorées */
+function majBottes() { if (S.bottes) joueur.userData.chaussures.forEach(c => { c.material = mat(BOTTES[S.bottes - 1].couleur); }); }
+majBottes();
 const dinde = poser(grp(fabDinde(.6)), DEPART[0] - 1.5, DEPART[1] + 1);
 const eDinde = entite(dinde, { type: 'dinde' });
 /* le cultivateur, caché tant qu'on ne l'a pas recruté */
@@ -1159,14 +1181,14 @@ const eFermier = entite(fermier, { type: 'fermier' });
    Le joystick glisse le long des obstacles ; le toucher calcule
    un chemin (A*) qui les contourne.
    ══════════════════════════════════════════════════════════ */
-const GR = .5, GX0 = -31, GZ0 = -23, GW = 124, GH = 92, RAYON = .45;
+const GR = .5, GX0 = -34, GZ0 = -27, GW = 136, GH = 100, RAYON = .45;
 const bloc = new Uint8Array(GW * GH), atteignable = new Uint8Array(GW * GH);
 const idx = (i, j) => j * GW + i;
 const cel = (x, z) => [Math.floor((x - GX0) / GR), Math.floor((z - GZ0) / GR)];
 const centreCel = n => [GX0 + ((n % GW) + .5) * GR, GZ0 + (Math.floor(n / GW) + .5) * GR];
 function dansIle(x, z, m) {
-  const hw = 30 - m, hd = 22 - m, r = Math.max(.5, 9 - m);
-  const dx = Math.max(Math.abs(x) - (hw - r), 0), dz = Math.max(Math.abs(z) - (hd - r), 0);
+  const hw = ILE.hw - m, hd = ILE.hd - m, r = Math.max(.5, ILE.r - m);
+  const dx = Math.max(Math.abs(x) - (hw - r), 0), dz = Math.max(Math.abs(z - ILE.cz) - (hd - r), 0);
   return dx * dx + dz * dz <= r * r;
 }
 function distSegment(px, pz, x0, z0, x1, z1) {
@@ -1845,6 +1867,11 @@ function listePads() {
     } });
   if (PRIX_PANIER[S.capacite]) l.push({ id: 'panier', x: PAD_PANIER[0], z: PAD_PANIER[1], e: '🧺', prix: PRIX_PANIER[S.capacite], niv: 1,
     fait: () => { S.capacite += 4; message(`🧺 Panier plus grand : ${S.capacite} places !`, 'Panier plus grand !'); } });
+  if (S.bottes < BOTTES.length) l.push({ id: 'bottes', x: PAD_BOTTES[0], z: PAD_BOTTES[1], e: '👟', prix: BOTTES[S.bottes].prix, niv: BOTTES[S.bottes].niv,
+    fait: () => {
+      S.bottes++; majBottes(); rebond(joueur); coeurs(joueur, 1, ['💨', '⭐', '👟']);
+      message('👟 Nouvelles bottes : Roullieee court plus vite !', 'Nouvelles bottes ! Je cours plus vite !');
+    } });
   const achetees = new Set(S.deco.map(d => d.id));
   DECOS.filter(D => !achetees.has(D.id)).slice(0, 1).forEach(D => {
     const place = placeDeco('deco-' + D.id);
@@ -2241,7 +2268,7 @@ function fenetreModeEmploi() {
     <span class="em">🐔</span><span>Passe à l’auge avec la bonne nourriture. Les bêtes mangent puis remplissent la caisse.</span>
     <span class="em">🚚</span><span>Passe derrière le camion : il prend ce que la commande demande. Commande finie = des pièces !</span>
     <span class="em">🏪</span><span>L’étal, à côté du camion : poses-y tes œufs, ton lait, ta laine, tes yaourts, tes pulls… Chaque camion qui arrive s’y sert tout seul !</span>
-    <span class="em">🟩</span><span>Arrête-toi sur un carré vert et ne bouge plus ⏳ : les pièces coulent dedans et tu achètes des animaux, des champs, des décorations. Chaque nouvel animal coûte un peu plus cher.</span>
+    <span class="em">🟩</span><span>Arrête-toi sur un carré vert et ne bouge plus ⏳ : les pièces coulent dedans et tu achètes des animaux, des champs, des décorations, des bottes 👟 pour courir plus vite. Chaque nouvel animal coûte un peu plus cher.</span>
     <span class="em">🥣</span><span>Les stands : apporte le lait 🥛 à la yaourterie et la laine 🧶 à l’atelier, puis reviens chercher les yaourts et les pulls. Ils rapportent beaucoup !</span>
     <span class="em">👨‍🌾</span><span>Le cultivateur (à recruter près de la grange) sème les champs, récolte et remplit les auges des bêtes tout seul.</span>
     <span class="em">💡</span><span>Perdu ? Touche le bouton Aide : une flèche te montre où aller.</span></div>`);
@@ -2297,7 +2324,7 @@ let tPrec = performance.now(), tLent = 0, immobileDepuis = maintenant(), dernier
 function deplacerJoueur(dt, t) {
   const p = joueur.position, u = joueur.userData;
   DIR.set(0, 0, 0);
-  let vitesse = 6.5;
+  let vitesse = VITESSES[S.bottes] || VITESSES[0];
   /* joystick ou clavier */
   let jx = joy.dx, jy = joy.dy;
   if (touches.has('arrowleft') || touches.has('q') || touches.has('a')) jx = -1;
@@ -2334,7 +2361,7 @@ function deplacerJoueur(dt, t) {
   if (marche) {
     immobileDepuis = maintenant();
     const avant = phasePas;
-    phasePas += dt * 11;
+    phasePas += dt * 11 * Math.max(1, vitesseJoueur / VITESSES[0]);   /* les jambes vont plus vite avec les bottes */
     if (Math.floor(avant / Math.PI) !== Math.floor(phasePas / Math.PI)) SFX.pas();
   }
   const a = marche ? Math.sin(phasePas) : 0;
@@ -2363,9 +2390,10 @@ function boucle(tms) {
   /* la caméra suit Roullieee en douceur */
   cam.cible.lerp(tmpV.set(joueur.position.x, 0, joueur.position.z), 1 - Math.exp(-dt * 5));
   placerCamera();
-  /* la dinde suit Roullieee, Médor suit la dinde */
+  /* la dinde suit Roullieee, Médor suit la dinde (aussi vite qu'elle) */
+  const vSuite = (VITESSES[S.bottes] || VITESSES[0]) + .3;
   const derriere = new THREE.Vector3(-Math.sin(joueur.rotation.y) * 1.5, 0, -Math.cos(joueur.rotation.y) * 1.5).add(joueur.position);
-  if (dinde.position.distanceTo(derriere) > .6) bougerCompagnon(dinde, derriere, 6.5, dt, t, .15);
+  if (dinde.position.distanceTo(derriere) > .6) bougerCompagnon(dinde, derriere, vSuite, dt, t, .15);
   dinde.children[0].userData.eventail.rotation.z = Math.sin(t * 1.5) * .1;
 
   for (const e of entites) {
@@ -2380,10 +2408,10 @@ function boucle(tms) {
       const u = e.obj.userData;
       if (e.D.suit) {
         const cible = new THREE.Vector3(-Math.sin(dinde.rotation.y) * 1.3, 0, -Math.cos(dinde.rotation.y) * 1.3).add(dinde.position);
-        if (e.obj.position.distanceTo(cible) > .7) bougerCompagnon(e.obj, cible, 6.5, dt, t);
+        if (e.obj.position.distanceTo(cible) > .7) bougerCompagnon(e.obj, cible, vSuite, dt, t);
       } else if (e.D.promene) {
         if (e.attente > 0) e.attente -= dt;
-        else if (e.obj.position.distanceTo(e.cible) < .2) { e.attente = rand(2, 6); e.cible.set(clamp(e.maison.x + rand(-3, 3), -26, 26), 0, clamp(e.maison.z + rand(-3, 3), -19, 19)); }
+        else if (e.obj.position.distanceTo(e.cible) < .2) { e.attente = rand(2, 6); e.cible.set(clamp(e.maison.x + rand(-3, 3), -29, 29), 0, clamp(e.maison.z + rand(-3, 3), -23, 19)); }
         else bougerCompagnon(e.obj, e.cible, 1.1, dt, t);
       }
       if (u.queue) u.queue.rotation.z = Math.sin(t * 8) * .4;
