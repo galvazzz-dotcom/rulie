@@ -242,32 +242,34 @@ const ITEMS = {
   carotte: { e: '🥕', nom: 'Carottes', val: 3 },
   oeuf:    { e: '🥚', nom: 'Œufs', val: 5 },
   lait:    { e: '🥛', nom: 'Lait', val: 8 },
-  truffe:  { e: '🍄', nom: 'Truffes', val: 11 },
+  fumier:  { e: '💩', nom: 'Fumier', val: 11 },
   laine:   { e: '🧶', nom: 'Laine', val: 10 },
   /* produits transformés dans les stands */
   yaourt:  { e: '🥣', nom: 'Yaourts', val: 20 },
-  pull:    { e: '🧥', nom: 'Pulls', val: 30 }
+  pull:    { e: '🧥', nom: 'Pulls', val: 30 },
+  engrais: { e: '🪴', nom: 'Engrais', val: 25 }
 };
 /* Les stands : on y dépose la matière première, ils la transforment
    tout seuls, et on vient chercher le produit fini. */
 const ATELIERS = {
-  yaourt: { nom: 'Yaourterie', a: 'à la yaourterie', entree: 'lait', sortie: 'yaourt', duree: 8, niv: 3, prix: 175, x: 2.2, z: -14.6, fab: () => fabYaourterie() },
-  pull:   { nom: 'Atelier de pulls', a: 'à l’atelier de pulls', entree: 'laine', sortie: 'pull', duree: 10, niv: 4, prix: 260, x: 15, z: -14.4, fab: () => fabAtelierPulls() }
+  yaourt: { nom: 'Yaourterie', a: 'à la yaourterie', entree: 'lait', sortie: 'yaourt', duree: 8, niv: 3, prix: 195, x: 2.2, z: -14.6, fab: () => fabYaourterie() },
+  pull:   { nom: 'Atelier de pulls', a: 'à l’atelier de pulls', entree: 'laine', sortie: 'pull', duree: 10, niv: 4, prix: 290, x: 15, z: -14.4, fab: () => fabAtelierPulls() },
+  engrais: { nom: 'Composteur', a: 'au composteur', entree: 'fumier', sortie: 'engrais', duree: 10, niv: 4, prix: 270, x: 22, z: -14.4, fab: () => fabComposteur() }
 };
 const ENTREE_MAX = 6, SORTIE_MAX = 8;
 /* le cultivateur : un aide qu'on recrute */
-const FERMIER = { prix: 175, niv: 2, pad: [-24.8, -14.6], repos: [-23.4, -13.2], porte: 4, vitesse: 4.5 };
+const FERMIER = { prix: 195, niv: 2, pad: [-24.8, -14.6], repos: [-23.4, -13.2], porte: 4, vitesse: 4.5 };
 /* l'étal, en bas à gauche du camion (assez loin pour que sa bulle ne
    cache pas la commande du camion) : on y pose les produits de la ferme
    et chaque camion qui arrive s'y sert tout seul. Les récoltes des champs
    n'y vont pas : elles restent pour nourrir les bêtes. */
-const ETAL = { prix: 145, niv: 2, x: -26.5, z: 15.5, zone: [-24, 15.5], plus: [-26.5, 19.3] };
-const ETAL_PRODUITS = ['oeuf', 'lait', 'truffe', 'laine', 'yaourt', 'pull'];
+const ETAL = { prix: 160, niv: 2, x: -26.5, z: 15.5, zone: [-24, 15.5], plus: [-26.5, 19.3] };
+const ETAL_PRODUITS = ['oeuf', 'lait', 'fumier', 'laine', 'yaourt', 'pull', 'engrais'];
 /* places par cagette, puis les agrandissements de l'étal (carré « 🏪⬆️ »
    au sud de l'étal, à l'écart de là où l'on dépose pour ne pas l'acheter
    sans le vouloir en attendant que la marchandise soit rangée) */
 const ETAL_PLACES = [6, 9, 12, 16];
-const ETAL_AGRANDIR = [{ prix: 180, niv: 3 }, { prix: 320, niv: 4 }, { prix: 520, niv: 5 }];
+const ETAL_AGRANDIR = [{ prix: 200, niv: 3 }, { prix: 355, niv: 4 }, { prix: 575, niv: 5 }];
 function placesEtal() { return ETAL_PLACES[S.etal.niv || 0]; }
 const CULTURES = {
   ble:     { e: '🌾', nom: 'Blé', du: 'du blé', de: 'de blé', duree: 15, niv: 1, recolte: 3 },
@@ -275,10 +277,10 @@ const CULTURES = {
   carotte: { e: '🥕', nom: 'Carotte', du: 'des carottes', de: 'de carottes', duree: 20, niv: 3, recolte: 3 }
 };
 const ANIMAUX = {
-  poule:  { e: '🐔', nom: 'Poule', les: 'les poules', mange: 'ble', donne: 'oeuf', duree: 12, niv: 1, prix: 35, max: 6, vitesse: 1.3 },
-  vache:  { e: '🐄', nom: 'Vache', les: 'les vaches', mange: 'mais', donne: 'lait', duree: 20, niv: 2, prix: 105, max: 4, vitesse: .6 },
-  cochon: { e: '🐖', nom: 'Cochon', les: 'les cochons', mange: 'carotte', donne: 'truffe', duree: 25, niv: 3, prix: 160, max: 4, vitesse: .8 },
-  mouton: { e: '🐑', nom: 'Mouton', les: 'les moutons', mange: 'ble', donne: 'laine', duree: 25, niv: 4, prix: 230, max: 4, vitesse: .7 }
+  poule:  { e: '🐔', nom: 'Poule', les: 'les poules', mange: 'ble', donne: 'oeuf', duree: 12, niv: 1, prix: 40, max: 6, vitesse: 1.3 },
+  vache:  { e: '🐄', nom: 'Vache', les: 'les vaches', mange: 'mais', donne: 'lait', duree: 20, niv: 2, prix: 120, max: 4, vitesse: .6 },
+  cochon: { e: '🐖', nom: 'Cochon', les: 'les cochons', mange: 'carotte', donne: 'fumier', duree: 25, niv: 3, prix: 180, max: 4, vitesse: .8 },
+  mouton: { e: '🐑', nom: 'Mouton', les: 'les moutons', mange: 'ble', donne: 'laine', duree: 25, niv: 4, prix: 255, max: 4, vitesse: .7 }
 };
 /* chaque enclos : son auge (à remplir) et sa caisse (à vider), dehors,
    contre la barrière ; et le carré d'achat d'une bête de plus */
@@ -291,16 +293,16 @@ const ENCLOS = {
 const AUGE_MAX = 8, CAISSE_MAX = 12;
 /* Expérience cumulée pour chaque niveau. Volontairement lente : une
    nouveauté toutes les quelques séances, pas toutes les deux minutes. */
-const PALIERS = [0, 150, 420, 840, 1500, 2400, 3700, 5300, 7500, 10400];
-function palier(i) { return i < PALIERS.length ? PALIERS[i] : PALIERS[PALIERS.length - 1] + (i - PALIERS.length + 1) * 3300; }
+const PALIERS = [0, 190, 525, 1050, 1900, 3000, 4650, 6650, 9400, 13000];
+function palier(i) { return i < PALIERS.length ? PALIERS[i] : PALIERS[PALIERS.length - 1] + (i - PALIERS.length + 1) * 4100; }
 const NOUVEAUTES = {
   2: [['🌽', 'Maïs'], ['🐄', 'Vaches'], ['👨‍🌾', 'Cultivateur'], ['🏪', 'Étal'], ['👟', 'Bottes bleues']],
   3: [['🥕', 'Carottes'], ['🐖', 'Cochons'], ['🥣', 'Yaourterie'], ['🏪', 'Étal plus grand']],
-  4: [['🐑', 'Moutons'], ['🧥', 'Atelier de pulls'], ['🌈', 'Arc-en-ciel'], ['👟', 'Bottes dorées'], ['🏪', 'Étal encore plus grand']],
+  4: [['🐑', 'Moutons'], ['🧥', 'Atelier de pulls'], ['🪴', 'Composteur'], ['👟', 'Bottes dorées'], ['🏪', 'Étal encore plus grand']],
   5: [['🦃', 'Statue Dindromakus'], ['🏪', 'Le plus grand étal']]
 };
 /* prix des champs 7 à 12 (les 6 premiers sont offerts) */
-const PRIX_CHAMPS = [45, 85, 145, 220, 290, 375];
+const PRIX_CHAMPS = [50, 95, 160, 245, 320, 415];
 const NB_CHAMPS = 12;
 /* Chaque bête de plus d'une même espèce coûte plus cher (×1,4) :
    la 3e poule achetée coûte bien plus que la 1re. */
@@ -309,20 +311,20 @@ function prixBete(esp) {
   const n = Math.max(0, S.animaux.filter(a => a.esp === esp).length - (BETES_DEPART[esp] || 0));
   return Math.round(ANIMAUX[esp].prix * Math.pow(1.4, n) / 5) * 5;
 }
-const PRIX_PANIER = { 6: 50, 10: 105, 14: 175, 18: 260 };
+const PRIX_PANIER = { 6: 55, 10: 120, 14: 195, 18: 290 };
 const DECOS = [
-  { id: 'fleurs',   e: '🌷', nom: 'Fleurs',      prix: 15,  niv: 1, faire: () => fabFleurs() },
-  { id: 'arbre',    e: '🌳', nom: 'Arbre',       prix: 25,  niv: 1, faire: () => fabArbre(true) },
-  { id: 'banc',     e: '🪑', nom: 'Banc',        prix: 30,  niv: 1, faire: () => fabBanc() },
-  { id: 'chien',    e: '🐕', nom: 'Médor',       prix: 65,  niv: 2, faire: () => fabChien(), suit: true, son: 'chien' },
-  { id: 'ballons',  e: '🎈', nom: 'Ballons',     prix: 45,  niv: 2, faire: () => fabBallons() },
-  { id: 'chat',     e: '🐈', nom: 'Minou',       prix: 65,  niv: 2, faire: () => fabChat(), promene: true, son: 'chat' },
-  { id: 'fontaine', e: '⛲', nom: 'Fontaine',    prix: 115, niv: 3, faire: () => fabFontaine() },
-  { id: 'epouv',    e: '🎃', nom: 'Épouvantail', prix: 60,  niv: 3, faire: () => fabEpouvantail() },
-  { id: 'arc',      e: '🌈', nom: 'Arc-en-ciel', prix: 175, niv: 4, faire: () => fabArcEnCiel() },
-  { id: 'dindo',    e: '🦃', nom: 'Dindromakus', prix: 290, niv: 5, faire: () => fabStatue(), glou: true }
+  { id: 'fleurs',   e: '🌷', nom: 'Fleurs',      prix: 20,  niv: 1, faire: () => fabFleurs() },
+  { id: 'arbre',    e: '🌳', nom: 'Arbre',       prix: 30,  niv: 1, faire: () => fabArbre(true) },
+  { id: 'banc',     e: '🪑', nom: 'Banc',        prix: 35,  niv: 1, faire: () => fabBanc() },
+  { id: 'chien',    e: '🐕', nom: 'Médor',       prix: 75,  niv: 2, faire: () => fabChien(), suit: true, son: 'chien' },
+  { id: 'ballons',  e: '🎈', nom: 'Ballons',     prix: 50,  niv: 2, faire: () => fabBallons() },
+  { id: 'chat',     e: '🐈', nom: 'Minou',       prix: 75,  niv: 2, faire: () => fabChat(), promene: true, son: 'chat' },
+  { id: 'fontaine', e: '⛲', nom: 'Fontaine',    prix: 130, niv: 3, faire: () => fabFontaine() },
+  { id: 'epouv',    e: '🎃', nom: 'Épouvantail', prix: 70,  niv: 3, faire: () => fabEpouvantail() },
+  { id: 'arc',      e: '🌈', nom: 'Arc-en-ciel', prix: 195, niv: 4, faire: () => fabArcEnCiel() },
+  { id: 'dindo',    e: '🦃', nom: 'Dindromakus', prix: 320, niv: 5, faire: () => fabStatue(), glou: true }
 ];
-const SPOTS_DECO = [[-10.4, -16.6], [21.45, -16.1], [-0.4, 17.9], [13, 17.2],
+const SPOTS_DECO = [[-10.4, -16.6], [22.5, -19.5], [-0.4, 17.9], [13, 17.2],
   [24, 17.4], [-15, 17.4], [-29.8, 16], [11.8, -12], [26.8, -13.8], [-1.6, -4.2]];
 const CLIENTS = [['👵', 'Mamie Jo'], ['👨‍🍳', 'Le boulanger'], ['👧', 'Lila'], ['👴', 'Papi Marcel'], ['👩‍🏫', 'La maîtresse'], ['🧒', 'Léo'], ['👩‍🌾', 'La voisine']];
 const VENTE = [-18.2, -15.4];     /* carré de vente devant la grange (reculée : sa bulle passe au-dessus de celles des champs) */
@@ -330,7 +332,7 @@ const PAD_PANIER = [-27, -3.4];   /* carré « panier plus grand » */
 /* les bottes de Roullieee : chaque paire la fait marcher plus vite */
 const PAD_BOTTES = [-27.5, 1.2];
 const VITESSES = [6.5, 7.5, 8.5, 9.5];
-const BOTTES = [{ prix: 85, niv: 1, couleur: '#ef4444' }, { prix: 185, niv: 2, couleur: '#3b82f6' }, { prix: 345, niv: 4, couleur: '#ffd23f' }];
+const BOTTES = [{ prix: 95, niv: 1, couleur: '#ef4444' }, { prix: 205, niv: 2, couleur: '#3b82f6' }, { prix: 380, niv: 4, couleur: '#ffd23f' }];
 const ZONE_CAMION = [-19.5, 9.2]; /* derrière le camion : là où l'on envoie Roullieee */
 const DEPART = [-6.5, -3.9];
 
@@ -346,7 +348,7 @@ function etatNeuf() {
     animaux: [{ id: 1, esp: 'poule', pret: 0 }, { id: 2, esp: 'poule', pret: 0 }],
     auges: { poulailler: 0, pre: 0, porcherie: 0, bergerie: 0 },
     caisses: { poulailler: 0, pre: 0, porcherie: 0, bergerie: 0 },
-    ateliers: { yaourt: { achete: false, entree: 0, sortie: 0, fin: 0 }, pull: { achete: false, entree: 0, sortie: 0, fin: 0 } },
+    ateliers: Object.fromEntries(Object.keys(ATELIERS).map(id => [id, { achete: false, entree: 0, sortie: 0, fin: 0 }])),
     fermier: false,
     etal: { achete: false, niv: 0, stock: Object.fromEntries(ETAL_PRODUITS.map(k => [k, 0])) },
     commande: null, pads: {}, placesPads: {}, deco: [],
@@ -368,6 +370,13 @@ function charger() {
       /* les paliers de niveau ont été rallongés : on garde le niveau déjà atteint */
       o.xp = Math.max(o.xp, palier(o.niveau - 1));
       if (!o.etal.niv) o.etal.niv = 0;
+      /* les truffes du cochon sont devenues du fumier, et il y a un stand de plus */
+      const r = k => k === 'truffe' ? 'fumier' : k;
+      o.porte = o.porte.map(r);
+      if (o.commande) o.commande.items.forEach(i => { i.k = r(i.k); });
+      if (o.etal.stock.truffe !== undefined) { o.etal.stock.fumier = o.etal.stock.truffe; delete o.etal.stock.truffe; }
+      ETAL_PRODUITS.forEach(k => { if (o.etal.stock[k] === undefined) o.etal.stock[k] = 0; });
+      for (const id in n.ateliers) if (!o.ateliers[id]) o.ateliers[id] = n.ateliers[id];
       return o;
     }
   } catch (e) {}
@@ -856,7 +865,16 @@ function fabMini(k) {
   else if (k === 'carotte') { const m = P(Co(.12, .5, 6), '#ff8c2a', 0, 0, 0, true); m.rotation.z = Math.PI / 2; const f = P(Co(.07, .2, 4), '#5fb34a', -.33, 0, 0, true); f.rotation.z = Math.PI / 2; g.add(m, f); }
   else if (k === 'oeuf') { const m = P(Sp(.14, 8, 6), '#fff7e6', 0, 0, 0, true); m.scale.set(1, .85, 1.25); g.add(m); }
   else if (k === 'lait') g.add(P(Cy(.13, .13, .24, 8), '#ffffff', 0, 0, 0, true), P(Cy(.07, .07, .06, 6), '#3a86ff', 0, .14, 0, true));
-  else if (k === 'truffe') g.add(P(Ic(.15), '#5b3a29', 0, 0, 0, true));
+  else if (k === 'fumier') {
+    /* un petit tas tout rond, comme l'émoji 💩 */
+    const a = P(Sp(.16, 9, 6), '#6b4226', 0, -.03, 0, true), b = P(Sp(.12, 8, 6), '#6b4226', 0, .07, 0, true), c = P(Co(.08, .14, 7), '#6b4226', 0, .17, 0, true);
+    a.scale.y = .55; b.scale.y = .6; g.add(a, b, c);
+  }
+  else if (k === 'engrais') {
+    /* un sac de toile fermé par une ficelle, avec une pousse verte peinte dessus */
+    g.add(P(Bx(.34, .2, .42), '#d6b98c', 0, 0, 0, true), P(Bx(.36, .06, .06), '#8a5a3c', 0, .02, -.17, true),
+      P(Bx(.16, .02, .16), '#22c55e', 0, .105, .05, true), P(Co(.04, .1, 4), '#16a34a', 0, .13, .05, true));
+  }
   else if (k === 'yaourt') g.add(P(Cy(.14, .11, .24, 10), '#fff7ed', 0, 0, 0, true), P(Cy(.145, .145, .04, 10), '#f9a8d4', 0, .13, 0, true));
   else if (k === 'pull') {
     g.add(P(Bx(.42, .18, .36), '#ef4444', 0, 0, 0, true), P(Bx(.12, .14, .3), '#ef4444', -.27, -.01, .02, true), P(Bx(.12, .14, .3), '#ef4444', .27, -.01, .02, true),
@@ -865,7 +883,7 @@ function fabMini(k) {
   else g.add(P(Ic(.16), '#fbfbf7', 0, 0, 0, true));
   return g;
 }
-/* les deux stands de transformation : un comptoir, un auvent rayé,
+/* les stands de transformation : un comptoir, un auvent rayé,
    une machine qui tourne pendant le travail et un plateau de produits finis */
 function fabStand(couleur, fond, machine, produit) {
   const g = grp(P(Bx(3.4, 2.4, .2), fond, 0, 1.2, -.9), P(Bx(3.4, 1, 1.1), '#ffffff', 0, .5, .55), P(Bx(3.5, .1, 1.2), couleur, 0, 1.05, .55, true));
@@ -898,6 +916,20 @@ function fabAtelierPulls() {
   g.userData.anim = roue; g.userData.axe = 'z';
   return g;
 }
+/* le composteur : un tonneau couché sur son support ; il tourne pendant
+   que le fumier devient de l'engrais */
+function fabComposteur() {
+  const support = grp(P(Bx(.08, .7, .5), '#8a5a3c', -.5, .35, 0), P(Bx(.08, .7, .5), '#8a5a3c', .5, .35, 0));
+  const tonneau = new THREE.Group(); tonneau.position.y = .62;
+  const c = P(Cy(.38, .38, .9, 12), '#16a34a', 0, 0, 0); c.rotation.z = Math.PI / 2; tonneau.add(c);
+  /* des lattes et une trappe, pour voir le tonneau tourner */
+  for (let i = 0; i < 4; i++) { const l = P(Bx(.92, .05, .08), '#14532d', 0, 0, 0, true); l.rotation.x = i * Math.PI / 2; l.position.set(0, Math.cos(i * Math.PI / 2) * .38, Math.sin(i * Math.PI / 2) * .38); tonneau.add(l); }
+  tonneau.add(P(Bx(.3, .06, .22), '#facc15', 0, .4, 0, true));
+  support.add(tonneau);
+  const g = fabStand('#65a30d', '#d9f99d', support, 'engrais');
+  g.userData.anim = tonneau; g.userData.axe = 'x';
+  return g;
+}
 /* avant l'achat : un petit chantier entouré d'une corde */
 function fabChantier() {
   const g = new THREE.Group();
@@ -912,22 +944,22 @@ function fabChantier() {
    son étiquette) et une guirlande de fanions — pas d'auvent, pour que
    la caméra voie bien ce qu'il y a dans les cagettes */
 function fabEtal() {
-  const g = grp(P(Bx(4.4, .12, 1.4), '#b5793e', 0, .86, 0));
-  for (const x of [-2.05, 2.05]) for (const z of [-.55, .55]) g.add(P(Bx(.14, .8, .14), '#8a5a3c', x, .4, z));
-  for (let i = 0; i < 6; i++) g.add(P(Bx(.73, .5, .06), i % 2 ? '#ffffff' : '#22c55e', -1.83 + i * .73, .6, .72, true));
-  for (const x of [-2.15, 2.15]) g.add(P(Cy(.06, .06, 2.5, 6), '#8a5a3c', x, 1.25, -.62));
-  g.add(P(Bx(4.3, .03, .03), '#ffffff', 0, 2.35, -.62, true));
-  for (let i = 0; i < 9; i++) {
-    const f = P(Pr(.32, .38, .03), ['#ef4444', '#facc15', '#3b82f6', '#22c55e'][i % 4], -1.9 + i * .475, 2.34, -.62, true);
+  const g = grp(P(Bx(4.9, .12, 1.4), '#b5793e', 0, .86, 0));
+  for (const x of [-2.3, 2.3]) for (const z of [-.55, .55]) g.add(P(Bx(.14, .8, .14), '#8a5a3c', x, .4, z));
+  for (let i = 0; i < 7; i++) g.add(P(Bx(.7, .5, .06), i % 2 ? '#ffffff' : '#22c55e', -2.1 + i * .7, .6, .72, true));
+  for (const x of [-2.4, 2.4]) g.add(P(Cy(.06, .06, 2.5, 6), '#8a5a3c', x, 1.25, -.62));
+  g.add(P(Bx(4.8, .03, .03), '#ffffff', 0, 2.35, -.62, true));
+  for (let i = 0; i < 10; i++) {
+    const f = P(Pr(.32, .38, .03), ['#ef4444', '#facc15', '#3b82f6', '#22c55e'][i % 4], -2.16 + i * .48, 2.34, -.62, true);
     f.rotation.z = Math.PI; g.add(f);
   }
   /* un petit panneau suspendu à la guirlande : une boule dorée par agrandissement */
   const etoiles = new THREE.Group(); etoiles.position.set(0, 2.62, -.62); g.add(etoiles);
   g.userData.etoiles = etoiles;
   g.userData.caisses = ETAL_PRODUITS.map((k, i) => {
-    const x = -1.83 + i * .73;
-    g.add(P(Bx(.64, .28, 1.04), '#c98b4b', x, 1.06, 0), P(Bx(.68, .06, .08), '#8a5a3c', x, 1.2, .5, true));
-    const etiquette = grp(P(Bx(.5, .42, .05), '#fff8e7', 0, 0, 0, true)), m = fabMini(k);
+    const x = -1.98 + i * .66;
+    g.add(P(Bx(.6, .28, 1.04), '#c98b4b', x, 1.06, 0), P(Bx(.64, .06, .08), '#8a5a3c', x, 1.2, .5, true));
+    const etiquette = grp(P(Bx(.46, .42, .05), '#fff8e7', 0, 0, 0, true)), m = fabMini(k);
     m.scale.setScalar(1.3); m.position.z = .08; etiquette.add(m);
     etiquette.position.set(x, 1.45, .56); etiquette.rotation.x = -.35; g.add(etiquette);
     const contenu = new THREE.Group(); contenu.position.set(x, 1.3, -.05); g.add(contenu);
@@ -1129,7 +1161,7 @@ majAteliers();
 
 /* l'étal, tourné vers le camion ; un chantier tant qu'on ne l'a pas acheté */
 const etal = poser(fabEtal(), ETAL.x, ETAL.z, Math.PI / 2), chantierEtal = poser(fabChantier(), ETAL.x, ETAL.z, Math.PI / 2);
-OBST.push({ r: [ETAL.x - .8, ETAL.z - 2.25, ETAL.x + .8, ETAL.z + 2.25] });
+OBST.push({ r: [ETAL.x - .8, ETAL.z - 2.5, ETAL.x + .8, ETAL.z + 2.5] });
 const eEtal = entite(etal, { type: 'etal', haut: 2.9, sig: '', vers: () => ETAL.zone,
   etatBulle: () => {
     const l = ETAL_PRODUITS.filter(k => S.etal.stock[k] > 0);
@@ -1635,7 +1667,7 @@ function presDuCamion(p) {
 }
 /* même principe pour l'étal : n'importe où le long de la table */
 function presDeLEtal(p) {
-  const dx = Math.max(Math.abs(p.x - ETAL.x) - .8, 0), dz = Math.max(Math.abs(p.z - ETAL.z) - 2.25, 0);
+  const dx = Math.max(Math.abs(p.x - ETAL.x) - .8, 0), dz = Math.max(Math.abs(p.z - ETAL.z) - 2.5, 0);
   return Math.hypot(dx, dz) < 2.4;
 }
 function zones(dt) {
@@ -1652,7 +1684,14 @@ function zones(dt) {
     if (Math.abs(p.x - fx) > DEMI_CHAMP + .1 || Math.abs(p.z - fz) > DEMI_CHAMP + .1) continue;
     const c = S.champs[i];
     if (!c.c) { const g = c.prevu || 'ble'; if (S.niveau >= CULTURES[g].niv) planter(i, g); return; }
-    if (t < c.t1) return;
+    if (t < c.t1) {
+      /* de l'engrais sur le dos : le champ qui pousse est mûr d'un coup */
+      if (deposer('engrais', () => pos3(fx, fz, .5))) {
+        c.t1 = t; sauver();
+        SFX.plop(); coeurs(eChamps[i].obj, 1.2, ['✨', '🌱', '💚']); flotter(eChamps[i].obj, '🪴 Pousse !', 1.6);
+      }
+      return;
+    }
     if (plein()) { alertePlein(); return; }
     prendre(cueillir(i), pos3(fx + rand(-.8, .8), fz + rand(-.8, .8), .8));
     gagnerXP(1);
@@ -1770,7 +1809,7 @@ function nouvelleCommande(facile) {
   for (const [id, A] of Object.entries(ATELIERS)) if (S.ateliers[id].achete) dispo.push(A.sortie);
   const types = facile ? ['ble'] : melange(dispo).slice(0, Math.min(dispo.length, randi(1, S.niveau >= 3 ? 3 : 2)));
   /* les produits transformés valent cher : on en demande peu */
-  const items = types.map(k => ({ k, n: facile ? 3 : (k === 'yaourt' || k === 'pull') ? randi(1, 2) : randi(2, S.niveau < 3 ? 4 : 5), fait: 0 }));
+  const items = types.map(k => ({ k, n: facile ? 3 : Object.values(ATELIERS).some(A => A.sortie === k) ? randi(1, 2) : randi(2, S.niveau < 3 ? 4 : 5), fait: 0 }));
   const val = items.reduce((s, i) => s + ITEMS[i.k].val * i.n, 0);
   const qui = pick(CLIENTS);
   return { items, pieces: Math.round(val * 1.6), xp: Math.max(3, Math.round(val / 2)), qui: qui[0], nom: qui[1] };
@@ -2227,7 +2266,12 @@ function conseil() {
     const K = ANIMAUX[E.espece];
     if (S.caisses[id] && !plein()) return { t: `Ramasse les ${ITEMS[K.donne].e} dans la caisse !`, x: E.caisse[0], z: dehors(E, E.caisse[0], E.caisse[1])[1] };
     if (S.porte.includes(K.mange) && S.auges[id] < 2 && S.animaux.some(a => a.esp === E.espece && !a.pret))
-      return { t: `Donne le ${ITEMS[K.mange].e} à manger : va à l’auge de ${K.les} !`, x: E.auge[0], z: dehors(E, E.auge[0], E.auge[1])[1] };
+      return { t: `Donne les ${ITEMS[K.mange].e} à manger : va à l’auge ${K.les.replace(/^les /, 'des ')} !`, x: E.auge[0], z: dehors(E, E.auge[0], E.auge[1])[1] };
+  }
+  /* de l'engrais sur le dos et un champ qui pousse encore */
+  if (S.porte.includes('engrais')) {
+    const i = S.champs.findIndex((p, i) => i < S.champsAchetes && p.c && t < p.t1);
+    if (i >= 0) return { t: 'Marche dans ce champ avec ton engrais 🪴 : il sera mûr tout de suite !', x: POS_CHAMPS[i][0], z: POS_CHAMPS[i][1] };
   }
   /* des produits sur le dos que le camion ne demande pas : à l'étal */
   if (S.etal.achete) {
@@ -2301,7 +2345,8 @@ function fenetreModeEmploi() {
     <span class="em">🚚</span><span>Passe derrière le camion : il prend ce que la commande demande. Commande finie = des pièces !</span>
     <span class="em">🏪</span><span>L’étal, à côté du camion : poses-y tes œufs, ton lait, ta laine, tes yaourts, tes pulls… Chaque camion qui arrive s’y sert tout seul ! Le carré 🏪⬆️ l’agrandit : plus de place dans chaque cagette.</span>
     <span class="em">🟩</span><span>Arrête-toi sur un carré vert et ne bouge plus ⏳ : les pièces coulent dedans et tu achètes des animaux, des champs, des décorations, des bottes 👟 pour courir plus vite. Chaque nouvel animal coûte un peu plus cher.</span>
-    <span class="em">🥣</span><span>Les stands : apporte le lait 🥛 à la yaourterie et la laine 🧶 à l’atelier, puis reviens chercher les yaourts et les pulls. Ils rapportent beaucoup !</span>
+    <span class="em">🥣</span><span>Les stands : apporte le lait 🥛 à la yaourterie, la laine 🧶 à l’atelier, le fumier 💩 au composteur, puis reviens chercher les yaourts, les pulls et l’engrais. Ils rapportent beaucoup !</span>
+    <span class="em">🪴</span><span>L’engrais : marche dans un champ qui pousse avec de l’engrais sur le dos, il est mûr tout de suite !</span>
     <span class="em">👨‍🌾</span><span>Le cultivateur (à recruter près de la grange) sème les champs, récolte et remplit les auges des bêtes tout seul.</span>
     <span class="em">💡</span><span>Perdu ? Touche le bouton Aide : une flèche te montre où aller.</span></div>`);
 }
