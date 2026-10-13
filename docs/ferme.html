@@ -81,6 +81,7 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
 .rond small{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);background:#fff;color:var(--encre);font-size:13px;font-weight:700;border-radius:999px;padding:2px 8px;white-space:nowrap;box-shadow:0 2px 0 rgba(0,0,0,.2)}
 .rond.vert{background:linear-gradient(#7ee36b,#2fa52a)}
 .rond.jaune{background:linear-gradient(#ffe46b,#ffb300)}
+.rond.brun{background:linear-gradient(#a3e635,#4d7c0f);animation:respire 1s ease-in-out infinite}
 .rond.vibre,.vibre{animation:vibre .45s}
 @keyframes vibre{0%,100%{transform:scale(1)}40%{transform:scale(1.18)}70%{transform:scale(.95)}}
 @media (max-width:560px){
@@ -176,6 +177,7 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
   </div>
   <div class="bas-gauche">
     <button class="rond vert" id="bChamps" aria-label="Choisir ce qui pousse dans chaque champ">🌱<small>Champs</small></button>
+    <button class="rond brun cache" id="bEngrais" aria-label="Mettre l’engrais sur ce champ">🪴<small>Engrais</small></button>
   </div>
   <div class="bas-droite">
     <button class="rond jaune" id="bAide" aria-label="Aide">💡<small>Aide</small></button>
@@ -1661,7 +1663,23 @@ function pos3(x, z, y = .6) { return new THREE.Vector3(x, y, z); }
 const RAYON_AUGE = 2.6, PORTEE_CAMION = 2.4, DEMI_PAD = TAILLE_PAD / 2;
 /* le camion prend la marchandise de n'importe quel côté : derrière,
    à gauche ou à droite (distance au rectangle du camion, pas à un point) */
-function engraisDemande() { const c = S.commande; return !!c && c.items.some(i => i.k === 'engrais' && i.fait < i.n); }
+/* L'engrais ne part jamais tout seul dans un champ : c'est l'enfant qui
+   décide. Debout sur un champ qui pousse, avec de l'engrais sur le dos,
+   le bouton 🪴 apparaît ; le toucher rend le champ mûr d'un coup. */
+let champQuiPousse = -1, boutonEngrais = false;
+function majBoutonEngrais() {
+  const ok = champQuiPousse >= 0 && S.porte.includes('engrais');
+  if (ok !== boutonEngrais) { boutonEngrais = ok; $('#bEngrais').classList.toggle('cache', !ok); if (ok) SFX.pop(); }
+}
+function mettreEngrais() {
+  const i = champQuiPousse, c = S.champs[i];
+  if (i < 0 || !c || !c.c || maintenant() >= c.t1) return;
+  const [fx, fz] = POS_CHAMPS[i];
+  if (!deposer('engrais', () => pos3(fx, fz, .5))) return;
+  c.t1 = maintenant(); sauver();
+  SFX.plop(); vibrer(30); coeurs(eChamps[i].obj, 1.2, ['✨', '🌱', '💚']); flotter(eChamps[i].obj, '🪴 Pousse !', 1.6);
+  champQuiPousse = -1; majBoutonEngrais();
+}
 function presDuCamion(p) {
   const dx = Math.max(Math.abs(p.x - camion.position.x) - .85, 0), dz = Math.max(Math.abs(p.z - camion.position.z) - 2, 0);
   return Math.hypot(dx, dz) < PORTEE_CAMION;
@@ -1678,6 +1696,7 @@ function zones(dt) {
   cadence -= dt;
   if (cadence > 0) return;
   cadence = .12;
+  champQuiPousse = -1;
 
   /* champs : semer ou récolter */
   for (let i = 0; i < S.champsAchetes; i++) {
@@ -1685,15 +1704,7 @@ function zones(dt) {
     if (Math.abs(p.x - fx) > DEMI_CHAMP + .1 || Math.abs(p.z - fz) > DEMI_CHAMP + .1) continue;
     const c = S.champs[i];
     if (!c.c) { const g = c.prevu || 'ble'; if (S.niveau >= CULTURES[g].niv) planter(i, g); return; }
-    if (t < c.t1) {
-      /* de l'engrais sur le dos : le champ qui pousse est mûr d'un coup —
-         sauf si le camion en demande, l'engrais sert d'abord aux commandes */
-      if (!engraisDemande() && deposer('engrais', () => pos3(fx, fz, .5))) {
-        c.t1 = t; sauver();
-        SFX.plop(); coeurs(eChamps[i].obj, 1.2, ['✨', '🌱', '💚']); flotter(eChamps[i].obj, '🪴 Pousse !', 1.6);
-      }
-      return;
-    }
+    if (t < c.t1) { champQuiPousse = i; return; }
     if (plein()) { alertePlein(); return; }
     prendre(cueillir(i), pos3(fx + rand(-.8, .8), fz + rand(-.8, .8), .8));
     gagnerXP(1);
@@ -2270,11 +2281,6 @@ function conseil() {
     if (S.porte.includes(K.mange) && S.auges[id] < 2 && S.animaux.some(a => a.esp === E.espece && !a.pret))
       return { t: `Donne les ${ITEMS[K.mange].e} à manger : va à l’auge ${K.les.replace(/^les /, 'des ')} !`, x: E.auge[0], z: dehors(E, E.auge[0], E.auge[1])[1] };
   }
-  /* de l'engrais sur le dos et un champ qui pousse encore */
-  if (S.porte.includes('engrais') && !engraisDemande()) {
-    const i = S.champs.findIndex((p, i) => i < S.champsAchetes && p.c && t < p.t1);
-    if (i >= 0) return { t: 'Marche dans ce champ avec ton engrais 🪴 : il sera mûr tout de suite !', x: POS_CHAMPS[i][0], z: POS_CHAMPS[i][1] };
-  }
   /* des produits sur le dos que le camion ne demande pas : à l'étal */
   if (S.etal.achete) {
     const k = S.porte.find(k => ETAL_PRODUITS.includes(k) && S.etal.stock[k] < placesEtal());
@@ -2348,7 +2354,7 @@ function fenetreModeEmploi() {
     <span class="em">🏪</span><span>L’étal, à côté du camion : poses-y tes œufs, ton lait, ta laine, tes yaourts, tes pulls… Chaque camion qui arrive s’y sert tout seul ! Le carré 🏪⬆️ l’agrandit : plus de place dans chaque cagette.</span>
     <span class="em">🟩</span><span>Arrête-toi sur un carré vert et ne bouge plus ⏳ : les pièces coulent dedans et tu achètes des animaux, des champs, des décorations, des bottes 👟 pour courir plus vite. Chaque nouvel animal coûte un peu plus cher.</span>
     <span class="em">🥣</span><span>Les stands : apporte le lait 🥛 à la yaourterie, la laine 🧶 à l’atelier, le fumier 💩 au composteur, puis reviens chercher les yaourts, les pulls et l’engrais. Ils rapportent beaucoup !</span>
-    <span class="em">🪴</span><span>L’engrais se vend cher et le camion en commande. Quand le camion n’en veut pas, marche avec dans un champ qui pousse : il est mûr tout de suite !</span>
+    <span class="em">🪴</span><span>L’engrais se vend cher et le camion en commande. Tu peux aussi t’arrêter sur un champ qui pousse et toucher le bouton 🪴 Engrais : il est mûr tout de suite !</span>
     <span class="em">👨‍🌾</span><span>Le cultivateur (à recruter près de la grange) sème les champs, récolte et remplit les auges des bêtes tout seul.</span>
     <span class="em">💡</span><span>Perdu ? Touche le bouton Aide : une flèche te montre où aller.</span></div>`);
 }
@@ -2394,6 +2400,7 @@ function fenetreChamps() {
   });
 }
 $('#bChamps').onclick = () => { ac(); SFX.pop(); fenetreChamps(); };
+$('#bEngrais').onclick = () => { ac(); mettreEngrais(); };
 
 /* ══════════════════════════════════════════════════════════
    LA BOUCLE
@@ -2463,6 +2470,7 @@ function boucle(tms) {
   if (!$('#titre').classList.contains('cache') || !$('#modal').classList.contains('cache')) arreterJoyClavier();
   deplacerJoueur(dt, t);
   zones(dt);
+  majBoutonEngrais();
   majFermier(dt);
   majTravailAteliers(dt);
   majEtal(dt);
