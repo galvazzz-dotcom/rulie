@@ -343,8 +343,8 @@ const ETAL_RANG1 = 7, ETAL_NIV_ETAGERE = 6;
 /* places par cagette, puis les agrandissements de l'étal (carré « 🏪⬆️ »
    au sud de l'étal, à l'écart de là où l'on dépose pour ne pas l'acheter
    sans le vouloir en attendant que la marchandise soit rangée) */
-const ETAL_PLACES = [6, 9, 12, 16, 20];
-const ETAL_AGRANDIR = [{ prix: 200, niv: 3 }, { prix: 425, niv: 4 }, { prix: 690, niv: 5 }, { prix: 1470, niv: 8 }];
+const ETAL_PLACES = [6, 9, 12, 16, 20, 24];
+const ETAL_AGRANDIR = [{ prix: 200, niv: 3 }, { prix: 425, niv: 4 }, { prix: 690, niv: 5 }, { prix: 1000, niv: 6 }, { prix: 1470, niv: 8 }];
 function placesEtal() { return ETAL_PLACES[S.etal.niv || 0]; }
 /* le silo à grain et l'entrepôt, à gauche des champs : même principe que
    l'étal, mais pour les récoltes. On y range ce qu'on porte, et chaque
@@ -401,10 +401,10 @@ const NOUVEAUTES = {
   3: [['🥕', 'Carottes'], ['🐖', 'Cochons'], ['🥣', 'Yaourterie'], ['🏪', 'Étal plus grand']],
   4: [['🐑', 'Moutons'], ['🧥', 'Atelier de pulls'], ['🪴', 'Composteur'], ['👟', 'Bottes dorées'], ['🏪', 'Étal encore plus grand']],
   5: [['🦃', 'Statue Dindromakus'], ['🏪', 'Le plus grand étal'], ['🌾', 'Champs niveau 2']],
-  6: [['🌉', 'Le pont'], ['🏝️', 'Une nouvelle île'], ['🍅', 'Tomates'], ['🐐', 'Chèvres'], ['🍞', 'Boulangerie'], ['🌾', 'Silo à grain'], ['🏪', 'Étal à deux étages'], ['👨‍🌾', 'Cultivateur niveau 2'], ['🐇', 'Pompon le lapin']],
-  7: [['🌾', 'Champs niveau 3'], ['🌻', 'Tournesols'], ['🐝', 'Abeilles'], ['🧀', 'Fromagerie'], ['👩‍🌾', 'Éleveuse'], ['🎡', 'Grande roue']],
+  6: [['🌉', 'Le pont'], ['🏝️', 'Une nouvelle île'], ['🍅', 'Tomates'], ['🐐', 'Chèvres'], ['🍞', 'Boulangerie'], ['🌾', 'Silo à grain'], ['🏪', 'Étal à deux étages et plus grand'], ['👨‍🌾', 'Cultivateur niveau 2'], ['🐇', 'Pompon le lapin']],
+  7: [['🌾', 'Champs niveau 3'], ['🧺', 'Panier plus grand'], ['🌻', 'Tournesols'], ['🐝', 'Abeilles'], ['🧀', 'Fromagerie'], ['👩‍🌾', 'Éleveuse'], ['🎡', 'Grande roue']],
   8: [['🥕', 'Entrepôt à fruits et légumes'], ['🍎', 'Verger'], ['🧃', 'Pressoir à jus'], ['👟', 'Bottes magiques'], ['🏪', 'Étal géant'], ['🎠', 'Manège']],
-  9: [['🎂', 'Pâtisserie'], ['🧑‍🌾', '2e cultivateur'], ['👩‍🌾', 'Éleveuse niveau 2'], ['🦚', 'Paon']],
+  9: [['🎂', 'Pâtisserie'], ['🧑‍🌾', '2e cultivateur'], ['👩‍🌾', 'Éleveuse niveau 2'], ['🧺', 'Panier encore plus grand'], ['🦚', 'Paon']],
   10: [['🐴', 'Poney'], ['🏆', 'Coupe d’or']]
 };
 /* la seconde île, à l'est, et le pont qui y mène (dans l'axe de la grande route) */
@@ -430,7 +430,9 @@ function prixBete(esp) {
   const n = Math.max(0, S.animaux.filter(a => a.esp === esp).length - (BETES_DEPART[esp] || 0));
   return Math.round(ANIMAUX[esp].prix * Math.pow(1.4, n) / 5) * 5;
 }
-const PRIX_PANIER = { 6: 55, 10: 120, 14: 195, 18: 290, 22: 420 };
+const PRIX_PANIER = { 6: 55, 10: 120, 14: 195, 18: 290, 22: 420, 26: 700, 30: 1100 };
+/* les deux derniers agrandissements du panier attendent un niveau (les autres sont là dès le début) */
+const NIV_PANIER = { 26: 7, 30: 9 };
 const DECOS = [
   { id: 'fleurs',   e: '🌷', nom: 'Fleurs',      prix: 20,  niv: 1, faire: () => fabFleurs() },
   { id: 'arbre',    e: '🌳', nom: 'Arbre',       prix: 30,  niv: 1, faire: () => fabArbre(true) },
@@ -1687,7 +1689,7 @@ poser(joueur, DEPART[0], DEPART[1]);
 const pileGroupe = joueur.userData.pile;
 const eJoueur = entite(joueur, { type: 'joueur', haut: 3,
   etatBulle: () => {
-    eJoueur.haut = 3.1 + (S.poney ? .7 : 0) + Math.min(S.porte.length, 24) * .27;
+    eJoueur.haut = 3.1 + (S.poney ? .7 : 0) + Math.min(S.porte.length, 34) * .27;
     if (S.porte.length >= S.capacite) return { t: 'PLEIN !', c: 'plein' };
     return S.porte.length ? { t: '🧺 <small>' + S.porte.length + '/' + S.capacite + '</small>', c: 'info' } : null;
   } });
@@ -2521,7 +2523,7 @@ function listePads() {
         message(`🌾 Champs niveau ${S.champsNiv + 1} : chaque champ donne ${n} récoltes !`, `Les champs donnent ${n} récoltes !`);
       } });
   }
-  if (PRIX_PANIER[S.capacite]) l.push({ id: 'panier', x: PAD_PANIER[0], z: PAD_PANIER[1], e: '🧺', prix: PRIX_PANIER[S.capacite], niv: 1,
+  if (PRIX_PANIER[S.capacite]) l.push({ id: 'panier', x: PAD_PANIER[0], z: PAD_PANIER[1], e: '🧺', prix: PRIX_PANIER[S.capacite], niv: NIV_PANIER[S.capacite] || 1,
     fait: () => { S.capacite += 4; message(`🧺 Panier plus grand : ${S.capacite} places !`, 'Panier plus grand !'); } });
   if (S.bottes < BOTTES.length) l.push({ id: 'bottes', x: PAD_BOTTES[0], z: PAD_BOTTES[1], e: '👟', prix: BOTTES[S.bottes].prix, niv: BOTTES[S.bottes].niv,
     premiere: S.bottes === 0,
