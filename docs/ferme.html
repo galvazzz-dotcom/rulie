@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#3ec5f0">
-<meta name="version" content="2026-10-14-niv5-ateliers">
+<meta name="version" content="2026-10-14-aides-niv7-8">
 <title>🚜 La Ferme de Roullieee</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lilita+One&display=swap" rel="stylesheet">
@@ -317,7 +317,7 @@ const GRANDS_ATELIERS = { prix: 700, niv: 5, pad: [8.6, -12] };
 function entreesDe(A) { return A.entree2 ? [[A.entree, 'entree'], [A.entree2, 'entree2']] : [[A.entree, 'entree']]; }
 /* Les aides qu'on recrute. Les cultivateurs sèment, récoltent et
    nourrissent les bêtes ; l'éleveuse vide les caisses pleines et porte
-   tout aux stands, à l'étal ou à la grange. */
+   tout aux stands, à l'étal ou à la grange ; un éleveur la rejoint ensuite. */
 const AIDES = {
   fermier:  { e: '👨‍🌾', prix: 195, niv: 2, pad: [-24.8, -14.6], repos: [-23.4, -13.2], porte: 4, vitesse: 4.5, metier: 'champs', look: {},
     arrive: ['👨‍🌾 Le cultivateur arrive ! Il sème, récolte et nourrit les bêtes.', 'Le cultivateur arrive ! Il va t’aider.'],
@@ -329,9 +329,12 @@ const AIDES = {
     arrive: ['👩‍🌾 L’éleveuse arrive ! Elle vide les caisses pleines et porte tout aux stands.', 'L’éleveuse arrive ! Elle va vider les caisses.'],
     plus: { prix: 1440, niv: 9, porte: 8, vitesse: 6.5,
       fait: ['⭐ Éleveuse niveau 2 ! Elle va plus vite et porte plus.', 'L’éleveuse passe au niveau 2 ! Elle va plus vite et porte plus !'] } },
-  fermier2: { e: '🧑‍🌾', prix: 1230, niv: 9, pad: [-28.6, -16.6], repos: [-27.4, -13.4], porte: 4, vitesse: 4.5, metier: 'champs',
+  fermier2: { e: '🧑‍🌾', prix: 900, niv: 7, pad: [-28.6, -16.6], repos: [-27.4, -13.4], porte: 4, vitesse: 4.5, metier: 'champs',
     look: { chemise: '#16a34a', salopette: '#92400e', cheveux: '#1f1408', peau: '#c68642' },
-    arrive: ['🧑‍🌾 Un 2e cultivateur arrive ! Les champs vont encore plus vite.', 'Un deuxième cultivateur arrive !'] }
+    arrive: ['🧑‍🌾 Un 2e cultivateur arrive ! Les champs vont encore plus vite.', 'Un deuxième cultivateur arrive !'] },
+  eleveuse2: { e: '👨‍🌾', prix: 1080, niv: 8, pad: [28.4, -1.4], repos: [27.6, -3.2], porte: 5, vitesse: 4.8, metier: 'caisses',
+    look: { chemise: '#0ea5e9', salopette: '#1e3a8a', cheveux: '#facc15', peau: '#e0ac69' },
+    arrive: ['👨‍🌾 Un éleveur arrive ! Avec l’éleveuse, ils vident les caisses deux fois plus vite.', 'Un deuxième éleveur arrive !'] }
 };
 /* l'étal, en bas à gauche du camion (assez loin pour que sa bulle ne
    cache pas la commande du camion) : on y pose les produits de la ferme
@@ -410,9 +413,9 @@ const NOUVEAUTES = {
   4: [['🐑', 'Moutons'], ['🧥', 'Atelier de pulls'], ['🪴', 'Composteur'], ['👟', 'Bottes dorées'], ['🏪', 'Étal encore plus grand']],
   5: [['📦', 'Grandes auges et caisses'], ['👟', 'Bottes vertes'], ['🥣', 'Ateliers plus grands'], ['🦃', 'Statue Dindromakus'], ['🏪', 'Le plus grand étal'], ['🌾', 'Champs niveau 2']],
   6: [['🌉', 'Le pont'], ['🏝️', 'Une nouvelle île'], ['🍅', 'Tomates'], ['🐐', 'Chèvres'], ['🍞', 'Boulangerie'], ['🌾', 'Silo à grain'], ['🏪', 'Étal à deux étages et plus grand'], ['👨‍🌾', 'Cultivateur niveau 2'], ['🐇', 'Pompon le lapin']],
-  7: [['🌾', 'Champs niveau 3'], ['🧺', 'Panier plus grand'], ['🌻', 'Tournesols'], ['🐝', 'Abeilles'], ['🧀', 'Fromagerie'], ['👩‍🌾', 'Éleveuse'], ['🎡', 'Grande roue']],
-  8: [['🥕', 'Entrepôt à fruits et légumes'], ['🍎', 'Verger'], ['🧃', 'Pressoir à jus'], ['👟', 'Bottes magiques'], ['🏪', 'Étal géant'], ['🎠', 'Manège']],
-  9: [['🎂', 'Pâtisserie'], ['🧑‍🌾', '2e cultivateur'], ['👩‍🌾', 'Éleveuse niveau 2'], ['🧺', 'Panier encore plus grand'], ['🦚', 'Paon']],
+  7: [['🌾', 'Champs niveau 3'], ['🧺', 'Panier plus grand'], ['🌻', 'Tournesols'], ['🐝', 'Abeilles'], ['🧀', 'Fromagerie'], ['👩‍🌾', 'Éleveuse'], ['🧑‍🌾', '2e cultivateur'], ['🎡', 'Grande roue']],
+  8: [['🥕', 'Entrepôt à fruits et légumes'], ['🍎', 'Verger'], ['🧃', 'Pressoir à jus'], ['👟', 'Bottes magiques'], ['👨‍🌾', '2e éleveur'], ['🏪', 'Étal géant'], ['🎠', 'Manège']],
+  9: [['🎂', 'Pâtisserie'], ['👩‍🌾', 'Éleveuse niveau 2'], ['🧺', 'Panier encore plus grand'], ['🦚', 'Paon']],
   10: [['🐴', 'Poney'], ['🏆', 'Coupe d’or']]
 };
 /* la seconde île, à l'est, et le pont qui y mène (dans l'axe de la grande route) */
@@ -487,7 +490,7 @@ function etatNeuf() {
     auges: Object.fromEntries(Object.keys(ENCLOS).map(id => [id, 0])),
     caisses: Object.fromEntries(Object.keys(ENCLOS).map(id => [id, 0])),
     ateliers: Object.fromEntries(Object.keys(ATELIERS).map(id => [id, { achete: false, entree: 0, entree2: 0, sortie: 0, fin: 0 }])),
-    grandesCaisses: false, grandsAteliers: false, fermier: false, fermierPlus: false, eleveuse: false, eleveusePlus: false, fermier2: false, pont: false, poney: false,
+    grandesCaisses: false, grandsAteliers: false, fermier: false, fermierPlus: false, eleveuse: false, eleveusePlus: false, fermier2: false, eleveuse2: false, pont: false, poney: false,
     pommiers: 0, pommes: VERGER.arbres.map(() => ({ t1: 0, reste: VERGER.recolte })),
     etal: { achete: false, niv: 0, stock: Object.fromEntries(ETAL_PRODUITS.map(k => [k, 0])) },
     reserves: Object.fromEntries(Object.entries(RESERVES).map(([id, R]) => [id, { achete: false, stock: Object.fromEntries(R.produits.map(k => [k, 0])) }])),
@@ -2883,6 +2886,11 @@ function placeVers(k, d) {
 const distance = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 function penserEleveuse(h) {
   const now = maintenant(), ici = [h.obj.position.x, h.obj.position.z];
+  /* deux éleveurs ne comptent pas deux fois la même caisse : ce que l'autre
+     va y prendre n'est plus là pour elle */
+  const pris = {};
+  for (const o of aides) if (o !== h && o.tache && o.tache.type === 'caisse') pris[o.tache.id] = (pris[o.tache.id] || 0) + o.tache.max;
+  const dispo = id => S.caisses[id] - (pris[id] || 0);
   const caisses = Object.entries(ENCLOS).map(([id, E]) => ({ id, k: ANIMAUX[E.espece].donne, pos: dehors(E, E.caisse[0], E.caisse[1]) }));
   if (h.porte.length) {
     /* la plus proche des destinations de ce qu'elle porte */
@@ -2892,7 +2900,7 @@ function penserEleveuse(h) {
     if (h.porte.length < porteAide(h)) {
       const detour = c => distance(ici, c.pos) + distance(c.pos, vers) - distance(ici, vers);
       const route = caisses.map(c => { const dc = destination(c.k); return { ...c, dc, max: placeVers(c.k, dc) - h.porte.filter(x => x === c.k).length }; })
-        .filter(c => S.caisses[c.id] >= 2 && c.max >= 2 && detour(c) < 15 && distance([c.dc.x, c.dc.z], vers) < 12)
+        .map(c => ({ ...c, max: Math.min(c.max, dispo(c.id)) })).filter(c => c.max >= 2 && detour(c) < 15 && distance([c.dc.x, c.dc.z], vers) < 12)
         .sort((a, b) => detour(a) - detour(b))[0];
       if (route) return aideVers(h, route.pos[0], route.pos[1], { type: 'caisse', id: route.id, max: route.max });
     }
@@ -2903,12 +2911,13 @@ function penserEleveuse(h) {
      au bout de 3 minutes, elle compte double */
   let mieux = null, score = 0;
   for (const c of caisses) {
-    if (S.caisses[c.id] < CAISSE_PLEINE) continue;
+    if (dispo(c.id) < CAISSE_PLEINE) continue;
     /* elle ne compte (et ne prendra) que ce que la destination peut accepter */
-    const d = destination(c.k), n = Math.min(S.caisses[c.id], porteAide(h), placeVers(c.k, d));
+    const d = destination(c.k), n = Math.min(dispo(c.id), porteAide(h), placeVers(c.k, d));
     if (n < 2) continue;
     const chemin = distance(ici, c.pos) + distance(c.pos, [d.x, d.z]) + 10;
-    const s = n * gainVers(c.k, d) / chemin * (1 + (pleineDepuis[c.id] ? (now - pleineDepuis[c.id]) / 180000 : 0));
+    /* une caisse que l'autre éleveur vide déjà passe après les autres */
+    const s = n * gainVers(c.k, d) / chemin * (1 + (pleineDepuis[c.id] ? (now - pleineDepuis[c.id]) / 180000 : 0)) * (pris[c.id] ? .5 : 1);
     if (s > score) { mieux = { ...c, n }; score = s; }
   }
   if (mieux) return aideVers(h, mieux.pos[0], mieux.pos[1], { type: 'caisse', id: mieux.id, max: mieux.n });
