@@ -151,6 +151,19 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
 .debloque{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:12px 0}
 .debloque div{background:#fff;border-radius:18px;padding:8px 14px;font-weight:700;border:3px solid #f1d9a8}
 .debloque .em{font-size:44px;display:block}
+@media (max-width:560px){
+  /* fenêtre « Niveau ! » sur téléphone : plus compacte, pour voir toutes les nouveautés et le bouton */
+  .grosse-etoile{font-size:64px}
+  .debloque{gap:8px;margin:8px 0}
+  .debloque div{display:flex;align-items:center;gap:6px;padding:3px 10px 3px 6px;font-size:15px;border-width:2px;border-radius:14px}
+  .debloque .em{font-size:26px}
+}
+@media (max-width:560px) and (max-height:820px){
+  .grosse-etoile{font-size:44px}
+  .debloque{gap:6px;margin:6px 0}
+  .debloque div{font-size:14px;padding:2px 8px 2px 5px}
+  .debloque .em{font-size:22px}
+}
 .plan{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;max-width:460px;margin:0 auto}
 .parcelle{position:relative;aspect-ratio:1;border-radius:18px;border:4px solid #fff;box-shadow:0 4px 0 rgba(0,0,0,.2);color:#fff;font-weight:700;font-size:15px;
   background:repeating-linear-gradient(0deg,#7b4a26 0 17%,#5e381c 17% 23%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-shadow:0 2px 0 rgba(0,0,0,.4)}
@@ -337,7 +350,7 @@ function placesEtal() { return ETAL_PLACES[S.etal.niv || 0]; }
    l'étal, mais pour les récoltes. On y range ce qu'on porte, et chaque
    camion qui arrive vient s'y servir tout seul. */
 const RESERVES = {
-  silo:     { nom: 'Silo à grain', e: '🌾', dans: 'dans le silo', produits: ['ble', 'mais', 'tournesol'], places: 30, prix: 2520, niv: 5,
+  silo:     { nom: 'Silo à grain', e: '🌾', dans: 'dans le silo', produits: ['ble', 'mais', 'tournesol'], places: 30, prix: 2520, niv: 6,
               x: -30.9, z: -10, zone: [-30.9, -7.3], haut: 5.2 },
   entrepot: { nom: 'Entrepôt', e: '🥕', dans: 'dans l’entrepôt', produits: ['carotte', 'tomate', 'pomme'], places: 30, prix: 3600, niv: 8,
               x: -30.9, z: -3.6, zone: [-30.9, -.9], haut: 3.9 }
@@ -387,8 +400,8 @@ const NOUVEAUTES = {
   2: [['🌽', 'Maïs'], ['🐄', 'Vaches'], ['👨‍🌾', 'Cultivateur'], ['🏪', 'Étal'], ['👟', 'Bottes bleues']],
   3: [['🥕', 'Carottes'], ['🐖', 'Cochons'], ['🥣', 'Yaourterie'], ['🏪', 'Étal plus grand']],
   4: [['🐑', 'Moutons'], ['🧥', 'Atelier de pulls'], ['🪴', 'Composteur'], ['👟', 'Bottes dorées'], ['🏪', 'Étal encore plus grand']],
-  5: [['🦃', 'Statue Dindromakus'], ['🏪', 'Le plus grand étal'], ['🌾', 'Champs niveau 2'], ['🌾', 'Silo à grain']],
-  6: [['🌉', 'Le pont'], ['🏝️', 'Une nouvelle île'], ['🍅', 'Tomates'], ['🐐', 'Chèvres'], ['🍞', 'Boulangerie'], ['🏪', 'Étal à deux étages'], ['👨‍🌾', 'Cultivateur niveau 2'], ['🐇', 'Pompon le lapin']],
+  5: [['🦃', 'Statue Dindromakus'], ['🏪', 'Le plus grand étal'], ['🌾', 'Champs niveau 2']],
+  6: [['🌉', 'Le pont'], ['🏝️', 'Une nouvelle île'], ['🍅', 'Tomates'], ['🐐', 'Chèvres'], ['🍞', 'Boulangerie'], ['🌾', 'Silo à grain'], ['🏪', 'Étal à deux étages'], ['👨‍🌾', 'Cultivateur niveau 2'], ['🐇', 'Pompon le lapin']],
   7: [['🌾', 'Champs niveau 3'], ['🌻', 'Tournesols'], ['🐝', 'Abeilles'], ['🧀', 'Fromagerie'], ['👩‍🌾', 'Éleveuse'], ['🎡', 'Grande roue']],
   8: [['🥕', 'Entrepôt à fruits et légumes'], ['🍎', 'Verger'], ['🧃', 'Pressoir à jus'], ['👟', 'Bottes magiques'], ['🏪', 'Étal géant'], ['🎠', 'Manège']],
   9: [['🎂', 'Pâtisserie'], ['🧑‍🌾', '2e cultivateur'], ['👩‍🌾', 'Éleveuse niveau 2'], ['🦚', 'Paon']],
@@ -3096,7 +3109,7 @@ function fenetreModeEmploi() {
     <span class="em">🐔</span><span>Passe à l’auge avec la bonne nourriture. Les bêtes mangent puis remplissent la caisse.</span>
     <span class="em">🚚</span><span>Passe derrière le camion : il prend ce que la commande demande. Commande finie = des pièces !</span>
     <span class="em">🏪</span><span>L’étal, à côté du camion : poses-y tes œufs, ton lait, ta laine, tes yaourts, tes pulls… Chaque camion qui arrive s’y sert tout seul ! Le carré 🏪⬆️ l’agrandit : plus de place dans chaque cagette.</span>
-    <span class="em">🌾</span><span>Au niveau 5, le silo à grain range le blé 🌾 et le maïs 🌽 (puis les tournesols 🌻) ; au niveau 8, l’entrepôt range les carottes 🥕, les tomates 🍅 et les pommes 🍎. Comme l’étal, le camion vient s’y servir tout seul.</span>
+    <span class="em">🌾</span><span>Au niveau 6, le silo à grain range le blé 🌾 et le maïs 🌽 (puis les tournesols 🌻) ; au niveau 8, l’entrepôt range les carottes 🥕, les tomates 🍅 et les pommes 🍎. Comme l’étal, le camion vient s’y servir tout seul.</span>
     <span class="em">🟩</span><span>Arrête-toi sur un carré vert et ne bouge plus ⏳ : les pièces coulent dedans et tu achètes des animaux, des champs, des décorations, des bottes 👟 pour courir plus vite. Chaque nouvel animal coûte un peu plus cher.</span>
     <span class="em">🥣</span><span>Les stands : apporte le lait 🥛 à la yaourterie, la laine 🧶 à l’atelier, le fumier 💩 au composteur, puis reviens chercher les yaourts, les pulls et l’engrais. Ils rapportent beaucoup !</span>
     <span class="em">🪴</span><span>L’engrais se vend cher et le camion en commande. Tu peux aussi t’arrêter sur un champ qui pousse et toucher le bouton 🪴 Engrais : il est mûr tout de suite !</span>
