@@ -347,9 +347,9 @@ const NOUVEAUTES = {
   2: [['🌽', 'Maïs'], ['🐄', 'Vaches'], ['👨‍🌾', 'Cultivateur'], ['🏪', 'Étal'], ['👟', 'Bottes bleues']],
   3: [['🥕', 'Carottes'], ['🐖', 'Cochons'], ['🥣', 'Yaourterie'], ['🏪', 'Étal plus grand']],
   4: [['🐑', 'Moutons'], ['🧥', 'Atelier de pulls'], ['🪴', 'Composteur'], ['👟', 'Bottes dorées'], ['🏪', 'Étal encore plus grand']],
-  5: [['🦃', 'Statue Dindromakus'], ['🏪', 'Le plus grand étal']],
+  5: [['🦃', 'Statue Dindromakus'], ['🏪', 'Le plus grand étal'], ['🌾', 'Champs niveau 2']],
   6: [['🌉', 'Le pont'], ['🏝️', 'Une nouvelle île'], ['🍅', 'Tomates'], ['🐐', 'Chèvres'], ['🍞', 'Boulangerie'], ['🏪', 'Étal à deux étages'], ['👨‍🌾', 'Cultivateur niveau 2'], ['🐇', 'Pompon le lapin']],
-  7: [['🌻', 'Tournesols'], ['🐝', 'Abeilles'], ['🧀', 'Fromagerie'], ['👩‍🌾', 'Éleveuse'], ['🎡', 'Grande roue']],
+  7: [['🌾', 'Champs niveau 3'], ['🌻', 'Tournesols'], ['🐝', 'Abeilles'], ['🧀', 'Fromagerie'], ['👩‍🌾', 'Éleveuse'], ['🎡', 'Grande roue']],
   8: [['🍎', 'Verger'], ['🧃', 'Pressoir à jus'], ['👟', 'Bottes magiques'], ['🏪', 'Étal géant'], ['🎠', 'Manège']],
   9: [['🎂', 'Pâtisserie'], ['🧑‍🌾', '2e cultivateur'], ['🦚', 'Paon']],
   10: [['🐴', 'Poney'], ['🏆', 'Coupe d’or']]
@@ -365,6 +365,10 @@ const PONEY = { prix: 900, niv: 10, pad: [60, 11.5], bonus: 2.5 };
 /* prix des champs 7 à 12 (les 6 premiers sont offerts) */
 const PRIX_CHAMPS = [50, 95, 160, 245, 320, 415];
 const NB_CHAMPS = 12;
+/* améliorations des champs : chacune ajoute 1 à chaque récolte (3 → 4 → 5) */
+const CHAMPS_PLUS = [{ prix: 400, niv: 5 }, { prix: 1000, niv: 7 }];
+const PAD_CHAMPS_PLUS = [-27.2, -7.9];
+function recolteDe(k) { return CULTURES[k].recolte + (S.champsNiv || 0); }
 /* Chaque bête de plus d'une même espèce coûte plus cher (×1,4) :
    la 3e poule achetée coûte bien plus que la 1re. */
 const BETES_DEPART = { poule: 2 };
@@ -414,7 +418,7 @@ function etatNeuf() {
     porte: [],
     /* prevu : ce qu'on sème dans ce champ (choisi par l'enfant, bouton 🌱 Champs) */
     champs: Array.from({ length: NB_CHAMPS }, (_, i) => i < 3 ? { c: 'ble', t0: t - 30000, t1: t - 1000, reste: 3, prevu: 'ble' } : { c: null, t0: 0, t1: 0, reste: 0, prevu: 'ble' }),
-    champsAchetes: 6,
+    champsAchetes: 6, champsNiv: 0,
     animaux: [{ id: 1, esp: 'poule', pret: 0 }, { id: 2, esp: 'poule', pret: 0 }],
     auges: Object.fromEntries(Object.keys(ENCLOS).map(id => [id, 0])),
     caisses: Object.fromEntries(Object.keys(ENCLOS).map(id => [id, 0])),
@@ -2178,7 +2182,7 @@ function zones(dt) {
    le champ redevient de la terre quand tout est ramassé */
 function cueillir(i) {
   const c = S.champs[i], k = c.c;
-  c.reste = (c.reste || CULTURES[k].recolte) - 1;
+  c.reste = (c.reste || recolteDe(k)) - 1;
   if (c.reste <= 0) { S.champs[i] = { c: null, t0: 0, t1: 0, reste: 0, prevu: c.prevu }; poserPlantes(eChamps[i]); rebond(eChamps[i].obj); vibrer(20); }
   sauver();
   return k;
@@ -2202,7 +2206,7 @@ majChamps();
 eChamps.forEach(poserPlantes);
 function planter(i, c) {
   const C = CULTURES[c], t = maintenant();
-  S.champs[i] = { c, t0: t, t1: t + C.duree * 1000, reste: C.recolte, prevu: S.champs[i].prevu || c };
+  S.champs[i] = { c, t0: t, t1: t + C.duree * 1000, reste: recolteDe(c), prevu: S.champs[i].prevu || c };
   poserPlantes(eChamps[i]);
   SFX.plop(); rebond(eChamps[i].obj);
   sauver();
@@ -2356,6 +2360,16 @@ function listePads() {
       fait: () => {
         S.etal.niv++; montrerEtal(); rebond(etal); coeurs(etal, 2.6, ['⭐', '✨', '📦']);
         message(`🏪 Étal plus grand : ${placesEtal()} places par cagette !`, 'L’étal est plus grand !');
+      } });
+  }
+  if (S.champsNiv < CHAMPS_PLUS.length) {
+    const A = CHAMPS_PLUS[S.champsNiv];
+    l.push({ id: 'champs-plus', x: PAD_CHAMPS_PLUS[0], z: PAD_CHAMPS_PLUS[1], e: '🌾⬆️', prix: A.prix, niv: A.niv, premiere: S.champsNiv === 0,
+      fait: () => {
+        S.champsNiv++;
+        for (let i = 0; i < S.champsAchetes; i++) { const c = S.champs[i]; if (c.c && c.reste) c.reste++; coeurs(eChamps[i].obj, 1.2, ['⭐', '🌾']); }
+        const n = recolteDe('ble');
+        message(`🌾 Champs niveau ${S.champsNiv + 1} : chaque champ donne ${n} récoltes !`, `Les champs donnent ${n} récoltes !`);
       } });
   }
   if (PRIX_PANIER[S.capacite]) l.push({ id: 'panier', x: PAD_PANIER[0], z: PAD_PANIER[1], e: '🧺', prix: PRIX_PANIER[S.capacite], niv: 1,
@@ -2846,7 +2860,7 @@ function fenetreModeEmploi() {
   ouvrirFenetre('Comment on joue ?', `<div class="aide-liste">
     <span class="em">👆</span><span>Glisse ton doigt pour faire marcher Roullieee, ou touche l’endroit où elle doit aller.</span>
     <span class="em">🌾</span><span>Marche dans un champ mûr : la récolte s’empile sur son dos. Sur la terre vide, elle sème ce qu’indique le petit panneau.</span>
-    <span class="em">🌱</span><span>Bouton Champs : touche chaque champ pour choisir ce qui y pousse : blé, maïs, carottes, puis tomates et tournesols.</span>
+    <span class="em">🌱</span><span>Bouton Champs : touche chaque champ pour choisir ce qui y pousse : blé, maïs, carottes, puis tomates et tournesols. Au niveau 5 puis au niveau 7, le carré 🌾⬆️ fait donner plus de récoltes à chaque champ.</span>
     <span class="em">🐔</span><span>Passe à l’auge avec la bonne nourriture. Les bêtes mangent puis remplissent la caisse.</span>
     <span class="em">🚚</span><span>Passe derrière le camion : il prend ce que la commande demande. Commande finie = des pièces !</span>
     <span class="em">🏪</span><span>L’étal, à côté du camion : poses-y tes œufs, ton lait, ta laine, tes yaourts, tes pulls… Chaque camion qui arrive s’y sert tout seul ! Le carré 🏪⬆️ l’agrandit : plus de place dans chaque cagette.</span>
