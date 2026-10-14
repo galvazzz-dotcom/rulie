@@ -352,12 +352,16 @@ const ENCLOS = {
 const AUGE_MAX = 8, CAISSE_MAX = 12;
 /* Expérience cumulée pour chaque niveau. Volontairement lente : une
    nouveauté toutes les quelques séances, pas toutes les deux minutes.
-   À partir du niveau 6, les paliers ont été allongés (x1,2 puis x1,5)
-   quand les aides, le silo et l'entrepôt ont accéléré la ferme. */
-const PALIERS = [0, 190, 525, 1050, 1900, 3000, 5000, 8000, 12000, 17500];
+   Depuis le niveau 2, chaque niveau demande 1,5 fois plus d'expérience
+   que dans la première version du jeu (le niveau 1 reste rapide). */
+const PALIERS = [0, 190, 700, 1500, 2800, 4500, 7000, 10000, 14000, 19500];
 function palier(i) { return i < PALIERS.length ? PALIERS[i] : PALIERS[PALIERS.length - 1] + (i - PALIERS.length + 1) * 6000; }
-/* les anciens paliers, pour garder la progression des parties commencées avant */
-function ancienPalier(i) { const A = [0, 190, 525, 1050, 1900, 3000, 4650, 6650, 9400, 13000]; return i < A.length ? A[i] : 13000 + (i - 9) * 4100; }
+/* les paliers des versions précédentes, pour garder la progression des parties commencées avant */
+const ANCIENS_PALIERS = {
+  1: { p: [0, 190, 525, 1050, 1900, 3000, 4650, 6650, 9400, 13000], ensuite: 4100 },
+  2: { p: [0, 190, 525, 1050, 1900, 3000, 5000, 8000, 12000, 17500], ensuite: 6000 }
+};
+function ancienPalier(v, i) { const A = ANCIENS_PALIERS[v]; return i < A.p.length ? A.p[i] : A.p[A.p.length - 1] + (i - A.p.length + 1) * A.ensuite; }
 const NOUVEAUTES = {
   2: [['🌽', 'Maïs'], ['🐄', 'Vaches'], ['👨‍🌾', 'Cultivateur'], ['🏪', 'Étal'], ['👟', 'Bottes bleues']],
   3: [['🥕', 'Carottes'], ['🐖', 'Cochons'], ['🥣', 'Yaourterie'], ['🏪', 'Étal plus grand']],
@@ -429,7 +433,7 @@ const DEPART = [-6.5, -3.9];
 function etatNeuf() {
   const t = maintenant();
   return {
-    v: 1, paliers: 2, pieces: 10, xp: 0, niveau: 1, prochainId: 10, capacite: 6, graine: 'ble', bottes: 0,
+    v: 1, paliers: 3, pieces: 10, xp: 0, niveau: 1, prochainId: 10, capacite: 6, graine: 'ble', bottes: 0,
     porte: [],
     /* prevu : ce qu'on sème dans ce champ (choisi par l'enfant, bouton 🌱 Champs) */
     champs: Array.from({ length: NB_CHAMPS }, (_, i) => i < 3 ? { c: 'ble', t0: t - 30000, t1: t - 1000, reste: 3, prevu: 'ble' } : { c: null, t0: 0, t1: 0, reste: 0, prevu: 'ble' }),
@@ -450,7 +454,7 @@ function charger() {
   try {
     const o = JSON.parse(localStorage.getItem(CLE) || 'null');
     if (o && o.v === 1) {
-      const anciensPaliers = o.paliers !== 2;
+      const versionPaliers = o.paliers || 1;
       const n = etatNeuf();
       for (const k in n) if (o[k] === undefined) o[k] = n[k];
       /* anciennes parties : une seule graine pour tous les champs, et 9 champs au plus */
@@ -459,11 +463,12 @@ function charger() {
       /* les anciens emplacements de déco ont été renumérotés */
       if (o.deco.some(d => d.place >= SPOTS_DECO.length)) o.deco.forEach((d, i) => { d.place = i % SPOTS_DECO.length; });
       o.placesPads = {};
-      /* paliers allongés à partir du niveau 6 : on garde le niveau et la part du niveau déjà faite */
-      if (anciensPaliers && o.niveau >= 6) {
-        const a = ancienPalier(o.niveau - 1), b = ancienPalier(o.niveau), fait = Math.min(Math.max((o.xp - a) / (b - a), 0), .99);
+      /* paliers allongés : on garde le niveau et la part du niveau déjà faite */
+      if (ANCIENS_PALIERS[versionPaliers] && o.niveau >= 2) {
+        const a = ancienPalier(versionPaliers, o.niveau - 1), b = ancienPalier(versionPaliers, o.niveau), fait = Math.min(Math.max((o.xp - a) / (b - a), 0), .99);
         o.xp = Math.round(palier(o.niveau - 1) + fait * (palier(o.niveau) - palier(o.niveau - 1)));
       }
+      o.paliers = n.paliers;
       /* les paliers de niveau ont été rallongés : on garde le niveau déjà atteint */
       o.xp = Math.max(o.xp, palier(o.niveau - 1));
       if (!o.etal.niv) o.etal.niv = 0;
