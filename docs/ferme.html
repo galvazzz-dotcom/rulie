@@ -312,6 +312,15 @@ const ETAL_RANG1 = 7, ETAL_NIV_ETAGERE = 6;
 const ETAL_PLACES = [6, 9, 12, 16, 20];
 const ETAL_AGRANDIR = [{ prix: 200, niv: 3 }, { prix: 355, niv: 4 }, { prix: 575, niv: 5 }, { prix: 820, niv: 8 }];
 function placesEtal() { return ETAL_PLACES[S.etal.niv || 0]; }
+/* le silo à grain et l'entrepôt, à gauche des champs : même principe que
+   l'étal, mais pour les récoltes. On y range ce qu'on porte, et chaque
+   camion qui arrive vient s'y servir tout seul. */
+const RESERVES = {
+  silo:     { nom: 'Silo à grain', e: '🌾', dans: 'dans le silo', produits: ['ble', 'mais', 'tournesol'], places: 30, prix: 1500, niv: 7,
+              x: -30.9, z: -10, zone: [-30.9, -7.3], haut: 5.2 },
+  entrepot: { nom: 'Entrepôt', e: '🥕', dans: 'dans l’entrepôt', produits: ['carotte', 'tomate', 'pomme'], places: 30, prix: 2000, niv: 8,
+              x: -30.9, z: -3.6, zone: [-30.9, -.9], haut: 3.9 }
+};
 const CULTURES = {
   ble:     { e: '🌾', nom: 'Blé', du: 'du blé', de: 'de blé', duree: 15, niv: 1, recolte: 3 },
   mais:    { e: '🌽', nom: 'Maïs', du: 'du maïs', de: 'de maïs', duree: 25, niv: 2, recolte: 3 },
@@ -349,8 +358,8 @@ const NOUVEAUTES = {
   4: [['🐑', 'Moutons'], ['🧥', 'Atelier de pulls'], ['🪴', 'Composteur'], ['👟', 'Bottes dorées'], ['🏪', 'Étal encore plus grand']],
   5: [['🦃', 'Statue Dindromakus'], ['🏪', 'Le plus grand étal'], ['🌾', 'Champs niveau 2']],
   6: [['🌉', 'Le pont'], ['🏝️', 'Une nouvelle île'], ['🍅', 'Tomates'], ['🐐', 'Chèvres'], ['🍞', 'Boulangerie'], ['🏪', 'Étal à deux étages'], ['👨‍🌾', 'Cultivateur niveau 2'], ['🐇', 'Pompon le lapin']],
-  7: [['🌾', 'Champs niveau 3'], ['🌻', 'Tournesols'], ['🐝', 'Abeilles'], ['🧀', 'Fromagerie'], ['👩‍🌾', 'Éleveuse'], ['🎡', 'Grande roue']],
-  8: [['🍎', 'Verger'], ['🧃', 'Pressoir à jus'], ['👟', 'Bottes magiques'], ['🏪', 'Étal géant'], ['🎠', 'Manège']],
+  7: [['🌾', 'Champs niveau 3'], ['🌾', 'Silo à grain'], ['🌻', 'Tournesols'], ['🐝', 'Abeilles'], ['🧀', 'Fromagerie'], ['👩‍🌾', 'Éleveuse'], ['🎡', 'Grande roue']],
+  8: [['🥕', 'Entrepôt à fruits et légumes'], ['🍎', 'Verger'], ['🧃', 'Pressoir à jus'], ['👟', 'Bottes magiques'], ['🏪', 'Étal géant'], ['🎠', 'Manège']],
   9: [['🎂', 'Pâtisserie'], ['🧑‍🌾', '2e cultivateur'], ['🦚', 'Paon']],
   10: [['🐴', 'Poney'], ['🏆', 'Coupe d’or']]
 };
@@ -426,6 +435,7 @@ function etatNeuf() {
     fermier: false, fermierPlus: false, eleveuse: false, fermier2: false, pont: false, poney: false,
     pommiers: 0, pommes: VERGER.arbres.map(() => ({ t1: 0, reste: VERGER.recolte })),
     etal: { achete: false, niv: 0, stock: Object.fromEntries(ETAL_PRODUITS.map(k => [k, 0])) },
+    reserves: Object.fromEntries(Object.entries(RESERVES).map(([id, R]) => [id, { achete: false, stock: Object.fromEntries(R.produits.map(k => [k, 0])) }])),
     commande: null, pads: {}, placesPads: {}, deco: [],
     musique: true, son: true
   };
@@ -1256,6 +1266,33 @@ function fabChantier() {
 /* l'étal : une table de marché, six cagettes (une par produit, avec
    son étiquette) et une guirlande de fanions — pas d'auvent, pour que
    la caméra voie bien ce qu'il y a dans les cagettes */
+/* trois bacs ouverts devant le silo ou l'entrepôt, un par produit, avec son étiquette */
+function bacsReserve(g, produits) {
+  return produits.map((k, i) => {
+    const x = (i - 1) * 1.02;
+    g.add(P(Bx(.9, .36, .8), '#c98b4b', x, .18, -1.05), P(Bx(.94, .07, .08), '#8a5a3c', x, .36, -1.45, true));
+    const etiquette = grp(P(Bx(.5, .44, .05), '#fff8e7', 0, 0, 0, true)), m = fabMini(k);
+    m.scale.setScalar(1.3); m.position.z = -.08; etiquette.add(m);
+    etiquette.position.set(x, .2, -1.5); etiquette.rotation.y = Math.PI; g.add(etiquette);
+    const dedans = new THREE.Group(); dedans.position.set(x, .42, -1.05); g.add(dedans);
+    return dedans;
+  });
+}
+function fabSilo() {
+  const g = grp(P(Cy(1.05, 1.05, 3.8, 16), '#d4dbe3', 0, 1.9, .65), P(Sp(1.05, 16, 8), '#ef4444', 0, 3.8, .65));
+  for (const y of [.9, 1.9, 2.9]) g.add(P(Cy(1.08, 1.08, .08, 16), '#94a3b8', 0, y, .65, true));
+  g.add(P(Bx(.12, 3.4, .12), '#64748b', -.55, 1.9, -.38, true), P(Bx(.12, 3.4, .12), '#64748b', .55, 1.9, -.38, true));
+  for (let y = .5; y < 3.5; y += .45) g.add(P(Bx(1.1, .06, .06), '#64748b', 0, y, -.38, true));
+  g.userData.bacs = bacsReserve(g, RESERVES.silo.produits);
+  return g;
+}
+function fabEntrepot() {
+  const g = grp(P(Bx(3.1, 2, 2), '#b45309', 0, 1, .7), P(Pr(3.5, 1.1, 2.4), '#7c2d12', 0, 2, .7));
+  g.add(P(Bx(1.1, 1.5, .06), '#5a3a22', 0, .75, -.31, true), P(Bx(1.14, .08, .08), '#fff3dc', 0, 1.52, -.33, true));
+  for (const x of [-1.52, 1.52]) g.add(P(Bx(.08, 2, .08), '#fff3dc', x, 1, -.31, true));
+  g.userData.bacs = bacsReserve(g, RESERVES.entrepot.produits);
+  return g;
+}
 function fabEtal() {
   const g = grp(P(Bx(4.9, .12, 1.4), '#b5793e', 0, .86, 0));
   for (const x of [-2.3, 2.3]) for (const z of [-.55, .55]) g.add(P(Bx(.14, .8, .14), '#8a5a3c', x, .4, z));
@@ -1521,6 +1558,29 @@ function montrerEtal() {
   for (let i = 0; i < n; i++) g.add(P(Ic(.16), '#ffd23f', (i - (n - 1) / 2) * .45, 0, .1, true));
 }
 montrerEtal();
+
+/* le silo et l'entrepôt, retournés pour que leurs bacs regardent la caméra ;
+   un chantier tant qu'on ne les a pas achetés */
+const eReserves = Object.fromEntries(Object.entries(RESERVES).map(([id, R]) => {
+  const obj = poser(id === 'silo' ? fabSilo() : fabEntrepot(), R.x, R.z, Math.PI), chantier = poser(fabChantier(), R.x, R.z);
+  OBST.push({ r: [R.x - 1.6, R.z - 1.7, R.x + 1.6, R.z + 1.5] });
+  const e = entite(obj, { type: 'reserve', haut: R.haut, sig: '', vers: () => R.zone,
+    etatBulle: () => {
+      const st = S.reserves[id].stock, l = R.produits.filter(k => st[k] > 0);
+      if (!l.length) return { t: R.produits.map(k => ITEMS[k].e).join('') + ' <small>→</small> 🚚', c: 'faim' };
+      return { t: l.map(k => '<span>' + ITEMS[k].e + '<small>' + st[k] + '</small></span>').join(''), c: 'info etal' };
+    } });
+  e.chantier = chantier;
+  return [id, e];
+}));
+function montrerReserves() {
+  for (const [id, e] of Object.entries(eReserves)) { const ok = S.reserves[id].achete; e.obj.visible = ok; e.chantier.visible = !ok; }
+}
+montrerReserves();
+function presDeReserve(R, p) {
+  const dx = Math.max(Math.abs(p.x - R.x) - 1.6, 0), dz = Math.max(R.z - 1.7 - p.z, p.z - R.z - 1.5, 0);
+  return Math.hypot(dx, dz) < 1.8;
+}
 
 /* le pont : on le voit dès le début, mais son portail reste fermé
    tant qu'on ne l'a pas acheté (niveau 6) */
@@ -2166,6 +2226,15 @@ function zones(dt) {
       return;
     }
   }
+  for (const [id, R] of Object.entries(RESERVES)) {
+    const Rs = S.reserves[id];
+    if (!Rs.achete || !presDeReserve(R, p)) continue;
+    const k = [...S.porte].reverse().find(k => R.produits.includes(k) && Rs.stock[k] < R.places);
+    if (!k) continue;
+    const ou = eReserves[id].obj.userData.bacs[R.produits.indexOf(k)].localToWorld(new THREE.Vector3(0, .1, 0));
+    if (deposer(k, () => ou)) { Rs.stock[k]++; sauver(); }
+    return;
+  }
   /* vente à la grange */
   if (Math.abs(p.x - VENTE[0]) < DEMI_PAD && Math.abs(p.z - VENTE[1]) < DEMI_PAD && S.porte.length) {
     const k = S.porte[S.porte.length - 1], v = ITEMS[k].val;
@@ -2278,14 +2347,37 @@ function majEtal(dt) {
       }
     });
   }
+  for (const [id, R] of Object.entries(RESERVES)) {
+    const e = eReserves[id], sr = S.reserves[id].stock, sigR = R.produits.map(k => sr[k]).join(',');
+    if (sigR === e.sig) continue;
+    e.sig = sigR;
+    e.obj.userData.bacs.forEach((g, i) => {
+      while (g.children.length) g.remove(g.children[0]);
+      for (let j = 0; j < Math.min(sr[R.produits[i]], 9); j++) {
+        const m = fabMini(R.produits[i]); m.scale.setScalar(.8);
+        m.position.set((j % 3 - 1) * .26, Math.floor(j / 3) * .2, 0); g.add(m);
+      }
+    });
+  }
   cadenceEtal -= dt;
   const c = S.commande;
-  if (!S.etal.achete || cadenceEtal > 0 || !c || eCamion.parti) return;
-  const it = c.items.find(i => i.fait < i.n && st[i.k] > 0);
+  if (cadenceEtal > 0 || !c || eCamion.parti) return;
+  /* d'abord l'étal, puis le silo et l'entrepôt */
+  let it = S.etal.achete && c.items.find(i => i.fait < i.n && st[i.k] > 0), depart;
+  if (it) { st[it.k]--; depart = etal.userData.caisses[ETAL_PRODUITS.indexOf(it.k)].localToWorld(new THREE.Vector3(0, .3, 0)); }
+  else for (const [id, R] of Object.entries(RESERVES)) {
+    const Rs = S.reserves[id];
+    if (!Rs.achete) continue;
+    it = c.items.find(i => i.fait < i.n && Rs.stock[i.k] > 0);
+    if (!it) continue;
+    Rs.stock[it.k]--;
+    depart = eReserves[id].obj.userData.bacs[R.produits.indexOf(it.k)].localToWorld(new THREE.Vector3(0, .3, 0));
+    break;
+  }
   if (!it) return;
   cadenceEtal = .35;
-  st[it.k]--; it.fait++;
-  const depart = etal.userData.caisses[ETAL_PRODUITS.indexOf(it.k)].localToWorld(new THREE.Vector3(0, .3, 0)), ou = new THREE.Vector3(rand(-.5, .5), 1.2, -.6);
+  it.fait++;
+  const ou = new THREE.Vector3(rand(-.5, .5), 1.2, -.6);
   lancer(fabMini(it.k), depart, () => camion.localToWorld(ou.clone()), .5);
   SFX.pose();
   majCharge();
@@ -2362,6 +2454,11 @@ function listePads() {
         message(`🏪 Étal plus grand : ${placesEtal()} places par cagette !`, 'L’étal est plus grand !');
       } });
   }
+  for (const [id, R] of Object.entries(RESERVES)) if (!S.reserves[id].achete) l.push({ id: 'reserve-' + id, x: R.zone[0], z: R.zone[1], e: R.e + '🏠', prix: R.prix, niv: R.niv, premiere: true,
+    fait: () => {
+      S.reserves[id].achete = true; montrerReserves(); apparaitre(eReserves[id].obj); glou();
+      message(`${R.e} ${R.nom} ! Ranges-y ${R.produits.map(k => ITEMS[k].e).join(' ')} : le camion viendra se servir tout seul.`, R.nom + ' ! Le camion viendra se servir tout seul.');
+    } });
   if (S.champsNiv < CHAMPS_PLUS.length) {
     const A = CHAMPS_PLUS[S.champsNiv];
     l.push({ id: 'champs-plus', x: PAD_CHAMPS_PLUS[0], z: PAD_CHAMPS_PLUS[1], e: '🌾⬆️', prix: A.prix, niv: A.niv, premiere: S.champsNiv === 0,
@@ -2795,6 +2892,11 @@ function conseil() {
     const k = S.porte.find(k => ETAL_PRODUITS.includes(k) && S.etal.stock[k] < placesEtal());
     if (k) return { t: `Pose tes ${ITEMS[k].e} sur l’étal à côté du camion : le camion se servira tout seul !`, x: ETAL.zone[0], z: ETAL.zone[1] };
   }
+  for (const [id, R] of Object.entries(RESERVES)) {
+    if (!S.reserves[id].achete) continue;
+    const k = S.porte.find(k => R.produits.includes(k) && S.reserves[id].stock[k] < R.places);
+    if (k) return { t: `Range tes ${ITEMS[k].e} ${R.dans}, à gauche des champs : le camion se servira tout seul !`, x: R.zone[0], z: R.zone[1] };
+  }
   if (plein()) return { t: 'Ton panier est plein ! Vends à la grange 🪙', x: VENTE[0], z: VENTE[1] };
   const mur = S.champs.findIndex((p, i) => i < S.champsAchetes && p.c && t >= p.t1);
   if (mur >= 0) return { t: 'Marche dans le champ pour récolter ' + CULTURES[S.champs[mur].c].e + ' !', x: POS_CHAMPS[mur][0], z: POS_CHAMPS[mur][1] };
@@ -2864,6 +2966,7 @@ function fenetreModeEmploi() {
     <span class="em">🐔</span><span>Passe à l’auge avec la bonne nourriture. Les bêtes mangent puis remplissent la caisse.</span>
     <span class="em">🚚</span><span>Passe derrière le camion : il prend ce que la commande demande. Commande finie = des pièces !</span>
     <span class="em">🏪</span><span>L’étal, à côté du camion : poses-y tes œufs, ton lait, ta laine, tes yaourts, tes pulls… Chaque camion qui arrive s’y sert tout seul ! Le carré 🏪⬆️ l’agrandit : plus de place dans chaque cagette.</span>
+    <span class="em">🌾</span><span>Au niveau 7, le silo à grain range le blé 🌾, le maïs 🌽 et les tournesols 🌻 ; au niveau 8, l’entrepôt range les carottes 🥕, les tomates 🍅 et les pommes 🍎. Comme l’étal, le camion vient s’y servir tout seul.</span>
     <span class="em">🟩</span><span>Arrête-toi sur un carré vert et ne bouge plus ⏳ : les pièces coulent dedans et tu achètes des animaux, des champs, des décorations, des bottes 👟 pour courir plus vite. Chaque nouvel animal coûte un peu plus cher.</span>
     <span class="em">🥣</span><span>Les stands : apporte le lait 🥛 à la yaourterie, la laine 🧶 à l’atelier, le fumier 💩 au composteur, puis reviens chercher les yaourts, les pulls et l’engrais. Ils rapportent beaucoup !</span>
     <span class="em">🪴</span><span>L’engrais se vend cher et le camion en commande. Tu peux aussi t’arrêter sur un champ qui pousse et toucher le bouton 🪴 Engrais : il est mûr tout de suite !</span>
