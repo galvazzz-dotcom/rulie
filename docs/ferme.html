@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#3ec5f0">
-<meta name="version" content="2026-10-14-niv5-caisses-bottes">
+<meta name="version" content="2026-10-14-niv5-ateliers">
 <title>🚜 La Ferme de Roullieee</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lilita+One&display=swap" rel="stylesheet">
@@ -311,7 +311,8 @@ const ATELIERS = {
   /* le premier stand à deux ingrédients : il faut les deux pour faire un gâteau */
   gateau:  { nom: 'Pâtisserie', a: 'à la pâtisserie', entree: 'oeuf', entree2: 'miel', sortie: 'gateau', duree: 12, niv: 9, prix: 1320, x: 72.5, z: 0, fab: () => fabPatisserie() }
 };
-const ENTREE_MAX = 6, SORTIE_MAX = 8;
+let ENTREE_MAX = 6, SORTIE_MAX = 8;
+const GRANDS_ATELIERS = { prix: 700, niv: 5, pad: [8.6, -12] };
 /* ce qu'un stand attend : [produit, compteur dans S.ateliers] */
 function entreesDe(A) { return A.entree2 ? [[A.entree, 'entree'], [A.entree2, 'entree2']] : [[A.entree, 'entree']]; }
 /* Les aides qu'on recrute. Les cultivateurs sèment, récoltent et
@@ -385,7 +386,10 @@ const ENCLOS = {
 /* auges et caisses : plus grandes une fois l'amélioration du niveau 5 achetée */
 let AUGE_MAX = 8, CAISSE_MAX = 12;
 const GRANDES_CAISSES = { prix: 700, niv: 5, pad: [-4, -9.5] };
-function majCapacites() { AUGE_MAX = S.grandesCaisses ? 12 : 8; CAISSE_MAX = S.grandesCaisses ? 18 : 12; }
+function majCapacites() {
+  AUGE_MAX = S.grandesCaisses ? 12 : 8; CAISSE_MAX = S.grandesCaisses ? 18 : 12;
+  ENTREE_MAX = S.grandsAteliers ? 10 : 6; SORTIE_MAX = S.grandsAteliers ? 12 : 8;
+}
 /* Expérience cumulée pour chaque niveau. Volontairement lente : une
    nouveauté toutes les quelques séances, pas toutes les deux minutes.
    Par rapport à la première version du jeu, les niveaux 2 à 4 demandent
@@ -404,7 +408,7 @@ const NOUVEAUTES = {
   2: [['🌽', 'Maïs'], ['🐄', 'Vaches'], ['👨‍🌾', 'Cultivateur'], ['🏪', 'Étal'], ['👟', 'Bottes bleues']],
   3: [['🥕', 'Carottes'], ['🐖', 'Cochons'], ['🥣', 'Yaourterie'], ['🏪', 'Étal plus grand']],
   4: [['🐑', 'Moutons'], ['🧥', 'Atelier de pulls'], ['🪴', 'Composteur'], ['👟', 'Bottes dorées'], ['🏪', 'Étal encore plus grand']],
-  5: [['📦', 'Grandes auges et caisses'], ['👟', 'Bottes vertes'], ['🦃', 'Statue Dindromakus'], ['🏪', 'Le plus grand étal'], ['🌾', 'Champs niveau 2']],
+  5: [['📦', 'Grandes auges et caisses'], ['👟', 'Bottes vertes'], ['🥣', 'Ateliers plus grands'], ['🦃', 'Statue Dindromakus'], ['🏪', 'Le plus grand étal'], ['🌾', 'Champs niveau 2']],
   6: [['🌉', 'Le pont'], ['🏝️', 'Une nouvelle île'], ['🍅', 'Tomates'], ['🐐', 'Chèvres'], ['🍞', 'Boulangerie'], ['🌾', 'Silo à grain'], ['🏪', 'Étal à deux étages et plus grand'], ['👨‍🌾', 'Cultivateur niveau 2'], ['🐇', 'Pompon le lapin']],
   7: [['🌾', 'Champs niveau 3'], ['🧺', 'Panier plus grand'], ['🌻', 'Tournesols'], ['🐝', 'Abeilles'], ['🧀', 'Fromagerie'], ['👩‍🌾', 'Éleveuse'], ['🎡', 'Grande roue']],
   8: [['🥕', 'Entrepôt à fruits et légumes'], ['🍎', 'Verger'], ['🧃', 'Pressoir à jus'], ['👟', 'Bottes magiques'], ['🏪', 'Étal géant'], ['🎠', 'Manège']],
@@ -483,7 +487,7 @@ function etatNeuf() {
     auges: Object.fromEntries(Object.keys(ENCLOS).map(id => [id, 0])),
     caisses: Object.fromEntries(Object.keys(ENCLOS).map(id => [id, 0])),
     ateliers: Object.fromEntries(Object.keys(ATELIERS).map(id => [id, { achete: false, entree: 0, entree2: 0, sortie: 0, fin: 0 }])),
-    grandesCaisses: false, fermier: false, fermierPlus: false, eleveuse: false, eleveusePlus: false, fermier2: false, pont: false, poney: false,
+    grandesCaisses: false, grandsAteliers: false, fermier: false, fermierPlus: false, eleveuse: false, eleveusePlus: false, fermier2: false, pont: false, poney: false,
     pommiers: 0, pommes: VERGER.arbres.map(() => ({ t1: 0, reste: VERGER.recolte })),
     etal: { achete: false, niv: 0, stock: Object.fromEntries(ETAL_PRODUITS.map(k => [k, 0])) },
     reserves: Object.fromEntries(Object.entries(RESERVES).map(([id, R]) => [id, { achete: false, stock: Object.fromEntries(R.produits.map(k => [k, 0])) }])),
@@ -2532,6 +2536,11 @@ function listePads() {
     fait: () => {
       S.grandesCaisses = true; majCapacites(); glou();
       message('📦 Grandes auges et caisses ! Les bêtes mangent et produisent plus longtemps.', 'Les auges et les caisses sont plus grandes !');
+    } });
+  if (!S.grandsAteliers) l.push({ id: 'grands-ateliers', x: GRANDS_ATELIERS.pad[0], z: GRANDS_ATELIERS.pad[1], e: '🥣⬆️', prix: GRANDS_ATELIERS.prix, niv: GRANDS_ATELIERS.niv, premiere: true,
+    fait: () => {
+      S.grandsAteliers = true; majCapacites(); glou();
+      message('🥣 Ateliers plus grands ! Tu peux déposer jusqu’à 10 ingrédients à chaque stand.', 'Les ateliers sont plus grands !');
     } });
   if (PRIX_PANIER[S.capacite]) l.push({ id: 'panier', x: PAD_PANIER[0], z: PAD_PANIER[1], e: '🧺', prix: PRIX_PANIER[S.capacite], niv: NIV_PANIER[S.capacite] || 1,
     fait: () => { S.capacite += 4; message(`🧺 Panier plus grand : ${S.capacite} places !`, 'Panier plus grand !'); } });
