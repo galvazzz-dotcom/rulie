@@ -407,7 +407,8 @@ const PRIX_CHAMPS = [50, 95, 160, 245, 320, 415];
 const NB_CHAMPS = 12;
 /* améliorations des champs : chacune ajoute 1 à chaque récolte (3 → 4 → 5) */
 const CHAMPS_PLUS = [{ prix: 480, niv: 5 }, { prix: 1680, niv: 7 }];
-const PAD_CHAMPS_PLUS = [-27.2, -7.9];
+/* sous les champs, au bord du chemin : à côté du silo, sa bulle « 🔒 Niv. 7 » cachait le prix du silo sur téléphone */
+const PAD_CHAMPS_PLUS = [-24.5, 4.9];
 function recolteDe(k) { return CULTURES[k].recolte + (S.champsNiv || 0); }
 /* Chaque bête de plus d'une même espèce coûte plus cher (×1,4) :
    la 3e poule achetée coûte bien plus que la 1re. */
@@ -441,7 +442,7 @@ const SPOTS_DECO = [[-10.4, -16.6], [22.5, -19.5], [-0.4, 17.9], [13, 17.2],
   [47.5, -6.5], [60, -18], [77, -6], [55, -6], [68, -6]];
 const CLIENTS = [['👵', 'Mamie Jo'], ['👨‍🍳', 'Le boulanger'], ['👧', 'Lila'], ['👴', 'Papi Marcel'], ['👩‍🏫', 'La maîtresse'], ['🧒', 'Léo'], ['👩‍🌾', 'La voisine']];
 const VENTE = [-18.2, -15.4];     /* carré de vente devant la grange (reculée : sa bulle passe au-dessus de celles des champs) */
-const PAD_PANIER = [-27, -3.4];   /* carré « panier plus grand » */
+const PAD_PANIER = [-26.3, -4.3]; /* carré « panier plus grand » (un peu à l'écart de l'entrepôt, pour que leurs bulles ne se touchent pas) */
 /* les bottes de Roullieee : chaque paire la fait marcher plus vite */
 const PAD_BOTTES = [-27.5, 1.2];
 const VITESSES = [6.5, 7.5, 8.5, 9.5, 10.5];
