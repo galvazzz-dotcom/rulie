@@ -55,15 +55,21 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
 /* ── HUD ── */
 #hud{position:fixed;inset:0;pointer-events:none;z-index:10}
 #hud > *{pointer-events:auto}
-.haut-gauche{position:absolute;left:max(10px,env(safe-area-inset-left));top:max(10px,env(safe-area-inset-top));display:flex;align-items:center}
+/* le haut de l'écran : une seule rangée, la barre d'expérience prend la place qui reste
+   (elle ne passe plus sous les pièces sur un téléphone) */
+#hud > .haut{position:absolute;left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));
+  display:flex;align-items:center;justify-content:space-between;gap:8px;pointer-events:none}
+.haut > *{pointer-events:auto}
+.haut-gauche{display:flex;align-items:center;flex:0 1 auto;min-width:0}
+.niveau{flex:none}
 .niveau{position:relative;z-index:2;width:70px;height:70px;display:flex;align-items:center;justify-content:center;font-family:'Lilita One';font-size:30px;color:#fff;
   text-shadow:0 2px 0 #b45309,0 0 6px rgba(0,0,0,.25);filter:drop-shadow(0 4px 0 rgba(0,0,0,.2))}
 .niveau::before{content:'';position:absolute;inset:0;background:linear-gradient(#ffe46b,#ffb300);
   clip-path:polygon(50% 0%,61% 33%,97% 35%,68% 57%,79% 92%,50% 72%,21% 92%,32% 57%,3% 35%,39% 33%);z-index:-1}
-.xp{position:relative;margin-left:-14px;width:min(34vw,180px);height:30px;background:rgba(59,36,18,.7);border:3px solid #fff;border-radius:999px;overflow:hidden}
+.xp{position:relative;margin-left:-14px;width:180px;flex:0 1 auto;min-width:0;height:30px;background:rgba(59,36,18,.7);border:3px solid #fff;border-radius:999px;overflow:hidden}
 .xp-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(#7dd3fc,#2563eb);border-radius:999px;transition:width .5s}
-.xp span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;text-shadow:0 1px 0 rgba(0,0,0,.5)}
-.haut-droite{position:absolute;right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));display:flex;gap:8px;align-items:center}
+.xp span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;text-shadow:0 1px 0 rgba(0,0,0,.5);white-space:nowrap}
+.haut-droite{display:flex;gap:8px;align-items:center;flex:none}
 .pieces{display:flex;align-items:center;gap:6px;height:48px;padding:0 16px 0 6px;background:rgba(59,36,18,.7);border:3px solid #fff;border-radius:999px;color:#fff;font-size:24px;font-weight:700}
 .pieces .ic{font-size:32px;line-height:1}
 .pieces.vibre{animation:vibre .4s}
@@ -95,9 +101,20 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
   .bulle.lock .in,.bulle.vente .in,.bulle.info .in,.bulle.plein .in{font-size:15px;height:34px}
   .bulle.cmd .in{font-size:17px;min-height:38px;padding:2px 7px}
   .rond{width:70px;height:70px;font-size:32px}
-  .pieces{font-size:20px;height:44px}
-  .petit{width:44px;height:44px;font-size:21px}
+  /* la musique et les sons restent dans ⚙️ Réglages */
+  #bMusique,#bSon{display:none}
+  .pieces{font-size:18px;height:40px;padding:0 12px 0 4px;gap:4px}
+  .pieces .ic{font-size:24px}
+  .petit{width:40px;height:40px;font-size:20px;border-radius:14px}
+  .niveau{width:60px;height:60px;font-size:26px}
+  .xp{height:26px;margin-left:-12px}
+  .xp span{font-size:13px}
   #cmd{font-size:19px;padding:4px 12px}
+}
+@media (max-width:350px){
+  .xp span{font-size:11px}
+  .pieces{font-size:16px;padding:0 10px 0 4px}
+  .pieces .ic{font-size:22px}
 }
 
 /* ── message ── */
@@ -167,17 +184,19 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
 <div id="joy" class="cache"><div id="joyK"></div></div>
 
 <div id="hud" class="cache">
-  <div class="haut-gauche">
-    <div class="niveau" id="niv">1</div>
-    <div class="xp"><div class="xp-fill" id="xpFill"></div><span id="xpTxt">0 / 20</span></div>
+  <div class="haut">
+    <div class="haut-gauche">
+      <div class="niveau" id="niv">1</div>
+      <div class="xp"><div class="xp-fill" id="xpFill"></div><span id="xpTxt">0 / 20</span></div>
+    </div>
+    <div class="haut-droite">
+      <div class="pieces" id="bourse"><span class="ic">🪙</span><b id="pieces">0</b></div>
+      <button class="petit" id="bMusique" aria-label="Musique">🎵</button>
+      <button class="petit" id="bSon" aria-label="Son">🔊</button>
+      <button class="petit" id="bReglages" aria-label="Réglages">⚙️</button>
+    </div>
   </div>
   <div id="cmd"></div>
-  <div class="haut-droite">
-    <div class="pieces" id="bourse"><span class="ic">🪙</span><b id="pieces">0</b></div>
-    <button class="petit" id="bMusique" aria-label="Musique">🎵</button>
-    <button class="petit" id="bSon" aria-label="Son">🔊</button>
-    <button class="petit" id="bReglages" aria-label="Réglages">⚙️</button>
-  </div>
   <div class="bas-gauche">
     <button class="rond vert" id="bChamps" aria-label="Choisir ce qui pousse dans chaque champ">🌱<small>Champs</small></button>
     <button class="rond brun cache" id="bEngrais" aria-label="Mettre l’engrais sur ce champ">🪴<small>Engrais</small></button>
@@ -269,14 +288,14 @@ const ITEMS = {
    tout seuls, et on vient chercher le produit fini. */
 const ATELIERS = {
   yaourt: { nom: 'Yaourterie', a: 'à la yaourterie', entree: 'lait', sortie: 'yaourt', duree: 8, niv: 3, prix: 195, x: 2.2, z: -14.6, fab: () => fabYaourterie() },
-  pull:   { nom: 'Atelier de pulls', a: 'à l’atelier de pulls', entree: 'laine', sortie: 'pull', duree: 10, niv: 4, prix: 290, x: 15, z: -14.4, fab: () => fabAtelierPulls() },
-  engrais: { nom: 'Composteur', a: 'au composteur', entree: 'fumier', sortie: 'engrais', duree: 10, niv: 4, prix: 270, x: 22, z: -14.4, fab: () => fabComposteur() },
+  pull:   { nom: 'Atelier de pulls', a: 'à l’atelier de pulls', entree: 'laine', sortie: 'pull', duree: 10, niv: 4, prix: 350, x: 15, z: -14.4, fab: () => fabAtelierPulls() },
+  engrais: { nom: 'Composteur', a: 'au composteur', entree: 'fumier', sortie: 'engrais', duree: 10, niv: 4, prix: 325, x: 22, z: -14.4, fab: () => fabComposteur() },
   /* sur la nouvelle île, alignés au nord de la route */
-  pain:    { nom: 'Boulangerie', a: 'à la boulangerie', entree: 'ble', sortie: 'pain', duree: 8, niv: 6, prix: 475, x: 50, z: 0, fab: () => fabBoulangerie() },
-  fromage: { nom: 'Fromagerie', a: 'à la fromagerie', entree: 'laitc', sortie: 'fromage', duree: 10, niv: 7, prix: 650, x: 57.5, z: 0, fab: () => fabFromagerie() },
-  jus:     { nom: 'Pressoir', a: 'au pressoir', entree: 'pomme', sortie: 'jus', duree: 9, niv: 8, prix: 800, x: 65, z: 0, fab: () => fabPressoir() },
+  pain:    { nom: 'Boulangerie', a: 'à la boulangerie', entree: 'ble', sortie: 'pain', duree: 8, niv: 6, prix: 570, x: 50, z: 0, fab: () => fabBoulangerie() },
+  fromage: { nom: 'Fromagerie', a: 'à la fromagerie', entree: 'laitc', sortie: 'fromage', duree: 10, niv: 7, prix: 780, x: 57.5, z: 0, fab: () => fabFromagerie() },
+  jus:     { nom: 'Pressoir', a: 'au pressoir', entree: 'pomme', sortie: 'jus', duree: 9, niv: 8, prix: 960, x: 65, z: 0, fab: () => fabPressoir() },
   /* le premier stand à deux ingrédients : il faut les deux pour faire un gâteau */
-  gateau:  { nom: 'Pâtisserie', a: 'à la pâtisserie', entree: 'oeuf', entree2: 'miel', sortie: 'gateau', duree: 12, niv: 9, prix: 1100, x: 72.5, z: 0, fab: () => fabPatisserie() }
+  gateau:  { nom: 'Pâtisserie', a: 'à la pâtisserie', entree: 'oeuf', entree2: 'miel', sortie: 'gateau', duree: 12, niv: 9, prix: 1320, x: 72.5, z: 0, fab: () => fabPatisserie() }
 };
 const ENTREE_MAX = 6, SORTIE_MAX = 8;
 /* ce qu'un stand attend : [produit, compteur dans S.ateliers] */
@@ -288,14 +307,14 @@ const AIDES = {
   fermier:  { e: '👨‍🌾', prix: 195, niv: 2, pad: [-24.8, -14.6], repos: [-23.4, -13.2], porte: 4, vitesse: 4.5, metier: 'champs', look: {},
     arrive: ['👨‍🌾 Le cultivateur arrive ! Il sème, récolte et nourrit les bêtes.', 'Le cultivateur arrive ! Il va t’aider.'],
     /* niveau 2 du cultivateur : son carré revient là où on l'a recruté */
-    plus: { prix: 550, niv: 6, porte: 7, vitesse: 6.5,
+    plus: { prix: 660, niv: 6, porte: 7, vitesse: 6.5,
       fait: ['⭐ Cultivateur niveau 2 ! Il va plus vite et porte plus.', 'Le cultivateur passe au niveau 2 ! Il va plus vite et porte plus !'] } },
-  eleveuse: { e: '👩‍🌾', prix: 600, niv: 7, pad: [44.6, -1.8], repos: [44.6, -4.4], porte: 5, vitesse: 4.8, metier: 'caisses',
+  eleveuse: { e: '👩‍🌾', prix: 720, niv: 7, pad: [44.6, -1.8], repos: [44.6, -4.4], porte: 5, vitesse: 4.8, metier: 'caisses',
     look: { chemise: '#ec4899', salopette: '#7c3aed', cheveux: '#c2410c', peau: '#f6c9a0', couettes: true },
     arrive: ['👩‍🌾 L’éleveuse arrive ! Elle vide les caisses pleines et porte tout aux stands.', 'L’éleveuse arrive ! Elle va vider les caisses.'],
-    plus: { prix: 1200, niv: 9, porte: 8, vitesse: 6.5,
+    plus: { prix: 1440, niv: 9, porte: 8, vitesse: 6.5,
       fait: ['⭐ Éleveuse niveau 2 ! Elle va plus vite et porte plus.', 'L’éleveuse passe au niveau 2 ! Elle va plus vite et porte plus !'] } },
-  fermier2: { e: '🧑‍🌾', prix: 1025, niv: 9, pad: [-28.6, -16.6], repos: [-27.4, -13.4], porte: 4, vitesse: 4.5, metier: 'champs',
+  fermier2: { e: '🧑‍🌾', prix: 1230, niv: 9, pad: [-28.6, -16.6], repos: [-27.4, -13.4], porte: 4, vitesse: 4.5, metier: 'champs',
     look: { chemise: '#16a34a', salopette: '#92400e', cheveux: '#1f1408', peau: '#c68642' },
     arrive: ['🧑‍🌾 Un 2e cultivateur arrive ! Les champs vont encore plus vite.', 'Un deuxième cultivateur arrive !'] }
 };
@@ -312,15 +331,15 @@ const ETAL_RANG1 = 7, ETAL_NIV_ETAGERE = 6;
    au sud de l'étal, à l'écart de là où l'on dépose pour ne pas l'acheter
    sans le vouloir en attendant que la marchandise soit rangée) */
 const ETAL_PLACES = [6, 9, 12, 16, 20];
-const ETAL_AGRANDIR = [{ prix: 200, niv: 3 }, { prix: 355, niv: 4 }, { prix: 575, niv: 5 }, { prix: 1225, niv: 8 }];
+const ETAL_AGRANDIR = [{ prix: 200, niv: 3 }, { prix: 425, niv: 4 }, { prix: 690, niv: 5 }, { prix: 1470, niv: 8 }];
 function placesEtal() { return ETAL_PLACES[S.etal.niv || 0]; }
 /* le silo à grain et l'entrepôt, à gauche des champs : même principe que
    l'étal, mais pour les récoltes. On y range ce qu'on porte, et chaque
    camion qui arrive vient s'y servir tout seul. */
 const RESERVES = {
-  silo:     { nom: 'Silo à grain', e: '🌾', dans: 'dans le silo', produits: ['ble', 'mais', 'tournesol'], places: 30, prix: 2100, niv: 7,
+  silo:     { nom: 'Silo à grain', e: '🌾', dans: 'dans le silo', produits: ['ble', 'mais', 'tournesol'], places: 30, prix: 2520, niv: 7,
               x: -30.9, z: -10, zone: [-30.9, -7.3], haut: 5.2 },
-  entrepot: { nom: 'Entrepôt', e: '🥕', dans: 'dans l’entrepôt', produits: ['carotte', 'tomate', 'pomme'], places: 30, prix: 3000, niv: 8,
+  entrepot: { nom: 'Entrepôt', e: '🥕', dans: 'dans l’entrepôt', produits: ['carotte', 'tomate', 'pomme'], places: 30, prix: 3600, niv: 8,
               x: -30.9, z: -3.6, zone: [-30.9, -.9], haut: 3.9 }
 };
 const CULTURES = {
@@ -334,9 +353,9 @@ const ANIMAUX = {
   poule:  { e: '🐔', nom: 'Poule', les: 'les poules', mange: 'ble', donne: 'oeuf', duree: 12, niv: 1, prix: 40, max: 6, vitesse: 1.3 },
   vache:  { e: '🐄', nom: 'Vache', les: 'les vaches', mange: 'mais', donne: 'lait', duree: 20, niv: 2, prix: 120, max: 4, vitesse: .6 },
   cochon: { e: '🐖', nom: 'Cochon', les: 'les cochons', mange: 'carotte', donne: 'fumier', duree: 25, niv: 3, prix: 180, max: 4, vitesse: .8 },
-  mouton: { e: '🐑', nom: 'Mouton', les: 'les moutons', mange: 'ble', donne: 'laine', duree: 25, niv: 4, prix: 255, max: 4, vitesse: .7 },
-  chevre: { e: '🐐', nom: 'Chèvre', les: 'les chèvres', mange: 'tomate', donne: 'laitc', duree: 22, niv: 6, prix: 375, max: 4, vitesse: .9 },
-  abeille: { e: '🐝', nom: 'Abeille', les: 'les abeilles', mange: 'tournesol', donne: 'miel', duree: 25, niv: 7, prix: 475, max: 5, vitesse: 1.6 }
+  mouton: { e: '🐑', nom: 'Mouton', les: 'les moutons', mange: 'ble', donne: 'laine', duree: 25, niv: 4, prix: 305, max: 4, vitesse: .7 },
+  chevre: { e: '🐐', nom: 'Chèvre', les: 'les chèvres', mange: 'tomate', donne: 'laitc', duree: 22, niv: 6, prix: 450, max: 4, vitesse: .9 },
+  abeille: { e: '🐝', nom: 'Abeille', les: 'les abeilles', mange: 'tournesol', donne: 'miel', duree: 25, niv: 7, prix: 570, max: 5, vitesse: 1.6 }
 };
 /* chaque enclos : son auge (à remplir) et sa caisse (à vider), dehors,
    contre la barrière ; et le carré d'achat d'une bête de plus */
@@ -377,17 +396,17 @@ const NOUVEAUTES = {
 };
 /* la seconde île, à l'est, et le pont qui y mène (dans l'axe de la grande route) */
 const ILE2 = { cx: 61, cz: -2, hw: 20, hd: 20, r: 8 };
-const PONT = { prix: 500, niv: 6, x0: 31, x1: 43, z: 4.8, pad: [28.6, 4.8], porte: 32.2 };
+const PONT = { prix: 600, niv: 6, x0: 31, x1: 43, z: 4.8, pad: [28.6, 4.8], porte: 32.2 };
 const EST = 36;   /* tout ce qui est à l'est de cette ligne est sur la nouvelle île */
 /* le verger : des pommiers qu'on achète un par un ; les pommes repoussent toutes seules */
-const VERGER = { arbres: [[48, -12], [56, -12], [64, -12], [72, -12]], prix: [350, 475, 625, 775], niv: 8, duree: 30, recolte: 4 };
+const VERGER = { arbres: [[48, -12], [56, -12], [64, -12], [72, -12]], prix: [420, 570, 750, 930], niv: 8, duree: 30, recolte: 4 };
 /* le poney : Roullieee monte dessus et galope plus vite */
-const PONEY = { prix: 1525, niv: 10, pad: [60, 11.5], bonus: 2.5 };
+const PONEY = { prix: 1830, niv: 10, pad: [60, 11.5], bonus: 2.5 };
 /* prix des champs 7 à 12 (les 6 premiers sont offerts) */
 const PRIX_CHAMPS = [50, 95, 160, 245, 320, 415];
 const NB_CHAMPS = 12;
 /* améliorations des champs : chacune ajoute 1 à chaque récolte (3 → 4 → 5) */
-const CHAMPS_PLUS = [{ prix: 400, niv: 5 }, { prix: 1400, niv: 7 }];
+const CHAMPS_PLUS = [{ prix: 480, niv: 5 }, { prix: 1680, niv: 7 }];
 const PAD_CHAMPS_PLUS = [-27.2, -7.9];
 function recolteDe(k) { return CULTURES[k].recolte + (S.champsNiv || 0); }
 /* Chaque bête de plus d'une même espèce coûte plus cher (×1,4) :
@@ -407,13 +426,13 @@ const DECOS = [
   { id: 'chat',     e: '🐈', nom: 'Minou',       prix: 75,  niv: 2, faire: () => fabChat(), promene: true, son: 'chat' },
   { id: 'fontaine', e: '⛲', nom: 'Fontaine',    prix: 130, niv: 3, faire: () => fabFontaine() },
   { id: 'epouv',    e: '🎃', nom: 'Épouvantail', prix: 70,  niv: 3, faire: () => fabEpouvantail() },
-  { id: 'arc',      e: '🌈', nom: 'Arc-en-ciel', prix: 195, niv: 4, faire: () => fabArcEnCiel() },
-  { id: 'dindo',    e: '🦃', nom: 'Dindromakus', prix: 320, niv: 5, faire: () => fabStatue(), glou: true },
-  { id: 'lapin',    e: '🐇', nom: 'Pompon',      prix: 325, niv: 6, faire: () => fabLapin(), promene: true, saut: .35 },
-  { id: 'roue',     e: '🎡', nom: 'Grande roue', prix: 600, niv: 7, faire: () => fabGrandeRoue() },
-  { id: 'manege',   e: '🎠', nom: 'Manège',      prix: 725, niv: 8, faire: () => fabManege(), son: 'achat' },
-  { id: 'paon',     e: '🦚', nom: 'Paon',        prix: 725, niv: 9, faire: () => fabPaon(), promene: true },
-  { id: 'coupe',    e: '🏆', nom: 'Coupe d’or',  prix: 1450, niv: 10, faire: () => fabCoupe(), son: 'niveau' }
+  { id: 'arc',      e: '🌈', nom: 'Arc-en-ciel', prix: 235, niv: 4, faire: () => fabArcEnCiel() },
+  { id: 'dindo',    e: '🦃', nom: 'Dindromakus', prix: 385, niv: 5, faire: () => fabStatue(), glou: true },
+  { id: 'lapin',    e: '🐇', nom: 'Pompon',      prix: 390, niv: 6, faire: () => fabLapin(), promene: true, saut: .35 },
+  { id: 'roue',     e: '🎡', nom: 'Grande roue', prix: 720, niv: 7, faire: () => fabGrandeRoue() },
+  { id: 'manege',   e: '🎠', nom: 'Manège',      prix: 870, niv: 8, faire: () => fabManege(), son: 'achat' },
+  { id: 'paon',     e: '🦚', nom: 'Paon',        prix: 870, niv: 9, faire: () => fabPaon(), promene: true },
+  { id: 'coupe',    e: '🏆', nom: 'Coupe d’or',  prix: 1740, niv: 10, faire: () => fabCoupe(), son: 'niveau' }
 ];
 /* les 5 derniers emplacements sont sur la nouvelle île (lapin, grande
    roue, manège, paon, coupe : les décos sont achetées dans l'ordre) */
@@ -426,7 +445,7 @@ const PAD_PANIER = [-27, -3.4];   /* carré « panier plus grand » */
 /* les bottes de Roullieee : chaque paire la fait marcher plus vite */
 const PAD_BOTTES = [-27.5, 1.2];
 const VITESSES = [6.5, 7.5, 8.5, 9.5, 10.5];
-const BOTTES = [{ prix: 95, niv: 1, couleur: '#ef4444' }, { prix: 205, niv: 2, couleur: '#3b82f6' }, { prix: 380, niv: 4, couleur: '#ffd23f' }, { prix: 850, niv: 8, couleur: '#a855f7' }];
+const BOTTES = [{ prix: 95, niv: 1, couleur: '#ef4444' }, { prix: 205, niv: 2, couleur: '#3b82f6' }, { prix: 455, niv: 4, couleur: '#ffd23f' }, { prix: 1020, niv: 8, couleur: '#a855f7' }];
 function vitesseMax() { return (VITESSES[S.bottes] || VITESSES[0]) + (S.poney ? PONEY.bonus : 0); }
 const ZONE_CAMION = [-19.5, 9.2]; /* derrière le camion : là où l'on envoie Roullieee */
 const DEPART = [-6.5, -3.9];
