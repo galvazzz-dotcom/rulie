@@ -381,7 +381,10 @@ const ENCLOS = {
   chevrerie:  { x: 51.5,  z: 11.5, w: 11,   d: 8,   sol: '#c9e59a', barriere: '#b07a45', espece: 'chevre',  auge: [48.5, 6.85], caisse: [54.5, 6.85], pad: [44.3, 11.5] },
   rucher:     { x: 68.5,  z: 11.5, w: 11,   d: 8,   sol: '#b7e4a0', barriere: '#fff3dc', espece: 'abeille', auge: [65.5, 6.85], caisse: [71.5, 6.85], pad: [75.7, 11.5] }
 };
-const AUGE_MAX = 8, CAISSE_MAX = 12;
+/* auges et caisses : plus grandes une fois l'amélioration du niveau 5 achetée */
+let AUGE_MAX = 8, CAISSE_MAX = 12;
+const GRANDES_CAISSES = { prix: 700, niv: 5, pad: [-4, -9.5] };
+function majCapacites() { AUGE_MAX = S.grandesCaisses ? 12 : 8; CAISSE_MAX = S.grandesCaisses ? 18 : 12; }
 /* Expérience cumulée pour chaque niveau. Volontairement lente : une
    nouveauté toutes les quelques séances, pas toutes les deux minutes.
    Par rapport à la première version du jeu, les niveaux 2 à 4 demandent
@@ -400,7 +403,7 @@ const NOUVEAUTES = {
   2: [['🌽', 'Maïs'], ['🐄', 'Vaches'], ['👨‍🌾', 'Cultivateur'], ['🏪', 'Étal'], ['👟', 'Bottes bleues']],
   3: [['🥕', 'Carottes'], ['🐖', 'Cochons'], ['🥣', 'Yaourterie'], ['🏪', 'Étal plus grand']],
   4: [['🐑', 'Moutons'], ['🧥', 'Atelier de pulls'], ['🪴', 'Composteur'], ['👟', 'Bottes dorées'], ['🏪', 'Étal encore plus grand']],
-  5: [['🦃', 'Statue Dindromakus'], ['🏪', 'Le plus grand étal'], ['🌾', 'Champs niveau 2']],
+  5: [['📦', 'Grandes auges et caisses'], ['👟', 'Bottes vertes'], ['🦃', 'Statue Dindromakus'], ['🏪', 'Le plus grand étal'], ['🌾', 'Champs niveau 2']],
   6: [['🌉', 'Le pont'], ['🏝️', 'Une nouvelle île'], ['🍅', 'Tomates'], ['🐐', 'Chèvres'], ['🍞', 'Boulangerie'], ['🌾', 'Silo à grain'], ['🏪', 'Étal à deux étages et plus grand'], ['👨‍🌾', 'Cultivateur niveau 2'], ['🐇', 'Pompon le lapin']],
   7: [['🌾', 'Champs niveau 3'], ['🧺', 'Panier plus grand'], ['🌻', 'Tournesols'], ['🐝', 'Abeilles'], ['🧀', 'Fromagerie'], ['👩‍🌾', 'Éleveuse'], ['🎡', 'Grande roue']],
   8: [['🥕', 'Entrepôt à fruits et légumes'], ['🍎', 'Verger'], ['🧃', 'Pressoir à jus'], ['👟', 'Bottes magiques'], ['🏪', 'Étal géant'], ['🎠', 'Manège']],
@@ -460,8 +463,8 @@ const VENTE = [-18.2, -15.4];     /* carré de vente devant la grange (reculée 
 const PAD_PANIER = [-26.3, -4.3]; /* carré « panier plus grand » (un peu à l'écart de l'entrepôt, pour que leurs bulles ne se touchent pas) */
 /* les bottes de Roullieee : chaque paire la fait marcher plus vite */
 const PAD_BOTTES = [-27.5, 1.2];
-const VITESSES = [6.5, 7.5, 8.5, 9.5, 10.5];
-const BOTTES = [{ prix: 95, niv: 1, couleur: '#ef4444' }, { prix: 205, niv: 2, couleur: '#3b82f6' }, { prix: 455, niv: 4, couleur: '#ffd23f' }, { prix: 1020, niv: 8, couleur: '#a855f7' }];
+const VITESSES = [6.5, 7.5, 8.5, 9.5, 10.5, 11.5];
+const BOTTES = [{ prix: 95, niv: 1, couleur: '#ef4444' }, { prix: 205, niv: 2, couleur: '#3b82f6' }, { prix: 455, niv: 4, couleur: '#ffd23f' }, { prix: 600, niv: 5, couleur: '#22c55e' }, { prix: 1020, niv: 8, couleur: '#a855f7' }];
 function vitesseMax() { return (VITESSES[S.bottes] || VITESSES[0]) + (S.poney ? PONEY.bonus : 0); }
 const ZONE_CAMION = [-19.5, 9.2]; /* derrière le camion : là où l'on envoie Roullieee */
 const DEPART = [-6.5, -3.9];
@@ -479,7 +482,7 @@ function etatNeuf() {
     auges: Object.fromEntries(Object.keys(ENCLOS).map(id => [id, 0])),
     caisses: Object.fromEntries(Object.keys(ENCLOS).map(id => [id, 0])),
     ateliers: Object.fromEntries(Object.keys(ATELIERS).map(id => [id, { achete: false, entree: 0, entree2: 0, sortie: 0, fin: 0 }])),
-    fermier: false, fermierPlus: false, eleveuse: false, eleveusePlus: false, fermier2: false, pont: false, poney: false,
+    grandesCaisses: false, fermier: false, fermierPlus: false, eleveuse: false, eleveusePlus: false, fermier2: false, pont: false, poney: false,
     pommiers: 0, pommes: VERGER.arbres.map(() => ({ t1: 0, reste: VERGER.recolte })),
     etal: { achete: false, niv: 0, stock: Object.fromEntries(ETAL_PRODUITS.map(k => [k, 0])) },
     reserves: Object.fromEntries(Object.entries(RESERVES).map(([id, R]) => [id, { achete: false, stock: Object.fromEntries(R.produits.map(k => [k, 0])) }])),
@@ -525,6 +528,7 @@ function charger() {
   return etatNeuf();
 }
 let S = charger();
+majCapacites();
 let attenteSauve = null, gele = false;
 function sauver() {
   if (gele) return;
@@ -2523,6 +2527,11 @@ function listePads() {
         message(`🌾 Champs niveau ${S.champsNiv + 1} : chaque champ donne ${n} récoltes !`, `Les champs donnent ${n} récoltes !`);
       } });
   }
+  if (!S.grandesCaisses) l.push({ id: 'grandes-caisses', x: GRANDES_CAISSES.pad[0], z: GRANDES_CAISSES.pad[1], e: '📦⬆️', prix: GRANDES_CAISSES.prix, niv: GRANDES_CAISSES.niv, premiere: true,
+    fait: () => {
+      S.grandesCaisses = true; majCapacites(); glou();
+      message('📦 Grandes auges et caisses ! Les bêtes mangent et produisent plus longtemps.', 'Les auges et les caisses sont plus grandes !');
+    } });
   if (PRIX_PANIER[S.capacite]) l.push({ id: 'panier', x: PAD_PANIER[0], z: PAD_PANIER[1], e: '🧺', prix: PRIX_PANIER[S.capacite], niv: NIV_PANIER[S.capacite] || 1,
     fait: () => { S.capacite += 4; message(`🧺 Panier plus grand : ${S.capacite} places !`, 'Panier plus grand !'); } });
   if (S.bottes < BOTTES.length) l.push({ id: 'bottes', x: PAD_BOTTES[0], z: PAD_BOTTES[1], e: '👟', prix: BOTTES[S.bottes].prix, niv: BOTTES[S.bottes].niv,
