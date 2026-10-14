@@ -272,11 +272,11 @@ const ATELIERS = {
   pull:   { nom: 'Atelier de pulls', a: 'à l’atelier de pulls', entree: 'laine', sortie: 'pull', duree: 10, niv: 4, prix: 290, x: 15, z: -14.4, fab: () => fabAtelierPulls() },
   engrais: { nom: 'Composteur', a: 'au composteur', entree: 'fumier', sortie: 'engrais', duree: 10, niv: 4, prix: 270, x: 22, z: -14.4, fab: () => fabComposteur() },
   /* sur la nouvelle île, alignés au nord de la route */
-  pain:    { nom: 'Boulangerie', a: 'à la boulangerie', entree: 'ble', sortie: 'pain', duree: 8, niv: 6, prix: 380, x: 50, z: 0, fab: () => fabBoulangerie() },
-  fromage: { nom: 'Fromagerie', a: 'à la fromagerie', entree: 'laitc', sortie: 'fromage', duree: 10, niv: 7, prix: 460, x: 57.5, z: 0, fab: () => fabFromagerie() },
-  jus:     { nom: 'Pressoir', a: 'au pressoir', entree: 'pomme', sortie: 'jus', duree: 9, niv: 8, prix: 540, x: 65, z: 0, fab: () => fabPressoir() },
+  pain:    { nom: 'Boulangerie', a: 'à la boulangerie', entree: 'ble', sortie: 'pain', duree: 8, niv: 6, prix: 475, x: 50, z: 0, fab: () => fabBoulangerie() },
+  fromage: { nom: 'Fromagerie', a: 'à la fromagerie', entree: 'laitc', sortie: 'fromage', duree: 10, niv: 7, prix: 650, x: 57.5, z: 0, fab: () => fabFromagerie() },
+  jus:     { nom: 'Pressoir', a: 'au pressoir', entree: 'pomme', sortie: 'jus', duree: 9, niv: 8, prix: 800, x: 65, z: 0, fab: () => fabPressoir() },
   /* le premier stand à deux ingrédients : il faut les deux pour faire un gâteau */
-  gateau:  { nom: 'Pâtisserie', a: 'à la pâtisserie', entree: 'oeuf', entree2: 'miel', sortie: 'gateau', duree: 12, niv: 9, prix: 680, x: 72.5, z: 0, fab: () => fabPatisserie() }
+  gateau:  { nom: 'Pâtisserie', a: 'à la pâtisserie', entree: 'oeuf', entree2: 'miel', sortie: 'gateau', duree: 12, niv: 9, prix: 1100, x: 72.5, z: 0, fab: () => fabPatisserie() }
 };
 const ENTREE_MAX = 6, SORTIE_MAX = 8;
 /* ce qu'un stand attend : [produit, compteur dans S.ateliers] */
@@ -288,12 +288,14 @@ const AIDES = {
   fermier:  { e: '👨‍🌾', prix: 195, niv: 2, pad: [-24.8, -14.6], repos: [-23.4, -13.2], porte: 4, vitesse: 4.5, metier: 'champs', look: {},
     arrive: ['👨‍🌾 Le cultivateur arrive ! Il sème, récolte et nourrit les bêtes.', 'Le cultivateur arrive ! Il va t’aider.'],
     /* niveau 2 du cultivateur : son carré revient là où on l'a recruté */
-    plus: { prix: 450, niv: 6, porte: 7, vitesse: 6.5,
+    plus: { prix: 550, niv: 6, porte: 7, vitesse: 6.5,
       fait: ['⭐ Cultivateur niveau 2 ! Il va plus vite et porte plus.', 'Le cultivateur passe au niveau 2 ! Il va plus vite et porte plus !'] } },
-  eleveuse: { e: '👩‍🌾', prix: 430, niv: 7, pad: [44.6, -1.8], repos: [44.6, -4.4], porte: 5, vitesse: 4.8, metier: 'caisses',
+  eleveuse: { e: '👩‍🌾', prix: 600, niv: 7, pad: [44.6, -1.8], repos: [44.6, -4.4], porte: 5, vitesse: 4.8, metier: 'caisses',
     look: { chemise: '#ec4899', salopette: '#7c3aed', cheveux: '#c2410c', peau: '#f6c9a0', couettes: true },
-    arrive: ['👩‍🌾 L’éleveuse arrive ! Elle vide les caisses pleines et porte tout aux stands.', 'L’éleveuse arrive ! Elle va vider les caisses.'] },
-  fermier2: { e: '🧑‍🌾', prix: 640, niv: 9, pad: [-28.6, -16.6], repos: [-27.4, -13.4], porte: 4, vitesse: 4.5, metier: 'champs',
+    arrive: ['👩‍🌾 L’éleveuse arrive ! Elle vide les caisses pleines et porte tout aux stands.', 'L’éleveuse arrive ! Elle va vider les caisses.'],
+    plus: { prix: 1200, niv: 9, porte: 8, vitesse: 6.5,
+      fait: ['⭐ Éleveuse niveau 2 ! Elle va plus vite et porte plus.', 'L’éleveuse passe au niveau 2 ! Elle va plus vite et porte plus !'] } },
+  fermier2: { e: '🧑‍🌾', prix: 1025, niv: 9, pad: [-28.6, -16.6], repos: [-27.4, -13.4], porte: 4, vitesse: 4.5, metier: 'champs',
     look: { chemise: '#16a34a', salopette: '#92400e', cheveux: '#1f1408', peau: '#c68642' },
     arrive: ['🧑‍🌾 Un 2e cultivateur arrive ! Les champs vont encore plus vite.', 'Un deuxième cultivateur arrive !'] }
 };
@@ -310,15 +312,15 @@ const ETAL_RANG1 = 7, ETAL_NIV_ETAGERE = 6;
    au sud de l'étal, à l'écart de là où l'on dépose pour ne pas l'acheter
    sans le vouloir en attendant que la marchandise soit rangée) */
 const ETAL_PLACES = [6, 9, 12, 16, 20];
-const ETAL_AGRANDIR = [{ prix: 200, niv: 3 }, { prix: 355, niv: 4 }, { prix: 575, niv: 5 }, { prix: 820, niv: 8 }];
+const ETAL_AGRANDIR = [{ prix: 200, niv: 3 }, { prix: 355, niv: 4 }, { prix: 575, niv: 5 }, { prix: 1225, niv: 8 }];
 function placesEtal() { return ETAL_PLACES[S.etal.niv || 0]; }
 /* le silo à grain et l'entrepôt, à gauche des champs : même principe que
    l'étal, mais pour les récoltes. On y range ce qu'on porte, et chaque
    camion qui arrive vient s'y servir tout seul. */
 const RESERVES = {
-  silo:     { nom: 'Silo à grain', e: '🌾', dans: 'dans le silo', produits: ['ble', 'mais', 'tournesol'], places: 30, prix: 1500, niv: 7,
+  silo:     { nom: 'Silo à grain', e: '🌾', dans: 'dans le silo', produits: ['ble', 'mais', 'tournesol'], places: 30, prix: 2100, niv: 7,
               x: -30.9, z: -10, zone: [-30.9, -7.3], haut: 5.2 },
-  entrepot: { nom: 'Entrepôt', e: '🥕', dans: 'dans l’entrepôt', produits: ['carotte', 'tomate', 'pomme'], places: 30, prix: 2000, niv: 8,
+  entrepot: { nom: 'Entrepôt', e: '🥕', dans: 'dans l’entrepôt', produits: ['carotte', 'tomate', 'pomme'], places: 30, prix: 3000, niv: 8,
               x: -30.9, z: -3.6, zone: [-30.9, -.9], haut: 3.9 }
 };
 const CULTURES = {
@@ -333,8 +335,8 @@ const ANIMAUX = {
   vache:  { e: '🐄', nom: 'Vache', les: 'les vaches', mange: 'mais', donne: 'lait', duree: 20, niv: 2, prix: 120, max: 4, vitesse: .6 },
   cochon: { e: '🐖', nom: 'Cochon', les: 'les cochons', mange: 'carotte', donne: 'fumier', duree: 25, niv: 3, prix: 180, max: 4, vitesse: .8 },
   mouton: { e: '🐑', nom: 'Mouton', les: 'les moutons', mange: 'ble', donne: 'laine', duree: 25, niv: 4, prix: 255, max: 4, vitesse: .7 },
-  chevre: { e: '🐐', nom: 'Chèvre', les: 'les chèvres', mange: 'tomate', donne: 'laitc', duree: 22, niv: 6, prix: 300, max: 4, vitesse: .9 },
-  abeille: { e: '🐝', nom: 'Abeille', les: 'les abeilles', mange: 'tournesol', donne: 'miel', duree: 25, niv: 7, prix: 340, max: 5, vitesse: 1.6 }
+  chevre: { e: '🐐', nom: 'Chèvre', les: 'les chèvres', mange: 'tomate', donne: 'laitc', duree: 22, niv: 6, prix: 375, max: 4, vitesse: .9 },
+  abeille: { e: '🐝', nom: 'Abeille', les: 'les abeilles', mange: 'tournesol', donne: 'miel', duree: 25, niv: 7, prix: 475, max: 5, vitesse: 1.6 }
 };
 /* chaque enclos : son auge (à remplir) et sa caisse (à vider), dehors,
    contre la barrière ; et le carré d'achat d'une bête de plus */
@@ -360,22 +362,22 @@ const NOUVEAUTES = {
   6: [['🌉', 'Le pont'], ['🏝️', 'Une nouvelle île'], ['🍅', 'Tomates'], ['🐐', 'Chèvres'], ['🍞', 'Boulangerie'], ['🏪', 'Étal à deux étages'], ['👨‍🌾', 'Cultivateur niveau 2'], ['🐇', 'Pompon le lapin']],
   7: [['🌾', 'Champs niveau 3'], ['🌾', 'Silo à grain'], ['🌻', 'Tournesols'], ['🐝', 'Abeilles'], ['🧀', 'Fromagerie'], ['👩‍🌾', 'Éleveuse'], ['🎡', 'Grande roue']],
   8: [['🥕', 'Entrepôt à fruits et légumes'], ['🍎', 'Verger'], ['🧃', 'Pressoir à jus'], ['👟', 'Bottes magiques'], ['🏪', 'Étal géant'], ['🎠', 'Manège']],
-  9: [['🎂', 'Pâtisserie'], ['🧑‍🌾', '2e cultivateur'], ['🦚', 'Paon']],
+  9: [['🎂', 'Pâtisserie'], ['🧑‍🌾', '2e cultivateur'], ['👩‍🌾', 'Éleveuse niveau 2'], ['🦚', 'Paon']],
   10: [['🐴', 'Poney'], ['🏆', 'Coupe d’or']]
 };
 /* la seconde île, à l'est, et le pont qui y mène (dans l'axe de la grande route) */
 const ILE2 = { cx: 61, cz: -2, hw: 20, hd: 20, r: 8 };
-const PONT = { prix: 400, niv: 6, x0: 31, x1: 43, z: 4.8, pad: [28.6, 4.8], porte: 32.2 };
+const PONT = { prix: 500, niv: 6, x0: 31, x1: 43, z: 4.8, pad: [28.6, 4.8], porte: 32.2 };
 const EST = 36;   /* tout ce qui est à l'est de cette ligne est sur la nouvelle île */
 /* le verger : des pommiers qu'on achète un par un ; les pommes repoussent toutes seules */
-const VERGER = { arbres: [[48, -12], [56, -12], [64, -12], [72, -12]], prix: [240, 320, 410, 520], niv: 8, duree: 30, recolte: 4 };
+const VERGER = { arbres: [[48, -12], [56, -12], [64, -12], [72, -12]], prix: [350, 475, 625, 775], niv: 8, duree: 30, recolte: 4 };
 /* le poney : Roullieee monte dessus et galope plus vite */
-const PONEY = { prix: 900, niv: 10, pad: [60, 11.5], bonus: 2.5 };
+const PONEY = { prix: 1525, niv: 10, pad: [60, 11.5], bonus: 2.5 };
 /* prix des champs 7 à 12 (les 6 premiers sont offerts) */
 const PRIX_CHAMPS = [50, 95, 160, 245, 320, 415];
 const NB_CHAMPS = 12;
 /* améliorations des champs : chacune ajoute 1 à chaque récolte (3 → 4 → 5) */
-const CHAMPS_PLUS = [{ prix: 400, niv: 5 }, { prix: 1000, niv: 7 }];
+const CHAMPS_PLUS = [{ prix: 400, niv: 5 }, { prix: 1400, niv: 7 }];
 const PAD_CHAMPS_PLUS = [-27.2, -7.9];
 function recolteDe(k) { return CULTURES[k].recolte + (S.champsNiv || 0); }
 /* Chaque bête de plus d'une même espèce coûte plus cher (×1,4) :
@@ -397,11 +399,11 @@ const DECOS = [
   { id: 'epouv',    e: '🎃', nom: 'Épouvantail', prix: 70,  niv: 3, faire: () => fabEpouvantail() },
   { id: 'arc',      e: '🌈', nom: 'Arc-en-ciel', prix: 195, niv: 4, faire: () => fabArcEnCiel() },
   { id: 'dindo',    e: '🦃', nom: 'Dindromakus', prix: 320, niv: 5, faire: () => fabStatue(), glou: true },
-  { id: 'lapin',    e: '🐇', nom: 'Pompon',      prix: 260, niv: 6, faire: () => fabLapin(), promene: true, saut: .35 },
-  { id: 'roue',     e: '🎡', nom: 'Grande roue', prix: 420, niv: 7, faire: () => fabGrandeRoue() },
-  { id: 'manege',   e: '🎠', nom: 'Manège',      prix: 480, niv: 8, faire: () => fabManege(), son: 'achat' },
-  { id: 'paon',     e: '🦚', nom: 'Paon',        prix: 450, niv: 9, faire: () => fabPaon(), promene: true },
-  { id: 'coupe',    e: '🏆', nom: 'Coupe d’or',  prix: 850, niv: 10, faire: () => fabCoupe(), son: 'niveau' }
+  { id: 'lapin',    e: '🐇', nom: 'Pompon',      prix: 325, niv: 6, faire: () => fabLapin(), promene: true, saut: .35 },
+  { id: 'roue',     e: '🎡', nom: 'Grande roue', prix: 600, niv: 7, faire: () => fabGrandeRoue() },
+  { id: 'manege',   e: '🎠', nom: 'Manège',      prix: 725, niv: 8, faire: () => fabManege(), son: 'achat' },
+  { id: 'paon',     e: '🦚', nom: 'Paon',        prix: 725, niv: 9, faire: () => fabPaon(), promene: true },
+  { id: 'coupe',    e: '🏆', nom: 'Coupe d’or',  prix: 1450, niv: 10, faire: () => fabCoupe(), son: 'niveau' }
 ];
 /* les 5 derniers emplacements sont sur la nouvelle île (lapin, grande
    roue, manège, paon, coupe : les décos sont achetées dans l'ordre) */
@@ -414,7 +416,7 @@ const PAD_PANIER = [-27, -3.4];   /* carré « panier plus grand » */
 /* les bottes de Roullieee : chaque paire la fait marcher plus vite */
 const PAD_BOTTES = [-27.5, 1.2];
 const VITESSES = [6.5, 7.5, 8.5, 9.5, 10.5];
-const BOTTES = [{ prix: 95, niv: 1, couleur: '#ef4444' }, { prix: 205, niv: 2, couleur: '#3b82f6' }, { prix: 380, niv: 4, couleur: '#ffd23f' }, { prix: 560, niv: 8, couleur: '#a855f7' }];
+const BOTTES = [{ prix: 95, niv: 1, couleur: '#ef4444' }, { prix: 205, niv: 2, couleur: '#3b82f6' }, { prix: 380, niv: 4, couleur: '#ffd23f' }, { prix: 850, niv: 8, couleur: '#a855f7' }];
 function vitesseMax() { return (VITESSES[S.bottes] || VITESSES[0]) + (S.poney ? PONEY.bonus : 0); }
 const ZONE_CAMION = [-19.5, 9.2]; /* derrière le camion : là où l'on envoie Roullieee */
 const DEPART = [-6.5, -3.9];
@@ -432,7 +434,7 @@ function etatNeuf() {
     auges: Object.fromEntries(Object.keys(ENCLOS).map(id => [id, 0])),
     caisses: Object.fromEntries(Object.keys(ENCLOS).map(id => [id, 0])),
     ateliers: Object.fromEntries(Object.keys(ATELIERS).map(id => [id, { achete: false, entree: 0, entree2: 0, sortie: 0, fin: 0 }])),
-    fermier: false, fermierPlus: false, eleveuse: false, fermier2: false, pont: false, poney: false,
+    fermier: false, fermierPlus: false, eleveuse: false, eleveusePlus: false, fermier2: false, pont: false, poney: false,
     pommiers: 0, pommes: VERGER.arbres.map(() => ({ t1: 0, reste: VERGER.recolte })),
     etal: { achete: false, niv: 0, stock: Object.fromEntries(ETAL_PRODUITS.map(k => [k, 0])) },
     reserves: Object.fromEntries(Object.entries(RESERVES).map(([id, R]) => [id, { achete: false, stock: Object.fromEntries(R.produits.map(k => [k, 0])) }])),
@@ -3062,7 +3064,7 @@ function fenetreModeEmploi() {
     <span class="em">👨‍🌾</span><span>Le cultivateur (à recruter près de la grange) sème les champs, récolte et remplit les auges des bêtes tout seul. Au niveau 6, le carré 👨‍🌾⬆️ le fait passer au niveau 2 : il va plus vite et porte plus.</span>
     <span class="em">🌉</span><span>Au niveau 6, achète le pont : une nouvelle île t’attend, avec des chèvres 🐐, des abeilles 🐝, un verger 🍎 et de nouveaux stands : pain 🍞, fromage 🧀, jus 🧃 et gâteau 🎂.</span>
     <span class="em">🎂</span><span>La pâtisserie a besoin de deux choses : des œufs 🥚 et du miel 🍯.</span>
-    <span class="em">👩‍🌾</span><span>L’éleveuse vide les caisses pleines et porte tout aux stands, à l’étal ou à la grange.</span>
+    <span class="em">👩‍🌾</span><span>L’éleveuse vide les caisses pleines et porte tout aux stands, à l’étal ou à la grange. Au niveau 9, le carré 👩‍🌾⬆️ la fait passer au niveau 2 : elle va plus vite et porte plus.</span>
     <span class="em">🐴</span><span>Au niveau 10, le poney : Roullieee galope sur son dos, encore plus vite !</span>
     <span class="em">💡</span><span>Perdu ? Touche le bouton Aide : une flèche te montre où aller.</span></div>`);
 }
