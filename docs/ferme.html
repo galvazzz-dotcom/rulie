@@ -2686,7 +2686,11 @@ function secouerArbre(e, force) {
    la grange. Ils sèment d'abord les champs vides et ne récoltent que
    pour les bêtes : le reste des champs est laissé aux commandes de
    l'enfant. L'éleveuse vide les caisses presque pleines et porte tout
-   aux stands qui en veulent, sinon à l'étal, sinon à la grange.
+   aux stands qui en veulent, sinon à l'étal, sinon à la grange. Elle
+   choisit la caisse qui rapporte le plus pour le chemin à faire (une
+   caisse pleine depuis longtemps passe devant), n'en prend que ce que
+   la destination peut accepter et complète son sac dans une caisse sur
+   sa route.
    ══════════════════════════════════════════════════════════ */
 const CAISSE_PLEINE = 4, LOT_AIDE = 4;
 function porteeParAides(k) { return aides.reduce((n, h) => n + h.porte.filter(x => x === k).length, 0); }
@@ -2695,12 +2699,14 @@ function enclosQuiMangent(k) { return Object.entries(ENCLOS).filter(([, E]) => A
 function placeAuge(id) { const n = AUGE_MAX - S.auges[id]; return n > 1 ? n : 0; }
 /* ce qu'il manque de cette culture pour remplir les auges, en comptant ce que les aides portent déjà */
 function manqueDe(k) { return enclosQuiMangent(k).reduce((n, [id]) => n + placeAuge(id), 0) - porteeParAides(k); }
-/* depuis quand chaque auge est vide */
-const videDepuis = {};
-function noterAugesVides(now) {
+/* depuis quand chaque auge est vide, et depuis quand chaque caisse est pleine (les bêtes ne produisent plus) */
+const videDepuis = {}, pleineDepuis = {};
+function noterAttentes(now) {
   for (const [id, E] of Object.entries(ENCLOS)) {
     if (S.auges[id] || !S.animaux.some(a => a.esp === E.espece)) delete videDepuis[id];
     else if (!videDepuis[id]) videDepuis[id] = now;
+    if (S.caisses[id] < CAISSE_MAX) delete pleineDepuis[id];
+    else if (!pleineDepuis[id]) pleineDepuis[id] = now;
   }
 }
 /* la prochaine tournée : l'auge vide depuis le plus longtemps, sinon la
@@ -2781,15 +2787,56 @@ function destination(k) {
   if (S.etal.achete && ETAL_PRODUITS.includes(k) && S.etal.stock[k] < placesEtal()) return { type: 'etal', x: ETAL.zone[0], z: ETAL.zone[1] };
   return { type: 'vente', x: VENTE[0], z: VENTE[1] };
 }
+/* ce que rapporte un produit posé là : au stand, le produit fini (à un stand
+   à deux ingrédients, seul celui qui manque compte vraiment) ; à l'étal, ce
+   que le camion en donne ; à la grange, sa valeur */
+function gainVers(k, d) {
+  if (d.type === 'vente') return ITEMS[k].val;
+  if (d.type === 'etal') return ITEMS[k].val * 1.6;
+  const A = ATELIERS[d.id], T = S.ateliers[d.id], v = ITEMS[A.sortie].val * 1.6;
+  if (!A.entree2) return v;
+  const [moi, autre] = k === A.entree ? [T.entree, T.entree2] : [T.entree2, T.entree];
+  return moi <= autre ? v : v / 4;
+}
+/* combien cet endroit peut encore prendre de ce produit */
+function placeVers(k, d) {
+  if (d.type === 'vente') return Infinity;
+  if (d.type === 'etal') return placesEtal() - S.etal.stock[k];
+  const A = ATELIERS[d.id];
+  return ENTREE_MAX - S.ateliers[d.id][k === A.entree ? 'entree' : 'entree2'];
+}
+const distance = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 function penserEleveuse(h) {
-  if (h.porte.length) { const d = destination(h.porte[h.porte.length - 1]); return aideVers(h, d.x, d.z, d); }
-  /* la caisse pleine la plus proche d'abord : pas d'aller-retour inutile d'une île à l'autre */
-  const p = h.obj.position, loin = E => Math.hypot(E.caisse[0] - p.x, E.caisse[1] - p.z);
-  const pleines = Object.entries(ENCLOS).filter(([id]) => S.caisses[id] >= CAISSE_PLEINE).sort((a, b) => loin(a[1]) - loin(b[1]));
-  if (pleines.length) {
-    const [id, E] = pleines[0], [x, z] = dehors(E, E.caisse[0], E.caisse[1]);
-    return aideVers(h, x, z, { type: 'caisse', id });
+  const now = maintenant(), ici = [h.obj.position.x, h.obj.position.z];
+  const caisses = Object.entries(ENCLOS).map(([id, E]) => ({ id, k: ANIMAUX[E.espece].donne, pos: dehors(E, E.caisse[0], E.caisse[1]) }));
+  if (h.porte.length) {
+    /* la plus proche des destinations de ce qu'elle porte */
+    const d = [...new Set(h.porte)].map(destination).sort((a, b) => distance(ici, [a.x, a.z]) - distance(ici, [b.x, b.z]))[0], vers = [d.x, d.z];
+    /* son sac n'est pas plein : elle le complète dans une caisse presque sur sa route,
+       dont le produit va au même endroit (ou juste à côté) et y a sa place */
+    if (h.porte.length < porteAide(h)) {
+      const detour = c => distance(ici, c.pos) + distance(c.pos, vers) - distance(ici, vers);
+      const route = caisses.map(c => { const dc = destination(c.k); return { ...c, dc, max: placeVers(c.k, dc) - h.porte.filter(x => x === c.k).length }; })
+        .filter(c => S.caisses[c.id] >= 2 && c.max >= 2 && detour(c) < 15 && distance([c.dc.x, c.dc.z], vers) < 12)
+        .sort((a, b) => detour(a) - detour(b))[0];
+      if (route) return aideVers(h, route.pos[0], route.pos[1], { type: 'caisse', id: route.id, max: route.max });
+    }
+    return aideVers(h, d.x, d.z, d);
   }
+  /* la caisse qui rapporte le plus pour le chemin à faire ; une caisse pleine
+     depuis longtemps passe peu à peu devant (ses bêtes ne produisent plus) :
+     au bout de 3 minutes, elle compte double */
+  let mieux = null, score = 0;
+  for (const c of caisses) {
+    if (S.caisses[c.id] < CAISSE_PLEINE) continue;
+    /* elle ne compte (et ne prendra) que ce que la destination peut accepter */
+    const d = destination(c.k), n = Math.min(S.caisses[c.id], porteAide(h), placeVers(c.k, d));
+    if (n < 2) continue;
+    const chemin = distance(ici, c.pos) + distance(c.pos, [d.x, d.z]) + 10;
+    const s = n * gainVers(c.k, d) / chemin * (1 + (pleineDepuis[c.id] ? (now - pleineDepuis[c.id]) / 180000 : 0));
+    if (s > score) { mieux = { ...c, n }; score = s; }
+  }
+  if (mieux) return aideVers(h, mieux.pos[0], mieux.pos[1], { type: 'caisse', id: mieux.id, max: mieux.n });
   flaner(h);
 }
 /* une étape du travail en cours ; false = travail terminé */
@@ -2815,8 +2862,8 @@ function faireTache(h) {
   }
   if (T.type === 'caisse') {
     const E = ENCLOS[T.id], k = ANIMAUX[E.espece].donne;
-    if (!S.caisses[T.id] || h.porte.length >= porteAide(h)) return false;
-    S.caisses[T.id]--; h.porte.push(k); sauver();
+    if (!S.caisses[T.id] || h.porte.length >= porteAide(h) || T.max <= 0) return false;
+    S.caisses[T.id]--; h.porte.push(k); T.max--; sauver();
     lancer(fabMini(k), pos3(E.caisse[0], E.caisse[1], .8), () => hautPileAide(h), .38);
     return true;
   }
@@ -3141,7 +3188,7 @@ function boucle(tms) {
   deplacerJoueur(dt, t);
   zones(dt);
   majBoutonEngrais();
-  noterAugesVides(now);
+  noterAttentes(now);
   aides.forEach(h => majAide(h, dt));
   majTravailAteliers(dt);
   majEtal(dt);
