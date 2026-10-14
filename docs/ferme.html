@@ -1659,7 +1659,7 @@ const eDinde = entite(dinde, { type: 'dinde' });
 const aides = Object.entries(AIDES).map(([id, A]) => {
   const obj = poser(fabFermier(A.look), A.repos[0], A.repos[1]);
   obj.visible = !!S[id];
-  const h = { id, A, obj, porte: [], trajet: null, tache: null, attente: 1, cadence: 0, phase: 0, sig: '' };
+  const h = { id, A, obj, porte: [], trajet: null, tache: null, attente: 1, cadence: 0, phase: 0, sig: '', culture: null, cible: null, livre: false };
   entite(obj, { type: 'aide', h });
   majLookAide(h);
   return h;
@@ -2677,19 +2677,53 @@ function secouerArbre(e, force) {
 
 /* ══════════════════════════════════════════════════════════
    LES AIDES
-   Les cultivateurs sèment les champs vides, récoltent ce dont les
-   bêtes ont besoin et le portent aux auges ; s'il leur reste quelque
-   chose sur le dos, ils le vendent à la grange. Ils ne récoltent que
+   Les cultivateurs font des tournées d'une seule culture : quand les
+   auges en attendent au moins LOT_AIDE (ou qu'une auge est vide), ils
+   passent d'un champ mûr à l'autre jusqu'à remplir leur sac, ressèment
+   chaque champ qu'ils vident, puis remplissent les auges les plus
+   vides. Les bêtes qui attendent depuis le plus longtemps passent
+   d'abord. S'il leur reste quelque chose sur le dos, ils le vendent à
+   la grange. Ils sèment d'abord les champs vides et ne récoltent que
    pour les bêtes : le reste des champs est laissé aux commandes de
    l'enfant. L'éleveuse vide les caisses presque pleines et porte tout
    aux stands qui en veulent, sinon à l'étal, sinon à la grange.
    ══════════════════════════════════════════════════════════ */
-const CAISSE_PLEINE = 4;
-/* une auge a-t-elle besoin de cette culture (en comptant ce que les aides portent déjà) ? */
-function aBesoinDe(k) {
-  const porte = aides.reduce((n, h) => n + h.porte.filter(x => x === k).length, 0);
-  return Object.entries(ENCLOS).some(([id, E]) => ANIMAUX[E.espece].mange === k && S.animaux.some(a => a.esp === E.espece)
-    && S.auges[id] + porte < 4);
+const CAISSE_PLEINE = 4, LOT_AIDE = 4;
+function porteeParAides(k) { return aides.reduce((n, h) => n + h.porte.filter(x => x === k).length, 0); }
+function enclosQuiMangent(k) { return Object.entries(ENCLOS).filter(([, E]) => ANIMAUX[E.espece].mange === k && S.animaux.some(a => a.esp === E.espece)); }
+/* la place dans une auge ; s'il n'en reste qu'une, elle attendra la tournée suivante */
+function placeAuge(id) { const n = AUGE_MAX - S.auges[id]; return n > 1 ? n : 0; }
+/* ce qu'il manque de cette culture pour remplir les auges, en comptant ce que les aides portent déjà */
+function manqueDe(k) { return enclosQuiMangent(k).reduce((n, [id]) => n + placeAuge(id), 0) - porteeParAides(k); }
+/* depuis quand chaque auge est vide */
+const videDepuis = {};
+function noterAugesVides(now) {
+  for (const [id, E] of Object.entries(ENCLOS)) {
+    if (S.auges[id] || !S.animaux.some(a => a.esp === E.espece)) delete videDepuis[id];
+    else if (!videDepuis[id]) videDepuis[id] = now;
+  }
+}
+/* la prochaine tournée : l'auge vide depuis le plus longtemps, sinon la
+   plus basse, sinon celle qui remplit le mieux le sac ; elle donne la
+   culture à récolter et l'auge à servir d'abord. Aucune si la tournée
+   ne vaut pas le déplacement. */
+function tourneeAFaire(murs, sac, now) {
+  const dispo = {};
+  for (const i of murs) { const c = S.champs[i]; dispo[c.c] = (dispo[c.c] || 0) + (c.reste || recolteDe(c.c)); }
+  let mieux = null;
+  for (const k in dispo) {
+    const n = Math.min(dispo[k], manqueDe(k), sac);
+    for (const [id] of enclosQuiMangent(k)) {
+      if (!placeAuge(id) || n < (S.auges[id] ? LOT_AIDE : 2)) continue;
+      const c = { k, cible: id, n, niveau: S.auges[id], attente: videDepuis[id] ? now - videDepuis[id] : 0 };
+      if (!mieux || c.attente > mieux.attente || c.attente === mieux.attente && (c.niveau < mieux.niveau || c.niveau === mieux.niveau && c.n > mieux.n)) mieux = c;
+    }
+  }
+  return mieux;
+}
+function ressemer(i) {
+  const c = S.champs[i], g = c.prevu || 'ble';
+  if (!c.c && S.niveau >= CULTURES[g].niv) planter(i, g);
 }
 function aideVers(h, x, z, tache) {
   const ch = trouverChemin(h.obj.position.x, h.obj.position.z, x, z);
@@ -2711,25 +2745,31 @@ function recruter(h) {
 }
 function penserCultivateur(h) {
   const now = maintenant(), p = h.obj.position;
-  if (h.porte.length) {
-    for (const [id, E] of Object.entries(ENCLOS)) {
-      if (h.porte.includes(ANIMAUX[E.espece].mange) && S.animaux.some(a => a.esp === E.espece) && S.auges[id] < AUGE_MAX) {
-        const [x, z] = dehors(E, E.auge[0], E.auge[1]);
-        return aideVers(h, x, z, { type: 'auge', id });
-      }
-    }
-    return aideVers(h, VENTE[0], VENTE[1], { type: 'vente' });
-  }
-  const dist = i => Math.hypot(POS_CHAMPS[i][0] - p.x, POS_CHAMPS[i][1] - p.z);
-  const proche = l => l.sort((a, b) => dist(a) - dist(b))[0];
+  const loin = ([x, z]) => Math.hypot(x - p.x, z - p.z);
+  const proche = l => l.sort((a, b) => loin(POS_CHAMPS[a]) - loin(POS_CHAMPS[b]))[0];
+  const recolter = l => { const i = proche(l); aideVers(h, POS_CHAMPS[i][0], POS_CHAMPS[i][1], { type: 'recolter', i }); };
   /* deux cultivateurs ne vont pas au même champ */
   const pris = new Set(aides.filter(o => o !== h && o.tache && o.tache.i !== undefined).map(o => o.tache.i));
   const champs = [];
   for (let i = 0; i < S.champsAchetes; i++) if (!pris.has(i)) champs.push(i);
+  const murs = champs.filter(i => S.champs[i].c && now >= S.champs[i].t1 && manqueDe(S.champs[i].c) > 0);
+  if (h.porte.length) {
+    /* tant qu'il n'a rien livré, il remplit son sac dans les autres champs mûrs de la même culture */
+    const encore = murs.filter(i => S.champs[i].c === h.culture);
+    if (!h.livre && h.porte.length < porteAide(h) && encore.length) return recolter(encore);
+    h.livre = true;
+    /* d'abord l'auge visée par la tournée, puis celles qui ont vraiment de la place, la plus vide d'abord */
+    const auges = Object.entries(ENCLOS).filter(([id, E]) => h.porte.includes(ANIMAUX[E.espece].mange) && S.animaux.some(a => a.esp === E.espece) && S.auges[id] < AUGE_MAX)
+      .map(([id, E]) => [id, dehors(E, E.auge[0], E.auge[1])])
+      .sort((a, b) => (b[0] === h.cible) - (a[0] === h.cible) || (placeAuge(b[0]) > 0) - (placeAuge(a[0]) > 0) || S.auges[a[0]] - S.auges[b[0]] || loin(a[1]) - loin(b[1]));
+    if (auges.length) { const [id, [x, z]] = auges[0]; return aideVers(h, x, z, { type: 'auge', id }); }
+    return aideVers(h, VENTE[0], VENTE[1], { type: 'vente' });
+  }
   const vides = champs.filter(i => !S.champs[i].c && S.niveau >= CULTURES[S.champs[i].prevu || 'ble'].niv);
   if (vides.length) { const i = proche(vides); return aideVers(h, POS_CHAMPS[i][0], POS_CHAMPS[i][1], { type: 'semer', i }); }
-  const murs = champs.filter(i => S.champs[i].c && now >= S.champs[i].t1 && aBesoinDe(S.champs[i].c));
-  if (murs.length) { const i = proche(murs); return aideVers(h, POS_CHAMPS[i][0], POS_CHAMPS[i][1], { type: 'recolter', i }); }
+  const t = tourneeAFaire(murs, porteAide(h), now);
+  h.livre = false; h.culture = t && t.k; h.cible = t && t.cible;
+  if (t) return recolter(murs.filter(i => S.champs[i].c === t.k));
   flaner(h);
 }
 /* où l'éleveuse porte un produit : un stand qui en veut, puis l'étal, sinon la grange */
@@ -2755,13 +2795,15 @@ function penserEleveuse(h) {
 /* une étape du travail en cours ; false = travail terminé */
 function faireTache(h) {
   const T = h.tache;
-  if (T.type === 'semer') { const c = S.champs[T.i]; if (!c.c) planter(T.i, c.prevu || 'ble'); return false; }
+  if (T.type === 'semer') { ressemer(T.i); return false; }
   if (T.type === 'recolter') {
     const c = S.champs[T.i];
-    if (!c.c || maintenant() < c.t1 || h.porte.length >= porteAide(h) || !aBesoinDe(c.c)) return false;
+    if (!c.c || c.c !== h.culture || maintenant() < c.t1 || h.porte.length >= porteAide(h) || manqueDe(c.c) <= 0) return false;
     const [fx, fz] = POS_CHAMPS[T.i], k = cueillir(T.i);
     h.porte.push(k);
     lancer(fabMini(k), pos3(fx + rand(-.8, .8), fz + rand(-.8, .8), .8), () => hautPileAide(h), .38);
+    /* il est sur le champ qu'il vient de vider : il le ressème tout de suite */
+    if (!S.champs[T.i].c) { ressemer(T.i); return false; }
     return true;
   }
   if (T.type === 'auge') {
@@ -3099,6 +3141,7 @@ function boucle(tms) {
   deplacerJoueur(dt, t);
   zones(dt);
   majBoutonEngrais();
+  noterAugesVides(now);
   aides.forEach(h => majAide(h, dt));
   majTravailAteliers(dt);
   majEtal(dt);
