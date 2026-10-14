@@ -352,14 +352,16 @@ const ENCLOS = {
 const AUGE_MAX = 8, CAISSE_MAX = 12;
 /* Expérience cumulée pour chaque niveau. Volontairement lente : une
    nouveauté toutes les quelques séances, pas toutes les deux minutes.
-   Depuis le niveau 2, chaque niveau demande 1,5 fois plus d'expérience
-   que dans la première version du jeu (le niveau 1 reste rapide). */
-const PALIERS = [0, 190, 700, 1500, 2800, 4500, 7000, 10000, 14000, 19500];
-function palier(i) { return i < PALIERS.length ? PALIERS[i] : PALIERS[PALIERS.length - 1] + (i - PALIERS.length + 1) * 6000; }
+   Par rapport à la première version du jeu, les niveaux 2 à 4 demandent
+   1,5 fois plus d'expérience, et le niveau 5 et les suivants environ
+   1,2 fois plus (le niveau 1 reste rapide). */
+const PALIERS = [0, 190, 700, 1500, 2800, 4160, 6160, 8560, 11760, 16160];
+function palier(i) { return i < PALIERS.length ? PALIERS[i] : PALIERS[PALIERS.length - 1] + (i - PALIERS.length + 1) * 4800; }
 /* les paliers des versions précédentes, pour garder la progression des parties commencées avant */
 const ANCIENS_PALIERS = {
   1: { p: [0, 190, 525, 1050, 1900, 3000, 4650, 6650, 9400, 13000], ensuite: 4100 },
-  2: { p: [0, 190, 525, 1050, 1900, 3000, 5000, 8000, 12000, 17500], ensuite: 6000 }
+  2: { p: [0, 190, 525, 1050, 1900, 3000, 5000, 8000, 12000, 17500], ensuite: 6000 },
+  3: { p: [0, 190, 700, 1500, 2800, 4500, 7000, 10000, 14000, 19500], ensuite: 6000 }
 };
 function ancienPalier(v, i) { const A = ANCIENS_PALIERS[v]; return i < A.p.length ? A.p[i] : A.p[A.p.length - 1] + (i - A.p.length + 1) * A.ensuite; }
 const NOUVEAUTES = {
@@ -433,7 +435,7 @@ const DEPART = [-6.5, -3.9];
 function etatNeuf() {
   const t = maintenant();
   return {
-    v: 1, paliers: 3, pieces: 10, xp: 0, niveau: 1, prochainId: 10, capacite: 6, graine: 'ble', bottes: 0,
+    v: 1, paliers: 4, pieces: 10, xp: 0, niveau: 1, prochainId: 10, capacite: 6, graine: 'ble', bottes: 0,
     porte: [],
     /* prevu : ce qu'on sème dans ce champ (choisi par l'enfant, bouton 🌱 Champs) */
     champs: Array.from({ length: NB_CHAMPS }, (_, i) => i < 3 ? { c: 'ble', t0: t - 30000, t1: t - 1000, reste: 3, prevu: 'ble' } : { c: null, t0: 0, t1: 0, reste: 0, prevu: 'ble' }),
