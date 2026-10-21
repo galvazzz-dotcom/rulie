@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#3ec5f0">
-<meta name="version" content="2026-10-14-aides-niv7-8">
+<meta name="version" content="2026-10-21-apprendre">
 <title>🚜 La Ferme de Roullieee</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lilita+One&display=swap" rel="stylesheet">
@@ -189,6 +189,117 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
 #jouer:disabled{filter:grayscale(1);animation:none;opacity:.8}
 @keyframes respire{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 #charge{color:#fff;font-weight:700;text-shadow:0 2px 0 rgba(0,0,0,.35);min-height:1.2em}
+/* ── écran titre : deux boutons, Jouer et Apprendre ── */
+.choixTitre{display:flex;gap:16px 22px;flex-wrap:wrap;justify-content:center;align-items:center}
+#apprendre{font-family:'Lilita One';font-size:clamp(32px,6vw,52px);color:#fff;padding:14px 40px;border-radius:30px;border:6px solid #fff;
+  background:linear-gradient(#7dd3fc,#2563eb);box-shadow:0 9px 0 #1e3a8a,0 16px 28px rgba(0,0,0,.3);text-shadow:0 3px 0 rgba(0,0,0,.25);animation:respire 1.2s ease-in-out .6s infinite}
+#apprendre:disabled{filter:grayscale(1);animation:none;opacity:.8}
+
+/* ── mode Apprendre ── */
+#hudA{position:fixed;inset:0;pointer-events:none;z-index:10}
+#hudA > *{pointer-events:auto}
+#hudA > .hautA{position:absolute;left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));
+  display:flex;align-items:center;justify-content:space-between;gap:8px;pointer-events:none}
+.hautA > *{pointer-events:auto}
+.hautA .petit{width:58px;height:58px;font-size:28px;border-radius:18px;flex:none}
+.hautA .vide{width:58px;flex:none;pointer-events:none}
+#aProg{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.95);border:4px solid #3a86ff;border-radius:999px;padding:5px 16px;box-shadow:0 5px 0 rgba(0,0,0,.15)}
+#aProg .em{font-size:26px;line-height:1}
+#aProg i{display:block;width:20px;height:20px;border-radius:50%;background:#e2e8f0;border:3px solid #94a3b8}
+#aProg i.p{background:#ffd23f;border-color:#f59e0b;animation:pop .35s cubic-bezier(.34,1.56,.64,1)}
+#aConsigne{position:absolute;left:50%;top:max(80px,calc(env(safe-area-inset-top) + 78px));transform:translateX(-50%);width:max-content;max-width:min(92vw,760px);
+  background:#fff;border:4px solid var(--or);border-radius:24px;padding:8px 18px;font-size:clamp(17px,1.6vmin + 12px,24px);font-weight:700;text-align:center;line-height:1.3;
+  box-shadow:0 6px 0 rgba(0,0,0,.15)}
+#aConsigne:active{transform:translateX(-50%) translateY(3px)}
+#aBulles{position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden}
+/* des bulles plus grosses que dans « Jouer » : ce sont les boutons des petits doigts */
+.bulle.a .in{min-width:60px;height:60px;padding:0 12px;font-size:34px;cursor:pointer}
+.bulle.a.caisseA .in{border-color:#fde68a}
+.bulle.a.panneau .in{background:linear-gradient(#ffffff,#fff3c4);border-color:#ffd23f;gap:6px;font-size:32px}
+.bulle.a.panneau .in::after{border-top-color:#ffd23f}
+.bulle.a.panneau.petit .in{min-width:50px;height:50px;font-size:26px}
+.etoilesA{font-size:20px;letter-spacing:-1px;white-space:nowrap}
+.etoilesA i{font-style:normal;filter:grayscale(1);opacity:.35}
+.bulle.a.cmdA .in{height:auto;min-height:60px;padding:6px 12px;border-color:#3a86ff;gap:8px}
+.bulle.a.cmdA .in::after{border-top-color:#3a86ff}
+.bulle.a.cmdA .em{font-size:34px}
+.bulle.a.cmdA b{font-family:'Lilita One';font-weight:400;font-size:38px;color:#1d4ed8;line-height:1}
+.cases{display:flex;gap:4px}
+.cases.dix{display:grid;grid-template-columns:repeat(5,auto)}
+.cases i{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;border:3px dashed #93c5fd;font-style:normal;font-size:18px}
+.cases i.p{border:3px solid #22c55e;background:#dcfce7;animation:pop .25s}
+.lot{display:inline-flex;align-items:center;gap:4px}
+.lot + .lot{margin-left:6px;padding-left:10px;border-left:3px solid #e2e8f0}
+.lot .ok{color:#16a34a;font-size:30px}
+.lot small{font-size:15px;letter-spacing:-3px}
+.bulle.a.faimA .in{border-color:#f97316;font-size:30px}
+.bulle.a.faimA .in::after{border-top-color:#f97316}
+/* la bulle que montre la flèche d'aide */
+.bulle.a.indice .in{animation:indiceA .55s ease-in-out infinite alternate;box-shadow:0 0 0 5px #ffd23f,0 0 26px 8px rgba(255,210,63,.95)}
+@keyframes indiceA{from{transform:scale(1)}to{transform:scale(1.14)}}
+.flotte.compte{font-family:'Lilita One';font-weight:400;font-size:58px;color:#ffd23f;text-shadow:0 4px 0 #b45309,0 0 10px rgba(0,0,0,.35)}
+#voileA{position:fixed;inset:0;z-index:35;background:#fff8e7;opacity:0;pointer-events:none;transition:opacity .25s}
+#voileA.on{opacity:1;pointer-events:auto}
+@media (max-width:560px){
+  .bulle.a .in{min-width:50px;height:50px;font-size:28px;padding:0 8px}
+  .bulle.a.panneau .in{font-size:26px}
+  .bulle.a.panneau.petit .in{min-width:42px;height:42px;font-size:22px}
+  .etoilesA{font-size:15px}
+  .bulle.a.cmdA .in{min-height:50px;padding:4px 8px;gap:5px}
+  .bulle.a.cmdA .em{font-size:26px}
+  .bulle.a.cmdA b{font-size:30px}
+  .cases i{width:24px;height:24px;font-size:13px;border-width:2px}
+  .cases i.p{border-width:2px}
+  .lot .ok{font-size:24px}
+  .hautA .petit{width:50px;height:50px;font-size:24px}
+  .hautA .vide{width:50px}
+  #aProg{gap:6px;padding:4px 12px}
+  #aProg .em{font-size:22px}
+  #aProg i{width:16px;height:16px}
+  .flotte.compte{font-size:48px}
+}
+/* choisir son niveau */
+.consigneN{font-size:20px;font-weight:700;margin:0 0 12px}
+.niveauxA{display:flex;flex-direction:column;gap:12px;max-width:440px;margin:0 auto}
+.nivA{position:relative;display:grid;grid-template-columns:auto 1fr;column-gap:14px;align-items:center;text-align:left;background:#fff;border:4px solid #f1d9a8;border-radius:22px;
+  padding:10px 60px 10px 14px;box-shadow:0 5px 0 #e0c48a;min-height:78px}
+.nivA:active{transform:translateY(3px);box-shadow:0 2px 0 #e0c48a}
+.nivA .et{grid-row:span 2;font-size:24px;min-width:3.4em;text-align:center;letter-spacing:-2px}
+.nivA .ex{font-size:30px;line-height:1.1}
+.nivA .ex b{font-family:'Lilita One';font-weight:400;color:#1d4ed8}
+.nivA .aide{font-size:16px;font-weight:600;color:#7c4a1d}
+.nivA .gagne{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:34px}
+.nivA.conseil{border-color:#22c55e;box-shadow:0 5px 0 #15803d;animation:respire 1.3s ease-in-out infinite}
+/* fin de niveau et album */
+.finA{font-size:22px;font-weight:700;margin:6px 0}
+@media (max-height:500px) and (orientation:landscape){
+  #aConsigne{top:max(10px,env(safe-area-inset-top));left:auto;right:max(12px,env(safe-area-inset-right));transform:none;max-width:46vw;font-size:16px;padding:6px 12px}
+  #aConsigne:active{transform:translateY(2px)}
+  #hudA > .hautA{justify-content:flex-start}
+  .hautA .vide{display:none}
+  .bulle.a .in{min-width:44px;height:44px;font-size:24px}
+  .bulle.a.cmdA .in{min-height:44px}
+  .cases i{width:21px;height:21px;font-size:12px}
+}
+.autoA{display:flex;align-items:center;justify-content:center;width:84px;height:84px;border-radius:50%;flex:none;
+  background:radial-gradient(circle at 35% 30%,#ffffff,#fde68a);border:5px solid #fff;box-shadow:0 0 0 3px #f59e0b,0 6px 12px rgba(0,0,0,.2);font-size:46px;line-height:1}
+.autoA.gros{width:130px;height:130px;font-size:76px;margin:10px auto 14px;animation:pop .6s cubic-bezier(.34,1.56,.64,1)}
+.autoA.vide{background:#ece5d3;box-shadow:0 0 0 3px #cbbf9f}
+.autoA.vide small{font-size:13px;filter:grayscale(1);opacity:.55;letter-spacing:-2px}
+.autoA.saute{animation:vibre .45s}
+.albumA{display:flex;flex-direction:column;gap:16px;align-items:center}
+.ligneA{display:flex;align-items:center;gap:12px}
+.actA{font-size:40px;width:52px;text-align:center}
+.bientotA{font-weight:700;color:#7c4a1d;margin:16px 0 0}
+@media (max-width:420px){
+  .autoA{width:66px;height:66px;font-size:36px}
+  .autoA.gros{width:110px;height:110px;font-size:64px}
+  .actA{font-size:30px;width:38px}
+  .ligneA{gap:8px}
+  .nivA{padding:8px 52px 8px 10px;column-gap:10px;min-height:70px}
+  .nivA .et{font-size:20px}
+  .nivA .ex{font-size:26px}
+}
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
 </head>
@@ -221,6 +332,20 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
 </div>
 <div id="toast"></div>
 
+<!-- le mode Apprendre : ses bulles, ses boutons, le voile entre deux scènes -->
+<div id="aBulles" class="cache"></div>
+<div id="hudA" class="cache">
+  <div class="hautA">
+    <button class="petit" id="aMaison" aria-label="Retour">🏠</button>
+    <div id="aProg" class="cache"></div>
+    <span class="vide"></span>
+  </div>
+  <button id="aConsigne" class="cache" aria-label="Réécouter la consigne"></button>
+  <div class="bas-gauche"><button class="rond vert" id="aAlbum" aria-label="Mon album">📒<small>Album</small></button></div>
+  <div class="bas-droite"><button class="rond jaune" id="aEcouter" aria-label="Réécouter la consigne">🔊<small>Écouter</small></button></div>
+</div>
+<div id="voileA"></div>
+
 <div id="modal" class="cache">
   <div class="panel">
     <div class="ruban" id="mTitre"></div>
@@ -232,7 +357,10 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
 <div id="titre">
   <h1><span>La</span> <span style="animation-delay:.1s">Ferme</span> <span style="animation-delay:.2s">de</span><br><span style="animation-delay:.3s">Roullieee</span></h1>
   <div class="sous">👩‍🌾 Promène Roullieee dans sa ferme ! 🧺</div>
-  <button id="jouer" disabled>▶ JOUER</button>
+  <div class="choixTitre">
+    <button id="jouer" disabled>▶ JOUER</button>
+    <button id="apprendre" disabled>📚 APPRENDRE</button>
+  </div>
   <div id="charge">Chargement de la ferme…</div>
 </div>
 
@@ -265,6 +393,8 @@ window.__fermeOK = true;
 
 const BASE = '';              /* les sons de la classe sont à côté, dans docs/sons/ */
 const CLE = 'fermeRoullieeeBalade.v1';
+/* « titre », « jouer » ou « apprendre » (le mode Apprendre a sa propre scène, voir plus bas) */
+let mode = 'titre';
 
 const $ = s => document.querySelector(s);
 const calque = $('#bulles');
@@ -628,7 +758,7 @@ if (window.speechSynthesis) { choisirVoix(); speechSynthesis.onvoiceschanged = c
 function dire(t) {
   if (!S.son || !window.speechSynthesis) return;
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(t.replace(/[^\p{L}\p{N}\s'’!?.,]/gu, ''));
+  const u = new SpeechSynthesisUtterance(t.replace(/[^\p{L}\p{N}\s'’!?.,-]/gu, ''));
   if (voixFR) u.voice = voixFR;
   u.lang = 'fr-FR'; u.rate = .95; u.pitch = 1.15;
   speechSynthesis.speak(u);
@@ -1916,7 +2046,7 @@ canvas.addEventListener('pointerdown', ev => {
 });
 canvas.addEventListener('pointermove', ev => {
   const d = doigts.get(ev.pointerId);
-  if (!d) return;
+  if (!d || mode === 'apprendre') return;
   if (doigts.size === 2) {
     const [p, q] = [...doigts.values()], avant = Math.hypot(p.x - q.x, p.y - q.y);
     d.x = ev.clientX; d.y = ev.clientY;
@@ -1943,14 +2073,16 @@ function arreterJoy() { joy.actif = false; joy.dx = joy.dy = 0; $('#joy').classL
 function finDoigt(ev) {
   doigts.delete(ev.pointerId);
   if (doigts.size === 0) {
-    if (geste && !geste.multi && !joy.actif && performance.now() - geste.t0 < 600) toucher(ev.clientX, ev.clientY);
+    /* mode Apprendre : un toucher, même un peu long ou qui a un peu glissé (petits doigts) */
+    if (mode === 'apprendre') { if (ev.type === 'pointerup' && geste && !geste.multi && performance.now() - geste.t0 < 1500 && Math.hypot(ev.clientX - geste.x0, ev.clientY - geste.y0) < 40) toucherA(ev.clientX, ev.clientY); }
+    else if (geste && !geste.multi && !joy.actif && performance.now() - geste.t0 < 600) toucher(ev.clientX, ev.clientY);
     arreterJoy();
     geste = null;
   }
 }
 canvas.addEventListener('pointerup', finDoigt);
 canvas.addEventListener('pointercancel', finDoigt);
-canvas.addEventListener('wheel', ev => { ev.preventDefault(); cam.dist = clamp(cam.dist * (1 + ev.deltaY * .001), 16, distBase * 1.8); placerCamera(); }, { passive: false });
+canvas.addEventListener('wheel', ev => { ev.preventDefault(); if (mode === 'apprendre') return; cam.dist = clamp(cam.dist * (1 + ev.deltaY * .001), 16, distBase * 1.8); placerCamera(); }, { passive: false });
 /* au clavier aussi (pratique sur l'ordinateur de la classe) */
 const touches = new Set();
 addEventListener('keydown', ev => { touches.add(ev.key.toLowerCase()); if (ev.key.startsWith('Arrow')) ev.preventDefault(); });
@@ -3099,8 +3231,9 @@ function aide(parle) {
 /* ══════════════════════════════════════════════════════════
    FENÊTRES : niveau, réglages, mode d'emploi
    ══════════════════════════════════════════════════════════ */
-function ouvrirFenetre(titre, html) { $('#mTitre').textContent = titre; $('#mCorps').innerHTML = html; $('#modal').classList.remove('cache'); fermerParole(); arreterJoy(); }
-function fermerFenetre() { $('#modal').classList.add('cache'); }
+let quandFerme = null;   /* ce qui se passe quand la fenêtre se ferme (mode Apprendre) */
+function ouvrirFenetre(titre, html) { quandFerme = null; $('#mTitre').textContent = titre; $('#mCorps').innerHTML = html; $('#modal').classList.remove('cache'); fermerParole(); arreterJoy(); }
+function fermerFenetre() { $('#modal').classList.add('cache'); const f = quandFerme; quandFerme = null; f && f(); }
 $('#mX').onclick = () => { SFX.pop(); fermerFenetre(); };
 $('#modal').addEventListener('pointerup', ev => { if (ev.target.id === 'modal') fermerFenetre(); });
 function fenetreNiveau(n) {
@@ -3117,11 +3250,13 @@ function fenetreNiveau(n) {
 function fenetreReglages() {
   ouvrirFenetre('⚙️ Réglages', `<div class="centre" style="display:flex;flex-direction:column;gap:12px;align-items:center">
     <button class="btn jaune" id="rAide">❓ Comment on joue ?</button>
+    <button class="btn jaune" id="rAccueil">📚 Écran d’accueil : Jouer ou Apprendre</button>
     <button class="btn jaune" id="rMus">🎵 Musique : ${S.musique ? 'oui' : 'non'}</button>
     <button class="btn jaune" id="rSon">🔊 Sons : ${S.son ? 'oui' : 'non'}</button>
     <button class="btn rouge" id="rRaz">🔄 Recommencer la ferme</button>
     <a href="${BASE}index.html" style="font-weight:700;color:#c2410c;font-size:18px">← Retour au Royaume de Roullieee</a></div>`);
   $('#rAide').onclick = fenetreModeEmploi;
+  $('#rAccueil').onclick = () => { SFX.pop(); retourTitre(); };
   $('#rMus').onclick = () => { basculerMusique(); fenetreReglages(); };
   $('#rSon').onclick = () => { basculerSon(); fenetreReglages(); };
   let sur = false;
@@ -3149,6 +3284,13 @@ function fenetreModeEmploi() {
     <span class="em">👩‍🌾</span><span>L’éleveuse vide les caisses pleines et porte tout aux stands, à l’étal ou à la grange. Au niveau 9, le carré 👩‍🌾⬆️ la fait passer au niveau 2 : elle va plus vite et porte plus.</span>
     <span class="em">🐴</span><span>Au niveau 10, le poney : Roullieee galope sur son dos, encore plus vite !</span>
     <span class="em">💡</span><span>Perdu ? Touche le bouton Aide : une flèche te montre où aller.</span></div>`);
+}
+function retourTitre() {
+  mode = 'titre';
+  fermerFenetre(); fermerParole(); arreterJoy();
+  clearInterval(musiqueMinuteur);
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  $('#hud').classList.add('cache'); $('#titre').classList.remove('cache');
 }
 function basculerMusique() { S.musique = !S.musique; majMusique(); majHud(); sauver(); }
 function basculerSon() { S.son = !S.son; if (!S.son && window.speechSynthesis) speechSynthesis.cancel(); majHud(); sauver(); }
@@ -3193,6 +3335,955 @@ function fenetreChamps() {
 }
 $('#bChamps').onclick = () => { ac(); SFX.pop(); fenetreChamps(); };
 $('#bEngrais').onclick = () => { ac(); mettreEngrais(); };
+
+/* ══════════════════════════════════════════════════════════
+   LE MODE « APPRENDRE » — de petits jeux pour les 5-6 ans
+   Une petite ferme bien rangée sert de menu : on touche un
+   panneau, Roullieee y va et on choisit son niveau (⭐, ⭐⭐, ⭐⭐⭐).
+   Dans chaque jeu, tout se fait en touchant : une caisse →
+   Roullieee y prend un objet (la voix compte avec l'enfant) ;
+   le camion ou un enclos → elle y dépose ce qu'elle porte.
+   La consigne est dite à voix haute (🔊 pour la réentendre). On
+   ne perd jamais : une erreur est expliquée gentiment, et une
+   flèche montre quoi faire quand l'enfant hésite.
+   5 manches par niveau, puis un autocollant pour l'album.
+   Le mode a sa propre scène et sa propre sauvegarde : la ferme
+   de « Jouer » (pièces, niveaux, bêtes) n'est jamais touchée.
+   ══════════════════════════════════════════════════════════ */
+const CLE_A = 'fermeRoullieeeApprendre.v1';
+function chargerA() {
+  const n = { etoiles: { livraison: [0, 0, 0], nourrir: [0, 0, 0] }, vu: false };
+  try {
+    const o = JSON.parse(localStorage.getItem(CLE_A));
+    if (o && o.etoiles) for (const id in n.etoiles) if (Array.isArray(o.etoiles[id])) n.etoiles[id] = n.etoiles[id].map((_, i) => o.etoiles[id][i] ? 1 : 0);
+    if (o && o.vu) n.vu = true;
+  } catch (e) {}
+  return n;
+}
+const SA = chargerA();
+function sauverA() { try { localStorage.setItem(CLE_A, JSON.stringify(SA)); } catch (e) {} }
+
+const NB_MANCHES = 5, MAX_PORTE_A = 12, VITESSE_A = 5.5;
+const JEUX = {
+  livraison: { e: '🚚', nom: 'La livraison', dire: 'La livraison',
+    niveaux: [{ ex: '🥚🥚🥚', aide: 'Compter jusqu’à 5' }, { ex: '🥚 <b>8</b>', aide: 'Compter jusqu’à 10' }, { ex: '🥚 + 🥕', aide: 'Deux produits à la fois' }],
+    autocollants: [['🐣', 'le poussin'], ['🚜', 'le tracteur'], ['🏆', 'la coupe d’or']] },
+  nourrir: { e: '🐄', nom: 'À table !', dire: 'À table, les animaux',
+    niveaux: [{ ex: '🐔 ❓', aide: 'Qui mange quoi ?' }, { ex: '🐷🐷🐷', aide: 'Un pour chacun' }, { ex: '🐔 + 🐄', aide: 'Deux enclos à nourrir' }],
+    autocollants: [['🐷', 'le petit cochon'], ['🐮', 'la vache'], ['🐝', 'l’abeille']] }
+};
+/* les mots pour parler juste : « une carotte », « trois œufs », « pas de lait » */
+const NOMBRES = ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix', 'onze', 'douze'];
+const MOTS = {
+  oeuf:      { un: 'un œuf', des: 'œufs', pas: 'd’œufs' },
+  lait:      { un: 'une bouteille de lait', des: 'bouteilles de lait', pas: 'de lait' },
+  carotte:   { un: 'une carotte', des: 'carottes', pas: 'de carottes' },
+  pomme:     { un: 'une pomme', des: 'pommes', pas: 'de pommes' },
+  tomate:    { un: 'une tomate', des: 'tomates', pas: 'de tomates' },
+  mais:      { un: 'un épi de maïs', des: 'épis de maïs', pas: 'de maïs' },
+  ble:       { un: 'une botte de blé', des: 'bottes de blé', pas: 'de blé' },
+  tournesol: { un: 'une fleur', des: 'fleurs', pas: 'de fleurs' }
+};
+function combien(n, k) { return n === 1 ? MOTS[k].un : NOMBRES[n] + ' ' + MOTS[k].des; }
+/* les bêtes à nourrir : ce qu'elles mangent est le même que dans « Jouer » */
+const ESPECES_A = {
+  poule:   { fab: fabPoule, k: 'ble', e: '🐔', echelle: .9, haut: 2.05, vitesse: 1.2, max: 5, pronom: 'elle',
+             la: 'la poule', La: 'La poule', les: 'les poules', Les: 'Les poules', un: 'une poule', des: 'poules', chaque: 'chaque poule',
+             mange1: 'La poule mange du blé.', mange: 'Les poules mangent du blé.' },
+  vache:   { fab: fabVache, k: 'mais', e: '🐄', echelle: .55, haut: 1.95, vitesse: .6, max: 4, pronom: 'elle',
+             la: 'la vache', La: 'La vache', les: 'les vaches', Les: 'Les vaches', un: 'une vache', des: 'vaches', chaque: 'chaque vache',
+             mange1: 'La vache mange du maïs.', mange: 'Les vaches mangent du maïs.' },
+  cochon:  { fab: fabCochon, k: 'carotte', e: '🐷', echelle: .7, haut: 1.85, vitesse: .8, max: 4, pronom: 'il',
+             la: 'le cochon', La: 'Le cochon', les: 'les cochons', Les: 'Les cochons', un: 'un cochon', des: 'cochons', chaque: 'chaque cochon',
+             mange1: 'Le cochon mange des carottes.', mange: 'Les cochons mangent des carottes.' },
+  abeille: { fab: fabAbeille, k: 'tournesol', e: '🐝', echelle: .85, haut: 2.3, vitesse: 1.4, max: 5, pronom: 'elle', vole: true,
+             la: 'l’abeille', La: 'L’abeille', les: 'les abeilles', Les: 'Les abeilles', un: 'une abeille', des: 'abeilles', chaque: 'chaque abeille',
+             mange1: 'L’abeille butine les fleurs.', mange: 'Les abeilles butinent les fleurs.' }
+};
+const NOURRITURES_A = ['ble', 'mais', 'carotte', 'tournesol'];
+
+/* ── la scène : une île à elle, rangée autrement à chaque jeu ── */
+const sceneA = new THREE.Scene();
+sceneA.background = new THREE.Color('#8fdcf7');
+sceneA.fog = new THREE.Fog('#8fdcf7', 60, 150);
+sceneA.add(new THREE.HemisphereLight('#ffffff', '#7fb35a', 1.7));
+const soleilA = new THREE.DirectionalLight('#fff1d6', 2.3);
+soleilA.position.set(12, 34, 18);
+soleilA.castShadow = true;
+soleilA.shadow.mapSize.set(tactile ? 1024 : 2048, tactile ? 1024 : 2048);
+Object.assign(soleilA.shadow.camera, { left: -18, right: 18, top: 18, bottom: -18, near: 5, far: 90 });
+soleilA.shadow.bias = -.0008;
+sceneA.add(soleilA, soleilA.target);
+const ILE_A = { hw: 13, hd: 11.5, r: 5 };
+const ecumeA = new THREE.Mesh(new THREE.ShapeGeometry(rectArrondi(2 * ILE_A.hw + 9, 2 * ILE_A.hd + 9, ILE_A.r + 4), 10), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: .35 }));
+{
+  const eauA = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshLambertMaterial({ color: '#3ec5f0' }));
+  eauA.rotation.x = -Math.PI / 2; eauA.position.y = -.55; eauA.receiveShadow = true;
+  ecumeA.rotation.x = -Math.PI / 2; ecumeA.position.y = -.52;
+  const sable = dalle(2 * ILE_A.hw + 5, 2 * ILE_A.hd + 5, ILE_A.r + 2, .8, ['#f6dca0', '#e9c27a'], -.25), herbe = dalle(2 * ILE_A.hw, 2 * ILE_A.hd, ILE_A.r, 1.2, ['#7ccf4f', '#8b5a2b'], 0);
+  sceneA.add(eauA, ecumeA, sable, herbe);
+  for (let i = 0; i < 40; i++) {
+    const t = new THREE.Mesh(Cy(rand(.8, 2), rand(.8, 2), .02, 7), mat(pick(['#6fc046', '#86d95a'])));
+    t.position.set(rand(-ILE_A.hw + 3, ILE_A.hw - 3), .011, rand(-ILE_A.hd + 3, ILE_A.hd - 3)); t.receiveShadow = true; sceneA.add(t);
+  }
+}
+const mondeA = new THREE.Group(); sceneA.add(mondeA);
+const joueurA = fabRoullieee(); sceneA.add(joueurA);
+const pileA = joueurA.userData.pile;
+function majBottesA() { if (S.bottes) joueurA.userData.chaussures.forEach(c => { c.material = mat(BOTTES[S.bottes - 1].couleur); }); }
+const dindeA = grp(fabDinde(.6)); sceneA.add(dindeA);
+const flecheA = fabFleche(); flecheA.visible = false; flecheA.userData.y = 3; sceneA.add(flecheA);
+const anneauA = new THREE.Mesh(new THREE.TorusGeometry(.6, .08, 6, 24), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true }));
+anneauA.rotation.x = -Math.PI / 2; anneauA.visible = false; sceneA.add(anneauA);
+/* la pastille au-dessus d'une bête qui a faim : un rond blanc (et un « ? » quand il faut deviner) */
+function texturePastille(txt) {
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d');
+  g.fillStyle = '#ffffff'; g.beginPath(); g.arc(64, 64, 56, 0, Math.PI * 2); g.fill();
+  g.lineWidth = 9; g.strokeStyle = '#f97316'; g.stroke();
+  if (txt) { g.fillStyle = '#7c2d12'; g.font = 'bold 86px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(txt, 64, 70); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+const matPastille = new THREE.SpriteMaterial({ map: texturePastille('') }), matQuestion = new THREE.SpriteMaterial({ map: texturePastille('?') });
+
+/* ── l'état du jeu en cours ── */
+const RA = { cible: null, fin: null, tourne: null, porte: [], enVol: 0, phase: 0, sig: '' };
+const fileA = { cle: null, n: 0, x: 0, z: 0, faire: null, prochain: 0 };
+const ciblesA = [], bullesA = [], betesA = [];
+let jetonA = 0, occupeA = false, sceneCourante = null, jeuA = null, nivA = 0, mancheA = 0, erreursManche = 0;
+let voixA = '', dernierToucherA = 0, sonAvantA = true, zoneMarcheA = [-8, -3, 8, 3], derniereCriA = 0;
+const cadreA = new THREE.Box3();
+/* tout ce qui attend (minuteries, fins d'animation) est oublié quand on change de scène */
+const garde = f => { const j = jetonA; return (...a) => { if (j === jetonA) f(...a); }; };
+function plusTardA(ms, f) { setTimeout(garde(f), ms); }
+
+function poserA(obj, x, z, ry = 0) { obj.position.set(x, 0, z); obj.rotation.y = ry; mondeA.add(obj); return obj; }
+function cibleA(obj, action) { obj.userData.actA = action; ciblesA.push(obj); return obj; }
+/* une bulle au-dessus d'un objet : ofs = hauteur (ou point local) ; toucher la bulle = toucher l'objet */
+function bulleA(obj, ofs, etat, tap) {
+  const el = document.createElement('div');
+  el.className = 'bulle a cache';
+  el.innerHTML = '<div class="in"></div>';
+  if (tap) el.addEventListener('pointerup', ev => { ev.stopPropagation(); ac(); tap(); });
+  $('#aBulles').appendChild(el);
+  const b = { obj, ofs: typeof ofs === 'number' ? new THREE.Vector3(0, ofs, 0) : ofs, el, etat, cle: '' };
+  bullesA.push(b);
+  return b;
+}
+const projA = new THREE.Vector3();
+function majBullesA() {
+  for (const b of bullesA) {
+    const st = b.obj.visible ? b.etat() : null;
+    const cle = st ? st.t + '|' + st.c : '';
+    if (cle !== b.cle) {
+      b.cle = cle;
+      b.el.classList.toggle('cache', !st);
+      if (st) { b.el.className = 'bulle a ' + st.c; b.el.firstChild.innerHTML = st.t; }
+    }
+    if (!st) continue;
+    b.el.classList.toggle('indice', flecheA.visible && b.obj === flecheA.userData.obj);
+    projA.copy(b.ofs); b.obj.localToWorld(projA); projA.project(camera);
+    b.el.style.transform = `translate3d(${(projA.x * .5 + .5) * innerWidth}px,${(-projA.y * .5 + .5) * innerHeight}px,0) translate(-50%,-100%)`;
+  }
+}
+function flotterA(obj, texte, haut, cls = '') {
+  const p = ecranDe(obj, haut), el = document.createElement('div');
+  el.className = 'flotte ' + cls; el.textContent = texte; el.style.left = p.x + 'px'; el.style.top = p.y + 'px';
+  document.body.appendChild(el); setTimeout(() => el.remove(), 1300);
+}
+function lancerA(obj, depart, versFn, duree, fin) {
+  sceneA.add(obj);
+  obj.position.copy(depart);
+  const v = new THREE.Vector3(), f = fin ? garde(fin) : null;
+  animer(duree, k => {
+    v.copy(versFn());
+    obj.position.lerpVectors(depart, v, k);
+    obj.position.y += Math.sin(k * Math.PI) * 1.4;
+    obj.rotation.y = k * 6;
+  }, () => { sceneA.remove(obj); f && f(); });
+}
+
+/* ── la voix : chaque consigne est dite, et gardée pour le bouton 🔊 ── */
+function consigneA(texte, voix) {
+  const el = $('#aConsigne');
+  el.innerHTML = texte || ''; el.classList.toggle('cache', !texte);
+  voixA = voix || '';
+  if (voix) dire(voix);
+}
+function ecouterA() { ac(); SFX.pop(); if (voixA) dire(voixA); montrerIndice(); }
+
+/* ── la caméra : tout le jeu tient dans l'écran, sur téléphone comme sur l'ordinateur ── */
+const camA = { cible: new THREE.Vector3(), dist: 30, tangage: 1.0, lacet: .12 };
+function placerCamA() {
+  const h = camA.dist * Math.cos(camA.tangage);
+  camera.position.set(camA.cible.x + h * Math.sin(camA.lacet), camA.dist * Math.sin(camA.tangage), camA.cible.z + h * Math.cos(camA.lacet));
+  camera.lookAt(camA.cible);
+  camera.updateMatrixWorld();
+  sceneA.fog.near = camA.dist + 25; sceneA.fog.far = camA.dist + 110;
+}
+const coinsA = Array.from({ length: 8 }, () => new THREE.Vector3());
+function etendueA() {
+  const b = cadreA;
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  coinsA.forEach((v, i) => {
+    v.set(i & 1 ? b.max.x : b.min.x, i & 2 ? b.max.y : b.min.y, i & 4 ? b.max.z : b.min.z).project(camera);
+    x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y);
+  });
+  return { x0, x1, y0, y1 };
+}
+function solNdcA(x, y) { ndc.set(x, y); rayon.setFromCamera(ndc, camera); const v = new THREE.Vector3(); return rayon.ray.intersectPlane(plan, v) ? v : null; }
+function cadrerA() {
+  const W = innerWidth, H = innerHeight;
+  /* en haut : les boutons, la consigne et la hauteur des bulles ; en bas : les gros boutons ronds */
+  const mH = Math.max(130, Math.min(190, H * .25)), mB = Math.min(100, H * .14), mC = 12;
+  const g = -1 + 2 * mC / W, d = 1 - 2 * mC / W, haut = 1 - 2 * mH / H, bas = -1 + 2 * mB / H;
+  camA.cible.set((cadreA.min.x + cadreA.max.x) / 2, 0, (cadreA.min.z + cadreA.max.z) / 2);
+  for (let iter = 0; iter < 4; iter++) {
+    let lo = 6, hi = 160;
+    for (let k = 0; k < 24; k++) {
+      const m = (lo + hi) / 2; camA.dist = m; placerCamA();
+      const e = etendueA();
+      if (e.x1 - e.x0 <= d - g && e.y1 - e.y0 <= haut - bas) hi = m; else lo = m;
+    }
+    camA.dist = hi; placerCamA();
+    /* on décale le regard pour que le jeu soit au milieu de la place libre */
+    const e = etendueA(), a = solNdcA((e.x0 + e.x1) / 2, (e.y0 + e.y1) / 2), c = solNdcA((g + d) / 2, (haut + bas) / 2);
+    if (!a || !c) break;
+    camA.cible.x += a.x - c.x; camA.cible.z += a.z - c.z;
+  }
+  placerCamA();
+}
+addEventListener('resize', () => { if (mode === 'apprendre') cadrerA(); });
+
+/* ── Roullieee marche tout droit jusqu'à ce qu'on a touché ── */
+function allerA(x, z, fin) {
+  RA.cible = new THREE.Vector3(x, 0, z); RA.fin = fin || null; RA.tourne = null;
+  anneauA.position.set(x, .06, z); anneauA.visible = true; anneauA.scale.setScalar(1); anneauA.material.opacity = 1;
+  animer(.6, k => { anneauA.scale.setScalar(1 + k * .6); anneauA.material.opacity = 1 - k; }, () => { anneauA.visible = false; });
+}
+/* toucher une chose : Roullieee y va, puis agit. Toucher encore la même
+   caisse = un objet de plus (chaque toucher compte pour un). */
+function demander(cle, x, z, faire, unique, regard) {
+  if (occupeA) return;
+  dernierToucherA = horloge; flecheA.visible = false;
+  if (fileA.cle === cle) { fileA.n = unique ? 1 : Math.min(fileA.n + 1, MAX_PORTE_A); return; }
+  Object.assign(fileA, { cle, n: 1, x, z, faire });
+  allerA(x, z, regard ? () => { RA.tourne = Math.atan2(regard[0] - x, regard[1] - z); } : null);
+}
+function majFileA() {
+  if (!fileA.n || RA.cible || occupeA || horloge < fileA.prochain) return;
+  const p = joueurA.position;
+  if (Math.hypot(p.x - fileA.x, p.z - fileA.z) > .3) { fileA.n = 0; return; }
+  fileA.n--; fileA.prochain = horloge + .42;
+  fileA.faire();
+}
+function deplacerA(dt, t) {
+  const p = joueurA.position, u = joueurA.userData;
+  let marche = false;
+  if (RA.cible) {
+    const dx = RA.cible.x - p.x, dz = RA.cible.z - p.z, d = Math.hypot(dx, dz);
+    if (d < .12) { p.x = RA.cible.x; p.z = RA.cible.z; RA.cible = null; const f = RA.fin; RA.fin = null; f && f(); }
+    else {
+      const s = Math.min(d, VITESSE_A * dt);
+      p.x += dx / d * s; p.z += dz / d * s;
+      joueurA.rotation.y = angle(joueurA.rotation.y, Math.atan2(dx, dz), .25);
+      marche = true;
+    }
+  } else if (RA.tourne !== null) joueurA.rotation.y = angle(joueurA.rotation.y, RA.tourne, .15);
+  if (marche) {
+    const avant = RA.phase;
+    RA.phase += dt * 11;
+    if (Math.floor(avant / Math.PI) !== Math.floor(RA.phase / Math.PI)) SFX.pas();
+  }
+  const a = marche ? Math.sin(RA.phase) : 0;
+  u.jg.rotation.x = a * .7; u.jd.rotation.x = -a * .7;
+  u.bg.rotation.x = -a * .6; u.bd.rotation.x = a * .6;
+  u.corps.position.y = marche ? Math.abs(Math.cos(RA.phase)) * .1 : 0;
+  pileA.rotation.x += ((marche ? -.08 : 0) + Math.sin(t * 9) * (marche ? .03 : .008) - pileA.rotation.x) * .2;
+}
+/* ce que Roullieee porte : une pile sur son dos, comme dans « Jouer » */
+function hautPileA() { return pileA.localToWorld(new THREE.Vector3(0, RA.porte.length * .27 + .2, 0)); }
+function majPileA() {
+  const n = Math.max(0, RA.porte.length - RA.enVol), sig = RA.porte.slice(0, n).join(',');
+  if (sig === RA.sig) return;
+  RA.sig = sig;
+  while (pileA.children.length) pileA.remove(pileA.children[0]);
+  RA.porte.slice(0, n).forEach((k, i) => { const m = fabMini(k); m.position.y = i * .27 + .12; pileA.add(m); });
+  hauteurPile = n;
+}
+function prendreA(k, depart) {
+  if (RA.porte.length >= MAX_PORTE_A) {
+    SFX.non(); fileA.n = 0;
+    flotterA(joueurA, '✋', 3.4 + RA.porte.length * .27);
+    dire('Mon panier est plein ! Va le vider.');
+    return false;
+  }
+  RA.porte.push(k); RA.enVol++;
+  lancerA(fabMini(k), depart, hautPileA, .34, () => { RA.enVol--; majPileA(); SFX.pile(); });
+  return true;
+}
+/* retire l'objet i du dos ; renvoie le point d'où il s'envole */
+function retirerDuDos(i) {
+  const depart = hautPileA();
+  RA.porte.splice(i, 1);
+  majPileA(); SFX.pose();
+  return depart;
+}
+/* chaque objet pris est compté à voix haute : « un… deux… trois… » */
+function compterA(k) {
+  const n = RA.porte.filter(x => x === k).length;
+  plusTardA(330, () => { dire(NOMBRES[n]); flotterA(joueurA, String(n), 3.3 + RA.porte.length * .27, 'compte'); });
+}
+
+/* ── changer de scène ── */
+function viderMondeA() {
+  jetonA++;
+  while (mondeA.children.length) mondeA.remove(mondeA.children[0]);
+  ciblesA.length = 0; betesA.length = 0;
+  bullesA.forEach(b => b.el.remove()); bullesA.length = 0;
+  Object.assign(RA, { cible: null, fin: null, tourne: null, porte: [], enVol: 0, sig: 'x' });
+  Object.assign(fileA, { cle: null, n: 0 });
+  majPileA();
+  flecheA.visible = false; anneauA.visible = false;
+  occupeA = false; erreursManche = 0; dernierToucherA = horloge;
+  consigneA('', '');
+}
+function transitionA(construire) {
+  occupeA = true;
+  const v = $('#voileA');
+  v.classList.add('on');
+  setTimeout(() => { construire(); cadrerA(); v.classList.remove('on'); }, 280);
+}
+function hudA(jeu) {
+  $('#aAlbum').classList.toggle('cache', !!jeu);
+  $('#aProg').classList.toggle('cache', !jeu);
+  if (jeu) majProgA();
+}
+function majProgA() {
+  $('#aProg').innerHTML = `<span class="em">${JEUX[jeuA].e}</span>` + Array.from({ length: NB_MANCHES }, (_, i) => `<i class="${i < mancheA ? 'p' : ''}"></i>`).join('');
+}
+function etoilesA(id) { return '<span class="etoilesA">' + SA.etoiles[id].map(x => x ? '⭐' : '<i>⭐</i>').join('') + '</span>'; }
+function decorA(arbres, fleurs) {
+  arbres.forEach(([x, z, r]) => poserA(fabArbre(!!r), x, z, rand(0, 6)));
+  fleurs.forEach(([x, z]) => poserA(fabFleurs(), x, z));
+}
+function chemin3A(x, z, w, d) { mondeA.add(P(Bx(w, .05, d), '#e2c08d', x, .03, z, true)); }
+
+/* ── un enclos, ses bêtes et son auge (pour « À table ! » et la petite ferme) ── */
+const SOLS_A = { poule: '#e9d38a', vache: '#9bd770', cochon: '#a87a4f', abeille: '#b7e4a0' };
+function creerEnclosA(esp, x, z, w, d, action) {
+  const K = ESPECES_A[esp], g = new THREE.Group(); g.position.set(x, 0, z);
+  g.add(P(Bx(w - .3, .04, d - .3), SOLS_A[esp], 0, .03, 0, true), fabBarriere(w, d, esp === 'vache' || esp === 'cochon' ? '#b07a45' : '#fff3dc'));
+  if (esp === 'poule') { const p = fabPoulailler(); p.scale.setScalar(.5); p.position.set(-w / 2 + .6, 0, -d / 2 + .75); g.add(p); }
+  if (esp === 'cochon') { const b = P(Cy(1.1, 1.1, .05, 12), '#6b4226', -.8, .06, .6, true); b.scale.z = .6; g.add(b); }
+  if (esp === 'abeille') { for (const s of [-1, 1]) { const r = fabRuche(); r.scale.setScalar(.65); r.position.set(s * (w / 2 - .6), 0, -d / 2 + .7); g.add(r); } const f = fabFleurs(); f.position.set(0, 0, d / 2 - .7); g.add(f); }
+  /* l'auge, dans l'enclos contre la barrière qui donne sur la place (au nord) */
+  const zAuge = -d / 2 + .55, auge = fabAuge(); auge.position.set(0, 0, zAuge); g.add(auge);
+  const contenu = new THREE.Group(); contenu.position.set(0, .5, zAuge); g.add(contenu);
+  mondeA.add(g);
+  const E = { esp, K, x, z, w, d, g, contenu, zAuge: z + zAuge, quai: [x, z - d / 2 - 1.0], betes: [], faim: false, repos: randi(1, 2), action };
+  cibleA(g, action);
+  return E;
+}
+function placeA(E) { return new THREE.Vector3(E.x + rand(-E.w / 2 + .55, E.w / 2 - .55), 0, E.z + rand(-E.d / 2 + 1.05, E.d / 2 - .5)); }
+function ajouterBeteA(E, apparition) {
+  const K = E.K, racine = new THREE.Group(), taille = new THREE.Group(), corps = K.fab();
+  taille.scale.setScalar(K.echelle); taille.add(corps); racine.add(taille);
+  racine.position.copy(placeA(E)); racine.rotation.y = rand(0, 6.28);
+  mondeA.add(racine);
+  const marque = new THREE.Group(); marque.visible = false; mondeA.add(marque);
+  const b = { E, K, esp: E.esp, obj: racine, corps, marque, faim: false, servi: false, versAuge: false, cible: placeA(E), attente: rand(0, 2), ph: rand(0, 6) };
+  cibleA(racine, E.action);
+  E.betes.push(b); betesA.push(b);
+  if (apparition) apparaitre(racine);
+  return b;
+}
+function retirerBeteA(b) {
+  const i = betesA.indexOf(b); if (i >= 0) betesA.splice(i, 1);
+  const j = ciblesA.indexOf(b.obj); if (j >= 0) ciblesA.splice(j, 1);
+  mondeA.remove(b.marque);
+  animer(.35, k => b.obj.scale.setScalar(Math.max(.01, 1 - k)), () => mondeA.remove(b.obj));
+}
+/* ce qu'une bête qui a faim montre au-dessus de sa tête : sa nourriture (niveau 2) ou un « ? » */
+function majMarqueA(b) {
+  const m = b.marque;
+  while (m.children.length) m.remove(m.children[0]);
+  const question = jeuA === 'nourrir' && nivA !== 1;
+  const s = new THREE.Sprite(question ? matQuestion : matPastille); s.scale.setScalar(question ? .9 : .78); m.add(s);
+  if (!question) { const mini = fabMini(b.K.k); mini.scale.setScalar(1.4); mini.position.set(0, -.03, .35); m.add(mini); }
+}
+function peuplerA(E, n, faim) {
+  while (E.betes.length > n) retirerBeteA(E.betes.pop());
+  while (E.betes.length < n) ajouterBeteA(E, true);
+  E.faim = faim;
+  /* les bêtes qui ont faim attendent en rang devant l'auge, chacune à sa place (deux rangées en quinconce) :
+     on voit bien « une bête = une part » */
+  const nb = E.betes.length, pas = Math.min(1.1, (E.w - 1.1) / Math.max(1, nb - 1));
+  E.betes.forEach((b, i) => {
+    b.faim = faim; b.servi = false; b.versAuge = false;
+    b.place = faim ? new THREE.Vector3(E.x + (i - (nb - 1) / 2) * pas, 0, E.zAuge + (i % 2 ? 1.75 : 1.0)) : null;
+    if (faim) { majMarqueA(b); b.cible = b.place.clone(); b.attente = 0; }
+  });
+}
+function bougerBeteA(b, dt, t) {
+  const p = b.obj.position, K = b.K;
+  if (b.faim && !b.servi && b.place) {
+    /* elle attend à sa place, tournée vers l'auge, et trépigne un peu */
+    const dx = b.place.x - p.x, dz = b.place.z - p.z, d = Math.hypot(dx, dz);
+    if (d > .1) {
+      const s = Math.min(d, K.vitesse * 2 * dt);
+      p.x += dx / d * s; p.z += dz / d * s;
+      b.obj.rotation.y = angle(b.obj.rotation.y, Math.atan2(dx, dz), .15);
+    } else b.obj.rotation.y = angle(b.obj.rotation.y, Math.PI, .08);
+    if (!K.vole) p.y = d > .1 ? Math.abs(Math.sin(t * 8 + b.ph)) * .08 : Math.max(0, Math.sin(t * 5 + b.ph * 3)) * (Math.sin(t * .7 + b.ph) > .6 ? .12 : 0);
+    b.corps.rotation.x = 0;
+  } else if (b.attente > 0) {
+    b.attente -= dt;
+    if (b.esp === 'poule') b.corps.rotation.x = (t * 1.7 + b.ph) % 1.6 < .3 ? .45 : 0;
+    if (!K.vole) p.y = 0;
+  } else {
+    const dx = b.cible.x - p.x, dz = b.cible.z - p.z, d = Math.hypot(dx, dz);
+    if (d < .15) {
+      if (b.versAuge) mangerA(b);
+      else { b.attente = rand(1.5, 4.5); b.cible = placeA(b.E); }
+    } else {
+      const s = Math.min(d, K.vitesse * (b.versAuge ? 2.2 : 1) * dt);
+      p.x += dx / d * s; p.z += dz / d * s;
+      b.obj.rotation.y = angle(b.obj.rotation.y, Math.atan2(dx, dz), .15);
+      if (!K.vole) p.y = b.esp === 'poule' ? Math.abs(Math.sin(t * 12 + b.ph)) * .12 : Math.abs(Math.sin(t * 6 + b.ph)) * .05;
+      b.corps.rotation.x = 0;
+    }
+  }
+  /* les abeilles volent en battant des ailes */
+  if (K.vole) {
+    p.y = 1.0 + Math.sin(t * 3 + b.ph) * .2;
+    b.corps.userData.ailes.forEach((w, i) => { w.rotation.z = Math.sin(t * 40 + i) * .6 * (i ? -1 : 1); });
+  }
+  b.marque.visible = b.faim;
+  if (b.faim) b.marque.position.set(p.x, K.haut + Math.sin(t * 3 + b.ph) * .08, p.z);
+}
+/* une bête reçoit sa part : elle court à l'auge */
+function servirA(b) {
+  b.servi = true; b.versAuge = true; b.attente = 0;
+  b.cible = new THREE.Vector3(clamp(b.E.x + rand(-.6, .6), b.E.x - .7, b.E.x + .7), 0, b.E.zAuge + .7);
+}
+function mangerA(b) {
+  const E = b.E;
+  b.versAuge = false; b.faim = false; b.attente = 1.4; b.corps.rotation.x = .3;
+  if (E.contenu.children.length) E.contenu.remove(E.contenu.children[E.contenu.children.length - 1]);
+  SFX.miam(); setTimeout(() => SFX[b.esp](), 250);
+  coeurs(b.obj, K_HAUT(b), ['❤️', '💛', '😋']);
+  b.cible = placeA(E);
+}
+const K_HAUT = b => b.K.haut - .3;
+function quiAFaimA(enclos) {
+  const l = enclos.filter(E => E.faim && E.betes.some(b => b.faim));
+  if (!l.length) return '';
+  if (l.length === 1) return l[0].betes.filter(b => b.faim).length === 1 ? `C’est ${l[0].K.la} qui a faim !` : `Ce sont ${l[0].K.les} qui ont faim !`;
+  return `Ce sont ${l.map(E => E.betes.length === 1 ? E.K.la : E.K.les).join(' et ')} qui ont faim !`;
+}
+const majuscule = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+/* ── une caisse (ou un bac) de produits où l'on se sert ── */
+function creerCaisseA(k, x, z, faire) {
+  const c = poserA(fabCaisse(), x, z), g = new THREE.Group(); g.position.y = .68; c.add(g);
+  for (let i = 0; i < 6; i++) { const m = fabMini(k); m.position.set(-.35 + (i % 3) * .35, Math.floor(i / 3) * .22, (i % 2) * .2 - .1); g.add(m); }
+  const C = { k, x, z, obj: c, quai: [x, z + 1.15] };
+  const action = () => demander('caisse-' + k, C.quai[0], C.quai[1], () => faire(C), false, [x, z]);
+  cibleA(c, action);
+  bulleA(c, 1.45, () => ({ t: ITEMS[k].e, c: 'caisseA' }), action);
+  return C;
+}
+function prendreCaisseA(C) {
+  if (!prendreA(C.k, pos3(C.x, C.z, 1.0))) return;
+  rebond(C.obj);
+  compterA(C.k);
+}
+
+/* ══════════ LA PETITE FERME : le menu des jeux ══════════ */
+function sceneFerme() {
+  viderMondeA();
+  sceneCourante = 'ferme'; jeuA = null; hudA(null);
+  zoneMarcheA = [-8, -2.9, 8, 3];
+  cadreA.set(new THREE.Vector3(-7.2, 0, -8.8), new THREE.Vector3(7.2, 6.8, 5.2));
+  decorA([[-9.6, -6, 1], [9.4, -6.4, 0], [-10, 2.6, 0], [10.2, 2.2, 1], [-3.8, -8.8, 0], [4.2, -8.6, 1]],
+    [[-2.4, 2.6], [2.6, 2.9], [-7.8, -3.4], [7.6, -3.6], [-1.2, -8.4], [8.6, 4.8]]);
+  chemin3A(0, 1.4, 13, 1.6); chemin3A(0, -1.2, 1.6, 3.6);
+  /* l'album est dans la maison de Roullieee */
+  const maison = maisonA = poserA(fabMaison(), 0, -5.6);
+  const allerAlbum = () => demander('lieu-album', 0, -2.9, ouvrirAlbum, true, [0, -5.6]);
+  cibleA(maison, allerAlbum);
+  bulleA(maison, 6.3, () => ({ t: '📒', c: 'panneau' }), allerAlbum);
+  /* le camion de la livraison */
+  const cam = lieuxA.livraison = poserA(fabCamion(), -4.6, -.9, Math.PI / 2);
+  const allerLiv = () => demander('lieu-livraison', -4.6, 1.15, () => ouvrirNiveaux('livraison'), true, [-4.6, -.9]);
+  cibleA(cam, allerLiv);
+  bulleA(cam, 2.7, () => ({ t: '🚚 ' + etoilesA('livraison'), c: 'panneau' }), allerLiv);
+  /* l'enclos où l'on nourrit les bêtes */
+  const allerNour = () => demander('lieu-nourrir', 4.6, 1.3, () => ouvrirNiveaux('nourrir'), true, [4.6, -1]);
+  const E = creerEnclosA('vache', 4.6, -1.2, 4.4, 3.6, allerNour);
+  ajouterBeteA(E, false);
+  const Ep = { ...E, esp: 'poule', K: ESPECES_A.poule, betes: [] };
+  ajouterBeteA(Ep, false); ajouterBeteA(Ep, false);
+  lieuxA.nourrir = E.g;
+  bulleA(E.g, 2.6, () => ({ t: '🐄 ' + etoilesA('nourrir'), c: 'panneau' }), allerNour);
+  /* deux chantiers : d'autres jeux arrivent */
+  for (const x of [-5, 5]) {
+    const c = poserA(fabChantier(), x, 4.3); c.scale.setScalar(.8);
+    const allerCh = () => demander('lieu-chantier' + x, x, 2.7, () => { SFX.pop(); consigneA('🚧 Ici, on prépare un nouveau jeu !', 'Ici, on prépare un nouveau jeu. Reviens bientôt !'); }, true, [x, 4.3]);
+    cibleA(c, allerCh);
+    bulleA(c, 1.5, () => ({ t: '🚧', c: 'panneau petit' }), allerCh);
+  }
+  joueurA.position.set(0, 0, 1.4); joueurA.rotation.y = 0;
+  dindeA.visible = true; dindeA.position.set(-1.4, 0, 1.8);
+  const bienvenue = SA.vu ? 'Choisis un jeu ! Touche un panneau.' : 'Bonjour ! Bienvenue dans la ferme pour apprendre. Touche un panneau pour choisir un jeu !';
+  plusTardA(450, () => {
+    consigneA('👆 Touche un panneau pour choisir un jeu', bienvenue);
+    if (!SA.vu) { SA.vu = true; sauverA(); montrerIndice(); }
+  });
+}
+function indiceFerme() {
+  const id = Object.keys(JEUX).find(id => SA.etoiles[id].includes(0)) || 'livraison';
+  return id === 'livraison' ? { x: -4.6, z: -.9, h: 4.9, obj: lieuxA.livraison } : { x: 4.6, z: -1.2, h: 4.7, obj: lieuxA.nourrir };
+}
+function ouvrirNiveaux(id) {
+  const J = JEUX[id], et = SA.etoiles[id], conseil = et.indexOf(0);
+  ouvrirFenetre(J.e + ' ' + J.nom, '<p class="centre consigneN">Choisis ton niveau</p><div class="niveauxA">' + J.niveaux.map((N, i) =>
+    `<button class="nivA${i === conseil ? ' conseil' : ''}" data-n="${i}" aria-label="Niveau ${i + 1}"><span class="et">${'⭐'.repeat(i + 1)}</span><span class="ex">${N.ex}</span>` +
+    `<span class="aide">${N.aide}</span>${et[i] ? `<span class="gagne">${J.autocollants[i][0]}</span>` : ''}</button>`).join('') + '</div>');
+  document.querySelectorAll('#mCorps .nivA').forEach(b => b.onclick = () => { SFX.pop(); fermerFenetre(); lancerJeu(id, +b.dataset.n); });
+  dire(`${J.dire} ! Choisis ton niveau. Une, deux ou trois étoiles ?`);
+}
+function lancerJeu(id, niv) { transitionA(() => (id === 'livraison' ? sceneLivraison : sceneNourrir)(niv)); }
+function ouvrirAlbum() {
+  let n = 0;
+  const lignes = Object.entries(JEUX).map(([id, J]) => `<div class="ligneA"><span class="actA">${J.e}</span>` + J.autocollants.map(([e, nom], i) => {
+    if (!SA.etoiles[id][i]) return `<div class="autoA vide"><small>${'⭐'.repeat(i + 1)}</small></div>`;
+    n++;
+    return `<button class="autoA" data-nom="${nom}" aria-label="${nom}">${e}</button>`;
+  }).join('') + '</div>').join('');
+  ouvrirFenetre('📒 Mon album', `<div class="albumA">${lignes}</div><p class="centre bientotA">🚧 D’autres jeux arrivent bientôt !</p>`);
+  document.querySelectorAll('#mCorps .autoA[data-nom]').forEach(b => b.onclick = () => {
+    SFX.pop(); dire(majuscule(b.dataset.nom) + ' !');
+    b.classList.remove('saute'); void b.offsetWidth; b.classList.add('saute');
+  });
+  dire(n ? `Ton album ! Tu as ${n === 1 ? 'un autocollant' : NOMBRES[n] + ' autocollants'}.` : 'Ton album est encore vide. Gagne des étoiles pour avoir des autocollants !');
+}
+function confirmerRetourA() {
+  ouvrirFenetre('🏠 La ferme', `<div class="centre"><p class="finA">On retourne à la petite ferme ?</p><div class="rapides">` +
+    `<button class="btn" id="aOui" style="font-size:22px">✅ Oui</button><button class="btn jaune" id="aNon" style="font-size:22px">▶ Je continue</button></div></div>`);
+  $('#aOui').onclick = () => { SFX.pop(); fermerFenetre(); transitionA(sceneFerme); };
+  $('#aNon').onclick = () => { SFX.pop(); fermerFenetre(); };
+  dire('On retourne à la petite ferme ?');
+}
+/* fin d'un niveau : une étoile de plus et un autocollant pour l'album */
+function finNiveau() {
+  const id = jeuA, niv = nivA, nouveau = !SA.etoiles[id][niv], [e, nom] = JEUX[id].autocollants[niv];
+  SA.etoiles[id][niv] = 1; sauverA();
+  SFX.niveau(); glou(); confettis(90); vibrer(60);
+  ouvrirFenetre('Bravo !', `<div class="centre"><div class="grosse-etoile">${'⭐'.repeat(niv + 1)}</div>` +
+    `<p class="finA">${nouveau ? 'Un nouvel autocollant pour ton album !' : 'Tu as encore réussi !'}</p><div class="autoA gros">${e}</div>` +
+    `<div class="rapides"><button class="btn jaune" id="aEncore">🔁 Encore</button>` +
+    (niv < 2 ? `<button class="btn" id="aSuivant">${'⭐'.repeat(niv + 2)} Niveau suivant</button>` : '') +
+    `<button class="btn jaune" id="aFerme">🏠 La ferme</button></div></div>`);
+  quandFerme = () => transitionA(sceneFerme);
+  $('#aEncore').onclick = () => { quandFerme = null; SFX.pop(); fermerFenetre(); lancerJeu(id, niv); };
+  if (niv < 2) $('#aSuivant').onclick = () => { quandFerme = null; SFX.pop(); fermerFenetre(); lancerJeu(id, niv + 1); };
+  $('#aFerme').onclick = () => { SFX.pop(); fermerFenetre(); };
+  dire('Bravo ! Tu as réussi ! ' + (nouveau ? `Voici ${nom} pour ton album !` : 'Tu veux rejouer ?'));
+}
+function mancheFinie() { mancheA++; majProgA(); }
+
+/* ══════════ JEU 1 : LA LIVRAISON — compter ══════════
+   Le camion montre ce qu'il veut, avec une case par objet (niveau 1 :
+   jusqu'à 5 ; niveau 2 : jusqu'à 10, en deux rangées de 5 et avec le
+   chiffre ; niveau 3 : deux produits, seulement les chiffres).
+   Roullieee prend un objet à chaque toucher de la caisse (la voix compte),
+   puis on touche le camion : elle y pose ce qu'il faut. Trop ? Le surplus
+   retourne dans sa caisse. Pas assez ? Le camion dit ce qui manque. */
+let maisonA = null, lieuxA = {}, caissesA = [], camionA = null, cmdA = null, camionLa = false, commandesA = [];
+const QUAI_CAMION = [-1.25, 1.75], Z_CAMION = 3.4;
+function sceneLivraison(niv) {
+  viderMondeA();
+  sceneCourante = 'livraison'; jeuA = 'livraison'; nivA = niv; mancheA = 0; hudA(jeuA);
+  dindeA.visible = false;
+  const produits = niv === 0 ? ['oeuf', 'lait', 'carotte'] : melange(['oeuf', 'lait', 'carotte', 'pomme', 'tomate', 'mais']).slice(0, niv === 2 ? 4 : 3);
+  const xs = produits.length === 4 ? [-4.5, -1.5, 1.5, 4.5] : [-3.3, 0, 3.3];
+  const bord = Math.max(...xs) + 1.1;
+  zoneMarcheA = [-bord + .6, -1.8, bord - .6, 1.75];
+  cadreA.set(new THREE.Vector3(-bord, 0, -4.4), new THREE.Vector3(bord, 3.2, 4.8));
+  decorA([[-9.4, -5.6, 1], [9.4, -5.6, 0], [-2.6, -7.8, 0], [3.2, -7.6, 1]], [[-8, -2.2], [8, -2.6], [-7.6, 6.4], [7.4, 6.6]]);
+  /* la route du camion, devant ; les caisses au fond : Roullieee y tourne le dos, on voit sa pile monter */
+  chemin3A(0, Z_CAMION, 26, 2.6);
+  caissesA = produits.map((k, i) => creerCaisseA(k, xs[i], -3, prendreCaisseA));
+  camionA = poserA(fabCamion(), -17, Z_CAMION, Math.PI / 2);
+  const allerCamion = () => demander('camion', QUAI_CAMION[0], QUAI_CAMION[1], dechargerCamion, true, [QUAI_CAMION[0], Z_CAMION]);
+  cibleA(camionA, allerCamion);
+  bulleA(camionA, new THREE.Vector3(0, 2.3, -.65), etatCommande, allerCamion);
+  joueurA.position.set(0, 0, 0); joueurA.rotation.y = 0;
+  commandesA = commandesLivraison(niv, produits);
+  camionLa = false; cmdA = null;
+  plusTardA(350, arriverCamion);
+}
+function commandesLivraison(niv, produits) {
+  const l = [];
+  let prec = null;
+  const autre = () => { const k = pick(produits.filter(x => x !== prec)); prec = k; return k; };
+  if (niv === 0) { const ns = melange([1, 2, 3, 4, 5]); ns.forEach(n => l.push([{ k: autre(), n }])); }
+  else if (niv === 1) {
+    const ns = melange([3, 4, 5, 6, 7, 8, 9, 10]).slice(0, NB_MANCHES);
+    if (!ns.some(n => n >= 8)) ns[randi(0, NB_MANCHES - 1)] = randi(8, 10);
+    ns.forEach(n => l.push([{ k: autre(), n }]));
+  } else for (let i = 0; i < NB_MANCHES; i++) {
+    const [a, b] = melange(produits).slice(0, 2);
+    l.push([{ k: a, n: randi(1, 5) }, { k: b, n: randi(1, 5) }]);
+  }
+  return l.map(c => ({ items: c.map(x => ({ ...x, fait: 0, vu: 0 })) }));
+}
+function arriverCamion() {
+  occupeA = true; camionLa = false;
+  cmdA = commandesA[mancheA]; erreursManche = 0;
+  const ch = camionA.userData.charge;
+  while (ch.children.length) ch.remove(ch.children[0]);
+  camionA.position.x = -17;
+  SFX.vroum();
+  animer(1.8, k => { camionA.position.x = -17 + 17 * (1 - Math.pow(1 - k, 3)); }, garde(() => {
+    camionLa = true; occupeA = false; SFX.klaxon(); rebond(camionA);
+    annoncerCommande(mancheA === 0);
+  }));
+}
+function texteCommande() {
+  const l = cmdA.items;
+  if (nivA === 0) return `🚚 veut ${ITEMS[l[0].k].e.repeat(l[0].n)}`;
+  return '🚚 veut ' + l.map(i => `${i.n} ${ITEMS[i.k].e}`).join(' et ');
+}
+function annoncerCommande(premiere) {
+  const voix = 'Le camion veut ' + cmdA.items.map(i => combien(i.n, i.k)).join(' et ') + '.' +
+    (premiere ? ' Touche la bonne caisse pour prendre ce qu’il faut, puis touche le camion !' : '');
+  consigneA(texteCommande(), voix);
+  if (premiere && nivA === 0) plusTardA(2500, montrerIndice);
+}
+/* la bulle de commande : une case par objet, qui se remplit sur le camion */
+function etatCommande() {
+  if (!camionLa || !cmdA) return null;
+  if (nivA === 2) return { t: cmdA.items.map(i => `<span class="lot">${ITEMS[i.k].e}<b>${i.n}</b>` +
+    (i.vu >= i.n ? '<span class="ok">✓</span>' : `<small>${ITEMS[i.k].e.repeat(i.vu)}</small>`) + '</span>').join(''), c: 'cmdA' };
+  const i = cmdA.items[0];
+  return { t: `<span class="em">${ITEMS[i.k].e}</span>${nivA === 1 ? `<b>${i.n}</b>` : ''}<span class="cases${i.n > 5 ? ' dix' : ''}">` +
+    Array.from({ length: i.n }, (_, j) => j < i.vu ? `<i class="p">${ITEMS[i.k].e}</i>` : '<i></i>').join('') + '</span>', c: 'cmdA' };
+}
+function placeSurCamion(n) {
+  const v = new THREE.Vector3((Math.floor(n / 5) % 2 - .5) * .62, .1 + Math.floor(n / 10) * .26, -1.0 + (n % 5) * .5);
+  return camionA.userData.charge.localToWorld(v);
+}
+function dechargerCamion() {
+  if (!camionLa) return;
+  if (!RA.porte.length) { annoncerCommande(false); montrerIndice(); return; }
+  occupeA = true;
+  const refus = [], trop = [];
+  let pose = cmdA.items.reduce((n, i) => n + i.fait, 0);
+  const etape = () => {
+    if (!RA.porte.length) { plusTardA(450, () => bilanCamion(refus, trop)); return; }
+    const i = RA.porte.length - 1, k = RA.porte[i], it = cmdA.items.find(x => x.k === k), depart = retirerDuDos(i);
+    if (it && it.fait < it.n) {
+      it.fait++;
+      const n = pose++, mini = fabMini(k);
+      lancerA(fabMini(k), depart, () => placeSurCamion(n), .4, () => {
+        mini.position.copy(camionA.userData.charge.worldToLocal(placeSurCamion(n))); camionA.userData.charge.add(mini);
+        it.vu++; SFX.pop(); dire(NOMBRES[it.vu]);
+        flotterA(camionA, String(it.vu), 3.2, 'compte');
+      });
+    } else {
+      /* ce n'est pas demandé, ou il y en a assez : retour dans la caisse */
+      (it ? trop : refus).push(k);
+      const C = caissesA.find(c => c.k === k);
+      SFX.non(); flotterA(joueurA, '✋', 3.4 + RA.porte.length * .27);
+      lancerA(fabMini(k), depart, () => pos3(C.x, C.z, .9), .55, () => rebond(C.obj));
+    }
+    plusTardA(520, etape);
+  };
+  etape();
+}
+function bilanCamion(refus, trop) {
+  const manque = cmdA.items.filter(i => i.fait < i.n), parts = [];
+  if (refus.length) parts.push(`Le camion ne veut pas ${MOTS[refus[0]].pas}.`);
+  if (trop.length) { const i = cmdA.items.find(x => x.k === trop[0]); parts.push(`Oups, il y en avait trop ! Le camion voulait ${combien(i.n, i.k)}.`); }
+  if (refus.length || trop.length) erreursManche++;
+  if (!manque.length) { reussirCamion(parts); return; }
+  occupeA = false;
+  parts.push('Il manque encore ' + manque.map(i => combien(i.n - i.fait, i.k)).join(' et ') + ' !');
+  voixA = parts.join(' '); dire(voixA);
+  if (erreursManche >= 2 || nivA === 0) plusTardA(1200, montrerIndice);
+}
+function reussirCamion(parts) {
+  occupeA = true;
+  const resume = cmdA.items.map(i => combien(i.n, i.k)).join(' et ');
+  plusTardA(250, () => dire((parts.length ? parts.join(' ') + ' ' : '') + pick(['Bravo !', 'Super !', 'Génial !']) + ' ' + majuscule(resume) + ' pour le camion !'));
+  SFX.achat(); coeurs(camionA, 3, ['⭐', '✨', '💛']);
+  mancheFinie();
+  plusTardA(2400, () => {
+    camionLa = false; SFX.klaxon(); setTimeout(SFX.vroum, 200);
+    animer(1.6, k => { camionA.position.x = 18 * k * k; }, garde(() => {
+      if (mancheA < NB_MANCHES) arriverCamion(); else plusTardA(300, finNiveau);
+    }));
+  });
+}
+function indiceLivraison() {
+  if (!camionLa || !cmdA) return null;
+  const porte = k => RA.porte.filter(x => x === k).length;
+  const inutile = RA.porte.some(k => { const i = cmdA.items.find(x => x.k === k); return !i || i.fait + porte(k) > i.n; });
+  const manque = cmdA.items.find(i => i.fait + porte(i.k) < i.n);
+  if (manque && !inutile) { const C = caissesA.find(c => c.k === manque.k); return { x: C.x, z: C.z, h: 3.9, obj: C.obj }; }
+  return { x: -1.25, z: Z_CAMION, h: 4.4, obj: camionA };
+}
+
+/* ══════════ JEU 2 : À TABLE ! — qui mange quoi, une part pour chacun ══════════
+   Niveau 1 : une bête a faim (un « ? » au-dessus d'elle) : quelle est sa
+   nourriture ? Niveau 2 : toutes les bêtes d'un enclos ont faim et montrent
+   ce qu'elles mangent : une part pour chacune (ni plus ni moins). Niveau 3 :
+   deux enclos ont faim en même temps, avec des « ? ». La nourriture est au
+   fond ; les enclos, devant, donnent sur la place par leur auge. */
+let enclosA = [], bacsA = [], manchesN = [];
+function sceneNourrir(niv) {
+  viderMondeA();
+  sceneCourante = 'nourrir'; jeuA = 'nourrir'; nivA = niv; mancheA = 0; hudA(jeuA);
+  dindeA.visible = false;
+  zoneMarcheA = [-5.6, -1.85, 5.6, .3];
+  cadreA.set(new THREE.Vector3(-6.4, 0, -4.4), new THREE.Vector3(6.4, 2.8, 5));
+  decorA([[-9.6, -5.4, 1], [9.6, -5.8, 0], [-2.6, -7.6, 1], [3, -7.8, 0]], [[-8.2, -1.6], [8.4, -1.2], [-8.6, 6.8], [8.2, 7]]);
+  bacsA = NOURRITURES_A.map((k, i) => creerCaisseA(k, -4.2 + i * 2.8, -3, prendreCaisseA));
+  enclosA = melange(Object.keys(ESPECES_A)).slice(0, 3).map((esp, i) => {
+    const x = (i - 1) * 4.25, E = creerEnclosA(esp, x, 3, 3.9, 3.4, () => demander('enclos-' + esp, x, E.quai[1], () => nourrirEnclos(E), true, [x, 3]));
+    peuplerA(E, niv === 0 ? 1 : E.repos, false);
+    return E;
+  });
+  joueurA.position.set(0, 0, -.8); joueurA.rotation.y = 0;
+  manchesN = manchesNourrir(niv);
+  plusTardA(500, () => mancheNourrir(true));
+}
+function manchesNourrir(niv) {
+  const l = [];
+  if (niv < 2) {
+    /* chaque enclos passe au moins une fois, jamais deux fois de suite */
+    const ordre = melange([0, 1, 2]);
+    while (ordre.length < NB_MANCHES) ordre.push(pick([0, 1, 2].filter(i => i !== ordre[ordre.length - 1])));
+    const ns = melange([2, 3, 4, 5, 3]);
+    ordre.forEach((i, m) => { const E = enclosA[i]; l.push([{ E, n: niv === 0 ? 1 : Math.min(ns[m], E.K.max) }]); });
+  } else for (let m = 0; m < NB_MANCHES; m++) {
+    const [a, b] = melange(enclosA).slice(0, 2);
+    l.push([{ E: a, n: randi(1, Math.min(4, a.K.max)) }, { E: b, n: randi(1, Math.min(4, b.K.max)) }]);
+  }
+  return l;
+}
+function mancheNourrir(premiere) {
+  occupeA = true; erreursManche = 0;
+  const m = manchesN[mancheA];
+  for (const E of enclosA) { const c = m.find(x => x.E === E); peuplerA(E, c ? c.n : (nivA === 0 ? 1 : E.repos), !!c); }
+  plusTardA(650, () => {
+    occupeA = false;
+    m.forEach(({ E }) => E.betes.forEach((b, i) => setTimeout(garde(() => rebond(b.obj)), i * 120)));
+    SFX[m[0].E.esp]();
+    annoncerNourrir(premiere);
+  });
+}
+function annoncerNourrir(premiere) {
+  const m = manchesN[mancheA];
+  let voix, texte;
+  if (nivA === 0) {
+    const K = m[0].E.K;
+    voix = `${K.La} a faim ! Qu’est-ce qu’${K.pronom} mange ?` + (premiere ? ' Touche sa nourriture, puis touche son enclos.' : '');
+    texte = `💭 ${K.e} a faim ! Qu’est-ce qu’${K.pronom} mange ?`;
+  } else if (nivA === 1) {
+    const { E, n } = m[0], K = E.K;
+    voix = `${n === 1 ? K.La + ' a' : majuscule(NOMBRES[n]) + ' ' + K.des + ' ont'} faim ! Donne ${MOTS[K.k].un} à ${K.chaque}.` + (premiere ? ' Touche la nourriture, puis touche l’enclos.' : '');
+    texte = `💭 ${K.e.repeat(n)} → un ${ITEMS[K.k].e} pour chacun`;
+  } else {
+    voix = majuscule(m.map(({ E, n }) => n === 1 ? E.K.la : E.K.les).join(' et ')) + ' ont faim ! Donne à manger à chacun.';
+    texte = '💭 ' + m.map(({ E, n }) => E.K.e.repeat(n)).join(' + ') + ' ont faim !';
+  }
+  consigneA(texte, voix);
+  if (premiere && nivA === 0) plusTardA(3500, montrerIndice);
+}
+/* Roullieee donne à un enclos ce qu'elle porte : la bonne nourriture va dans
+   l'auge (une part par bête qui a faim) ; ce qui est pour un autre enclos qui
+   a faim reste sur son dos ; le reste retourne dans son bac. */
+function nourrirEnclos(E) {
+  const affame = E.faim && E.betes.some(b => b.faim);
+  if (!RA.porte.length) {
+    if (affame) { voixA = `${E.betes.length === 1 ? E.K.La + ' a' : E.K.Les + ' ont'} faim ! Va chercher à manger.`; dire(voixA); montrerIndice(); }
+    else dire(`${E.betes.length === 1 ? E.K.La + ' n’a' : E.K.Les + ' n’ont'} pas faim. ` + quiAFaimA(enclosA));
+    return;
+  }
+  occupeA = true;
+  const notes = { refus: null, pasFaim: false, trop: false, garde: null };
+  let donnes = 0;
+  const classer = k => {
+    if (k === E.K.k) return E.betes.some(b => b.faim && !b.servi) ? 'donner' : E.faim ? 'trop' : 'pasfaim';
+    if (enclosA.some(F => F !== E && F.K.k === k && F.betes.some(b => b.faim && !b.servi))) return 'garder';
+    return 'refus';
+  };
+  const etape = () => {
+    let i = RA.porte.length - 1;
+    while (i >= 0 && classer(RA.porte[i]) === 'garder') { notes.garde = notes.garde || RA.porte[i]; i--; }
+    if (i < 0) { attendreRepas(E, notes, donnes); return; }
+    const k = RA.porte[i], c = classer(k), depart = retirerDuDos(i);
+    if (c === 'donner') {
+      const b = E.betes.find(x => x.faim && !x.servi), n = ++donnes;
+      b.servi = true;
+      const ou = new THREE.Vector3(clamp((E.contenu.children.length % 3 - 1) * .45, -.5, .5), 0, 0);
+      lancerA(fabMini(k), depart, () => E.contenu.localToWorld(ou.clone()), .45, () => {
+        const m = fabMini(k); m.position.copy(ou); E.contenu.add(m);
+        servirA(b); SFX.pop(); dire(NOMBRES[n]);
+        flotterA(joueurA, String(n), 3.3 + RA.porte.length * .27, 'compte');
+      });
+    } else {
+      if (c === 'refus') notes.refus = notes.refus || k; else if (c === 'trop') notes.trop = true; else notes.pasFaim = true;
+      const B = bacsA.find(x => x.k === k);
+      SFX.non();
+      if (c === 'refus') E.betes.forEach(b => secouer(b.corps));
+      flotterA(E.g, c === 'refus' ? '🙅' : '✋', 2.2);
+      lancerA(fabMini(k), depart, () => pos3(B.x, B.z, .9), .6, () => rebond(B.obj));
+    }
+    plusTardA(520, etape);
+  };
+  etape();
+}
+/* on laisse les bêtes servies aller manger, puis on fait le point */
+function attendreRepas(E, notes, donnes, essais = 0) {
+  if (essais < 25 && E.betes.some(b => b.servi && b.faim)) { plusTardA(300, () => attendreRepas(E, notes, donnes, essais + 1)); return; }
+  const parts = [], n1 = E.betes.length === 1;
+  if (notes.refus) parts.push(`${n1 ? E.K.La + ' ne mange' : E.K.Les + ' ne mangent'} pas ${MOTS[notes.refus].pas} !`);
+  if (notes.pasFaim) parts.push(`${n1 ? E.K.La + ' n’a' : E.K.Les + ' n’ont'} pas faim. ${quiAFaimA(enclosA)}`);
+  /* rien donné : ce qu'elle porte est pour un autre enclos */
+  if (!donnes && !notes.refus && !notes.pasFaim && !notes.trop && notes.garde)
+    parts.push(E.faim ? `${n1 ? E.K.La + ' ne mange' : E.K.Les + ' ne mangent'} pas ${MOTS[notes.garde].pas} !` : `${n1 ? E.K.La + ' n’a' : E.K.Les + ' n’ont'} pas faim. ${quiAFaimA(enclosA)}`);
+  if (notes.refus || notes.pasFaim || notes.trop) erreursManche++;
+  const restent = enclosA.filter(F => F.faim && F.betes.some(b => b.faim)), fini = donnes && !restent.includes(E);
+  /* cet enclos a tout reçu, mais un autre attend encore */
+  if (fini && restent.length) parts.push(`Bravo, ${n1 ? E.K.la + ' a' : E.K.les + ' ont'} mangé !`);
+  /* trop : chacun a déjà sa part, le reste retourne dans son bac */
+  if (notes.trop) parts.push(donnes ? 'Il y en avait trop, le reste retourne dans son bac.' : `Il en reste ! ${n1 ? majuscule(E.K.la) + ' a' : majuscule(E.K.chaque) + ' a'} déjà mangé.`);
+  if (!restent.length) { reussirNourrir(parts); return; }
+  occupeA = false;
+  if (restent.includes(E) && donnes) {
+    const n = E.betes.filter(b => b.faim).length;
+    parts.push(`Il manque encore ${combien(n, E.K.k)}. ${majuscule(n === 1 ? E.K.un + ' a' : NOMBRES[n] + ' ' + E.K.des + ' ont')} encore faim !`);
+  } else if (fini) parts.push(quiAFaimA(enclosA));
+  /* au niveau 1, après deux essais, on dit la réponse */
+  if (nivA === 0 && erreursManche >= 2) parts.push(restent[0].K.mange1 + ' Regarde la flèche !');
+  voixA = parts.join(' '); dire(voixA);
+  if (erreursManche >= 2 || (nivA === 0 && erreursManche)) plusTardA(900, montrerIndice);
+}
+function reussirNourrir(parts) {
+  occupeA = true;
+  const m = manchesN[mancheA];
+  let bravo;
+  if (nivA === 0) bravo = 'Miam ! ' + m[0].E.K.mange1;
+  else if (nivA === 1) bravo = `Bravo ! ${majuscule(MOTS[m[0].E.K.k].un)} pour ${m[0].E.K.chaque} !`;
+  else bravo = 'Bravo ! Tout le monde a mangé !';
+  plusTardA(200, () => dire((parts.length ? parts.join(' ') + ' ' : '') + bravo));
+  SFX.achat();
+  mancheFinie();
+  plusTardA(2800, () => { if (mancheA < NB_MANCHES) mancheNourrir(false); else finNiveau(); });
+}
+function indiceNourrir() {
+  const E = enclosA.find(F => F.faim && F.betes.some(b => b.faim && !b.servi));
+  if (!E) return null;
+  const reste = E.betes.filter(b => b.faim && !b.servi).length, porte = RA.porte.filter(x => x === E.K.k).length;
+  if (porte >= reste || (porte && !RA.porte.some(k => k !== E.K.k))) return { x: E.x, z: E.z, h: 3.3 };
+  const B = bacsA.find(x => x.k === E.K.k);
+  return { x: B.x, z: B.z, h: 3.9, obj: B.obj };
+}
+
+/* ── la flèche d'aide : quand l'enfant hésite, après deux erreurs, ou avec 🔊 ── */
+function montrerIndice() {
+  const c = sceneCourante === 'livraison' ? indiceLivraison() : sceneCourante === 'nourrir' ? indiceNourrir() : indiceFerme();
+  if (!c) return;
+  flecheA.userData.y = c.h; flecheA.userData.obj = c.obj || null; flecheA.position.set(c.x, c.h, c.z); flecheA.visible = true;
+  flecheA.userData.jusqua = horloge + 8;
+}
+function indicesA() {
+  if (flecheA.visible && horloge > flecheA.userData.jusqua) flecheA.visible = false;
+  if (occupeA || RA.cible || fileA.n || !$('#modal').classList.contains('cache')) { dernierToucherA = Math.max(dernierToucherA, horloge - 2); return; }
+  const delai = sceneCourante === 'ferme' ? 14 : [7, 10, 13][nivA];
+  if (horloge - dernierToucherA < delai) return;
+  dernierToucherA = horloge;
+  if (voixA) dire(voixA);
+  montrerIndice();
+}
+
+/* ── toucher l'écran : un objet (ou tout près), sinon Roullieee va s'y promener ── */
+function toucherA(x, y) {
+  ac();
+  if (occupeA) return;
+  versNdc(x, y); rayon.setFromCamera(ndc, camera);
+  for (const h of rayon.intersectObjects(ciblesA, true)) {
+    let o = h.object;
+    while (o && !o.userData.actA) o = o.parent;
+    if (o && o.visible) { o.userData.actA(); return; }
+  }
+  if (!solSous(x, y, ptSol)) return;
+  let mieux = null, dm = 2.2;
+  for (const o of ciblesA) { const d = Math.hypot(o.position.x - ptSol.x, o.position.z - ptSol.z); if (d < dm) { dm = d; mieux = o; } }
+  if (mieux) { mieux.userData.actA(); return; }
+  dernierToucherA = horloge; fileA.cle = null; fileA.n = 0;
+  allerA(clamp(ptSol.x, zoneMarcheA[0], zoneMarcheA[2]), clamp(ptSol.z, zoneMarcheA[1], zoneMarcheA[3]));
+}
+
+/* ── entrer dans le mode, en sortir ── */
+function entrerApprendre() {
+  mode = 'apprendre';
+  /* la voix est la consigne : le son reste allumé ici (le réglage de « Jouer » revient en sortant) */
+  sonAvantA = S.son; S.son = true;
+  clearInterval(musiqueMinuteur);
+  $('#titre').classList.add('cache'); $('#hud').classList.add('cache'); $('#bulles').classList.add('cache');
+  $('#hudA').classList.remove('cache'); $('#aBulles').classList.remove('cache');
+  majBottesA();
+  sceneFerme(); cadrerA();
+}
+function quitterApprendre() {
+  viderMondeA();
+  mode = 'titre'; S.son = sonAvantA;
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  $('#hudA').classList.add('cache'); $('#aBulles').classList.add('cache'); $('#bulles').classList.remove('cache');
+  $('#titre').classList.remove('cache');
+}
+$('#aMaison').onclick = () => { ac(); SFX.pop(); if (sceneCourante === 'ferme') quitterApprendre(); else confirmerRetourA(); };
+$('#aEcouter').onclick = ecouterA;
+$('#aConsigne').onclick = ecouterA;
+$('#aAlbum').onclick = () => { ac(); SFX.pop(); ouvrirAlbum(); };
+
+function boucleApprendre(dt, t) {
+  deplacerA(dt, t);
+  majFileA();
+  betesA.forEach(b => bougerBeteA(b, dt, t));
+  /* dans la petite ferme, la dinde suit Roullieee */
+  if (dindeA.visible) {
+    const derriere = new THREE.Vector3(-Math.sin(joueurA.rotation.y) * 1.5, 0, -Math.cos(joueurA.rotation.y) * 1.5).add(joueurA.position);
+    if (dindeA.position.distanceTo(derriere) > .6) bougerCompagnon(dindeA, derriere, VITESSE_A + .3, dt, t, .15);
+    dindeA.children[0].userData.eventail.rotation.z = Math.sin(t * 1.5) * .1;
+  }
+  /* une bête qui a faim le rappelle de temps en temps */
+  if (sceneCourante === 'nourrir' && !occupeA && horloge - derniereCriA > 9) {
+    derniereCriA = horloge;
+    const b = pick(betesA.filter(x => x.faim && !x.servi));
+    if (b && !(window.speechSynthesis && speechSynthesis.speaking)) { rebond(b.obj); SFX[b.esp](); }
+  }
+  /* la fumée de la cheminée, comme dans « Jouer » */
+  if (sceneCourante === 'ferme' && maisonA) maisonA.userData.fumee.forEach(s => {
+    s.userData.t = (s.userData.t + dt * .25) % 1;
+    const k = s.userData.t;
+    s.position.set(1.4 + Math.sin(k * 5) * .2, 5.5 + k * 3, -.6 - k * .5); s.scale.setScalar(.4 + k * 1.1); s.material.opacity = .85 * (1 - k);
+  });
+  if (flecheA.visible) { flecheA.position.y = flecheA.userData.y + Math.abs(Math.sin(t * 4)) * .6; flecheA.rotation.y = t * 2; }
+  indicesA();
+  ecumeA.scale.setScalar(1 + Math.sin(t * 1.2) * .012);
+  placerCamA();
+  renderer.render(sceneA, camera);
+  majBullesA();
+  majPileA();
+}
 
 /* ══════════════════════════════════════════════════════════
    LA BOUCLE
@@ -3268,6 +4359,7 @@ function boucle(tms) {
     a.f(k);
     if (k >= 1) { anims.splice(i, 1); a.fin && a.fin(); }
   }
+  if (mode === 'apprendre') { boucleApprendre(dt, t); return; }
   if (!$('#titre').classList.contains('cache') || !$('#modal').classList.contains('cache')) arreterJoyClavier();
   deplacerJoueur(dt, t);
   zones(dt);
@@ -3394,7 +4486,18 @@ majHud();
 $('#pieces').textContent = S.pieces;
 $('#charge').textContent = '';
 $('#jouer').disabled = false;
+$('#apprendre').disabled = false;
+$('#apprendre').onclick = () => {
+  ac();
+  /* Safari (iPhone, iPad) ne parle qu'après une première phrase dite pendant un toucher */
+  if (window.speechSynthesis) { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); }
+  Object.values(banque).forEach(b => amorcer(b.a));
+  amorcer(glouA);
+  SFX.achat();
+  entrerApprendre();
+};
 $('#jouer').onclick = () => {
+  mode = 'jouer';
   ac();
   Object.values(banque).forEach(b => amorcer(b.a));
   amorcer(glouA);
