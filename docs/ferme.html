@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#3ec5f0">
-<meta name="version" content="2026-10-21-apprendre-4-jeux">
+<meta name="version" content="2026-10-21-apprendre-revu">
 <title>🚜 La Ferme de Roullieee</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lilita+One&display=swap" rel="stylesheet">
@@ -240,6 +240,7 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
 .bulle.a.optionA .in{height:auto;min-width:78px;min-height:78px;font-size:50px;border-radius:22px;border-color:#22c55e}
 .bulle.a.optionA .in::after{border-top-color:#22c55e}
 .bulle.a.clapA .in{font-size:22px;letter-spacing:-4px;padding:0 14px 0 10px;border-color:#fde68a}
+.bulle.a.clapA.grille .in{display:grid;grid-template-columns:repeat(2,auto);gap:0 2px;height:auto;min-height:56px;padding:4px 10px;letter-spacing:0;line-height:1.05}
 @media (max-width:560px){
   .bulle.a.carteA .in{min-width:84px;min-height:84px;font-size:56px}
   .bulle.a.optionA .in{min-width:64px;min-height:64px;font-size:40px}
@@ -291,6 +292,10 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
   .bulle.a .in{min-width:44px;height:44px;font-size:24px}
   .bulle.a.cmdA .in{min-height:44px}
   .cases i{width:21px;height:21px;font-size:12px}
+  .bulle.a.carteA .in{min-width:66px;min-height:66px;font-size:44px}
+  .bulle.a.optionA .in{min-width:54px;min-height:54px;font-size:34px}
+  .bulle.a.clapA .in{font-size:15px}
+  .bulle.a.clapA.grille .in{min-height:44px}
 }
 .autoA{display:flex;align-items:center;justify-content:center;width:84px;height:84px;border-radius:50%;flex:none;
   background:radial-gradient(circle at 35% 30%,#ffffff,#fde68a);border:5px solid #fff;box-shadow:0 0 0 3px #f59e0b,0 6px 12px rgba(0,0,0,.2);font-size:46px;line-height:1}
@@ -301,7 +306,8 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
 .albumA{display:flex;flex-direction:column;gap:16px;align-items:center}
 .ligneA{display:flex;align-items:center;gap:12px}
 .actA{font-size:40px;width:52px;text-align:center}
-.bientotA{font-weight:700;color:#7c4a1d;margin:16px 0 0}
+.completA{font-size:20px;font-weight:700;color:#b45309;margin:14px 0 0}
+.lienA{margin-top:14px;font-size:15px;font-weight:600;color:#9a6a3a;text-decoration:underline;padding:6px 10px}
 @media (max-width:420px){
   .autoA{width:66px;height:66px;font-size:36px}
   .autoA.gros{width:110px;height:110px;font-size:64px}
@@ -768,10 +774,11 @@ function choisirVoix() { if (!window.speechSynthesis) return; voixFR = speechSyn
 if (window.speechSynthesis) { choisirVoix(); speechSynthesis.onvoiceschanged = choisirVoix; }
 function dire(t) {
   if (!S.son || !window.speechSynthesis) return;
-  speechSynthesis.cancel();
+  /* on n'interrompt que s'il y a une phrase en cours (Safari perd parfois la suivante après un cancel) */
+  if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(t.replace(/[^\p{L}\p{N}\s'’!?.,:…-]/gu, ''));
   if (voixFR) u.voice = voixFR;
-  u.lang = 'fr-FR'; u.rate = .95; u.pitch = 1.15;
+  u.lang = 'fr-FR'; u.rate = mode === 'apprendre' ? .88 : .95; u.pitch = 1.15;   /* un peu plus lent pour les petits */
   speechSynthesis.speak(u);
 }
 
@@ -3469,7 +3476,7 @@ const RA = { cible: null, suite: [], fin: null, tourne: null, porte: [], enVol: 
 const fileA = { cle: null, n: 0, x: 0, z: 0, faire: null, prochain: 0 };
 const ciblesA = [], bullesA = [], betesA = [];
 let jetonA = 0, occupeA = false, sceneCourante = null, jeuA = null, nivA = 0, mancheA = 0, erreursManche = 0;
-let voixA = '', dernierToucherA = 0, sonAvantA = true, zoneMarcheA = [-8, -3, 8, 3], derniereCriA = 0;
+let voixA = '', relancesA = 0, dernierToucherA = 0, sonAvantA = true, zoneMarcheA = [-8, -3, 8, 3], derniereCriA = 0;
 const cadreA = new THREE.Box3();
 /* tout ce qui attend (minuteries, fins d'animation) est oublié quand on change de scène */
 const garde = f => { const j = jetonA; return (...a) => { if (j === jetonA) f(...a); }; };
@@ -3525,7 +3532,7 @@ function lancerA(obj, depart, versFn, duree, fin) {
 function consigneA(texte, voix) {
   const el = $('#aConsigne');
   el.innerHTML = texte || ''; el.classList.toggle('cache', !texte);
-  voixA = voix || '';
+  voixA = voix || ''; relancesA = 0;
   if (voix) dire(voix);
 }
 function ecouterA() { ac(); SFX.pop(); if (voixA) dire(voixA); montrerIndice(); }
@@ -3602,7 +3609,11 @@ function cheminA(x0, z0, x1, z1, prof = 0) {
    caisse = un objet de plus (chaque toucher compte pour un). */
 function demander(cle, x, z, faire, unique, regard) {
   if (occupeA) return;
-  dernierToucherA = horloge; flecheA.visible = false;
+  dernierToucherA = horloge; flecheA.visible = false; relancesA = 0;
+  /* elle prend encore ce qu'on a demandé ici : elle finit d'abord, puis elle y va */
+  const ici = joueurA.position;
+  if (fileA.n > 0 && fileA.cle !== cle && !RA.cible && Math.hypot(ici.x - fileA.x, ici.z - fileA.z) < .3) { fileA.ensuite = [cle, x, z, faire, unique, regard]; return; }
+  fileA.ensuite = null;
   if (fileA.cle === cle) {
     /* déjà là, ou déjà en route : un objet de plus (sinon, on y retourne) */
     const p = joueurA.position, dest = RA.cible ? (RA.suite.length ? RA.suite[RA.suite.length - 1] : RA.cible) : null;
@@ -3613,12 +3624,13 @@ function demander(cle, x, z, faire, unique, regard) {
 }
 function majFileA() {
   /* une fenêtre est ouverte (album, niveaux…) : ce qui attendait est oublié */
-  if (fileA.n && !$('#modal').classList.contains('cache')) { fileA.n = 0; return; }
+  if (fileA.n && !$('#modal').classList.contains('cache')) { fileA.n = 0; fileA.ensuite = null; return; }
   if (!fileA.n || RA.cible || occupeA || horloge < fileA.prochain) return;
   const p = joueurA.position;
   if (Math.hypot(p.x - fileA.x, p.z - fileA.z) > .3) { fileA.n = 0; return; }
   fileA.n--; fileA.prochain = horloge + .42;
   fileA.faire();
+  if (!fileA.n && fileA.ensuite) { const e = fileA.ensuite; fileA.ensuite = null; plusTardA(380, () => demander(...e)); }
 }
 function deplacerA(dt, t) {
   const p = joueurA.position, u = joueurA.userData;
@@ -3662,7 +3674,7 @@ function prendreA(k, depart) {
   if (RA.porte.length >= MAX_PORTE_A) {
     SFX.non(); fileA.n = 0;
     flotterA(joueurA, '✋', 3.4 + RA.porte.length * .27);
-    dire('Mon panier est plein ! Va le vider.');
+    dire(sceneCourante === 'livraison' ? 'Mon panier est plein ! Va au camion.' : 'Mon panier est plein ! Va donner à manger.');
     return false;
   }
   RA.porte.push(k); RA.enVol++;
@@ -3683,14 +3695,21 @@ function compterA(k) {
 }
 
 /* ── changer de scène ── */
+/* les matériaux faits exprès pour un objet (fumée, ailes…) sont libérés avec la scène ;
+   ceux du cache (mat()) et les pastilles sont partagés et restent */
+function libererA(racine) {
+  const gardes = new Set([...matCache.values(), matPastille, matQuestion]);
+  racine.traverse(o => { if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { if (!gardes.has(m)) m.dispose(); }); });
+}
 function viderMondeA() {
   jetonA++;
+  libererA(mondeA);
   while (mondeA.children.length) mondeA.remove(mondeA.children[0]);
   ciblesA.length = 0; betesA.length = 0;
   bullesA.forEach(b => b.el.remove()); bullesA.length = 0;
   Object.assign(RA, { cible: null, suite: [], fin: null, tourne: null, porte: [], enVol: 0, sig: 'x' });
   obstaclesA.length = 0;
-  Object.assign(fileA, { cle: null, n: 0 });
+  Object.assign(fileA, { cle: null, n: 0, ensuite: null });
   majPileA();
   flecheA.visible = false; anneauA.visible = false;
   occupeA = false; erreursManche = 0; dernierToucherA = horloge;
@@ -3917,12 +3936,22 @@ function ouvrirAlbum() {
     n++;
     return `<button class="autoA" data-nom="${nom}" aria-label="${nom}">${e}</button>`;
   }).join('') + '</div>').join('');
-  ouvrirFenetre('📒 Mon album', `<div class="albumA">${lignes}</div>`);
+  const total = Object.values(JEUX).reduce((t, J) => t + J.autocollants.length, 0);
+  ouvrirFenetre('📒 Mon album', `<div class="albumA">${lignes}</div>` + (n === total ? '<p class="centre completA">🏆 Ton album est complet ! Bravo !</p>' : '') +
+    '<p class="centre"><button class="lienA" id="aRaz">🔄 Nouvel enfant ? Recommencer l’album</button></p>');
+  /* pour la classe : un autre enfant prend la tablette (deux touchers, pour ne pas effacer par erreur) */
+  let sur = false;
+  $('#aRaz').onclick = function () {
+    SFX.pop();
+    if (!sur) { sur = true; this.textContent = '⚠️ Touche encore pour effacer les étoiles et les autocollants'; return; }
+    for (const id in SA.etoiles) SA.etoiles[id] = [0, 0, 0];
+    sauverA(); ouvrirAlbum(); dire('L’album est tout neuf ! À toi de jouer !');
+  };
   document.querySelectorAll('#mCorps .autoA[data-nom]').forEach(b => b.onclick = () => {
     SFX.pop(); dire(majuscule(b.dataset.nom) + ' !');
     b.classList.remove('saute'); void b.offsetWidth; b.classList.add('saute');
   });
-  dire(n ? `Ton album ! Tu as ${n === 1 ? 'un autocollant' : NOMBRES[n] + ' autocollants'}.` : 'Ton album est encore vide. Gagne des étoiles pour avoir des autocollants !');
+  dire(n === total ? 'Ton album est complet ! Bravo, tu as tous les autocollants !' : n ? `Ton album ! Tu as ${n === 1 ? 'un autocollant' : NOMBRES[n] + ' autocollants'}.` : 'Ton album est encore vide. Gagne des étoiles pour avoir des autocollants !');
 }
 function confirmerRetourA() {
   ouvrirFenetre('🏠 La ferme', `<div class="centre"><p class="finA">On retourne à la petite ferme ?</p><div class="rapides">` +
@@ -4259,10 +4288,11 @@ function indiceNourrir() {
    Niveau 3 : quel mot rime avec l'image du tableau ?
    Les syllabes sont dites avec des mots qui sonnent pareil (« pas », « pie »,
    « yon ») : la voix de l'appareil les prononce bien mieux qu'une syllabe seule.
-   Pas de mots qui finissent par un « e » muet : on compte les syllabes à l'oral. */
+   Pas de mots qui finissent par un « e » muet (« hélicoptère ») ni de mots qu'on
+   découpe de deux façons (« mi-el ») : on compte les syllabes à l'oral. */
 const MOTS_SYL = [
   ['chat', '🐱', 'chat', ['chat']], ['chien', '🐶', 'chien', ['chien']], ['œuf', '🥚', 'œuf', ['œuf']], ['pain', '🍞', 'pain', ['pain']],
-  ['miel', '🍯', 'miel', ['miel']], ['fleur', '🌸', 'fleur', ['fleur']], ['lait', '🥛', 'lait', ['lait']],
+  ['loup', '🐺', 'loup', ['loup']], ['fleur', '🌸', 'fleur', ['fleur']], ['lait', '🥛', 'lait', ['lait']],
   ['lapin', '🐰', 'la-pin', ['la', 'pin']], ['cochon', '🐷', 'co-chon', ['co', 'chon']], ['mouton', '🐑', 'mou-ton', ['mou', 'ton']],
   ['canard', '🦆', 'ca-nard', ['cas', 'nard']], ['poney', '🐴', 'po-ney', ['pot', 'nez']], ['camion', '🚚', 'ca-mion', ['cas', 'mion']],
   ['tracteur', '🚜', 'trac-teur', ['trac', 'teur']], ['poussin', '🐥', 'pou-ssin', ['pou', 'saint']], ['dindon', '🦃', 'din-don', ['daim', 'don']],
@@ -4274,7 +4304,7 @@ const MOTS_SYL = [
   ['kangourou', '🦘', 'kan-gou-rou', ['quand', 'goût', 'roue']], ['éléphant', '🐘', 'é-lé-phant', ['et', 'lait', 'fend']],
   ['parapluie', '☔', 'pa-ra-pluie', ['pas', 'rat', 'pluie']], ['avocat', '🥑', 'a-vo-cat', ['a', 'veau', 'cas']],
   ['télévision', '📺', 'té-lé-vi-sion', ['thé', 'lait', 'vie', 'sion']], ['ordinateur', '💻', 'or-di-na-teur', ['or', 'dit', 'na', 'teur']],
-  ['hélicoptère', '🚁', 'hé-li-cop-tère', ['et', 'lit', 'cope', 'terre']], ['rhinocéros', '🦏', 'rhi-no-cé-ros', ['riz', 'nos', 'ces', 'rosse']],
+  ['rhinocéros', '🦏', 'rhi-no-cé-ros', ['riz', 'nos', 'ces', 'rosse']],
   ['alligator', '🐊', 'a-lli-ga-tor', ['a', 'lit', 'ga', 'tort']]
 ].map(([mot, e, ecrit, voix]) => ({ mot, e, ecrit, voix, n: voix.length }));
 /* les rimes : le mot du tableau, le mot qui rime, et le son qu'ils partagent (pour choisir les intrus) */
@@ -4310,7 +4340,9 @@ function sceneSyllabes(niv) {
   depart3 = [0, 3.4];
   if (niv < 2) {
     /* les chemins : niveau 1, 1-2-3 dalles dans l'ordre ; niveau 2, 1 à 4 dalles mélangés */
-    const nbs = niv === 0 ? [1, 2, 3] : melange([1, 2, 3, 4]), xs = nbs.length === 3 ? [-3, 0, 3] : [-4.2, -1.4, 1.4, 4.2];
+    /* écran en largeur (téléphone couché) : les chemins s'écartent, pour que leurs bulles ne se touchent pas */
+    const large = innerWidth > innerHeight * 1.2, nbs = niv === 0 ? [1, 2, 3] : melange([1, 2, 3, 4]);
+    const xs = nbs.length === 3 ? (large ? [-4, 0, 4] : [-3, 0, 3]) : (large ? [-5.7, -1.9, 1.9, 5.7] : [-4.2, -1.4, 1.4, 4.2]);
     cheminsA = nbs.map((n, i) => creerCheminA(n, xs[i]));
     const bord = Math.max(...xs) + 1.6;
     cadreA.set(new THREE.Vector3(-bord, 0, -5.9), new THREE.Vector3(bord, 3.4, 4.4));
@@ -4341,7 +4373,9 @@ function creerCheminA(n, x) {
   const C = { n, x, g, dalles, quai: [x, z0 + 1.15] };
   const action = () => demander('chemin-' + n, C.quai[0], C.quai[1], () => sauterChemin(C), true, [x, z0]);
   cibleA(g, action);
-  bulleA(g, new THREE.Vector3(0, 1.3, zf - .5), () => ({ t: '👏'.repeat(n), c: 'clapA' }), action);
+  /* 3 ou 4 applaudissements en petit carré, comme sur un dé : plus étroit et facile à compter */
+  const claps = n > 2 ? Array.from({ length: n }, () => '<span>👏</span>').join('') : '👏'.repeat(n);
+  bulleA(g, new THREE.Vector3(0, 1.3, zf - .5), () => ({ t: claps, c: n > 2 ? 'clapA grille' : 'clapA' }), action);
   return C;
 }
 function creerPupitreA(x, i) {
@@ -4598,7 +4632,8 @@ function indicesA() {
   const delai = sceneCourante === 'ferme' ? 14 : [7, 10, 13][nivA];
   if (horloge - dernierToucherA < delai) return;
   dernierToucherA = horloge;
-  if (voixA) dire(voixA);
+  /* la consigne est redite deux fois au plus ; ensuite, seule la flèche revient (sans parler) */
+  if (voixA && relancesA < 2) { relancesA++; dire(voixA); }
   montrerIndice();
 }
 
@@ -4616,7 +4651,7 @@ function toucherA(x, y) {
   let mieux = null, dm = 2.2;
   for (const o of ciblesA) { const d = Math.hypot(o.position.x - ptSol.x, o.position.z - ptSol.z); if (d < dm) { dm = d; mieux = o; } }
   if (mieux) { mieux.userData.actA(); return; }
-  dernierToucherA = horloge; fileA.cle = null; fileA.n = 0;
+  dernierToucherA = horloge; relancesA = 0; Object.assign(fileA, { cle: null, n: 0, ensuite: null });
   allerA(clamp(ptSol.x, zoneMarcheA[0], zoneMarcheA[2]), clamp(ptSol.z, zoneMarcheA[1], zoneMarcheA[3]));
 }
 
