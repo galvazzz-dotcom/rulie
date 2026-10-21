@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#3ec5f0">
-<meta name="version" content="2026-10-21-apprendre">
+<meta name="version" content="2026-10-21-apprendre-4-jeux">
 <title>🚜 La Ferme de Roullieee</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lilita+One&display=swap" rel="stylesheet">
@@ -234,6 +234,17 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
 .lot small{font-size:15px;letter-spacing:-3px}
 .bulle.a.faimA .in{border-color:#f97316;font-size:30px}
 .bulle.a.faimA .in::after{border-top-color:#f97316}
+/* syllabes : l'image du mot sur le chevalet, les images à choisir, les applaudissements de chaque chemin */
+.bulle.a.carteA .in{height:auto;min-width:104px;min-height:104px;font-size:70px;border-radius:26px;border-color:#a855f7;padding:4px 14px}
+.bulle.a.carteA .in::after{border-top-color:#a855f7}
+.bulle.a.optionA .in{height:auto;min-width:78px;min-height:78px;font-size:50px;border-radius:22px;border-color:#22c55e}
+.bulle.a.optionA .in::after{border-top-color:#22c55e}
+.bulle.a.clapA .in{font-size:22px;letter-spacing:-4px;padding:0 14px 0 10px;border-color:#fde68a}
+@media (max-width:560px){
+  .bulle.a.carteA .in{min-width:84px;min-height:84px;font-size:56px}
+  .bulle.a.optionA .in{min-width:64px;min-height:64px;font-size:40px}
+  .bulle.a.clapA .in{font-size:17px}
+}
 /* la bulle que montre la flèche d'aide */
 .bulle.a.indice .in{animation:indiceA .55s ease-in-out infinite alternate;box-shadow:0 0 0 5px #ffd23f,0 0 26px 8px rgba(255,210,63,.95)}
 @keyframes indiceA{from{transform:scale(1)}to{transform:scale(1.14)}}
@@ -758,7 +769,7 @@ if (window.speechSynthesis) { choisirVoix(); speechSynthesis.onvoiceschanged = c
 function dire(t) {
   if (!S.son || !window.speechSynthesis) return;
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(t.replace(/[^\p{L}\p{N}\s'’!?.,-]/gu, ''));
+  const u = new SpeechSynthesisUtterance(t.replace(/[^\p{L}\p{N}\s'’!?.,:…-]/gu, ''));
   if (voixFR) u.voice = voixFR;
   u.lang = 'fr-FR'; u.rate = .95; u.pitch = 1.15;
   speechSynthesis.speak(u);
@@ -3352,7 +3363,7 @@ $('#bEngrais').onclick = () => { ac(); mettreEngrais(); };
    ══════════════════════════════════════════════════════════ */
 const CLE_A = 'fermeRoullieeeApprendre.v1';
 function chargerA() {
-  const n = { etoiles: { livraison: [0, 0, 0], nourrir: [0, 0, 0] }, vu: false };
+  const n = { etoiles: { livraison: [0, 0, 0], nourrir: [0, 0, 0], syllabes: [0, 0, 0], pompon: [0, 0, 0] }, vu: false };
   try {
     const o = JSON.parse(localStorage.getItem(CLE_A));
     if (o && o.etoiles) for (const id in n.etoiles) if (Array.isArray(o.etoiles[id])) n.etoiles[id] = n.etoiles[id].map((_, i) => o.etoiles[id][i] ? 1 : 0);
@@ -3365,12 +3376,18 @@ function sauverA() { try { localStorage.setItem(CLE_A, JSON.stringify(SA)); } ca
 
 const NB_MANCHES = 5, MAX_PORTE_A = 12, VITESSE_A = 5.5;
 const JEUX = {
-  livraison: { e: '🚚', nom: 'La livraison', dire: 'La livraison',
+  livraison: { e: '🚚', nom: 'La livraison', dire: 'La livraison !',
     niveaux: [{ ex: '🥚🥚🥚', aide: 'Compter jusqu’à 5' }, { ex: '🥚 <b>8</b>', aide: 'Compter jusqu’à 10' }, { ex: '🥚 + 🥕', aide: 'Deux produits à la fois' }],
     autocollants: [['🐣', 'le poussin'], ['🚜', 'le tracteur'], ['🏆', 'la coupe d’or']] },
-  nourrir: { e: '🐄', nom: 'À table !', dire: 'À table, les animaux',
+  nourrir: { e: '🐄', nom: 'À table !', dire: 'À table, les animaux !',
     niveaux: [{ ex: '🐔 ❓', aide: 'Qui mange quoi ?' }, { ex: '🐷🐷🐷', aide: 'Un pour chacun' }, { ex: '🐔 + 🐄', aide: 'Deux enclos à nourrir' }],
-    autocollants: [['🐷', 'le petit cochon'], ['🐮', 'la vache'], ['🐝', 'l’abeille']] }
+    autocollants: [['🐷', 'le petit cochon'], ['🐮', 'la vache'], ['🐝', 'l’abeille']] },
+  syllabes: { e: '👏', nom: 'Les syllabes', dire: 'Les syllabes !',
+    niveaux: [{ ex: '👏👏', aide: 'Compter les syllabes, avec de l’aide' }, { ex: '👏👏👏👏', aide: 'Compter les syllabes tout seul' }, { ex: '🎂 ⛵', aide: 'Trouver les mots qui riment' }],
+    autocollants: [['🦋', 'le papillon'], ['🐌', 'l’escargot'], ['🌈', 'l’arc-en-ciel']] },
+  pompon: { e: '🐇', nom: 'Où est Pompon ?', dire: 'Où est Pompon ?',
+    niveaux: [{ ex: '⬆️ ⬇️', aide: 'Devant, derrière' }, { ex: '⬅️ ➡️', aide: 'À gauche, à droite' }, { ex: '↔️ 📦', aide: 'Entre, dans… tout mélangé' }],
+    autocollants: [['🐰', 'Pompon'], ['🦊', 'le renard'], ['🦉', 'le hibou']] }
 };
 /* les mots pour parler juste : « une carotte », « trois œufs », « pas de lait » */
 const NOMBRES = ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix', 'onze', 'douze'];
@@ -3448,7 +3465,7 @@ function texturePastille(txt) {
 const matPastille = new THREE.SpriteMaterial({ map: texturePastille('') }), matQuestion = new THREE.SpriteMaterial({ map: texturePastille('?') });
 
 /* ── l'état du jeu en cours ── */
-const RA = { cible: null, fin: null, tourne: null, porte: [], enVol: 0, phase: 0, sig: '' };
+const RA = { cible: null, suite: [], fin: null, tourne: null, porte: [], enVol: 0, phase: 0, sig: '' };
 const fileA = { cle: null, n: 0, x: 0, z: 0, faire: null, prochain: 0 };
 const ciblesA = [], bullesA = [], betesA = [];
 let jetonA = 0, occupeA = false, sceneCourante = null, jeuA = null, nivA = 0, mancheA = 0, erreursManche = 0;
@@ -3482,7 +3499,7 @@ function majBullesA() {
       if (st) { b.el.className = 'bulle a ' + st.c; b.el.firstChild.innerHTML = st.t; }
     }
     if (!st) continue;
-    b.el.classList.toggle('indice', flecheA.visible && b.obj === flecheA.userData.obj);
+    b.el.classList.toggle('indice', (flecheA.visible && b.obj === flecheA.userData.obj) || horloge < (b.brille || 0));
     projA.copy(b.ofs); b.obj.localToWorld(projA); projA.project(camera);
     b.el.style.transform = `translate3d(${(projA.x * .5 + .5) * innerWidth}px,${(-projA.y * .5 + .5) * innerHeight}px,0) translate(-50%,-100%)`;
   }
@@ -3558,20 +3575,45 @@ addEventListener('resize', () => { if (mode === 'apprendre') cadrerA(); });
 
 /* ── Roullieee marche tout droit jusqu'à ce qu'on a touché ── */
 function allerA(x, z, fin) {
-  RA.cible = new THREE.Vector3(x, 0, z); RA.fin = fin || null; RA.tourne = null;
+  /* le chemin contourne ce qui est posé sur la place (obstaclesA), sinon tout droit */
+  RA.suite = cheminA(joueurA.position.x, joueurA.position.z, x, z);
+  RA.cible = RA.suite.shift(); RA.fin = fin || null; RA.tourne = null;
   anneauA.position.set(x, .06, z); anneauA.visible = true; anneauA.scale.setScalar(1); anneauA.material.opacity = 1;
   animer(.6, k => { anneauA.scale.setScalar(1 + k * .6); anneauA.material.opacity = 1 - k; }, () => { anneauA.visible = false; });
+}
+const obstaclesA = [];   /* des cercles { x, z, r } que Roullieee contourne */
+function cheminA(x0, z0, x1, z1, prof = 0) {
+  const dx = x1 - x0, dz = z1 - z0, l2 = dx * dx + dz * dz;
+  let gene = null, tMin = 2;
+  for (const o of obstaclesA) {
+    if (Math.hypot(o.x - x1, o.z - z1) < o.r) continue;   /* on va justement à côté de lui */
+    const t = l2 ? clamp(((o.x - x0) * dx + (o.z - z0) * dz) / l2, 0, 1) : 0;
+    if (t <= 0 || t >= 1) continue;
+    if (Math.hypot(x0 + dx * t - o.x, z0 + dz * t - o.z) < o.r && t < tMin) { tMin = t; gene = o; }
+  }
+  if (!gene || prof > 2) return [new THREE.Vector3(x1, 0, z1)];
+  /* on passe à côté de l'obstacle, du côté où le chemin passait déjà */
+  const qx = x0 + dx * tMin - gene.x, qz = z0 + dz * tMin - gene.z, l = Math.hypot(qx, qz);
+  const nx = l > .01 ? qx / l : -dz / Math.sqrt(l2), nz = l > .01 ? qz / l : dx / Math.sqrt(l2);
+  const wx = gene.x + nx * (gene.r + .45), wz = gene.z + nz * (gene.r + .45);
+  return [...cheminA(x0, z0, wx, wz, prof + 1), ...cheminA(wx, wz, x1, z1, prof + 1)];
 }
 /* toucher une chose : Roullieee y va, puis agit. Toucher encore la même
    caisse = un objet de plus (chaque toucher compte pour un). */
 function demander(cle, x, z, faire, unique, regard) {
   if (occupeA) return;
   dernierToucherA = horloge; flecheA.visible = false;
-  if (fileA.cle === cle) { fileA.n = unique ? 1 : Math.min(fileA.n + 1, MAX_PORTE_A); return; }
+  if (fileA.cle === cle) {
+    /* déjà là, ou déjà en route : un objet de plus (sinon, on y retourne) */
+    const p = joueurA.position, dest = RA.cible ? (RA.suite.length ? RA.suite[RA.suite.length - 1] : RA.cible) : null;
+    if (dest ? Math.hypot(dest.x - x, dest.z - z) < .3 : Math.hypot(p.x - x, p.z - z) < .3) { fileA.n = unique ? 1 : Math.min(fileA.n + 1, MAX_PORTE_A); return; }
+  }
   Object.assign(fileA, { cle, n: 1, x, z, faire });
   allerA(x, z, regard ? () => { RA.tourne = Math.atan2(regard[0] - x, regard[1] - z); } : null);
 }
 function majFileA() {
+  /* une fenêtre est ouverte (album, niveaux…) : ce qui attendait est oublié */
+  if (fileA.n && !$('#modal').classList.contains('cache')) { fileA.n = 0; return; }
   if (!fileA.n || RA.cible || occupeA || horloge < fileA.prochain) return;
   const p = joueurA.position;
   if (Math.hypot(p.x - fileA.x, p.z - fileA.z) > .3) { fileA.n = 0; return; }
@@ -3583,7 +3625,11 @@ function deplacerA(dt, t) {
   let marche = false;
   if (RA.cible) {
     const dx = RA.cible.x - p.x, dz = RA.cible.z - p.z, d = Math.hypot(dx, dz);
-    if (d < .12) { p.x = RA.cible.x; p.z = RA.cible.z; RA.cible = null; const f = RA.fin; RA.fin = null; f && f(); }
+    if (d < .12) {
+      p.x = RA.cible.x; p.z = RA.cible.z;
+      if (RA.suite && RA.suite.length) RA.cible = RA.suite.shift();
+      else { RA.cible = null; const f = RA.fin; RA.fin = null; f && f(); }
+    }
     else {
       const s = Math.min(d, VITESSE_A * dt);
       p.x += dx / d * s; p.z += dz / d * s;
@@ -3642,7 +3688,8 @@ function viderMondeA() {
   while (mondeA.children.length) mondeA.remove(mondeA.children[0]);
   ciblesA.length = 0; betesA.length = 0;
   bullesA.forEach(b => b.el.remove()); bullesA.length = 0;
-  Object.assign(RA, { cible: null, fin: null, tourne: null, porte: [], enVol: 0, sig: 'x' });
+  Object.assign(RA, { cible: null, suite: [], fin: null, tourne: null, porte: [], enVol: 0, sig: 'x' });
+  obstaclesA.length = 0;
   Object.assign(fileA, { cle: null, n: 0 });
   majPileA();
   flecheA.visible = false; anneauA.visible = false;
@@ -3828,13 +3875,20 @@ function sceneFerme() {
   ajouterBeteA(Ep, false); ajouterBeteA(Ep, false);
   lieuxA.nourrir = E.g;
   bulleA(E.g, 2.6, () => ({ t: '🐄 ' + etoilesA('nourrir'), c: 'panneau' }), allerNour);
-  /* deux chantiers : d'autres jeux arrivent */
-  for (const x of [-5, 5]) {
-    const c = poserA(fabChantier(), x, 4.3); c.scale.setScalar(.8);
-    const allerCh = () => demander('lieu-chantier' + x, x, 2.7, () => { SFX.pop(); consigneA('🚧 Ici, on prépare un nouveau jeu !', 'Ici, on prépare un nouveau jeu. Reviens bientôt !'); }, true, [x, 4.3]);
-    cibleA(c, allerCh);
-    bulleA(c, 1.5, () => ({ t: '🚧', c: 'panneau petit' }), allerCh);
-  }
+  /* les syllabes : un petit chemin de dalles où l'on saute */
+  const gS = lieuxA.syllabes = new THREE.Group(); gS.position.set(-5, 0, 4.3); mondeA.add(gS);
+  [[-1.1, .5], [0, 0], [1.1, -.5]].forEach(([x, z], i) => gS.add(P(Cy(.5, .5, .12, 12), i === 1 ? '#ffd23f' : '#d6d3d1', x, .06, z, true)));
+  const fS = fabFleurs(); fS.position.set(1.4, 0, .6); gS.add(fS);
+  const allerSyl = () => demander('lieu-syllabes', -5, 2.6, () => ouvrirNiveaux('syllabes'), true, [-5, 4.3]);
+  cibleA(gS, allerSyl);
+  bulleA(gS, 1.2, () => ({ t: '👏 ' + etoilesA('syllabes'), c: 'panneau' }), allerSyl);
+  /* Pompon : ses oreilles dépassent d'un buisson */
+  const gP = lieuxA.pompon = new THREE.Group(); gP.position.set(5, 0, 4.3); mondeA.add(gP);
+  gP.add(fabBuissonA());
+  const lp = fabLapin(); lp.position.set(.62, .05, .3); lp.rotation.y = -.5; gP.add(lp); gP.userData.lapin = lp;
+  const allerPom = () => demander('lieu-pompon', 5, 2.6, () => ouvrirNiveaux('pompon'), true, [5, 4.3]);
+  cibleA(gP, allerPom);
+  bulleA(gP, 2.0, () => ({ t: '🐇 ' + etoilesA('pompon'), c: 'panneau' }), allerPom);
   joueurA.position.set(0, 0, 1.4); joueurA.rotation.y = 0;
   dindeA.visible = true; dindeA.position.set(-1.4, 0, 1.8);
   const bienvenue = SA.vu ? 'Choisis un jeu ! Touche un panneau.' : 'Bonjour ! Bienvenue dans la ferme pour apprendre. Touche un panneau pour choisir un jeu !';
@@ -3844,8 +3898,8 @@ function sceneFerme() {
   });
 }
 function indiceFerme() {
-  const id = Object.keys(JEUX).find(id => SA.etoiles[id].includes(0)) || 'livraison';
-  return id === 'livraison' ? { x: -4.6, z: -.9, h: 4.9, obj: lieuxA.livraison } : { x: 4.6, z: -1.2, h: 4.7, obj: lieuxA.nourrir };
+  const id = Object.keys(JEUX).find(id => SA.etoiles[id].includes(0)) || 'livraison', o = lieuxA[id];
+  return { x: o.position.x, z: o.position.z, h: { livraison: 4.9, nourrir: 4.7, syllabes: 3.4, pompon: 4.1 }[id], obj: o };
 }
 function ouvrirNiveaux(id) {
   const J = JEUX[id], et = SA.etoiles[id], conseil = et.indexOf(0);
@@ -3853,9 +3907,9 @@ function ouvrirNiveaux(id) {
     `<button class="nivA${i === conseil ? ' conseil' : ''}" data-n="${i}" aria-label="Niveau ${i + 1}"><span class="et">${'⭐'.repeat(i + 1)}</span><span class="ex">${N.ex}</span>` +
     `<span class="aide">${N.aide}</span>${et[i] ? `<span class="gagne">${J.autocollants[i][0]}</span>` : ''}</button>`).join('') + '</div>');
   document.querySelectorAll('#mCorps .nivA').forEach(b => b.onclick = () => { SFX.pop(); fermerFenetre(); lancerJeu(id, +b.dataset.n); });
-  dire(`${J.dire} ! Choisis ton niveau. Une, deux ou trois étoiles ?`);
+  dire(`${J.dire} Choisis ton niveau. Une, deux ou trois étoiles ?`);
 }
-function lancerJeu(id, niv) { transitionA(() => (id === 'livraison' ? sceneLivraison : sceneNourrir)(niv)); }
+function lancerJeu(id, niv) { transitionA(() => ({ livraison: sceneLivraison, nourrir: sceneNourrir, syllabes: sceneSyllabes, pompon: scenePompon })[id](niv)); }
 function ouvrirAlbum() {
   let n = 0;
   const lignes = Object.entries(JEUX).map(([id, J]) => `<div class="ligneA"><span class="actA">${J.e}</span>` + J.autocollants.map(([e, nom], i) => {
@@ -3863,7 +3917,7 @@ function ouvrirAlbum() {
     n++;
     return `<button class="autoA" data-nom="${nom}" aria-label="${nom}">${e}</button>`;
   }).join('') + '</div>').join('');
-  ouvrirFenetre('📒 Mon album', `<div class="albumA">${lignes}</div><p class="centre bientotA">🚧 D’autres jeux arrivent bientôt !</p>`);
+  ouvrirFenetre('📒 Mon album', `<div class="albumA">${lignes}</div>`);
   document.querySelectorAll('#mCorps .autoA[data-nom]').forEach(b => b.onclick = () => {
     SFX.pop(); dire(majuscule(b.dataset.nom) + ' !');
     b.classList.remove('saute'); void b.offsetWidth; b.classList.add('saute');
@@ -4196,9 +4250,335 @@ function indiceNourrir() {
   return { x: B.x, z: B.z, h: 3.9, obj: B.obj };
 }
 
+/* ══════════ JEU 3 : LES SYLLABES — découper les mots, entendre les rimes ══════════
+   Niveaux 1 et 2 : une image (un mot), et des chemins de 1, 2, 3 (ou 4)
+   dalles. On choisit le chemin qui a autant de dalles que le mot a de
+   syllabes : Roullieee saute une dalle par syllabe en la disant (« pa… pi…
+   llon »), comme on frappe les syllabes en classe. Niveau 1 : la voix
+   découpe le mot ; niveau 2 : il faut le découper tout seul.
+   Niveau 3 : quel mot rime avec l'image du tableau ?
+   Les syllabes sont dites avec des mots qui sonnent pareil (« pas », « pie »,
+   « yon ») : la voix de l'appareil les prononce bien mieux qu'une syllabe seule.
+   Pas de mots qui finissent par un « e » muet : on compte les syllabes à l'oral. */
+const MOTS_SYL = [
+  ['chat', '🐱', 'chat', ['chat']], ['chien', '🐶', 'chien', ['chien']], ['œuf', '🥚', 'œuf', ['œuf']], ['pain', '🍞', 'pain', ['pain']],
+  ['miel', '🍯', 'miel', ['miel']], ['fleur', '🌸', 'fleur', ['fleur']], ['lait', '🥛', 'lait', ['lait']],
+  ['lapin', '🐰', 'la-pin', ['la', 'pin']], ['cochon', '🐷', 'co-chon', ['co', 'chon']], ['mouton', '🐑', 'mou-ton', ['mou', 'ton']],
+  ['canard', '🦆', 'ca-nard', ['cas', 'nard']], ['poney', '🐴', 'po-ney', ['pot', 'nez']], ['camion', '🚚', 'ca-mion', ['cas', 'mion']],
+  ['tracteur', '🚜', 'trac-teur', ['trac', 'teur']], ['poussin', '🐥', 'pou-ssin', ['pou', 'saint']], ['dindon', '🦃', 'din-don', ['daim', 'don']],
+  ['gâteau', '🎂', 'gâ-teau', ['gars', 'tôt']], ['ballon', '🎈', 'bal-lon', ['bas', 'long']], ['abeille', '🐝', 'a-beille', ['a', 'beille']],
+  ['citron', '🍋', 'ci-tron', ['si', 'tron']],
+  ['papillon', '🦋', 'pa-pi-llon', ['pas', 'pie', 'yon']], ['escargot', '🐌', 'es-car-got', ['esse', 'car', 'go']],
+  ['hérisson', '🦔', 'hé-ri-sson', ['et', 'riz', 'son']], ['chocolat', '🍫', 'cho-co-lat', ['chaud', 'co', 'la']],
+  ['potiron', '🎃', 'po-ti-ron', ['pot', 'ti', 'rond']], ['ananas', '🍍', 'a-na-nas', ['a', 'na', 'nasse']],
+  ['kangourou', '🦘', 'kan-gou-rou', ['quand', 'goût', 'roue']], ['éléphant', '🐘', 'é-lé-phant', ['et', 'lait', 'fend']],
+  ['parapluie', '☔', 'pa-ra-pluie', ['pas', 'rat', 'pluie']], ['avocat', '🥑', 'a-vo-cat', ['a', 'veau', 'cas']],
+  ['télévision', '📺', 'té-lé-vi-sion', ['thé', 'lait', 'vie', 'sion']], ['ordinateur', '💻', 'or-di-na-teur', ['or', 'dit', 'na', 'teur']],
+  ['hélicoptère', '🚁', 'hé-li-cop-tère', ['et', 'lit', 'cope', 'terre']], ['rhinocéros', '🦏', 'rhi-no-cé-ros', ['riz', 'nos', 'ces', 'rosse']],
+  ['alligator', '🐊', 'a-lli-ga-tor', ['a', 'lit', 'ga', 'tort']]
+].map(([mot, e, ecrit, voix]) => ({ mot, e, ecrit, voix, n: voix.length }));
+/* les rimes : le mot du tableau, le mot qui rime, et le son qu'ils partagent (pour choisir les intrus) */
+const RIMES = [
+  ['gâteau', '🎂', 'bateau', '⛵', 'o'], ['lapin', '🐰', 'sapin', '🎄', 'in'], ['camion', '🚚', 'avion', '✈️', 'on'],
+  ['poussin', '🐥', 'raisin', '🍇', 'in'], ['chat', '🐱', 'rat', '🐀', 'a'], ['mouton', '🐑', 'ballon', '🎈', 'on'],
+  ['vélo', '🚲', 'château', '🏰', 'o'], ['canard', '🦆', 'renard', '🦊', 'ar'], ['abeille', '🐝', 'oreille', '👂', 'eille'],
+  ['fleur', '🌸', 'cœur', '❤️', 'eur'], ['grenouille', '🐸', 'citrouille', '🎃', 'ouille'], ['chien', '🐶', 'train', '🚂', 'in']
+].map(([mot, e, rime, er, son]) => ({ mot, e, rime, er, son }));
+const syllabesDites = w => w.voix.join(', ');
+/* des fins qui se ressemblent trop pour servir d'intrus l'une à l'autre */
+const RIMES_PROCHES = { a: ['ar'], ar: ['a'] };
+function clapA() { bruit({ hp: 1100, dur: .07, v: .34 }); bruit({ hp: 2600, dur: .05, d: .012, v: .2 }); }
+let cheminsA = [], motsA = [], tableauA = null, optionsA = [], depart3 = [0, 3.4];
+const Z_TABLEAU = -5.0;
+/* le tableau (un chevalet) où s'affiche l'image du mot */
+function creerTableauA() {
+  const g = new THREE.Group(); g.position.set(0, 0, Z_TABLEAU);
+  for (const x of [-.9, .9]) { const p = P(Bx(.14, 2.3, .14), '#8a5a3c', x, 1.1, .2); p.rotation.x = -.12; g.add(p); }
+  const pan = P(Bx(2.4, 1.7, .12), '#fff8e7', 0, 1.65, .05); pan.rotation.x = -.12; g.add(pan, P(Bx(2.6, .12, .3), '#8a5a3c', 0, .8, .25));
+  mondeA.add(g);
+  const dire1 = () => { ac(); SFX.pop(); if (voixA) dire(voixA); };
+  cibleA(g, dire1);
+  bulleA(g, 1.05, () => motsA[mancheA] ? { t: motsA[mancheA].e, c: 'carteA' } : null, dire1);
+  return g;
+}
+function sceneSyllabes(niv) {
+  viderMondeA();
+  sceneCourante = 'syllabes'; jeuA = 'syllabes'; nivA = niv; mancheA = 0; hudA(jeuA);
+  dindeA.visible = false;
+  decorA([[-9.4, -6.2, 1], [9.4, -6, 0], [-3.6, -8, 1], [3.8, -8.2, 0]], [[-8.2, 1.4], [8.4, 1], [-7.6, 6.2], [7.8, 6.4]]);
+  tableauA = creerTableauA();
+  depart3 = [0, 3.4];
+  if (niv < 2) {
+    /* les chemins : niveau 1, 1-2-3 dalles dans l'ordre ; niveau 2, 1 à 4 dalles mélangés */
+    const nbs = niv === 0 ? [1, 2, 3] : melange([1, 2, 3, 4]), xs = nbs.length === 3 ? [-3, 0, 3] : [-4.2, -1.4, 1.4, 4.2];
+    cheminsA = nbs.map((n, i) => creerCheminA(n, xs[i]));
+    const bord = Math.max(...xs) + 1.6;
+    cadreA.set(new THREE.Vector3(-bord, 0, -5.9), new THREE.Vector3(bord, 3.4, 4.4));
+    zoneMarcheA = [-bord + .6, 2.6, bord - .6, 3.8];
+    /* des mots de 1, 2, 3 (et 4) syllabes, chacun au moins une fois */
+    const par = n => melange(MOTS_SYL.filter(w => w.n === n));
+    const ns = niv === 0 ? melange([1, 2, 3, pick([2, 3]), pick([1, 2, 3])]) : melange([1, 2, 3, 4, pick([2, 3, 4])]);
+    const pris = {};
+    motsA = ns.map(n => { pris[n] = (pris[n] || 0) + 1; return par(n)[pris[n] - 1] || par(n)[0]; });
+  } else {
+    cheminsA = [];
+    cadreA.set(new THREE.Vector3(-5.2, 0, -5.9), new THREE.Vector3(5.2, 3.4, 4.2));
+    zoneMarcheA = [-4.6, .6, 4.6, 3.8];
+    motsA = melange(RIMES).slice(0, NB_MANCHES);
+    optionsA = [-3.2, 0, 3.2].map((x, i) => creerPupitreA(x, i));
+  }
+  joueurA.position.set(depart3[0], 0, depart3[1]); joueurA.rotation.y = Math.PI;
+  plusTardA(500, () => mancheSyllabes(true));
+}
+function creerCheminA(n, x) {
+  const g = new THREE.Group(); g.position.set(x, 0, 0); mondeA.add(g);
+  const z0 = 1.9, dalles = [];
+  for (let j = 0; j < n; j++) { const d = P(Cy(.55, .55, .14, 14), '#d6d3d1', 0, .07, z0 - j * 1.15, true); g.add(d); dalles.push(d); }
+  /* au bout du chemin, un petit drapeau */
+  const zf = z0 - (n - 1) * 1.15 - 1.0;
+  g.add(P(Cy(.05, .05, 1.4, 5), '#8a5a3c', 0, .7, zf), P(Pr(.6, .45, .04), '#ef4444', .3, 1.15, zf, true));
+  g.children[g.children.length - 1].rotation.z = -Math.PI / 2;
+  const C = { n, x, g, dalles, quai: [x, z0 + 1.15] };
+  const action = () => demander('chemin-' + n, C.quai[0], C.quai[1], () => sauterChemin(C), true, [x, z0]);
+  cibleA(g, action);
+  bulleA(g, new THREE.Vector3(0, 1.3, zf - .5), () => ({ t: '👏'.repeat(n), c: 'clapA' }), action);
+  return C;
+}
+function creerPupitreA(x, i) {
+  const g = new THREE.Group(); g.position.set(x, 0, -.6);
+  g.add(P(Bx(.25, 1.0, .25), '#8a5a3c', 0, .5, 0), P(Bx(1.4, .1, 1.0), '#b5793e', 0, 1.05, 0));
+  mondeA.add(g);
+  const O = { i, x, g, quai: [x, .8] };
+  const action = () => demander('option-' + i, O.quai[0], O.quai[1], () => choisirRime(O), true, [x, -.6]);
+  cibleA(g, action);
+  O.bulle = bulleA(g, 1.2, () => O.mot ? { t: O.mot.e, c: 'optionA' } : null, action);
+  return O;
+}
+function mancheSyllabes(premiere) {
+  erreursManche = 0; occupeA = false;
+  const w = motsA[mancheA];
+  if (nivA < 2) {
+    cheminsA.forEach(C => C.dalles.forEach(d => { d.material = mat('#d6d3d1'); }));
+    const voix = `Écoute : ${w.mot}.` + (nivA === 0 ? ` ${majuscule(syllabesDites(w))}.` : '') + ' Combien de syllabes ?' + (premiere ? ' Choisis le chemin qui a autant de dalles !' : '');
+    consigneA(`👂 ${w.e} ${nivA === 0 ? w.ecrit : w.mot} : combien de 👏\u00a0?`, voix);
+    rebond(tableauA);
+    if (premiere && nivA === 0) plusTardA(4500, montrerIndice);
+  } else {
+    /* le bon mot et deux intrus qui ne riment pas avec lui */
+    const intrus = melange(RIMES.filter(r => r.son !== w.son && !(RIMES_PROCHES[w.son] || []).includes(r.son)).flatMap(r => [{ mot: r.mot, e: r.e }, { mot: r.rime, e: r.er }])).filter((m, i, l) => l.findIndex(x => x.mot === m.mot) === i).slice(0, 2);
+    const opts = melange([{ mot: w.rime, e: w.er, bon: true }, ...intrus]);
+    optionsA.forEach((O, i) => { O.mot = opts[i]; apparaitre(O.g); });
+    consigneA(`👂 Quel mot rime avec ${w.e} ${w.mot}\u00a0?`, `Quel mot rime avec ${w.mot} ? ${opts.map(o => o.mot).join('… ')} ?`);
+    rebond(tableauA);
+    /* on montre chaque image quand la voix la nomme */
+    optionsA.forEach((O, i) => plusTardA(1700 + i * 850, () => { O.bulle.brille = horloge + .8; rebond(O.g); }));
+  }
+}
+/* Roullieee saute sur les dalles : une syllabe par dalle */
+function sauterChemin(C) {
+  const w = motsA[mancheA];
+  occupeA = true;
+  const p = joueurA.position, n = Math.min(C.n, w.n);
+  RA.tourne = Math.PI;
+  const saut = j => {
+    if (j >= n) { plusTardA(350, () => bilanChemin(C, w)); return; }
+    const a = p.clone(), d = C.dalles[j], b = new THREE.Vector3(C.x, 0, d.position.z);
+    animer(.42, k => { p.lerpVectors(a, b, k); p.y = Math.sin(k * Math.PI) * .75; }, garde(() => {
+      p.y = 0; d.material = mat('#ffd23f'); clapA(); dire(w.voix[j]);
+      flotterA(joueurA, '👏', 3.4);
+      plusTardA(380, () => saut(j + 1));
+    }));
+  };
+  saut(0);
+}
+function bilanChemin(C, w) {
+  const bravo = `${majuscule(syllabesDites(w))} : ${w.n === 1 ? 'une syllabe' : NOMBRES[w.n] + ' syllabes'} !`;
+  if (C.n === w.n) {
+    SFX.achat(); coeurs(joueurA, 3.2, ['⭐', '✨', '👏']); rebond(tableauA);
+    dire(pick(['Bravo !', 'Super !', 'Génial !']) + ' ' + bravo);
+    consigneA(`${w.e} ${w.ecrit} : ${'👏'.repeat(w.n)}`, '');
+    mancheFinie();
+    plusTardA(2600, () => {
+      if (mancheA >= NB_MANCHES) { finNiveau(); return; }
+      allerA(depart3[0], depart3[1], () => { RA.tourne = Math.PI; mancheSyllabes(false); });
+    });
+    return;
+  }
+  /* trop de dalles : elle s'arrête avant la fin ; pas assez : il reste des syllabes à dire */
+  erreursManche++; SFX.non();
+  const ecart = Math.abs(C.n - w.n);
+  voixA = (C.n > w.n ? 'Oh ! Il y a trop de dalles. ' : `Oh ! Il manque ${ecart === 1 ? 'une dalle' : NOMBRES[ecart] + ' dalles'}. `) +
+    `${majuscule(w.mot)}, c’est ${syllabesDites(w)} : ${w.n === 1 ? 'une syllabe' : NOMBRES[w.n] + ' syllabes'}. Essaie un autre chemin !`;
+  dire(voixA);
+  secouer(joueurA);
+  plusTardA(1800, () => allerA(depart3[0], depart3[1], () => {
+    RA.tourne = Math.PI; occupeA = false;
+    C.dalles.forEach(d => { d.material = mat('#d6d3d1'); });
+    if (erreursManche >= 2) montrerIndice();
+  }));
+}
+function choisirRime(O) {
+  const w = motsA[mancheA];
+  if (!O.mot) return;
+  if (O.mot.bon) {
+    occupeA = true;
+    SFX.achat(); coeurs(O.g, 2, ['⭐', '✨', '🎵']); rebond(O.g); rebond(tableauA);
+    dire(`${majuscule(w.mot)}… ${O.mot.mot} ! Ça finit pareil, ça rime. Bravo !`);
+    mancheFinie();
+    plusTardA(2800, () => {
+      if (mancheA >= NB_MANCHES) { finNiveau(); return; }
+      allerA(depart3[0], depart3[1], () => { RA.tourne = Math.PI; mancheSyllabes(false); });
+    });
+    return;
+  }
+  erreursManche++; SFX.non(); secouer(O.g);
+  voixA = `${majuscule(w.mot)}… ${O.mot.mot}… Ça ne finit pas pareil. Écoute encore : ${w.mot}. Quel mot rime avec ${w.mot} ?`;
+  dire(voixA);
+  if (erreursManche >= 2) plusTardA(900, montrerIndice);
+}
+function indiceSyllabes() {
+  const w = motsA[mancheA];
+  if (!w) return null;
+  if (nivA < 2) { const C = cheminsA.find(c => c.n === w.n); return { x: C.x, z: C.dalles[C.n - 1].position.z - 1.0, h: 2.6, obj: C.g }; }
+  const O = optionsA.find(o => o.mot && o.mot.bon);
+  return O ? { x: O.x, z: -.6, h: 3.4, obj: O.g } : null;
+}
+
+/* ══════════ JEU 4 : OÙ EST POMPON ? — se repérer dans l'espace ══════════
+   Pompon joue à cache-cache dans les buissons autour de trois repères.
+   La voix dit où il est (« derrière le tracteur ») : on touche le bon
+   buisson, Roullieee y court (en contournant ce qui est sur la place).
+   Pas là ? Elle dit où l'on est (« Ici, c'est devant le tracteur ») :
+   on apprend les mots par contraste. Gauche et droite : comme on voit
+   l'écran. Niveau 1 : devant, derrière. Niveau 2 : à gauche, à droite (et
+   un peu de devant, derrière). Niveau 3 : entre, dans, et tout mélangé. */
+const REPERES_A = {
+  tracteur: { fab: () => fabTracteur(), ry: Math.PI / 2, r: 1.55, e: '🚜', le: 'le tracteur', du: 'du tracteur' },
+  fontaine: { fab: () => fabFontaine(), ry: 0, r: 1.65, e: '⛲', le: 'la fontaine', du: 'de la fontaine' },
+  banc:     { fab: () => fabBanc(), ry: 0, r: 1.15, e: '🪑', le: 'le banc', du: 'du banc' },
+  caisse:   { fab: () => { const c = fabCaisse(); c.scale.setScalar(1.45); return c; }, ry: 0, r: 1.2, e: '📦', le: 'la caisse', du: 'de la caisse' }
+};
+function fabBuissonA() {
+  return grp(P(Ic(.62, 1), '#4caf50', 0, .55, 0), P(Ic(.46, 1), '#66bb6a', .4, .72, .15), P(Ic(.44, 1), '#43a047', -.42, .48, .2), P(Ic(.36, 1), '#5cb85c', .1, .95, -.15));
+}
+function phraseA(rel) {
+  const [r, A, B] = rel;
+  return r === 'devant' ? 'devant ' + A.le : r === 'derrière' ? 'derrière ' + A.le : r === 'gauche' ? 'à gauche ' + A.du : r === 'droite' ? 'à droite ' + A.du
+    : r === 'entre' ? `entre ${A.le} et ${B.le}` : 'dans ' + A.le;
+}
+function texteRelA(rel) {
+  const [r, A, B] = rel;
+  return r === 'gauche' ? `à gauche ⬅️ ${A.du} ${A.e}` : r === 'droite' ? `à droite ➡️ ${A.du} ${A.e}` : r === 'entre' ? `entre ${A.le} ${A.e} et ${B.le} ${B.e}` : `${phraseA(rel)} ${A.e}`;
+}
+let cachettesA = [], questionsA = [], pomponA = null;
+const DEPART_P = [0, 4.3];
+function scenePompon(niv) {
+  viderMondeA();
+  sceneCourante = 'pompon'; jeuA = 'pompon'; nivA = niv; mancheA = 0; hudA(jeuA);
+  dindeA.visible = false;
+  decorA([[-9.6, -6.6, 1], [9.4, -6.4, 0], [-3.4, -8.2, 0], [3.6, -8.4, 1]], [[-8.4, 2.4], [8.6, 2.2], [-7.4, 6.6], [7.8, 6.8]]);
+  const ids = niv === 2 ? ['tracteur', 'fontaine', 'caisse'] : melange(['tracteur', 'fontaine', 'banc']);
+  const xs = [-4.6, 0, 4.6], ZR = -.9, reps = ids.map((id, i) => ({ id, ...REPERES_A[id], x: xs[i], z: ZR }));
+  reps.forEach(R => {
+    R.obj = poserA(R.fab(), R.x, R.z, R.ry); obstaclesA.push({ x: R.x, z: R.z, r: R.r });
+    /* toucher un repère : on entend son nom (la caisse, elle, peut cacher Pompon : voir plus bas) */
+    cibleA(R.obj, () => { if (occupeA) return; ac(); SFX.pop(); rebond(R.obj); dire(`C’est ${R.le} ! Pompon se cache dans un buisson.`); dernierToucherA = horloge; });
+  });
+  cachettesA = [];
+  const buisson = (x, z, rels, quai) => {
+    const o = poserA(fabBuissonA(), x, z, rand(0, 6));
+    const H = { x, z, obj: o, rels, quai };
+    obstaclesA.push({ x, z, r: .8 });
+    const action = () => demander('cachette-' + cachettesA.indexOf(H), H.quai[0], H.quai[1], () => chercherA(H), true, [x, z]);
+    cibleA(o, action);
+    cachettesA.push(H);
+    return H;
+  };
+  /* devant (côté écran) et derrière chaque repère */
+  reps.forEach(R => {
+    buisson(R.x, R.z + 2.2, [['devant', R]], [R.x, R.z + 3.2]);
+    buisson(R.x, R.z - 2.3, [['derrière', R]], [R.x + (R.x < 0 ? -1 : 1) * 1.0, R.z - 2.3]);
+  });
+  /* entre deux repères : à droite de l'un, à gauche de l'autre */
+  if (niv > 0) for (let i = 0; i < 2; i++) buisson((xs[i] + xs[i + 1]) / 2, ZR, [['droite', reps[i]], ['gauche', reps[i + 1]], ['entre', reps[i], reps[i + 1]]], [(xs[i] + xs[i + 1]) / 2, ZR + 1.1]);
+  /* dans la caisse */
+  const caisse = reps.find(R => R.id === 'caisse');
+  if (caisse) {
+    const H = { x: caisse.x, z: caisse.z, obj: caisse.obj, rels: [['dans', caisse]], quai: [caisse.x, caisse.z + 1.55], dans: true };
+    caisse.obj.userData.actA = () => demander('cachette-caisse', H.quai[0], H.quai[1], () => chercherA(H), true, [H.x, H.z]);
+    cachettesA.push(H);
+  }
+  /* les questions : une cachette et la façon d'en parler */
+  const q = (H, r) => ({ H, rel: H.rels.find(x => x[0] === r) || H.rels[0] });
+  const avant = cachettesA.filter(H => H.rels[0][0] === 'devant' || H.rels[0][0] === 'derrière'), cotes = cachettesA.filter(H => H.rels.length === 3);
+  if (niv === 0) questionsA = melange(avant).slice(0, NB_MANCHES).map(H => q(H, H.rels[0][0]));
+  else if (niv === 1) questionsA = melange([...melange([q(cotes[0], 'droite'), q(cotes[0], 'gauche'), q(cotes[1], 'droite'), q(cotes[1], 'gauche')]).slice(0, 3), ...melange(avant).slice(0, 2).map(H => q(H, H.rels[0][0]))]);
+  else questionsA = melange([q(cotes[0], 'entre'), q(cotes[1], 'entre'), q(cachettesA.find(H => H.dans), 'dans'),
+    q(pick(avant), null), q(pick(cotes), pick(['gauche', 'droite']))]);
+  /* jamais deux fois de suite la même cachette */
+  for (let i = 1; i < questionsA.length; i++) if (questionsA[i].H === questionsA[i - 1].H) { const j = (i + 1) % questionsA.length; [questionsA[i], questionsA[j]] = [questionsA[j], questionsA[i]]; }
+  questionsA.forEach(x => { if (!x.rel) x.rel = x.H.rels[0]; });
+  pomponA = poserA(new THREE.Group(), 1.1, 3.6, 0);
+  const lap = fabLapin(); lap.scale.setScalar(1.3); pomponA.add(lap);
+  cadreA.set(new THREE.Vector3(-6.4, 0, -4.4), new THREE.Vector3(6.4, 2.6, 5.2));
+  zoneMarcheA = [-6, -4, 6, 4.6];
+  joueurA.position.set(DEPART_P[0], 0, DEPART_P[1]); joueurA.rotation.y = 0;
+  plusTardA(500, () => manchePompon(true));
+}
+/* Pompon se cache : un petit nuage, et il a disparu */
+function manchePompon(premiere) {
+  occupeA = true; erreursManche = 0;
+  const Q = questionsA[mancheA];
+  pomponA.visible = true; pomponA.position.set(joueurA.position.x + 1.1, 0, joueurA.position.z + .2); pomponA.rotation.y = 0;
+  apparaitre(pomponA);
+  if (premiere) dire('Pompon veut jouer à cache-cache !');
+  plusTardA(premiere ? 2200 : 700, () => {
+    coeurs(pomponA, .8, ['💨', '✨', '💨']); SFX.plop();
+    pomponA.visible = false;
+    plusTardA(500, () => {
+      occupeA = false;
+      consigneA(`🐇 est caché ${texteRelA(Q.rel)}`, `Pompon est caché ${phraseA(Q.rel)}. Trouve-le !`);
+      if (premiere && nivA === 0) plusTardA(5000, montrerIndice);
+    });
+  });
+}
+function chercherA(H) {
+  const Q = questionsA[mancheA];
+  occupeA = true;
+  secouer(H.obj); SFX.feuilles();
+  plusTardA(450, () => {
+    if (H === Q.H) {
+      /* trouvé ! Pompon sort de sa cachette et saute vers Roullieee */
+      pomponA.visible = true; pomponA.position.set(H.x, H.dans ? .7 : .2, H.z); apparaitre(pomponA);
+      const a = pomponA.position.clone(), b = new THREE.Vector3((joueurA.position.x + H.x) / 2, 0, (joueurA.position.z + H.z) / 2);
+      animer(.6, k => { pomponA.position.lerpVectors(a, b, k); pomponA.position.y = a.y * (1 - k) + Math.sin(k * Math.PI) * 1.2; }, garde(() => { pomponA.position.y = 0; rebond(pomponA); }));
+      SFX.achat(); glou(); coeurs(pomponA, 1.2, ['❤️', '🐇', '✨']); flotterA(pomponA, 'Coucou !', 1.6);
+      dire(`Coucou ! Tu as trouvé Pompon ! Il était ${phraseA(Q.rel)}.`);
+      consigneA(`🐇 était ${texteRelA(Q.rel)} ✅`, '');
+      mancheFinie();
+      plusTardA(2800, () => {
+        if (mancheA >= NB_MANCHES) { finNiveau(); return; }
+        allerA(DEPART_P[0], DEPART_P[1], () => { RA.tourne = 0; manchePompon(false); });
+      });
+      return;
+    }
+    /* pas là : on dit où l'on est, puis où il est */
+    erreursManche++; SFX.non();
+    const ici = H.rels.find(r => r[1] === Q.rel[1] && r[0] !== 'entre') || H.rels.find(r => r[0] !== 'entre') || H.rels[0];
+    voixA = `Pompon n’est pas là ! Ici, c’est ${phraseA(ici)}. Pompon est caché ${phraseA(Q.rel)}.`;
+    dire(voixA);
+    occupeA = false;
+    if (erreursManche >= 2) plusTardA(1200, montrerIndice);
+  });
+}
+function indicePompon() {
+  const Q = questionsA[mancheA];
+  return Q && pomponA && !pomponA.visible ? { x: Q.H.x, z: Q.H.z, h: Q.H.dans ? 2.6 : 2.3 } : null;
+}
+
 /* ── la flèche d'aide : quand l'enfant hésite, après deux erreurs, ou avec 🔊 ── */
 function montrerIndice() {
-  const c = sceneCourante === 'livraison' ? indiceLivraison() : sceneCourante === 'nourrir' ? indiceNourrir() : indiceFerme();
+  const c = ({ livraison: indiceLivraison, nourrir: indiceNourrir, syllabes: indiceSyllabes, pompon: indicePompon, ferme: indiceFerme })[sceneCourante]();
   if (!c) return;
   flecheA.userData.y = c.h; flecheA.userData.obj = c.obj || null; flecheA.position.set(c.x, c.h, c.z); flecheA.visible = true;
   flecheA.userData.jusqua = horloge + 8;
@@ -4270,6 +4650,11 @@ function boucleApprendre(dt, t) {
     const b = pick(betesA.filter(x => x.faim && !x.servi));
     if (b && !(window.speechSynthesis && speechSynthesis.speaking)) { rebond(b.obj); SFX[b.esp](); }
   }
+  /* l'eau de la fontaine (Où est Pompon ?) */
+  if (sceneCourante === 'pompon') mondeA.children.forEach(o => o.userData.gouttes && o.userData.gouttes.forEach(g => {
+    const k = (t * .8 + g.userData.t) % 1;
+    g.position.set(Math.cos(g.userData.a) * k * .9, 2.2 + Math.sin(k * Math.PI) * .6 - k * 1.5, Math.sin(g.userData.a) * k * .9);
+  }));
   /* la fumée de la cheminée, comme dans « Jouer » */
   if (sceneCourante === 'ferme' && maisonA) maisonA.userData.fumee.forEach(s => {
     s.userData.t = (s.userData.t + dt * .25) % 1;
