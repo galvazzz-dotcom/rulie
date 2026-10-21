@@ -4348,10 +4348,11 @@ function sceneSyllabes(niv) {
     cadreA.set(new THREE.Vector3(-bord, 0, -5.9), new THREE.Vector3(bord, 3.4, 4.4));
     zoneMarcheA = [-bord + .6, 2.6, bord - .6, 3.8];
     /* des mots de 1, 2, 3 (et 4) syllabes, chacun au moins une fois */
-    const par = n => melange(MOTS_SYL.filter(w => w.n === n));
+    /* chaque liste est mélangée une seule fois : jamais deux fois le même mot dans un niveau */
+    const listes = {}, pris = {};
+    [1, 2, 3, 4].forEach(n => { listes[n] = melange(MOTS_SYL.filter(w => w.n === n)); pris[n] = 0; });
     const ns = niv === 0 ? melange([1, 2, 3, pick([2, 3]), pick([1, 2, 3])]) : melange([1, 2, 3, 4, pick([2, 3, 4])]);
-    const pris = {};
-    motsA = ns.map(n => { pris[n] = (pris[n] || 0) + 1; return par(n)[pris[n] - 1] || par(n)[0]; });
+    motsA = ns.map(n => listes[n][pris[n]++ % listes[n].length]);
   } else {
     cheminsA = [];
     cadreA.set(new THREE.Vector3(-5.2, 0, -5.9), new THREE.Vector3(5.2, 3.4, 4.2));
