@@ -1,14 +1,14 @@
-/* Le Royaume des Dindies — démarrage.
-   Étape 1 : le jeu s'ouvre sur le Grand Défilé (la vitrine des 72 dindies). */
-import { chaqueImage, renderer } from './moteur/rendu.js';
-import { demarrerDefile } from './scenes/defile.js';
+/* Le Royaume des Dindies — démarrage : l'écran titre, puis le Domaine.
+   (Le Grand Défilé de l'étape 1 est sur defile.html.) */
+import { renderer } from './moteur/rendu.js';
+import { ecranTitre } from './scenes/titre.js';
+import { demarrerJeu } from './scenes/jeu.js';
 
-demarrerDefile();
 window.__rendu = { renderer };   /* pour les tests automatiques */
-/* on enlève l'écran de chargement après la première image */
-let fait = false;
-chaqueImage(() => {
-  if (fait) return;
-  fait = true;
-  requestAnimationFrame(() => { document.getElementById('chargement').remove(); document.getElementById('ui').classList.remove('cache'); });
+document.getElementById('chargement')?.remove();
+ecranTitre({
+  surJouer: (idProfil, etat) => {
+    document.body.classList.add('enJeu');
+    demarrerJeu({ idProfil, etat, changerProfil: () => location.reload() });
+  }
 });

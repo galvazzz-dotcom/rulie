@@ -4,40 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="theme-color" content="#5ec4f5">
-<meta name="version" content="2026-10-21-etape1-defile">
+<meta name="version" content="2026-10-21-etape2-domaine">
 <title>🦃 Le Royaume des Dindies</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lilita+One&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="jeu.css">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
 </head>
-<body>
+<body class="pageJeu">
 <canvas id="toile"></canvas>
-<div id="chargement"><div class="oeuf">🥚</div><p>Le défilé se prépare…</p></div>
-<div id="ui" class="cache">
-  <header class="haut">
-    <a class="rond" href="../index.html" aria-label="Retour au site">🏠</a>
-    <button id="bLivre" class="rond" aria-label="Le Grand Livre">📖</button>
-    <div class="titre"><span><b>Le Grand Défilé</b><small>Le Royaume des Dindies · aperçu</small></span></div>
-    <button id="bDefile" class="rond" aria-label="Défilé automatique">▶</button>
-  </header>
-  <button id="bPrec" class="fleche g" aria-label="Dindie précédente">‹</button>
-  <button id="bSuiv" class="fleche d" aria-label="Dindie suivante">›</button>
-  <div id="actions">
-    <button data-a="roue"><i>🦚</i><span>Roue</span></button>
-    <button data-a="glouglou"><i>🎵</i><span>Glouglou</span></button>
-    <button data-a="saut"><i>🦘</i><span>Saut</span></button>
-    <button id="bStade"><i>🦃</i><span>Adulte</span></button>
-    <button id="bChroma"><i>✨</i><span>Chroma</span></button>
-  </div>
-  <div id="cri" class="cri cache"></div>
-  <section id="carte" class="carte"></section>
-  <section id="livre" class="livre cache" aria-label="Le Grand Livre des Dindies">
-    <div class="livreHaut"><b>📖 Le Grand Livre des Dindies</b><button id="bFermerLivre" class="rond petit" aria-label="Fermer">✖</button></div>
-    <div id="filtres" class="filtres"></div>
-    <div id="grille" class="grille"></div>
-  </section>
-</div>
+<div id="chargement"><div class="oeuf">🥚</div><p>Le Royaume se réveille…</p></div>
 <script type="module" src="js/main.js"></script>
 </body>
 </html>

@@ -35,9 +35,11 @@ const domeMat = new THREE.ShaderMaterial({
 });
 export const dome = new THREE.Mesh(new THREE.SphereGeometry(150, 32, 16), domeMat);
 scene.add(dome);
+let brume = [30, 120];
+export const distancesBrume = (pres, loin) => { brume = [pres, loin]; if (scene.fog) { scene.fog.near = pres; scene.fog.far = loin; } };
 export function couleursCiel(haut, bas, sol = bas) {
   domeMat.uniforms.haut.value.set(haut); domeMat.uniforms.bas.value.set(bas); domeMat.uniforms.sol.value.set(sol);
-  scene.fog = new THREE.Fog(bas, 30, 120);
+  if (!scene.fog) scene.fog = new THREE.Fog(bas, ...brume); else { scene.fog.color.set(bas); scene.fog.near = brume[0]; scene.fog.far = brume[1]; }
 }
 couleursCiel('#5ec4f5', '#d9f3ff', '#bfe9fb');
 

@@ -10,6 +10,11 @@ export const cylindre = (rh, rb, h, s = 16) => geo(`c${rh}_${rb}_${h}_${s}`, () 
 export const cone = (r, h, s = 14) => geo(`o${r}_${h}_${s}`, () => new THREE.ConeGeometry(r, h, s));
 export const tore = (R, r, a = Math.PI * 2, sr = 10, st = 28) => geo(`t${R}_${r}_${a}_${sr}_${st}`, () => new THREE.TorusGeometry(R, r, sr, st, a));
 export const boite = (w, h, d) => geo(`b${w}_${h}_${d}`, () => new THREE.BoxGeometry(w, h, d));
+/* un prisme (toit à deux pentes) : base 1 × profondeur 1, hauteur 1, faîte le long de z */
+export const prisme = () => geo('prisme', () => {
+  const s = new THREE.Shape(); s.moveTo(-.5, 0); s.lineTo(.5, 0); s.lineTo(0, 1); s.closePath();
+  const g = new THREE.ExtrudeGeometry(s, { depth: 1, bevelEnabled: false }); g.translate(0, 0, -.5); g.computeVertexNormals(); return g;
+});
 export function etoile5(r = 1, e = .35) {
   return geo(`e${r}_${e}`, () => {
     const s = new THREE.Shape();
@@ -44,6 +49,22 @@ export function fusion(parts) {
   out.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   out.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
   out.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  out.setAttribute('nContour', new THREE.BufferAttribute(normalesLisses(pos, nor), 3));
   out.computeBoundingSphere();
+  return out;
+}
+/* pour le contour : la moyenne des normales des sommets au même endroit
+   (sinon le contour se fend aux arêtes des boîtes et des toits) */
+export function normalesLisses(pos, nor) {
+  /* une clé numérique par position (arrondie au dixième de millimètre) : bien plus rapide qu'un texte */
+  const n = pos.length / 3, cles = new Float64Array(n), somme = new Map(), out = new Float32Array(pos.length);
+  for (let i = 0; i < n; i++) {
+    const k = (Math.round(pos[i * 3] * 1e4) * 73856093) ^ (Math.round(pos[i * 3 + 1] * 1e4) * 19349663) ^ (Math.round(pos[i * 3 + 2] * 1e4) * 83492791);
+    cles[i] = k;
+    let j = somme.get(k); if (j === undefined) { j = somme.size * 3; somme.set(k, j); }
+  }
+  const acc = new Float32Array(somme.size * 3);
+  for (let i = 0; i < n; i++) { const j = somme.get(cles[i]); acc[j] += nor[i * 3]; acc[j + 1] += nor[i * 3 + 1]; acc[j + 2] += nor[i * 3 + 2]; }
+  for (let i = 0; i < n; i++) { const j = somme.get(cles[i]), l = Math.hypot(acc[j], acc[j + 1], acc[j + 2]) || 1; out[i * 3] = acc[j] / l; out[i * 3 + 1] = acc[j + 1] / l; out[i * 3 + 2] = acc[j + 2] / l; }
   return out;
 }

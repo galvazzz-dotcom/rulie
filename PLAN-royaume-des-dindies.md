@@ -377,17 +377,22 @@ En mode aide, les compétences se déclenchent toutes seules.
 
 ```
 docs/royaume/
-  index.html              la page du jeu
-  style.css
+  index.html              la page du jeu (écran titre, puis le Domaine)
+  defile.html             le Grand Défilé des 72 dindies (étape 1)
+  style.css, jeu.css
   js/main.js              démarrage, boucle, passage d'une scène à l'autre
   js/moteur/              rendu (toon, contours, ciel), formes, caméra, entrées, interface,
                           sons, voix, sauvegarde, temps (jour/nuit, météo, lune)
   js/dindies/             adn, modele (3D), portrait (SVG), elevage, stats
   js/donnees/             types, especes, regions, batiments, objets, competences,
                           courses, quetes, pnj
-  js/personnages/         roullieee, pnj
-  js/scenes/              defile (étape 1), domaine, region, capture, couvoir,
-                          dindodrome, course, concours
+  js/personnages/         chibi (modèle commun), roullieee, pnj
+  js/monde/               carte (grille + A*), decor (île, eau, végétation, nuit),
+                          batiments, domaine
+  js/jeu/                 etat, individus, objets, scenario (quêtes et dialogues)
+  js/ui/                  panneaux (Boutique, Labo, Livre, Musée, Fiche, Clapier…)
+  js/scenes/              titre, jeu (le Domaine), defile (étape 1), region, capture,
+                          couvoir, dindodrome, course, concours
 royaume-outils/           les tests Playwright, le simulateur d'équilibrage,
                           le générateur du tableau des espèces
 ```
@@ -416,13 +421,13 @@ Chaque étape se termine par : les tests passent, des captures sur les 4 formats
   - le défilé automatique.
 - **Fini quand :** les 72 espèces s’affichent en 3D et en portrait sur les 4 formats, sans erreur, et le rendu est fluide sur téléphone.
 
-### Étape 2 — Le Domaine
-- [ ] La carte 3D du Domaine : zones, chemins, décors, jour et nuit.
-- [ ] Les déplacements de Roullieee et la caméra qui la suit.
-- [ ] La Maison (profils, sauvegarde, code), la Boutique, le Labo, 2 enclos et le Clapier.
-- [ ] Les PNJ, les dialogues, le journal des quêtes, et le chapitre 1 jusqu’au départ en montgolfière.
-- [ ] Le Grand Livre du jeu (silhouettes « ? », indices) et le Musée.
-- [ ] Des dindies de départ, offertes par le Professeur, qui vivent dans les enclos.
+### Étape 2 — Le Domaine ✅
+- [x] La carte 3D du Domaine : zones, chemins, décors, jour et nuit.
+- [x] Les déplacements de Roullieee et la caméra qui la suit.
+- [x] La Maison (profils, sauvegarde, code), la Boutique, le Labo, 2 enclos et le Clapier.
+- [x] Les PNJ, les dialogues, le journal des quêtes, et le chapitre 1 jusqu’au départ en montgolfière.
+- [x] Le Grand Livre du jeu (silhouettes « ? », indices) et le Musée.
+- [x] Des dindies de départ, offertes par le Professeur, qui vivent dans les enclos.
 - **Fini quand :** on peut se promener dans le Domaine, ranger ses dindies, sauvegarder et reprendre.
 
 ### Étape 3 — L’expédition
@@ -469,7 +474,7 @@ Chaque étape se termine par : les tests passent, des captures sur les 4 formats
 - [ ] La musique, les cris de chaque espèce, les sons.
 - [ ] Les tutoriels, le mode aide, l’accessibilité.
 - [ ] Les performances sur téléphone, une partie complète testée automatiquement, et les 4 formats.
-- [ ] Le site : un bouton sur l’accueil et la page publique « Le Grand Livre des Dindies ».
+- [ ] Le site : la page publique « Le Grand Livre des Dindies » (le bouton sur l’accueil existe depuis l’étape 2, avec la mention « en développement »).
 - **Fini quand :** la version 1.0 est en ligne.
 
 **Après la 1.0 :** la version Petits (5-7 ans) et un mode Apprendre.
@@ -487,3 +492,4 @@ Chaque étape se termine par : les tests passent, des captures sur les 4 formats
 |---|---|---|
 | 2026-10-21 | — | Le plan est écrit, et les données des 72 espèces aussi (`especes.js`). |
 | 2026-10-21 | 1 | Le Grand Défilé est en ligne (`docs/royaume/`) : moteur toon avec contours, modèle 3D de dindie et portrait SVG depuis le même ADN, 72 espèces × 4 stades × chromatique, nouvelle Roullieee, Grand Livre avec filtres, défilé automatique. Tests : `royaume-outils/test-etape1.mjs` (576 dindies sans erreur, mémoire stable, 4 formats). Pas encore de bouton sur l’accueil du site (prévu à l’étape 9). |
+| 2026-10-21 | 2 | Le Domaine est jouable (`docs/royaume/index.html`) : écran titre avec 3 profils, prologue illustré, île 3D (eau, écume, chemins, arbres, fleurs, lampadaires, lucioles), jour et nuit à l’heure réelle (ou réglés), déplacements au toucher (A*), au joystick et au clavier, caméra qui suit, silhouette derrière les murs. Bâtiments : Maison, Labo, Boutique, Musée, 8 enclos (2 à réparer au chapitre 1), Clapier, porte du Dindodrome, port et montgolfière. 5 PNJ en chibi avec portraits SVG, dialogues, journal, carte, sac, fiche des dindies (stats et potentiel), Grand Livre avec silhouettes et indices. Chapitre 1 en 7 quêtes, jusqu’à la montgolfière réparée. Sauvegarde automatique, code de sauvegarde et fichier. Le Défilé passe sur `defile.html`. Bouton sur l’accueil du site, sous la ferme, avec « 🚧 En développement ». Tests : `royaume-outils/test-etape2.mjs` (chapitre 1 joué de bout en bout avec chaque starter, rechargement de la sauvegarde, aucune erreur) et `test-etape1.mjs` (toujours vert). |

@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { scene, camera, renderer, chaqueImage, centrerImage, soleil } from '../moteur/rendu.js';
 import { sphere, cylindre, cone, tore, boite, fusion } from '../moteur/formes.js';
-import { toon, contour } from '../moteur/materiaux.js';
+import { toon, contour, contourPour } from '../moteur/materiaux.js';
 import { hasard } from '../moteur/couleurs.js';
 import { glouglou, pop, tada, audio } from '../moteur/sons.js';
 import { ESPECES } from '../donnees/especes.js';
@@ -24,7 +24,7 @@ const POS_DINDIE = new THREE.Vector3(.2, 0, 0);
 function poser(parts, ep = .02, ombre = true) {
   const g = fusion(parts), grp = new THREE.Group();
   const m = new THREE.Mesh(g, toon()); m.castShadow = ombre; m.receiveShadow = true; grp.add(m);
-  if (ep) grp.add(new THREE.Mesh(g, contour(ep)));
+  if (ep) grp.add(new THREE.Mesh(g, contourPour(g, ep)));
   scene.add(grp);
   return grp;
 }

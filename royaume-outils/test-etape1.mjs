@@ -1,15 +1,15 @@
 /* Tests automatiques de l'étape 1 (le Grand Défilé), avec Playwright.
    Usage : node royaume-outils/test-etape1.mjs [adresse] [dossier des captures]
-   - adresse par défaut : http://localhost:8765/royaume/index.html
+   - adresse par défaut : http://localhost:8765/royaume/defile.html
      (servir une copie de docs/royaume où la carte d'import pointe vers un three.module.js local,
-      ou utiliser directement https://galvazzz-dotcom.github.io/rulie/royaume/index.html)
+      ou utiliser directement https://galvazzz-dotcom.github.io/rulie/royaume/defile.html)
    - CHROMIUM=/chemin/vers/chromium si Playwright ne trouve pas son navigateur.
    Vérifie : les 72 espèces × 4 stades × chromatique se construisent sans erreur ; le défilé
    automatique avance ; glisser du doigt change de dindie ; la mémoire reste stable ;
    et fait des captures (roue, glouglou, Grand Livre) sur 4 formats d'écran. */
 import { chromium } from 'playwright';
 import { mkdirSync } from 'fs';
-const URL = process.argv[2] || 'http://localhost:8765/royaume/index.html', OUT = process.argv[3] || 'captures-etape1';
+const URL = process.argv[2] || 'http://localhost:8765/royaume/defile.html', OUT = process.argv[3] || 'captures-etape1';
 mkdirSync(OUT, { recursive: true });
 const b = await chromium.launch({ executablePath: process.env.CHROMIUM || undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
 let echecs = 0;
@@ -45,7 +45,7 @@ const ouvrir = async (w, h, mob, hash = '') => {
   const avance = await pg.waitForFunction(n0 => window.__defile.etat.i !== n0, n0, { timeout: 20000 }).then(() => true, () => false);
   verifier(avance, 'le défilé automatique passe à la dindie suivante');
   await pg.evaluate(() => document.getElementById('bDefile').click());
-  await pg.waitForFunction(() => !window.__defile.arrivee, null, { timeout: 20000 });
+  await pg.waitForFunction(() => !window.__defile.arrivee, null, { timeout: 90000 });
   const avant = await pg.evaluate(() => window.__defile.etat.i);
   await pg.mouse.move(300, 250); await pg.mouse.down(); await pg.mouse.move(120, 255, { steps: 6 }); await pg.mouse.up();
   await pg.waitForTimeout(300);

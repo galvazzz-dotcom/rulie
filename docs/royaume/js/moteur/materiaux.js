@@ -20,26 +20,29 @@ export function toon(couleur = null, options = {}) {
 }
 export function toonTexture(texture) { return new THREE.MeshToonMaterial({ gradientMap: tons, map: texture }); }
 
+/* lisse = la géométrie a l'attribut « nContour » (fabriqué par fusion()) : pas de fente aux arêtes */
 const contours = new Map();
-export function contour(epaisseur = .018, couleur = '#2a1a10') {
-  const cle = epaisseur + couleur;
+export function contour(epaisseur = .018, couleur = '#2a1a10', lisse = false) {
+  const cle = epaisseur + couleur + lisse;
   let m = contours.get(cle);
   if (!m) {
     m = new THREE.MeshBasicMaterial({ color: couleur, side: THREE.BackSide });
     m.onBeforeCompile = s => {
-      s.vertexShader = s.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>\n  transformed += normalize(normal) * ${epaisseur.toFixed(4)};`);
+      if (lisse) s.vertexShader = 'attribute vec3 nContour;\n' + s.vertexShader;
+      s.vertexShader = s.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>\n  transformed += normalize(${lisse ? 'nContour' : 'normal'}) * ${epaisseur.toFixed(4)};`);
     };
-    m.customProgramCacheKey = () => 'contour' + epaisseur;
+    m.customProgramCacheKey = () => 'contour' + epaisseur + lisse;
     contours.set(cle, m);
   }
   return m;
 }
+export const contourPour = (geometrie, epaisseur, couleur) => contour(epaisseur, couleur, !!geometrie.attributes.nContour);
 
 /* une forme + son contour, prêts à poser */
 export function avecContour(geometrie, materiau, epaisseur = .018, ombre = true) {
   const g = new THREE.Group();
   const m = new THREE.Mesh(geometrie, materiau); m.castShadow = ombre; m.receiveShadow = true;
-  const c = new THREE.Mesh(geometrie, contour(epaisseur));
+  const c = new THREE.Mesh(geometrie, contourPour(geometrie, epaisseur));
   g.add(c, m);
   g.userData.mesh = m; g.userData.contour = c;
   return g;

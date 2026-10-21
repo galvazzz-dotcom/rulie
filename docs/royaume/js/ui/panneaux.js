@@ -1,0 +1,329 @@
+/* ══════════ LES FENÊTRES DU JEU ══════════
+   Boutique, Labo, Grand Livre, Musée, Maison (sauvegarde, profils, réglages),
+   Clapier et équipe, enclos, fiche d'une dindie, sac, journal, carte, choix de la première dindie. */
+import { ESPECES, PAR_ID } from '../donnees/especes.js';
+import { TYPES, RARETES, ORDRE_TYPES } from '../donnees/types.js';
+import { variante } from '../dindies/adn.js';
+import { portraitDindie } from '../dindies/portrait.js';
+import { fenetre, toast, $, $$, el, echapper, barre, fermerTout } from '../moteur/ui.js';
+import { pop, tada, glouglou } from '../moteur/sons.js';
+import * as J from '../jeu/etat.js';
+import { OBJETS, enBoutique } from '../jeu/objets.js';
+import { CARACTERES, NOMS_RIGOLOS, nomDe, stats, xpPourNiveau, vaDans } from '../jeu/individus.js';
+import * as S from '../jeu/scenario.js';
+import { QUETES } from '../jeu/scenario.js';
+import * as SAUVE from '../moteur/sauvegarde.js';
+import { LIEUX, ORDRE_ENCLOS } from '../monde/domaine.js';
+import { forme } from '../monde/decor.js';
+
+const E = () => J.etat();
+const PASTILLE = { commune: '⚪', rare: '🔵', epique: '🟣', mythique: '🌈' };
+let n = 0;
+const portrait = (d, opts = {}) => portraitDindie(variante(PAR_ID[d.espece], { stade: d.stade, chroma: d.chroma }), { id: 'P' + (n++), ...opts });
+const portraitEsp = (id, opts = {}) => portraitDindie(variante(PAR_ID[id]), { id: 'Q' + (n++), ...opts });
+const etoiles = k => '⭐'.repeat(k) + '<i class="eteinte">' + '⭐'.repeat(5 - k) + '</i>';
+const lieuTexte = l => l === 'equipe' ? '🎒 Dans ton équipe' : l === 'clapier' ? '🐾 Au Clapier' : l.startsWith('enclos:') ? `${TYPES[l.slice(7)].e} ${TYPES[l.slice(7)].habitat}` : l;
+
+/* ── la boutique de Mimi ── */
+export function ouvrirBoutique() {
+  const F = fenetre('🛒 Chez Mimi', '', { classe: 'boutique' });
+  const dessiner = () => {
+    const ids = Object.keys(OBJETS).filter(id => enBoutique(id, E()));
+    F.contenu.innerHTML = `<p class="bourse">Tu as <b>${E().pieces} 🪙</b></p><div class="rayons">` + ids.map(id => {
+      const O = OBJETS[id], q = id === 'friandise' ? 5 : 1;
+      return `<div class="article"><span class="em">${O.e}</span><div><b>${O.nom}</b><small>${O.desc}</small><small class="possede">Tu en as : ${J.combien(id)}</small></div>
+        <button class="btn acheter" data-id="${id}" data-q="${q}" ${E().pieces < O.prix * q ? 'disabled' : ''}>${q > 1 ? q + ' pour ' : ''}${O.prix * q} 🪙</button></div>`;
+    }).join('') + '</div>';
+    $$('.acheter', F.contenu).forEach(b => b.onclick = () => {
+      const id = b.dataset.id, q = +b.dataset.q;
+      if (!J.depenser(OBJETS[id].prix * q)) { toast('Il te manque des pièces !'); return; }
+      J.ajouterObjet(id, q); pop(); toast(`${OBJETS[id].e} ${OBJETS[id].nom}${q > 1 ? ' × ' + q : ''} : merci !`);
+      S.evenement('achat', id); dessiner();
+    });
+  };
+  dessiner();
+}
+
+/* ── le Labo : le Professeur, le Grand Livre, les talents, des conseils ── */
+export function ouvrirLabo() {
+  const F = fenetre('🔬 Le Labo du Professeur', `<div class="menuLabo">
+    <button class="btn grand" id="lLivre">📖 Ouvrir le Grand Livre</button>
+    <button class="btn grand jaune" id="lTalents">⭐ Lire les talents de mes dindies</button>
+    <button class="btn grand vert" id="lConseil">💡 Un conseil, Professeur ?</button></div>`);
+  $('#lLivre', F.el).onclick = () => { pop(); ouvrirLivre(); };
+  $('#lTalents', F.el).onclick = () => {
+    pop();
+    const T = fenetre('⭐ Les talents', E().dindies.length ? `<p class="petitTexte">Chaque dindie a de 0 à 5 étoiles de talent par stat. Les bébés héritent des talents de leurs parents !</p>` +
+      E().dindies.map(d => `<div class="ligneTalent"><div class="mini">${portrait(d)}</div><div><b>${echapper(nomDe(d))}</b><div>⚡ ${etoiles(d.talents[0])}</div><div>💪 ${etoiles(d.talents[1])}</div><div>🦘 ${etoiles(d.talents[2])}</div></div></div>`).join('') : '<p>Tu n’as pas encore de dindie !</p>');
+    void T;
+  };
+  $('#lConseil', F.el).onclick = () => {
+    pop();
+    const C = ['Touche une dindie pour voir sa fiche : tu peux la nourrir, la caresser ou la déplacer.', 'Chaque habitat accueille les dindies de son type. Le Clapier, lui, accueille tout le monde !',
+      'Le courrier arrive chaque jour dans la boîte aux lettres, près de ta maison.', 'La nuit, les dindies dorment. Chut !', 'Fais un vœu à la fontaine : on ne sait jamais…',
+      'Glisse ton doigt sur l’écran pour te déplacer comme avec un joystick, ou touche l’endroit où aller.'];
+    toast('💡 ' + C[Math.floor(Math.random() * C.length)], { duree: 4500 });
+  };
+}
+
+/* ── le Grand Livre : 72 pages, avec les silhouettes des espèces pas encore trouvées ── */
+export function ouvrirLivre() {
+  const L = E().livre, vus = Object.keys(L.vus).length, att = Object.keys(L.attrapes).length;
+  let filtre = 'toutes';
+  const F = fenetre('📖 Le Grand Livre des Dindies', '', { classe: 'livreJeu', large: true });
+  const dessiner = () => {
+    const liste = ESPECES.filter(e => filtre === 'toutes' || e.rarete === filtre || e.types.includes(filtre));
+    F.contenu.innerHTML = `<p class="compteLivre">👁️ Vues : <b>${vus}</b> · ✅ Attrapées : <b>${att}</b> / 72</p>
+      <div class="filtres">${[['toutes', 'Toutes'], ...Object.keys(RARETES).map(k => [k, PASTILLE[k] + ' ' + RARETES[k].nom]), ...ORDRE_TYPES.map(t => [t, TYPES[t].e])].map(([k, t]) => `<button data-f="${k}" class="${k === filtre ? 'on' : ''}">${t}</button>`).join('')}</div>
+      <div class="grille">${liste.map(e => {
+        const a = L.attrapes[e.id], v = L.vus[e.id];
+        return `<button class="case ${e.rarete} ${a ? '' : v ? 'vue' : 'inconnue'}" data-id="${e.id}" style="--rar:${RARETES[e.rarete].couleur}"><span>${e.n}</span>${a ? '<em>✅</em>' : ''}${portraitEsp(e.id, { silhouette: !v })}</button>`;
+      }).join('')}</div>`;
+    $$('.filtres button', F.contenu).forEach(b => b.onclick = () => { pop(); filtre = b.dataset.f; dessiner(); });
+    $$('.case', F.contenu).forEach(b => b.onclick = () => { pop(); pageLivre(b.dataset.id); });
+  };
+  dessiner();
+}
+const INDICES = { pres: 'les Prés', maroc: 'le Maroc imaginaire', belgique: 'la Belgique', jungle: 'la Jungle', banquise: 'la Banquise', volcan: 'le Volcan', foret: 'la Forêt de la Lune', nuages: 'le Royaume des Nuages' };
+function indice(e) {
+  const o = e.origine;
+  if (o.sorte === 'sauvage') return `🧭 On la rencontre dans ${INDICES[o.region]}.`;
+  if (o.sorte === 'croisement') return `🥚 Elle naît d’un croisement : un parent ${TYPES[o.types[0]].e} et un parent ${TYPES[o.types[1]].e}.`;
+  if (o.sorte === 'recette') return `🥚 Une recette secrète : deux espèces précises… ${E().livre.vus[o.especes[0]] ? PAR_ID[o.especes[0]].nom : '???'} et ${E().livre.vus[o.especes[1]] ? PAR_ID[o.especes[1]].nom : '???'}.`;
+  return `🌈 Une légende… On parle de « ${o.quete} ».`;
+}
+function pageLivre(id) {
+  const e = PAR_ID[id], a = E().livre.attrapes[id], v = E().livre.vus[id], R = RARETES[e.rarete];
+  fenetre(v ? e.nom : `N° ${e.n} : ???`, `<div class="pageLivre" style="--rar:${R.couleur}">
+    <div class="grandPortrait">${portraitEsp(id, { silhouette: !v })}</div>
+    <p><span class="pill rar">${PASTILLE[e.rarete]} ${R.nom}</span> ${v ? e.types.map(t => `<span class="pill">${TYPES[t].e} ${TYPES[t].nom}</span>`).join(' ') : ''}</p>
+    ${a ? `<p>${e.desc}</p><p class="cri">« ${e.cri} »</p>${['⚡ Vitesse', '💪 Endurance', '🦘 Saut'].map((t, i) => `<div class="stat"><span>${t}</span>${barre(e.stats[i] / 10, R.couleur)}<b>${e.stats[i]}</b></div>`).join('')}`
+      : v ? `<p>Tu l’as déjà vue, mais pas encore attrapée.</p>` : '<p>Tu ne l’as encore jamais vue…</p>'}
+    <p class="indice">${indice(e)}</p></div>`);
+}
+
+/* ── le Musée : les portraits des espèces attrapées, dans des cadres dorés ── */
+export function ouvrirMusee() {
+  const att = ESPECES.filter(e => E().livre.attrapes[e.id]);
+  fenetre('📖 Le Musée du Grand Livre', `<p class="petitTexte">Chaque espèce que tu attrapes a son portrait ici. Il y a 72 cadres… Combien en rempliras-tu ?</p>
+    <div class="musee">${ESPECES.map(e => E().livre.attrapes[e.id] ? `<figure class="cadre ${e.rarete}"><div>${portraitEsp(e.id)}</div><figcaption>${e.nom}</figcaption></figure>`
+      : `<figure class="cadre vide"><div><b>?</b></div><figcaption>N° ${e.n}</figcaption></figure>`).join('')}</div>`, { classe: 'museeF', large: true });
+  S.evenement('musee');
+  if (att.length) toast(`🖼️ ${att.length} portrait${att.length > 1 ? 's' : ''} au Musée !`);
+}
+
+/* ── la fiche d'une dindie ── */
+export function ouvrirFiche(d, { surChange } = {}) {
+  const F = fenetre('', '', { classe: 'fiche' });
+  const dessiner = () => {
+    const e = PAR_ID[d.espece], R = RARETES[e.rarete], st = stats(d), C = CARACTERES[d.caractere], max = stats({ ...d, niveau: 50 });
+    F.titre(`${e.types.map(t => TYPES[t].e).join('')} ${echapper(nomDe(d))}`);
+    F.contenu.innerHTML = `<div class="ficheHaut" style="--rar:${R.couleur}"><div class="grandPortrait">${portrait(d)}</div>
+      <div><p class="nomEsp">${e.nom} ${d.chroma ? '✨' : ''}</p><p><span class="pill rar">${PASTILLE[e.rarete]} ${R.nom}</span></p>
+      <p class="niv">Niveau <b>${d.niveau}</b></p>${barre(d.xp / xpPourNiveau(d.niveau), '#3b82f6')}
+      <p class="coeurs" title="Bonheur">${'❤️'.repeat(Math.round(d.bonheur / 20))}<i class="eteinte">${'❤️'.repeat(5 - Math.round(d.bonheur / 20))}</i></p></div></div>
+      ${['⚡ Vitesse', '💪 Endurance', '🦘 Saut'].map((t, i) => `<div class="stat"><span>${t}</span><div class="barreP double"><i style="width:${max[i]}%"></i><b style="width:${st[i]}%;background:${R.couleur}"></b></div><b>${st[i]}</b><small>${etoiles(d.talents[i])}</small></div>`).join('')}
+      <p class="petitTexte">La barre claire : ce qu’elle peut atteindre au niveau 50. Les ⭐ : ses talents.</p>
+      <p class="petitTexte">🎭 <b>${C.nom}</b> : ${C.desc}<br>📍 ${lieuTexte(d.lieu)}${E().compagnon === d.uid ? ' · 🐾 te suit partout' : ''}</p>
+      <div class="actionsFiche">
+        <button class="btn" id="fCaresse">💗 Caresser</button>
+        <button class="btn jaune" id="fMiam" ${J.combien('friandise') ? '' : 'disabled'}>🍪 Friandise (${J.combien('friandise')})</button>
+        <button class="btn" id="fNom">✏️ Renommer</button>
+        ${d.lieu === 'equipe' ? `<button class="btn vert" id="fSuivre">${E().compagnon === d.uid ? '🛑 Ne plus suivre' : '🐾 Me suivre'}</button>` : ''}
+      </div>
+      <p class="petitTitre">Déplacer vers…</p><div class="actionsFiche" id="fDest"></div>`;
+    const dest = [['equipe', '🎒 Équipe'], ...(E().batiments.clapier.repare ? [['clapier', '🐾 Clapier']] : []),
+      ...ORDRE_ENCLOS.map(([t]) => t).filter(t => E().enclos[t]?.construit && vaDans(d, t)).map(t => ['enclos:' + t, `${TYPES[t].e} ${TYPES[t].habitat}`])].filter(([l]) => l !== d.lieu);
+    $('#fDest', F.el).innerHTML = dest.length ? dest.map(([l, t]) => `<button class="btn petit" data-l="${l}">${t}</button>`).join('') : '<small>Pas d’autre endroit pour l’instant.</small>';
+    $$('#fDest button', F.el).forEach(b => b.onclick = () => {
+      const err = J.deplacer(d, b.dataset.l);
+      if (err) { toast('⚠️ ' + err); return; }
+      pop(); toast(`${nomDe(d)} → ${lieuTexte(d.lieu)}`); S.evenement('deplacement', d.uid); surChange && surChange(); dessiner();
+    });
+    $('#fCaresse', F.el).onclick = () => {
+      const t = Date.now();
+      if (t - (d.derniereCaresse || 0) < 20000) { toast(`${nomDe(d)} a déjà eu plein de câlins. Reviens dans un moment !`); return; }
+      d.derniereCaresse = t; d.bonheur = Math.min(100, d.bonheur + 5); glouglou(1.2); toast(`💗 ${nomDe(d)} adore les câlins !`); J.changer('dindies'); window.dispatchEvent(new CustomEvent('dindie-joie', { detail: d.uid })); dessiner();
+    };
+    $('#fMiam', F.el).onclick = () => {
+      if (!J.retirerObjet('friandise')) return;
+      const k = d.caractere === 'gourmande' ? 2 : 1;
+      d.bonheur = Math.min(100, d.bonheur + 15 * k); glouglou(1.1); tada();
+      toast(`🍪 Miam ! ${nomDe(d)} se régale${k > 1 ? ' (deux fois plus, elle est gourmande !)' : ''}`);
+      J.changer('dindies'); window.dispatchEvent(new CustomEvent('dindie-joie', { detail: d.uid }));
+      S.evenement('nourrir', d.uid); dessiner();
+    };
+    $('#fNom', F.el).onclick = () => renommer(d, dessiner);
+    const sv = $('#fSuivre', F.el); if (sv) sv.onclick = () => { pop(); J.choisirCompagnon(E().compagnon === d.uid ? null : d); surChange && surChange(); dessiner(); };
+  };
+  dessiner();
+  return F;
+}
+function renommer(d, apres) {
+  const F = fenetre('✏️ Un nouveau nom', `<div class="renommer"><input id="rNom" maxlength="14" value="${echapper(d.surnom || '')}" placeholder="${echapper(PAR_ID[d.espece].nom)}">
+    <button class="btn jaune" id="rDe">🎲 Une idée</button><button class="btn vert" id="rOk">✅ C’est bon</button></div>`);
+  const i = $('#rNom', F.el); setTimeout(() => i.focus(), 50);
+  $('#rDe', F.el).onclick = () => { pop(); i.value = NOMS_RIGOLOS[Math.floor(Math.random() * NOMS_RIGOLOS.length)]; };
+  $('#rOk', F.el).onclick = () => { d.surnom = i.value.trim().slice(0, 14) || null; pop(); J.changer('dindies'); F.fermer(); apres && apres(); };
+}
+
+/* ── le Clapier et l'équipe : toutes les dindies, rangées par endroit ── */
+export function ouvrirClapier({ surChange } = {}) {
+  const F = fenetre('🐾 Mes dindies', '', { classe: 'clapierF', large: true });
+  const carte = d => `<button class="carteDindie" data-uid="${d.uid}" style="--rar:${RARETES[PAR_ID[d.espece].rarete].couleur}"><div class="mini">${portrait(d)}</div><b>${echapper(nomDe(d))}</b><small>Niv. ${d.niveau}${E().compagnon === d.uid ? ' · 🐾' : ''}</small></button>`;
+  const dessiner = () => {
+    const eq = J.equipe(), cl = J.dansClapier();
+    let h = `<h3>🎒 Équipe <small>${eq.length}/6</small></h3><div class="rangee">${eq.map(carte).join('') || '<p class="petitTexte">Personne dans ton équipe.</p>'}</div>`;
+    h += E().batiments.clapier.repare ? `<h3>🐾 Clapier <small>${cl.length}/${J.placesClapier()}</small></h3><div class="rangee">${cl.map(carte).join('') || '<p class="petitTexte">Le Clapier est vide.</p>'}</div>`
+      : '<h3>🐾 Clapier</h3><p class="petitTexte">🚧 Le Clapier est en ruine.</p>';
+    for (const [t] of ORDRE_ENCLOS) if (E().enclos[t]?.construit) h += `<h3>${TYPES[t].e} ${TYPES[t].habitat} <small>${J.dansEnclos(t).length}/${J.placesEnclos(t)}</small></h3><div class="rangee">${J.dansEnclos(t).map(carte).join('') || '<p class="petitTexte">Vide.</p>'}</div>`;
+    F.contenu.innerHTML = h;
+    $$('.carteDindie', F.contenu).forEach(b => b.onclick = () => { pop(); ouvrirFiche(J.parUid(b.dataset.uid), { surChange: () => { dessiner(); surChange && surChange(); } }); });
+  };
+  dessiner();
+  return F;
+}
+/* un enclos : ses habitantes, et ranger une dindie de l'équipe ici */
+export function ouvrirEnclos(type, { surChange } = {}) {
+  const T = TYPES[type], construit = E().enclos[type]?.construit;
+  const F = fenetre(`${T.e} ${T.habitat}`, '', { classe: 'enclosF' });
+  const dessiner = () => {
+    if (!construit) { F.contenu.innerHTML = `<p>🚧 Cet enclos est en ruine. On le reconstruira plus tard pour les dindies <b>${T.e} ${T.nom}</b>.</p>`; return; }
+    const ici = J.dansEnclos(type), candidates = E().dindies.filter(d => d.lieu !== 'enclos:' + type && vaDans(d, type));
+    F.contenu.innerHTML = `<p class="petitTexte">L’habitat des dindies ${T.e} <b>${T.nom}</b>. Places : ${ici.length}/${J.placesEnclos(type)}.</p>
+      <div class="rangee">${ici.map(d => `<button class="carteDindie" data-uid="${d.uid}"><div class="mini">${portrait(d)}</div><b>${echapper(nomDe(d))}</b><small>Niv. ${d.niveau}</small></button>`).join('') || '<p class="petitTexte">Personne n’y vit encore.</p>'}</div>
+      ${candidates.length ? `<p class="petitTitre">Installer ici :</p><div class="rangee">${candidates.map(d => `<button class="carteDindie installer" data-uid="${d.uid}"><div class="mini">${portrait(d)}</div><b>${echapper(nomDe(d))}</b><small>➕ Installer</small></button>`).join('')}</div>` : ''}`;
+    $$('.carteDindie:not(.installer)', F.contenu).forEach(b => b.onclick = () => { pop(); ouvrirFiche(J.parUid(b.dataset.uid), { surChange: () => { dessiner(); surChange && surChange(); } }); });
+    $$('.installer', F.contenu).forEach(b => b.onclick = () => {
+      const d = J.parUid(b.dataset.uid), err = J.deplacer(d, 'enclos:' + type);
+      if (err) { toast('⚠️ ' + err); return; }
+      tada(); toast(`🏡 ${nomDe(d)} s’installe dans ${T.habitat} !`); S.evenement('deplacement', d.uid); surChange && surChange(); dessiner();
+    });
+  };
+  dessiner();
+  return F;
+}
+
+/* ── le sac ── */
+export function ouvrirSac() {
+  const inv = Object.entries(E().inventaire).filter(([, q]) => q > 0);
+  const imp = inv.filter(([id]) => OBJETS[id]?.important), autres = inv.filter(([id]) => !OBJETS[id]?.important);
+  const ligne = ([id, q]) => `<div class="article"><span class="em">${OBJETS[id].e}</span><div><b>${OBJETS[id].nom}${q > 1 ? ' × ' + q : ''}</b><small>${OBJETS[id].desc}</small></div></div>`;
+  fenetre('🎒 Mon sac', `<p class="bourse">🪙 <b>${E().pieces}</b> pièces · 🪶 <b>${E().plumesOr}</b> plume${E().plumesOr > 1 ? 's' : ''} d’or</p>
+    ${imp.length ? `<h3>⭐ Objets importants</h3>${imp.map(ligne).join('')}` : ''}<h3>🧺 Objets</h3>${autres.map(ligne).join('') || '<p class="petitTexte">Ton sac est vide.</p>'}`);
+}
+
+/* ── le journal des quêtes ── */
+export function ouvrirJournal() {
+  const e = E(), cur = S.queteDe(e.quete.etape);
+  fenetre('📜 Journal des quêtes', `<p class="chapitre">Chapitre 1 : Le Domaine en ruine</p>` + QUETES.map(Q => {
+    const finie = e.quete.finies.includes(Q.id), active = cur && cur.id === Q.id;
+    if (!finie && !active) return `<div class="quete verrou">🔒 ???</div>`;
+    return `<div class="quete ${finie ? 'finie' : 'active'}"><b>${finie ? '✅' : '📜'} ${Q.titre}</b>${active ? `<p>➡️ ${S.texteEtape()}</p>` : ''}
+      <small>Récompense : ${Q.recompense.pieces || 0} 🪙${Object.keys(Q.recompense.objets || {}).map(o => ' + ' + OBJETS[o].e).join('')}</small></div>`;
+  }).join('') + (e.quete.etape === 'fin' ? '<div class="quete active"><b>🎈 Chapitre 2 : l’expédition aux Prés</b><p>Bientôt !</p></div>' : ''));
+}
+
+/* ── la carte du Domaine (on peut toucher un lieu pour y aller) ── */
+export function ouvrirCarte({ position, cible, allerA }) {
+  const W = 120, H = 100, X = x => (x + 60) / 120 * W, Z = z => (z + 50) / 100 * H;
+  let contour = '';
+  for (let k = 0; k <= 120; k++) { const th = k / 120 * Math.PI * 2; let lo = .3, hi = 1.6; for (let it = 0; it < 22; it++) { const m = (lo + hi) / 2; if (forme(Math.cos(th) * 54 * m, Math.sin(th) * 46 * m) < 1) lo = m; else hi = m; } contour += (k ? 'L' : 'M') + X(Math.cos(th) * 54 * lo).toFixed(1) + ' ' + Z(Math.sin(th) * 46 * lo).toFixed(1); }
+  const lieux = Object.entries(LIEUX).map(([id, l]) => `<g class="lieuCarte" data-id="${id}"><circle cx="${X(l.x)}" cy="${Z(l.z)}" r="5.2" fill="#fff" stroke="#b45309" stroke-width=".8"/><text x="${X(l.x)}" y="${Z(l.z) + 2}" font-size="6" text-anchor="middle">${l.e}</text></g>`).join('');
+  const F = fenetre('🗺️ La carte du Domaine', `<svg class="carteSvg" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="#5fd0f3"/><path d="${contour}Z" fill="#8fd16a" stroke="#f3dfa2" stroke-width="2"/>
+    ${lieux}${cible ? `<text x="${X(cible[0])}" y="${Z(cible[1]) - 5}" font-size="7" text-anchor="middle">⭐</text>` : ''}
+    <circle cx="${X(position[0])}" cy="${Z(position[1])}" r="2.6" fill="#ea580c" stroke="#fff" stroke-width="1"/></svg>
+    <p class="petitTexte">● C’est toi. ⭐ C’est là que t’attend ta quête. Touche un lieu pour y aller !</p><div id="cLieu" class="petitTexte"></div>`, { large: true });
+  $$('.lieuCarte', F.el).forEach(g => g.onclick = () => {
+    const l = LIEUX[g.dataset.id]; pop();
+    $('#cLieu', F.el).innerHTML = `<b>${l.e} ${l.nom}</b> <button class="btn petit vert" id="cAller">🚶 Y aller</button>`;
+    $('#cAller', F.el).onclick = () => { F.fermer(); allerA(l.x, l.z + (g.dataset.id === 'place' ? 4 : 0)); };
+  });
+}
+
+/* ── la Maison : sauvegarde (code, fichier), profils, réglages ── */
+export function ouvrirMaison({ appliquerReglages, changerProfil, idProfil }) {
+  const r = E().reglages;
+  const F = fenetre('🏠 Ma maison', `
+    <h3>⚙️ Réglages</h3>
+    <label class="reglage"><input type="checkbox" id="mSon" ${r.son ? 'checked' : ''}> 🔊 Les sons</label>
+    <label class="reglage"><input type="checkbox" id="mMus" ${r.musique ? 'checked' : ''}> 🎵 La musique</label>
+    <label class="reglage"><input type="checkbox" id="mVoix" ${r.voix ? 'checked' : ''}> 🗣️ La voix lit les dialogues</label>
+    <label class="reglage">🕐 L’heure du jeu :
+      <select id="mHeure"><option value="vraie">la vraie heure</option><option value="jour">toujours le jour</option><option value="nuit">toujours la nuit</option></select></label>
+    <h3>💾 Sauvegarde</h3>
+    <p class="petitTexte">Le jeu se sauvegarde tout seul sur cet appareil. Pour ne jamais perdre ta partie (ou la continuer ailleurs), garde ton <b>code de sauvegarde</b>.</p>
+    <div class="ligneBtn"><button class="btn" id="mCode">📋 Voir mon code</button><button class="btn jaune" id="mFichier">⬇️ Télécharger</button></div>
+    <textarea id="mZone" class="cache" rows="4" readonly></textarea>
+    <div class="ligneBtn"><button class="btn vert" id="mCharger">📥 Charger un code</button><label class="btn jaune">📂 Charger un fichier<input type="file" id="mFile" accept=".txt" hidden></label></div>
+    <h3>👤 Profil</h3>
+    <p class="petitTexte">Tu joues avec le profil <b>${echapper(E().profil.nom)}</b>.</p>
+    <button class="btn" id="mProfil">👥 Changer de profil</button>`);
+  $('#mHeure', F.el).value = r.heure;
+  const maj = () => { r.son = $('#mSon', F.el).checked; r.musique = $('#mMus', F.el).checked; r.voix = $('#mVoix', F.el).checked; r.heure = $('#mHeure', F.el).value; appliquerReglages(); J.changer('reglages'); };
+  ['#mSon', '#mMus', '#mVoix', '#mHeure'].forEach(s => $(s, F.el).onchange = maj);
+  $('#mCode', F.el).onclick = () => {
+    const z = $('#mZone', F.el), c = SAUVE.exporterCode(E());
+    z.classList.remove('cache'); z.value = c; z.select();
+    try { navigator.clipboard.writeText(c).then(() => toast('📋 Code copié !')); } catch { /* le texte reste à copier à la main */ }
+  };
+  $('#mFichier', F.el).onclick = () => { SAUVE.telecharger(E(), 'royaume-' + E().profil.nom); toast('⬇️ Fichier téléchargé !'); };
+  const charger = texte => {
+    try {
+      const nouveau = J.migrer(SAUVE.importerCode(texte));
+      if (!confirm(`Charger la partie de « ${nouveau.profil.nom} » (${nouveau.dindies.length} dindies) ? La partie actuelle de ce profil sera remplacée.`)) return;
+      SAUVE.sauverProfil(idProfil(), nouveau); location.reload();
+    } catch (err) { toast('⚠️ ' + err.message, { duree: 4000 }); }
+  };
+  $('#mCharger', F.el).onclick = () => { const c = prompt('Colle ton code de sauvegarde (il commence par RD1-) :'); if (c) charger(c); };
+  $('#mFile', F.el).onchange = ev => { const f = ev.target.files[0]; if (!f) return; f.text().then(charger); };
+  $('#mProfil', F.el).onclick = () => { fermerTout(); changerProfil(); };
+}
+
+/* ── le choix de la première dindie ── */
+export function choisirStarter() {
+  return new Promise(resoudre => {
+    let choisie = null;
+    const F = fenetre('🥚 Choisis ta première dindie !', `<p class="petitTexte">Elles ont toutes besoin d’une amie. Touche celle que tu préfères :</p>
+      <div class="starters">${S.STARTERS.map(id => { const e = PAR_ID[id], T = TYPES[e.types[0]]; return `<button class="starter" data-id="${id}" style="--t:${T.couleur}">
+        <div class="grandPortrait">${portraitEsp(id)}</div><b>${e.nom}</b><span class="pill">${T.e} ${T.nom}</span><small>${e.desc}</small>
+        <small>⚡ ${e.stats[0]} · 💪 ${e.stats[1]} · 🦘 ${e.stats[2]}</small></button>`; }).join('')}</div>
+      <div id="sNom" class="cache renommer"><p>Comment veux-tu l’appeler ?</p><input id="sInput" maxlength="14"><button class="btn jaune" id="sDe">🎲</button><button class="btn vert grand" id="sOk">✅ C’est elle !</button></div>`,
+      { classe: 'starterF', large: true, surFermer: () => resoudre(choisie) });
+    $$('.starter', F.el).forEach(b => b.onclick = () => {
+      $$('.starter', F.el).forEach(x => x.classList.toggle('choisi', x === b)); glouglou(1.25);
+      $('#sNom', F.el).classList.remove('cache'); const i = $('#sInput', F.el);
+      if (!i.value) i.value = NOMS_RIGOLOS[Math.floor(Math.random() * NOMS_RIGOLOS.length)];
+      F.el.dataset.choix = b.dataset.id;
+    });
+    $('#sDe', F.el).onclick = () => { pop(); $('#sInput', F.el).value = NOMS_RIGOLOS[Math.floor(Math.random() * NOMS_RIGOLOS.length)]; };
+    $('#sOk', F.el).onclick = () => { choisie = { espece: F.el.dataset.choix, surnom: $('#sInput', F.el).value.trim().slice(0, 14) || null }; F.fermer(); };
+  });
+}
+
+/* ── le courrier du jour et la fontaine aux vœux ── */
+const aujourdhui = () => new Date().toISOString().slice(0, 10);
+const LETTRES = [
+  ['Professeur Plumeau', 'Savais-tu que les dindies font la roue pour dire « je suis contente » ? Voici un petit quelque chose pour ton Domaine !'],
+  ['Mimi', 'Coucou ! J’ai trop de friandises à la boutique, je t’en envoie une. Bisous !'],
+  ['Capitaine Zéphyr', 'Le vent m’a soufflé que tu faisais du bon travail. Continue, exploratrice !'],
+  ['Coach Ginette', 'Une, deux ! Une dindie heureuse court plus vite. N’oublie pas les câlins !'],
+  ['Gontran', 'Ha ! Moi j’ai déjà… bon, d’accord, je n’ai qu’une dindie aussi. Tiens, une pièce. Gloup gloup.']
+];
+export function courrier() {
+  const e = E();
+  if (e.quotidien.courrier === aujourdhui()) { fenetre('📬 Le courrier', '<p>La boîte aux lettres est vide. Le facteur repasse demain !</p>'); return; }
+  e.quotidien.courrier = aujourdhui();
+  const [de, msg] = LETTRES[Math.floor(Math.random() * LETTRES.length)];
+  J.gagnerPieces(50); J.ajouterObjet('friandise');
+  tada();
+  fenetre('📬 Du courrier !', `<div class="lettre"><p>${msg}</p><p class="signature">— ${de}</p></div><p class="bourse">🎁 + 50 🪙 et 🍪 1 friandise</p>`);
+}
+export function voeu(effet) {
+  const e = E();
+  if (!J.depenser(1)) { toast('Il faut une pièce pour faire un vœu !'); return; }
+  effet();
+  if (e.quotidien.voeu !== aujourdhui()) { e.quotidien.voeu = aujourdhui(); e.plumesOr++; J.changer('pieces'); toast('✨ Ton vœu brille… Une <b>plume d’or</b> 🪶 tombe dans ta main !', { duree: 3500 }); return; }
+  const V = ['Plouf ! Ton vœu est parti dans l’eau…', 'La fontaine fait des bulles. C’est bon signe !', 'Un poisson te fait un clin d’œil.', 'Tu entends un tout petit glouglou au fond de l’eau…'];
+  toast('⛲ ' + V[Math.floor(Math.random() * V.length)]);
+}

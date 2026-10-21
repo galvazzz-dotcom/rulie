@@ -7,7 +7,7 @@
          d.marcher(vitesse) (0 = s'arrêter) ; d.liberer() pour la retirer. */
 import * as THREE from 'three';
 import { sphere, demiSphere, cylindre, cone, tore, etoile5, geo, fusion } from '../moteur/formes.js';
-import { toon, toonTexture, contour, texRonde, texEtoile } from '../moteur/materiaux.js';
+import { toon, toonTexture, contour, contourPour, texRonde, texEtoile } from '../moteur/materiaux.js';
 import { assombrir, eclaircir, ARC, hasard } from '../moteur/couleurs.js';
 import { formeQueue } from './adn.js';
 
@@ -125,13 +125,13 @@ const marqueGeo = () => geo('marque', () => { const g = new THREE.SphereGeometry
 const etoileMarqueGeo = () => geo('marqueEtoile', () => etoile5(1, .3).clone());
 
 export function creerDindie(a) {
-  const racine = new THREE.Group(), aJeter = [];
+  const racine = new THREE.Group(), aJeter = [], lesContours = [];
   const poussin = a.stade === 'poussin', jeune = a.stade === 'jeune';
   /* une forme et son contour, dans un groupe (c'est le groupe qu'on agrandit) */
   const ajouter = (parent, geometrie, materiau, ep = EP, ombre = true) => {
     const grp = new THREE.Group(); parent.add(grp);
     const m = new THREE.Mesh(geometrie, materiau); m.castShadow = ombre; m.receiveShadow = true; grp.add(m);
-    if (ep) grp.add(new THREE.Mesh(geometrie, contour(ep)));
+    if (ep) { const c = new THREE.Mesh(geometrie, contourPour(geometrie, ep)); grp.add(c); lesContours.push(c); }
     return grp;
   };
   const fus = parts => { const g = fusion(parts); aJeter.push(g); return g; };
@@ -169,7 +169,7 @@ export function creerDindie(a) {
     flammes: [['e', .82, .7, .3, a.bande], ['e', .9, .4, .16, eclaircir(a.bande, .45)]], etoiles: [['s', .8, .34, 0, a.bande]], uni: [] }[a.motifQueue] || [];
   if (Q.n) {
     plumes = new THREE.InstancedMesh(plumeGeo(), toon('#ffffff'), Q.n); plumes.castShadow = true;
-    contourPlumes = new THREE.InstancedMesh(plumeGeo(), contour(.05), Q.n); contourPlumes.instanceMatrix = plumes.instanceMatrix;
+    contourPlumes = new THREE.InstancedMesh(plumeGeo(), contour(.05), Q.n); contourPlumes.instanceMatrix = plumes.instanceMatrix; lesContours.push(contourPlumes);
     for (let i = 0; i < Q.n; i++) plumes.setColorAt(i, new THREE.Color(couleurPlume(i)));
     queueG.add(contourPlumes, plumes);
     marques = couches.map(([forme, y, sx, sy, coul]) => {
@@ -260,8 +260,8 @@ export function creerDindie(a) {
   poserQueue(.3);
 
   /* ── les animations ── */
-  let action = null, tAction = 0, vitesse = 0, phase = 0, roueK = .3, regard = 0, regardCible = 0, prochainRegard = 2, prochainClin = 1.5, clin = 0;
-  const DUREES = { roue: 2.8, glouglou: 1.4, saut: .9 };
+  let action = null, tAction = 0, vitesse = 0, phase = 0, roueK = .3, regard = 0, regardCible = 0, prochainRegard = 2, prochainClin = 1.5, clin = 0, dort = false, sommeil = 0;
+  const DUREES = { roue: 2.8, glouglou: 1.4, saut: .9, picore: 1.3 };
   function jouer(nom) { action = nom; tAction = 0; }
   function marcher(v) { vitesse = v; }
   function maj(dt, t) {
@@ -270,7 +270,8 @@ export function creerDindie(a) {
     if (fin) action = null;
     const p = action ? tAction / DUREES[action] : 0, env = action ? Math.sin(Math.min(1, p * 1.15) * Math.PI) : 0;
     /* la roue */
-    const roueCible = action === 'roue' && p < .82 ? 1 : vitesse > 1.5 ? .05 : .3;
+    sommeil += ((dort ? 1 : 0) - sommeil) * Math.min(1, dt * 2.5);
+    const roueCible = action === 'roue' && p < .82 ? 1 : vitesse > 1.5 || dort ? .05 : .3;
     roueK += (roueCible - roueK) * Math.min(1, dt * (roueCible > roueK ? 7 : 4));
     poserQueue(roueK);
     const gonfle = (roueK - .3) / .7;
@@ -296,7 +297,8 @@ export function creerDindie(a) {
       else if (p < .72) { const q = (p - .22) / .5; haut = Math.sin(q * Math.PI) * .5; ecrase = 1 + .08 * Math.sin(q * Math.PI); ailes.forEach((g, i) => { g.rotation.z = (i ? 1 : -1) * (.4 + Math.sin(t * 30) * .4); }); }
       else ecrase = 1 - .1 * Math.sin((p - .72) / .28 * Math.PI);
     }
-    corpsG.position.y = (poussin ? .5 : .62) + bond + haut;
+    corpsG.position.y = (poussin ? .5 : .62) + bond + haut - sommeil * (poussin ? .16 : .24);
+    pattes.forEach(g => { g.visible = sommeil < .6; });
     corpsG.scale.set(1 / Math.sqrt(ecrase), ecrase, 1 / Math.sqrt(ecrase));
     pattes.forEach(g => { g.position.y = (poussin ? .26 : .34) + haut; });
     corpsG.rotation.z = roulis; corpsG.rotation.x = tangage;
@@ -305,12 +307,12 @@ export function creerDindie(a) {
     regard += (regardCible - regard) * Math.min(1, dt * 3);
     teteG.rotation.y = action === 'glouglou' ? 0 : regard;
     teteG.rotation.z = action === 'glouglou' ? Math.sin(t * 32) * .22 * env : 0;
-    teteG.rotation.x = action === 'glouglou' ? -.25 * env : action === 'roue' ? -.12 * env : 0;
+    teteG.rotation.x = action === 'glouglou' ? -.25 * env : action === 'roue' ? -.12 * env : action === 'picore' ? Math.max(0, Math.sin(p * Math.PI * 4)) * .9 * env + .3 * env : sommeil * .35;
     if (barbG) barbG.rotation.x = action === 'glouglou' ? Math.sin(t * 26) * .5 * env : Math.sin(t * 3) * .05;
     /* les yeux clignent */
     if (t > prochainClin) { clin = .14; prochainClin = t + 2 + Math.random() * 3.5; }
     clin = Math.max(0, clin - dt);
-    yeuxG.scale.y = clin > 0 ? .12 : 1;
+    yeuxG.scale.y = clin > 0 || sommeil > .5 ? .12 : 1;
     /* l'aura tourne, les étincelles scintillent */
     if (aura) { aura.rotation.y = t * .6; aura.position.y = Math.sin(t * 1.4) * .04; sol.material.opacity = .4 + Math.sin(t * 2) * .12; }
     etincelles.forEach(s => { const k = Math.max(0, Math.sin(t * 3 + s.userData.ph)); s.scale.setScalar(.06 + k * .2); s.material.opacity = k; });
@@ -325,5 +327,7 @@ export function creerDindie(a) {
   }
   /* où mettre une bulle au-dessus d'elle */
   const hauteur = () => (poussin ? 1.0 : 1.45) * a.taille;
-  return { racine, maj, jouer, marcher, liberer, hauteur, adn: a };
+  const dormir = v => { dort = v; if (v) action = null; };
+  const montrerContours = v => lesContours.forEach(c => { c.visible = v; });
+  return { racine, maj, jouer: n => { if (!dort) jouer(n); }, marcher, liberer, hauteur, dormir, montrerContours, dortIl: () => dort, adn: a };
 }
