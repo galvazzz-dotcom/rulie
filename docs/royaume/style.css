@@ -1,0 +1,99 @@
+:root{--or:#f59e0b;--encre:#3b2a1a;--creme:#fff8e7;--rar:#9ca3af;--zoneBas:42vh}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#5ec4f5;font-family:'Fredoka',system-ui,sans-serif;color:var(--encre);overscroll-behavior:none;user-select:none;-webkit-user-select:none}
+#toile{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+.cache{display:none!important}
+
+/* chargement */
+#chargement{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(#5ec4f5,#d9f3ff);z-index:50;font-size:20px;font-weight:700}
+#chargement .oeuf{font-size:72px;animation:balance 1s ease-in-out infinite}
+@keyframes balance{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+
+/* barre du haut */
+#ui{position:fixed;inset:0;pointer-events:none;z-index:5}
+#ui > *{pointer-events:auto}
+.haut{position:absolute;left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));display:flex;align-items:center;gap:8px;pointer-events:none}
+.haut > *{pointer-events:auto}
+.rond{display:flex;align-items:center;justify-content:center;width:50px;height:50px;border-radius:16px;background:#fff;font-size:24px;box-shadow:0 4px 0 rgba(0,0,0,.18);text-decoration:none;flex:none}
+.rond:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+.rond.petit{width:40px;height:40px;font-size:18px;border-radius:12px}
+.rond.on{background:var(--or);color:#fff}
+.titre{flex:1;min-width:0;text-align:center;line-height:1.05;pointer-events:none;display:flex;justify-content:center}
+.titre > span{display:inline-block;max-width:100%;background:rgba(255,255,255,.92);border-radius:16px;padding:5px 14px 6px;box-shadow:0 4px 0 rgba(0,0,0,.15)}
+.titre b{display:block;font-family:'Lilita One',sans-serif;font-weight:400;font-size:clamp(17px,4.4vw,26px);color:#c2410c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.titre small{display:block;font-size:11.5px;font-weight:700;color:#7c4a1d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* flèches et actions, posées sur la zone 3D */
+.fleche{position:absolute;top:calc((100vh - var(--zoneBas)) * .52);transform:translateY(-50%);width:52px;height:72px;border-radius:20px;background:rgba(255,255,255,.88);font-size:46px;line-height:1;font-weight:700;box-shadow:0 4px 0 rgba(0,0,0,.15)}
+.fleche.g{left:max(8px,env(safe-area-inset-left))}.fleche.d{right:max(8px,env(safe-area-inset-right))}
+.fleche:active{transform:translateY(calc(-50% + 3px))}
+#actions{position:absolute;left:50%;bottom:calc(var(--zoneBas) + 10px);transform:translateX(-50%);display:flex;gap:6px;background:rgba(255,255,255,.9);padding:6px;border-radius:20px;box-shadow:0 5px 0 rgba(0,0,0,.12)}
+#actions button{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:56px;height:56px;border-radius:14px;background:#fff7e6;border:3px solid #fde68a;line-height:1}
+#actions button:active{transform:translateY(2px)}
+#actions i{font-style:normal;font-size:22px}
+#actions span{font-size:11px;font-weight:700;margin-top:3px}
+#actions button.on{background:#fef3c7;border-color:var(--or)}
+
+/* le cri, au-dessus de la dindie */
+.cri{position:absolute;left:0;top:0;transform:translate(-50%,-100%);background:#fff;border:4px solid var(--or);border-radius:18px;padding:6px 14px;font-family:'Lilita One',sans-serif;font-size:20px;white-space:nowrap;box-shadow:0 5px 0 rgba(0,0,0,.15);animation:pop .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none!important}
+.cri::after{content:'';position:absolute;left:50%;bottom:-12px;transform:translateX(-50%);border:9px solid transparent;border-top-color:var(--or);border-bottom:0}
+@keyframes pop{0%{transform:translate(-50%,-100%) scale(.3)}100%{transform:translate(-50%,-100%) scale(1)}}
+
+/* la carte de l'espèce */
+.carte{position:absolute;left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));height:calc(var(--zoneBas) - 20px);
+  display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto 1fr;gap:6px 12px;padding:12px;border-radius:24px;background:#fff;border:6px solid var(--rar);box-shadow:0 8px 20px rgba(0,0,0,.2);overflow:hidden}
+.carte.mythique{border-color:transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#ef4444,#f97316,#facc15,#22c55e,#3b82f6,#a855f7) border-box}
+.carte .por{grid-row:span 2;width:clamp(96px,30vw,150px);aspect-ratio:1;border-radius:16px;overflow:hidden;border:3px solid var(--rar);align-self:start}
+.carte .por svg{display:block;width:100%;height:100%}
+.carte .tete{min-width:0}
+.carte .num{font-size:13px;font-weight:700;opacity:.6}
+.carte h2{margin:0;font-family:'Lilita One',sans-serif;font-weight:400;font-size:clamp(19px,4.6vw,26px);line-height:1.05}
+.carte .etiq{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.pill{font-size:12px;font-weight:700;padding:2px 9px;border-radius:99px;background:#f1f5f9;white-space:nowrap}
+.pill.rar{color:#fff;background:var(--rar);letter-spacing:.5px}
+.mythique .pill.rar{background:linear-gradient(90deg,#ef4444,#f59e0b,#22c55e,#3b82f6,#a855f7)}
+.carte .corpsCarte{min-width:0;overflow:auto;font-size:14px}
+.stat{display:flex;align-items:center;gap:6px;margin:2px 0;font-weight:700}
+.stat i{font-style:normal;width:22px;text-align:center}
+.stat .barre{flex:1;height:10px;border-radius:9px;background:#e5e7eb;overflow:hidden}
+.stat .barre b{display:block;height:100%;border-radius:9px;background:var(--rar);transition:width .4s}
+.mythique .stat .barre b{background:linear-gradient(90deg,#f97316,#facc15)}
+.stat em{font-style:normal;width:20px;text-align:right}
+.carte .criCarte{font-weight:700;color:#b45309;margin:6px 0 2px}
+.carte p{margin:2px 0 4px;line-height:1.3}
+.carte .orig{font-size:13px;color:#64748b;font-weight:600}
+
+/* le Grand Livre */
+.livre{position:absolute;inset:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));z-index:20;background:var(--creme);border:6px solid var(--or);border-radius:28px;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.3);animation:monte .25s ease-out}
+@keyframes monte{from{transform:translateY(30px);opacity:0}}
+.livreHaut{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 4px 16px;font-family:'Lilita One',sans-serif;font-size:20px}
+.filtres{display:flex;gap:6px;overflow-x:auto;padding:6px 12px 10px;flex:none;scrollbar-width:none}
+.filtres button{flex:none;padding:6px 12px;border-radius:99px;background:#fff;border:3px solid #f1d9a8;font-weight:700;font-size:14px;white-space:nowrap}
+.filtres button.on{background:var(--or);border-color:var(--or);color:#fff}
+.grille{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:10px;padding:4px 12px 16px;align-content:start}
+.case{position:relative;display:block;width:100%;height:0;padding:100% 0 0;border-radius:16px;overflow:hidden;border:4px solid var(--rar);background:#fff;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.case.mythique{border-color:#f59e0b}
+.case.choisie{outline:4px solid #22c55e;outline-offset:2px}
+.case svg{position:absolute;inset:0;display:block;width:100%;height:100%}
+.case span{position:absolute;z-index:1;left:4px;top:3px;font-size:11px;font-weight:700;background:rgba(255,255,255,.85);padding:0 5px;border-radius:8px}
+
+/* grand écran ou téléphone couché : la carte à droite */
+@media (min-aspect-ratio:1/1){
+  :root{--zoneBas:0px}
+  .carte{left:auto;width:min(40vw,460px);top:calc(max(10px,env(safe-area-inset-top)) + 64px);height:auto;grid-template-columns:1fr;grid-template-rows:auto auto 1fr}
+  .carte .por{grid-row:auto;width:min(220px,30vh);justify-self:center}
+  .fleche{top:52%}
+  .fleche.d{right:calc(min(40vw,460px) + 24px)}
+  #actions{left:calc((100vw - min(40vw,460px)) / 2);bottom:max(12px,env(safe-area-inset-bottom))}
+}
+@media (min-aspect-ratio:1/1) and (max-height:500px){
+  .carte{top:66px;grid-template-columns:auto 1fr;grid-template-rows:auto 1fr;padding:8px;gap:4px 8px}
+  .carte .por{grid-row:span 2;width:90px}
+  .titre small{display:none}
+  .rond{width:44px;height:44px;font-size:20px}
+  #actions button{min-width:46px;height:46px}
+  #actions span{display:none}
+  .fleche{width:44px;height:60px;font-size:38px}
+}
+@media (max-width:380px){ #actions button{min-width:50px} .rond{width:44px;height:44px} }
