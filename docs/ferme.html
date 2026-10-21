@@ -4452,11 +4452,15 @@ function indiceSyllabes() {
    on apprend les mots par contraste. Gauche et droite : comme on voit
    l'écran. Niveau 1 : devant, derrière. Niveau 2 : à gauche, à droite (et
    un peu de devant, derrière). Niveau 3 : entre, dans, et tout mélangé. */
+/* chaque repère regarde l'enfant (le capot du tracteur, l'assise du banc) : son « devant » à lui est
+   aussi le côté de l'enfant, il n'y a pas deux devant possibles. av / ar : jusqu'où il va vers l'avant
+   et vers l'arrière. Gauche et droite ne se disent que de la fontaine, ronde, sans avant ni arrière :
+   la gauche d'un tracteur qui nous regarde est à notre droite, ce serait une autre confusion. */
 const REPERES_A = {
-  tracteur: { fab: () => fabTracteur(), ry: Math.PI / 2, r: 1.55, e: '🚜', le: 'le tracteur', du: 'du tracteur' },
-  fontaine: { fab: () => fabFontaine(), ry: 0, r: 1.65, e: '⛲', le: 'la fontaine', du: 'de la fontaine' },
-  banc:     { fab: () => fabBanc(), ry: 0, r: 1.15, e: '🪑', le: 'le banc', du: 'du banc' },
-  caisse:   { fab: () => { const c = fabCaisse(); c.scale.setScalar(1.45); return c; }, ry: 0, r: 1.2, e: '📦', le: 'la caisse', du: 'de la caisse' }
+  tracteur: { fab: () => fabTracteur(), av: 1.75, ar: 1.1, r: 1.6, e: '🚜', le: 'le tracteur', du: 'du tracteur' },
+  fontaine: { fab: () => fabFontaine(), av: 1.5, ar: 1.5, r: 1.65, e: '⛲', le: 'la fontaine', du: 'de la fontaine' },
+  banc:     { fab: () => fabBanc(), av: .3, ar: .3, r: 1.15, e: '🪑', le: 'le banc', du: 'du banc' },
+  caisse:   { fab: () => { const c = fabCaisse(); c.scale.setScalar(1.45); return c; }, av: .65, ar: .65, r: 1.2, e: '📦', le: 'la caisse', du: 'de la caisse' }
 };
 function fabBuissonA() {
   return grp(P(Ic(.62, 1), '#4caf50', 0, .55, 0), P(Ic(.46, 1), '#66bb6a', .4, .72, .15), P(Ic(.44, 1), '#43a047', -.42, .48, .2), P(Ic(.36, 1), '#5cb85c', .1, .95, -.15));
@@ -4477,10 +4481,11 @@ function scenePompon(niv) {
   sceneCourante = 'pompon'; jeuA = 'pompon'; nivA = niv; mancheA = 0; hudA(jeuA);
   dindeA.visible = false;
   decorA([[-9.6, -6.6, 1], [9.4, -6.4, 0], [-3.4, -8.2, 0], [3.6, -8.4, 1]], [[-8.4, 2.4], [8.6, 2.2], [-7.4, 6.6], [7.8, 6.8]]);
-  const ids = niv === 2 ? ['tracteur', 'fontaine', 'caisse'] : melange(['tracteur', 'fontaine', 'banc']);
+  /* la fontaine toujours au milieu : c'est elle qui a un buisson à gauche et un à droite */
+  const bords = melange(niv === 2 ? ['tracteur', 'caisse'] : ['tracteur', 'banc']), ids = [bords[0], 'fontaine', bords[1]];
   const xs = [-4.6, 0, 4.6], ZR = -.9, reps = ids.map((id, i) => ({ id, ...REPERES_A[id], x: xs[i], z: ZR }));
   reps.forEach(R => {
-    R.obj = poserA(R.fab(), R.x, R.z, R.ry); obstaclesA.push({ x: R.x, z: R.z, r: R.r });
+    R.obj = poserA(R.fab(), R.x, R.z); obstaclesA.push({ x: R.x, z: R.z + (R.av - R.ar) / 2, r: R.r });
     /* toucher un repère : on entend son nom (la caisse, elle, peut cacher Pompon : voir plus bas) */
     cibleA(R.obj, () => { if (occupeA) return; ac(); SFX.pop(); rebond(R.obj); dire(`C’est ${R.le} ! Pompon se cache dans un buisson.`); dernierToucherA = horloge; });
   });
@@ -4494,13 +4499,18 @@ function scenePompon(niv) {
     cachettesA.push(H);
     return H;
   };
-  /* devant (côté écran) et derrière chaque repère */
+  /* devant (côté enfant, c'est aussi le devant du repère) et derrière chaque repère */
   reps.forEach(R => {
-    buisson(R.x, R.z + 2.2, [['devant', R]], [R.x, R.z + 3.2]);
-    buisson(R.x, R.z - 2.3, [['derrière', R]], [R.x + (R.x < 0 ? -1 : 1) * 1.0, R.z - 2.3]);
+    const zd = R.z + R.av + .95, zr = R.z - R.ar - .95;
+    buisson(R.x, zd, [['devant', R]], [R.x, zd + 1.0]);
+    buisson(R.x, zr, [['derrière', R]], [R.x + (R.x < 0 ? -1 : 1) * 1.0, zr]);
   });
-  /* entre deux repères : à droite de l'un, à gauche de l'autre */
-  if (niv > 0) for (let i = 0; i < 2; i++) buisson((xs[i] + xs[i + 1]) / 2, ZR, [['droite', reps[i]], ['gauche', reps[i + 1]], ['entre', reps[i], reps[i + 1]]], [(xs[i] + xs[i + 1]) / 2, ZR + 1.1]);
+  /* à gauche et à droite de la fontaine (et entre elle et ses voisins) */
+  if (niv > 0) {
+    const F = reps[1];
+    buisson((xs[0] + xs[1]) / 2, ZR, [['gauche', F], ['entre', reps[0], F]], [(xs[0] + xs[1]) / 2, ZR + 1.1]).cote = true;
+    buisson((xs[1] + xs[2]) / 2, ZR, [['droite', F], ['entre', F, reps[2]]], [(xs[1] + xs[2]) / 2, ZR + 1.1]).cote = true;
+  }
   /* dans la caisse */
   const caisse = reps.find(R => R.id === 'caisse');
   if (caisse) {
@@ -4510,11 +4520,10 @@ function scenePompon(niv) {
   }
   /* les questions : une cachette et la façon d'en parler */
   const q = (H, r) => ({ H, rel: H.rels.find(x => x[0] === r) || H.rels[0] });
-  const avant = cachettesA.filter(H => H.rels[0][0] === 'devant' || H.rels[0][0] === 'derrière'), cotes = cachettesA.filter(H => H.rels.length === 3);
-  if (niv === 0) questionsA = melange(avant).slice(0, NB_MANCHES).map(H => q(H, H.rels[0][0]));
-  else if (niv === 1) questionsA = melange([...melange([q(cotes[0], 'droite'), q(cotes[0], 'gauche'), q(cotes[1], 'droite'), q(cotes[1], 'gauche')]).slice(0, 3), ...melange(avant).slice(0, 2).map(H => q(H, H.rels[0][0]))]);
-  else questionsA = melange([q(cotes[0], 'entre'), q(cotes[1], 'entre'), q(cachettesA.find(H => H.dans), 'dans'),
-    q(pick(avant), null), q(pick(cotes), pick(['gauche', 'droite']))]);
+  const avant = cachettesA.filter(H => H.rels[0][0] === 'devant' || H.rels[0][0] === 'derrière'), cotes = cachettesA.filter(H => H.cote);
+  if (niv === 0) questionsA = melange(avant).slice(0, NB_MANCHES).map(H => q(H, null));
+  else if (niv === 1) questionsA = melange([q(cotes[0], 'gauche'), q(cotes[1], 'droite'), q(pick(cotes), null), ...melange(avant).slice(0, 2).map(H => q(H, null))]);
+  else questionsA = melange([q(cotes[0], 'entre'), q(cotes[1], 'entre'), q(cachettesA.find(H => H.dans), 'dans'), q(pick(avant), null), q(pick(cotes), null)]);
   /* jamais deux fois de suite la même cachette */
   for (let i = 1; i < questionsA.length; i++) if (questionsA[i].H === questionsA[i - 1].H) { const j = (i + 1) % questionsA.length; [questionsA[i], questionsA[j]] = [questionsA[j], questionsA[i]]; }
   questionsA.forEach(x => { if (!x.rel) x.rel = x.H.rels[0]; });
