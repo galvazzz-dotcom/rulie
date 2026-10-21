@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#3ec5f0">
-<meta name="version" content="2026-10-21-apprendre-revu">
+<meta name="version" content="2026-10-21-apprendre-8-jeux">
 <title>🚜 La Ferme de Roullieee</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lilita+One&display=swap" rel="stylesheet">
@@ -215,10 +215,15 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
 /* des bulles plus grosses que dans « Jouer » : ce sont les boutons des petits doigts */
 .bulle.a .in{min-width:60px;height:60px;padding:0 12px;font-size:34px;cursor:pointer}
 .bulle.a.caisseA .in{border-color:#fde68a}
+.bulle.a.bebeA .in{min-width:0;width:42px;height:42px;padding:0;font-size:22px}
 .bulle.a.panneau .in{background:linear-gradient(#ffffff,#fff3c4);border-color:#ffd23f;gap:6px;font-size:32px}
 .bulle.a.panneau .in::after{border-top-color:#ffd23f}
 .bulle.a.panneau.petit .in{min-width:50px;height:50px;font-size:26px}
 .etoilesA{font-size:20px;letter-spacing:-1px;white-space:nowrap}
+/* les panneaux de la petite ferme : l'image, et les étoiles dessous (plus étroits, ils ne se chevauchent pas) */
+.bulle.a.lieuA .in{flex-direction:column;height:auto;min-height:0;padding:5px 9px 4px;gap:1px;line-height:1}
+.bulle.a.lieuA .em{font-size:34px;line-height:1.05}
+.bulle.a.lieuA .etoilesA{font-size:15px}
 .etoilesA i{font-style:normal;filter:grayscale(1);opacity:.35}
 .bulle.a.cmdA .in{height:auto;min-height:60px;padding:6px 12px;border-color:#3a86ff;gap:8px}
 .bulle.a.cmdA .in::after{border-top-color:#3a86ff}
@@ -246,6 +251,27 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
   .bulle.a.optionA .in{min-width:64px;min-height:64px;font-size:40px}
   .bulle.a.clapA .in{font-size:17px}
 }
+/* potager et étal : la frise, le plan du jardin, la suite à continuer */
+.bulle.a.friseA .in{height:auto;min-height:60px;padding:6px 10px;gap:6px;border-color:#a855f7}
+.bulle.a.friseA .in::after{border-top-color:#a855f7}
+.friseA .case{display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:12px;border:3px dashed #c4b5fd;font-size:28px;font-family:'Lilita One';font-weight:400;color:#a78bfa}
+.friseA .case.p{border:3px solid #22c55e;background:#dcfce7;animation:pop .3s}
+.bulle.a.planA .in{height:auto;padding:6px;border-color:#16a34a}
+.bulle.a.planA .in::after{border-top-color:#16a34a}
+.planA .grille{display:grid;grid-template-columns:repeat(3,42px);gap:4px}
+.planA .grille span{display:flex;align-items:center;justify-content:center;height:42px;border-radius:9px;background:#8b5a2b;font-size:26px}
+.planA .grille span.ok{box-shadow:inset 0 0 0 3px #4ade80}
+.planA .grille span.vu{box-shadow:inset 0 0 0 4px #ffd23f}
+.bulle.a.suiteA .in{height:auto;min-height:54px;padding:4px 10px;gap:2px;font-size:28px;border-color:#f97316}
+.bulle.a.suiteA .in::after{border-top-color:#f97316}
+.suiteA .vide{display:inline-block;width:32px;height:32px;border-radius:50%;border:3px dashed #fdba74}
+@media (max-width:560px){
+  .friseA .case{width:36px;height:36px;font-size:22px}
+  .planA .grille{grid-template-columns:repeat(3,34px)}
+  .planA .grille span{height:34px;font-size:21px}
+  .bulle.a.suiteA .in{font-size:21px}
+  .suiteA .vide{width:24px;height:24px}
+}
 /* la bulle que montre la flèche d'aide */
 .bulle.a.indice .in{animation:indiceA .55s ease-in-out infinite alternate;box-shadow:0 0 0 5px #ffd23f,0 0 26px 8px rgba(255,210,63,.95)}
 @keyframes indiceA{from{transform:scale(1)}to{transform:scale(1.14)}}
@@ -257,6 +283,8 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
   .bulle.a.panneau .in{font-size:26px}
   .bulle.a.panneau.petit .in{min-width:42px;height:42px;font-size:22px}
   .etoilesA{font-size:15px}
+  .bulle.a.lieuA .em{font-size:28px}
+  .bulle.a.lieuA .etoilesA{font-size:12px}
   .bulle.a.cmdA .in{min-height:50px;padding:4px 8px;gap:5px}
   .bulle.a.cmdA .em{font-size:26px}
   .bulle.a.cmdA b{font-size:30px}
@@ -290,6 +318,9 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
   #hudA > .hautA{justify-content:flex-start}
   .hautA .vide{display:none}
   .bulle.a .in{min-width:44px;height:44px;font-size:24px}
+  .bulle.a.lieuA .in{padding:3px 6px 2px}
+  .bulle.a.lieuA .em{font-size:24px}
+  .bulle.a.lieuA .etoilesA{font-size:11px}
   .bulle.a.cmdA .in{min-height:44px}
   .cases i{width:21px;height:21px;font-size:12px}
   .bulle.a.carteA .in{min-width:66px;min-height:66px;font-size:44px}
@@ -306,12 +337,13 @@ button{font-family:inherit;border:0;cursor:pointer;touch-action:manipulation;col
 .albumA{display:flex;flex-direction:column;gap:16px;align-items:center}
 .ligneA{display:flex;align-items:center;gap:12px}
 .actA{font-size:40px;width:52px;text-align:center}
+@media (max-width:420px){ .autoA{width:56px;height:56px;font-size:30px} .albumA{gap:9px} .actA{font-size:26px;width:34px} }
 .completA{font-size:20px;font-weight:700;color:#b45309;margin:14px 0 0}
+/* téléphone couché : l'album sur deux colonnes */
+@media (max-height:500px) and (orientation:landscape){ .albumA{display:grid;grid-template-columns:auto auto;gap:8px 34px;justify-content:center} .autoA{width:54px;height:54px;font-size:30px} .actA{font-size:28px;width:36px} }
 .lienA{margin-top:14px;font-size:15px;font-weight:600;color:#9a6a3a;text-decoration:underline;padding:6px 10px}
 @media (max-width:420px){
-  .autoA{width:66px;height:66px;font-size:36px}
   .autoA.gros{width:110px;height:110px;font-size:64px}
-  .actA{font-size:30px;width:38px}
   .ligneA{gap:8px}
   .nivA{padding:8px 52px 8px 10px;column-gap:10px;min-height:70px}
   .nivA .et{font-size:20px}
@@ -3370,7 +3402,7 @@ $('#bEngrais').onclick = () => { ac(); mettreEngrais(); };
    ══════════════════════════════════════════════════════════ */
 const CLE_A = 'fermeRoullieeeApprendre.v1';
 function chargerA() {
-  const n = { etoiles: { livraison: [0, 0, 0], nourrir: [0, 0, 0], syllabes: [0, 0, 0], pompon: [0, 0, 0] }, vu: false };
+  const n = { etoiles: Object.fromEntries(['livraison', 'nourrir', 'syllabes', 'pompon', 'potager', 'etal', 'concert', 'bebes'].map(id => [id, [0, 0, 0]])), vu: false };
   try {
     const o = JSON.parse(localStorage.getItem(CLE_A));
     if (o && o.etoiles) for (const id in n.etoiles) if (Array.isArray(o.etoiles[id])) n.etoiles[id] = n.etoiles[id].map((_, i) => o.etoiles[id][i] ? 1 : 0);
@@ -3382,6 +3414,7 @@ const SA = chargerA();
 function sauverA() { try { localStorage.setItem(CLE_A, JSON.stringify(SA)); } catch (e) {} }
 
 const NB_MANCHES = 5, MAX_PORTE_A = 12, VITESSE_A = 5.5;
+let nbManches = NB_MANCHES;   /* manches du niveau en cours (5 le plus souvent ; l'étal en a 4, le plan du potager 3) */
 const JEUX = {
   livraison: { e: '🚚', nom: 'La livraison', dire: 'La livraison !',
     niveaux: [{ ex: '🥚🥚🥚', aide: 'Compter jusqu’à 5' }, { ex: '🥚 <b>8</b>', aide: 'Compter jusqu’à 10' }, { ex: '🥚 + 🥕', aide: 'Deux produits à la fois' }],
@@ -3394,10 +3427,23 @@ const JEUX = {
     autocollants: [['🦋', 'le papillon'], ['🐌', 'l’escargot'], ['🌈', 'l’arc-en-ciel']] },
   pompon: { e: '🐇', nom: 'Où est Pompon ?', dire: 'Où est Pompon ?',
     niveaux: [{ ex: '⬆️ ⬇️', aide: 'Devant, derrière' }, { ex: '⬅️ ➡️', aide: 'À gauche, à droite' }, { ex: '↔️ 📦', aide: 'Entre, dans… tout mélangé' }],
-    autocollants: [['🐰', 'Pompon'], ['🦊', 'le renard'], ['🦉', 'le hibou']] }
+    autocollants: [['🐰', 'Pompon'], ['🦊', 'le renard'], ['🦉', 'le hibou']] },
+  potager: { e: '🌱', nom: 'Le potager', dire: 'Le potager !',
+    niveaux: [{ ex: '🌰 💧 🌱', aide: 'Semer, arroser, récolter' }, { ex: '1️⃣ 2️⃣ 3️⃣ 4️⃣', aide: 'Remettre les images dans l’ordre' }, { ex: '🗺️ 🥕🍅', aide: 'Semer comme sur le plan' }],
+    autocollants: [['🥕', 'la carotte'], ['🌻', 'le tournesol'], ['🍓', 'la fraise']] },
+  etal: { e: '🧺', nom: 'Ranger l’étal', dire: 'Ranger l’étal !',
+    niveaux: [{ ex: '🔴 🟡', aide: 'Ranger par couleur' }, { ex: '🐔 🌱', aide: 'Animal ou plante ?' }, { ex: '🍎🥕🍎❓', aide: 'Continuer la suite' }],
+    autocollants: [['🍉', 'la pastèque'], ['🧀', 'le fromage'], ['🛒', 'le chariot']] },
+  concert: { e: '🎵', nom: 'Le concert', dire: 'Le concert de la ferme !',
+    niveaux: [{ ex: '👂 🐄', aide: 'Qui fait ce bruit ?' }, { ex: '🎵🎵', aide: 'Répéter une petite chanson' }, { ex: '🎵🎵🎵🎵', aide: 'Répéter une longue chanson' }],
+    autocollants: [['🥁', 'le tambour'], ['🎺', 'la trompette'], ['🎸', 'la guitare']] },
+  bebes: { e: '🐣', nom: 'Les bébés animaux', dire: 'Les bébés animaux !',
+    niveaux: [{ ex: '🐥 → 🐔', aide: 'Ramener le bébé à sa maman' }, { ex: '🔎 🐑', aide: 'Trouver le bébé qu’on appelle' }, { ex: '❓ ❓', aide: 'Le mémory des familles' }],
+    autocollants: [['🐤', 'le petit poussin'], ['🐑', 'l’agneau'], ['🐴', 'le poulain']] }
 };
 /* les mots pour parler juste : « une carotte », « trois œufs », « pas de lait » */
-const NOMBRES = ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix', 'onze', 'douze'];
+const NOMBRES = ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize',
+  'dix-sept', 'dix-huit', 'dix-neuf', 'vingt', 'vingt et un', 'vingt-deux', 'vingt-trois', 'vingt-quatre'];
 const MOTS = {
   oeuf:      { un: 'un œuf', des: 'œufs', pas: 'd’œufs' },
   lait:      { un: 'une bouteille de lait', des: 'bouteilles de lait', pas: 'de lait' },
@@ -3476,6 +3522,7 @@ const RA = { cible: null, suite: [], fin: null, tourne: null, porte: [], enVol: 
 const fileA = { cle: null, n: 0, x: 0, z: 0, faire: null, prochain: 0 };
 const ciblesA = [], bullesA = [], betesA = [];
 let jetonA = 0, occupeA = false, sceneCourante = null, jeuA = null, nivA = 0, mancheA = 0, erreursManche = 0;
+let rejouerA = null;   /* le concert : 🔊 fait réentendre le cri ou la chanson */
 let voixA = '', relancesA = 0, dernierToucherA = 0, sonAvantA = true, zoneMarcheA = [-8, -3, 8, 3], derniereCriA = 0;
 const cadreA = new THREE.Box3();
 /* tout ce qui attend (minuteries, fins d'animation) est oublié quand on change de scène */
@@ -3535,7 +3582,7 @@ function consigneA(texte, voix) {
   voixA = voix || ''; relancesA = 0;
   if (voix) dire(voix);
 }
-function ecouterA() { ac(); SFX.pop(); if (voixA) dire(voixA); montrerIndice(); }
+function ecouterA() { ac(); SFX.pop(); if (rejouerA) { rejouerA(); return; } if (voixA) dire(voixA); montrerIndice(); }
 
 /* ── la caméra : tout le jeu tient dans l'écran, sur téléphone comme sur l'ordinateur ── */
 const camA = { cible: new THREE.Vector3(), dist: 30, tangage: 1.0, lacet: .12 };
@@ -3667,7 +3714,7 @@ function majPileA() {
   if (sig === RA.sig) return;
   RA.sig = sig;
   while (pileA.children.length) pileA.remove(pileA.children[0]);
-  RA.porte.slice(0, n).forEach((k, i) => { const m = fabMini(k); m.position.y = i * .27 + .12; pileA.add(m); });
+  RA.porte.slice(0, n).forEach((k, i) => { const m = fabPorteA(k); m.position.y = i * .27 + .12; pileA.add(m); });
   hauteurPile = n;
 }
 function prendreA(k, depart) {
@@ -3678,7 +3725,7 @@ function prendreA(k, depart) {
     return false;
   }
   RA.porte.push(k); RA.enVol++;
-  lancerA(fabMini(k), depart, hautPileA, .34, () => { RA.enVol--; majPileA(); SFX.pile(); });
+  lancerA(fabPorteA(k), depart, hautPileA, .34, () => { RA.enVol--; majPileA(); SFX.pile(); });
   return true;
 }
 /* retire l'objet i du dos ; renvoie le point d'où il s'envole */
@@ -3701,8 +3748,15 @@ function libererA(racine) {
   const gardes = new Set([...matCache.values(), matPastille, matQuestion]);
   racine.traverse(o => { if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { if (!gardes.has(m)) m.dispose(); }); });
 }
+function retirerA(obj) {
+  mondeA.remove(obj);
+  const j = ciblesA.indexOf(obj); if (j >= 0) ciblesA.splice(j, 1);
+  for (let i = bullesA.length - 1; i >= 0; i--) if (bullesA[i].obj === obj) { bullesA[i].el.remove(); bullesA.splice(i, 1); }
+}
 function viderMondeA() {
   jetonA++;
+  nbManches = NB_MANCHES; rejouerA = null;
+  if (bebesA.porte) { joueurA.remove(bebesA.porte.obj); bebesA.porte = null; }
   libererA(mondeA);
   while (mondeA.children.length) mondeA.remove(mondeA.children[0]);
   ciblesA.length = 0; betesA.length = 0;
@@ -3727,7 +3781,7 @@ function hudA(jeu) {
   if (jeu) majProgA();
 }
 function majProgA() {
-  $('#aProg').innerHTML = `<span class="em">${JEUX[jeuA].e}</span>` + Array.from({ length: NB_MANCHES }, (_, i) => `<i class="${i < mancheA ? 'p' : ''}"></i>`).join('');
+  $('#aProg').innerHTML = `<span class="em">${JEUX[jeuA].e}</span>` + Array.from({ length: nbManches }, (_, i) => `<i class="${i < mancheA ? 'p' : ''}"></i>`).join('');
 }
 function etoilesA(id) { return '<span class="etoilesA">' + SA.etoiles[id].map(x => x ? '⭐' : '<i>⭐</i>').join('') + '</span>'; }
 function decorA(arbres, fleurs) {
@@ -3867,49 +3921,96 @@ function prendreCaisseA(C) {
   compterA(C.k);
 }
 
-/* ══════════ LA PETITE FERME : le menu des jeux ══════════ */
+/* ══════════ LA PETITE FERME : le menu des jeux ══════════
+   Trois rangées de trois : au fond le potager, la maison (l'album) et
+   l'étal ; au milieu le camion, la scène du concert et l'enclos ; devant
+   les dalles des syllabes, la brebis et son agneau, le buisson de Pompon.
+   Roullieee passe par deux allées (devant le fond, devant le milieu). */
+const LIEUX_A = {
+  livraison: { e: '🚚', quai: [-6.4, 1.75], hB: 2.7 },
+  concert:   { e: '🎵', quai: [0, 1.75], hB: 2.3 },
+  nourrir:   { e: '🐄', quai: [6.4, 1.75], hB: 2.6 },
+  syllabes:  { e: '👏', quai: [-6.4, 2.75], hB: 1.2 },
+  bebes:     { e: '🐣', quai: [0, 2.75], hB: 1.6 },
+  pompon:    { e: '🐇', quai: [6.4, 2.75], hB: 2.0 },
+  potager:   { e: '🌱', quai: [-6.4, -4.1], hB: 2.2 },
+  etal:      { e: '🧺', quai: [6.4, -4.1], hB: 2.7 }
+};
 function sceneFerme() {
+  const venu = jeuA;
   viderMondeA();
   sceneCourante = 'ferme'; jeuA = null; hudA(null);
-  zoneMarcheA = [-8, -2.9, 8, 3];
-  cadreA.set(new THREE.Vector3(-7.2, 0, -8.8), new THREE.Vector3(7.2, 6.8, 5.2));
-  decorA([[-9.6, -6, 1], [9.4, -6.4, 0], [-10, 2.6, 0], [10.2, 2.2, 1], [-3.8, -8.8, 0], [4.2, -8.6, 1]],
-    [[-2.4, 2.6], [2.6, 2.9], [-7.8, -3.4], [7.6, -3.6], [-1.2, -8.4], [8.6, 4.8]]);
-  chemin3A(0, 1.4, 13, 1.6); chemin3A(0, -1.2, 1.6, 3.6);
-  /* l'album est dans la maison de Roullieee */
-  const maison = maisonA = poserA(fabMaison(), 0, -5.6);
-  const allerAlbum = () => demander('lieu-album', 0, -2.9, ouvrirAlbum, true, [0, -5.6]);
+  zoneMarcheA = [-8.4, -4.5, 8.4, 2.9];
+  cadreA.set(new THREE.Vector3(-8.9, 0, -10.2), new THREE.Vector3(8.9, 6.8, 6.2));
+  decorA([[-10.6, -8.4, 1], [10.6, -8.6, 0], [-10.8, .8, 0], [10.8, .6, 1], [-3.4, -10, 0], [3.5, -10.2, 1], [-10.4, 6.8, 1], [10.6, 7, 0]],
+    [[-3.3, 4.6], [3.3, 4.9], [-3.4, -6.9], [3.4, -6.7], [-9.8, -3.2], [9.8, -3.4]]);
+  chemin3A(0, -4.1, 17.4, 1.5); chemin3A(0, 2.2, 17.4, 1.9);
+  chemin3A(-3.2, -1.05, 1.4, 4.6); chemin3A(3.2, -1.05, 1.4, 4.6);
+  const allerLieu = id => {
+    const L = LIEUX_A[id];
+    return () => demander('lieu-' + id, L.quai[0], L.quai[1], () => ouvrirNiveaux(id), true, [lieuxA[id].position.x, lieuxA[id].position.z]);
+  };
+  const lieu = (id, obj, r, action) => {
+    const L = LIEUX_A[id], aller = action || allerLieu(id);
+    lieuxA[id] = obj; obj.userData.hIndice = L.hB + 2.2;
+    if (!action) cibleA(obj, aller);
+    bulleA(obj, L.hB, () => ({ t: `<span class="em">${L.e}</span>` + etoilesA(id), c: 'panneau lieuA' }), aller);
+    if (r) obstaclesA.push({ x: obj.position.x, z: obj.position.z, r });
+  };
+  /* au fond : l'album est dans la maison de Roullieee */
+  const maison = maisonA = poserA(fabMaison(), 0, -7.4);
+  const allerAlbum = () => demander('lieu-album', 0, -4.1, ouvrirAlbum, true, [0, -7.4]);
   cibleA(maison, allerAlbum);
   bulleA(maison, 6.3, () => ({ t: '📒', c: 'panneau' }), allerAlbum);
-  /* le camion de la livraison */
-  const cam = lieuxA.livraison = poserA(fabCamion(), -4.6, -.9, Math.PI / 2);
-  const allerLiv = () => demander('lieu-livraison', -4.6, 1.15, () => ouvrirNiveaux('livraison'), true, [-4.6, -.9]);
-  cibleA(cam, allerLiv);
-  bulleA(cam, 2.7, () => ({ t: '🚚 ' + etoilesA('livraison'), c: 'panneau' }), allerLiv);
+  /* le potager : de la terre, des tournesols en fleur et l'arrosoir */
+  const gPo = new THREE.Group(); gPo.position.set(-6.4, 0, -6.6); mondeA.add(gPo);
+  gPo.add(fabParcelleA(3.2, 2.4));
+  const pl = fabPlantes('tournesol'); pl.g.scale.set(.7, .7, .55); pl.tetes.forEach(m => { m.material = mat(COULEUR_MUR.tournesol); }); gPo.add(pl.g);
+  const arr = fabArrosoirA(); arr.position.set(2.1, 0, .9); arr.rotation.y = -.6; gPo.add(arr);
+  lieu('potager', gPo);
+  /* l'étal du marché, avec quelques produits */
+  const gE = new THREE.Group(); gE.position.set(6.4, 0, -6.6); mondeA.add(gE);
+  gE.add(fabTableEtalA(3.4));
+  ['pomme', 'carotte', 'fromage', 'oeuf'].forEach((k, i) => { const m = fabMini(k); m.scale.setScalar(1.5); m.position.set(-1.2 + i * .8, 1.08, .1); gE.add(m); });
+  lieu('etal', gE);
+  /* au milieu : le camion de la livraison */
+  lieu('livraison', poserA(fabCamion(), -6.4, -1.05, Math.PI / 2), 2.3);
+  /* la petite scène du concert, avec deux chanteurs */
+  const gC = new THREE.Group(); gC.position.set(0, 0, -1.05); mondeA.add(gC);
+  gC.add(P(Cy(1.75, 1.85, .26, 20), '#c98b4b', 0, .13, 0));
+  const fond = grp(P(Bx(3.6, 1.7, .16), '#7c3aed', 0, .85, 0), P(Bx(3.8, .16, .24), '#5b21b6', 0, 1.75, 0));
+  for (let i = 0; i < 6; i++) { const f = P(Pr(.3, .34, .03), ['#ef4444', '#facc15', '#3b82f6', '#22c55e'][i % 4], -1.5 + i * .6, 1.6, .12, true); f.rotation.z = Math.PI; fond.add(f); }
+  fond.position.z = -1.45; gC.add(fond);
+  [['cochon', -.7], ['poule', .75]].forEach(([id, x]) => { const M = MUSICIENS[id], a = M.fab(); a.scale.setScalar(M.ech * .8); a.position.set(x, .26, -.1); gC.add(a); });
+  lieu('concert', gC, 1.9);
   /* l'enclos où l'on nourrit les bêtes */
-  const allerNour = () => demander('lieu-nourrir', 4.6, 1.3, () => ouvrirNiveaux('nourrir'), true, [4.6, -1]);
-  const E = creerEnclosA('vache', 4.6, -1.2, 4.4, 3.6, allerNour);
+  const allerNour = allerLieu('nourrir');
+  const E = creerEnclosA('vache', 6.4, -1.25, 3.8, 3.4, allerNour);
   ajouterBeteA(E, false);
   const Ep = { ...E, esp: 'poule', K: ESPECES_A.poule, betes: [] };
   ajouterBeteA(Ep, false); ajouterBeteA(Ep, false);
-  lieuxA.nourrir = E.g;
-  bulleA(E.g, 2.6, () => ({ t: '🐄 ' + etoilesA('nourrir'), c: 'panneau' }), allerNour);
-  /* les syllabes : un petit chemin de dalles où l'on saute */
-  const gS = lieuxA.syllabes = new THREE.Group(); gS.position.set(-5, 0, 4.3); mondeA.add(gS);
+  lieu('nourrir', E.g, 2.3, allerNour);
+  /* devant : les syllabes, un petit chemin de dalles où l'on saute */
+  const gS = new THREE.Group(); gS.position.set(-6.4, 0, 4.4); mondeA.add(gS);
   [[-1.1, .5], [0, 0], [1.1, -.5]].forEach(([x, z], i) => gS.add(P(Cy(.5, .5, .12, 12), i === 1 ? '#ffd23f' : '#d6d3d1', x, .06, z, true)));
   const fS = fabFleurs(); fS.position.set(1.4, 0, .6); gS.add(fS);
-  const allerSyl = () => demander('lieu-syllabes', -5, 2.6, () => ouvrirNiveaux('syllabes'), true, [-5, 4.3]);
-  cibleA(gS, allerSyl);
-  bulleA(gS, 1.2, () => ({ t: '👏 ' + etoilesA('syllabes'), c: 'panneau' }), allerSyl);
+  lieu('syllabes', gS);
+  /* les bébés : la brebis, son agneau et un poussin dans la paille */
+  const gB = new THREE.Group(); gB.position.set(0, 0, 4.4); mondeA.add(gB);
+  const paille = P(Cy(1.3, 1.4, .1, 16), '#f2c14e', 0, .05, 0, true); paille.scale.z = .75; gB.add(paille);
+  const brebis = fabAnimalA(FAMILLES.mouton, false); brebis.position.set(-.45, .1, -.1); brebis.rotation.y = .5; gB.add(brebis);
+  const agneau = fabAnimalA(FAMILLES.mouton, true); agneau.position.set(.55, .1, .25); agneau.rotation.y = -.4; gB.add(agneau);
+  const pou = fabPoussinA(); pou.position.set(.95, .1, -.35); pou.rotation.y = -.8; gB.add(pou);
+  lieu('bebes', gB);
   /* Pompon : ses oreilles dépassent d'un buisson */
-  const gP = lieuxA.pompon = new THREE.Group(); gP.position.set(5, 0, 4.3); mondeA.add(gP);
+  const gP = new THREE.Group(); gP.position.set(6.4, 0, 4.4); mondeA.add(gP);
   gP.add(fabBuissonA());
   const lp = fabLapin(); lp.position.set(.62, .05, .3); lp.rotation.y = -.5; gP.add(lp); gP.userData.lapin = lp;
-  const allerPom = () => demander('lieu-pompon', 5, 2.6, () => ouvrirNiveaux('pompon'), true, [5, 4.3]);
-  cibleA(gP, allerPom);
-  bulleA(gP, 2.0, () => ({ t: '🐇 ' + etoilesA('pompon'), c: 'panneau' }), allerPom);
-  joueurA.position.set(0, 0, 1.4); joueurA.rotation.y = 0;
-  dindeA.visible = true; dindeA.position.set(-1.4, 0, 1.8);
+  lieu('pompon', gP);
+  /* Roullieee revient là où elle a joué (au milieu la première fois) */
+  const q = venu && LIEUX_A[venu] ? LIEUX_A[venu].quai : [-1.7, 2.2];
+  joueurA.position.set(q[0], 0, q[1]); joueurA.rotation.y = 0;
+  dindeA.visible = true; dindeA.position.set(q[0] + (q[0] > 4 ? -1.4 : 1.4), 0, q[1] + .3);
   const bienvenue = SA.vu ? 'Choisis un jeu ! Touche un panneau.' : 'Bonjour ! Bienvenue dans la ferme pour apprendre. Touche un panneau pour choisir un jeu !';
   plusTardA(450, () => {
     consigneA('👆 Touche un panneau pour choisir un jeu', bienvenue);
@@ -3918,7 +4019,7 @@ function sceneFerme() {
 }
 function indiceFerme() {
   const id = Object.keys(JEUX).find(id => SA.etoiles[id].includes(0)) || 'livraison', o = lieuxA[id];
-  return { x: o.position.x, z: o.position.z, h: { livraison: 4.9, nourrir: 4.7, syllabes: 3.4, pompon: 4.1 }[id], obj: o };
+  return { x: o.position.x, z: o.position.z, h: o.userData.hIndice, obj: o };
 }
 function ouvrirNiveaux(id) {
   const J = JEUX[id], et = SA.etoiles[id], conseil = et.indexOf(0);
@@ -3928,7 +4029,10 @@ function ouvrirNiveaux(id) {
   document.querySelectorAll('#mCorps .nivA').forEach(b => b.onclick = () => { SFX.pop(); fermerFenetre(); lancerJeu(id, +b.dataset.n); });
   dire(`${J.dire} Choisis ton niveau. Une, deux ou trois étoiles ?`);
 }
-function lancerJeu(id, niv) { transitionA(() => ({ livraison: sceneLivraison, nourrir: sceneNourrir, syllabes: sceneSyllabes, pompon: scenePompon })[id](niv)); }
+function lancerJeu(id, niv) {
+  transitionA(() => ({ livraison: sceneLivraison, nourrir: sceneNourrir, syllabes: sceneSyllabes, pompon: scenePompon,
+    potager: scenePotager, etal: sceneEtal, concert: sceneConcert, bebes: sceneBebes })[id](niv));
+}
 function ouvrirAlbum() {
   let n = 0;
   const lignes = Object.entries(JEUX).map(([id, J]) => `<div class="ligneA"><span class="actA">${J.e}</span>` + J.autocollants.map(([e, nom], i) => {
@@ -4108,7 +4212,7 @@ function reussirCamion(parts) {
   plusTardA(2400, () => {
     camionLa = false; SFX.klaxon(); setTimeout(SFX.vroum, 200);
     animer(1.6, k => { camionA.position.x = 18 * k * k; }, garde(() => {
-      if (mancheA < NB_MANCHES) arriverCamion(); else plusTardA(300, finNiveau);
+      if (mancheA < nbManches) arriverCamion(); else plusTardA(300, finNiveau);
     }));
   });
 }
@@ -4268,7 +4372,7 @@ function reussirNourrir(parts) {
   plusTardA(200, () => dire((parts.length ? parts.join(' ') + ' ' : '') + bravo));
   SFX.achat();
   mancheFinie();
-  plusTardA(2800, () => { if (mancheA < NB_MANCHES) mancheNourrir(false); else finNiveau(); });
+  plusTardA(2800, () => { if (mancheA < nbManches) mancheNourrir(false); else finNiveau(); });
 }
 function indiceNourrir() {
   const E = enclosA.find(F => F.faim && F.betes.some(b => b.faim && !b.servi));
@@ -4434,7 +4538,7 @@ function bilanChemin(C, w) {
     consigneA(`${w.e} ${w.ecrit} : ${'👏'.repeat(w.n)}`, '');
     mancheFinie();
     plusTardA(2600, () => {
-      if (mancheA >= NB_MANCHES) { finNiveau(); return; }
+      if (mancheA >= nbManches) { finNiveau(); return; }
       allerA(depart3[0], depart3[1], () => { RA.tourne = Math.PI; mancheSyllabes(false); });
     });
     return;
@@ -4461,7 +4565,7 @@ function choisirRime(O) {
     dire(`${majuscule(w.mot)}… ${O.mot.mot} ! Ça finit pareil, ça rime. Bravo !`);
     mancheFinie();
     plusTardA(2800, () => {
-      if (mancheA >= NB_MANCHES) { finNiveau(); return; }
+      if (mancheA >= nbManches) { finNiveau(); return; }
       allerA(depart3[0], depart3[1], () => { RA.tourne = Math.PI; mancheSyllabes(false); });
     });
     return;
@@ -4601,7 +4705,7 @@ function chercherA(H) {
       consigneA(`🐇 était ${texteRelA(Q.rel)} ✅`, '');
       mancheFinie();
       plusTardA(2800, () => {
-        if (mancheA >= NB_MANCHES) { finNiveau(); return; }
+        if (mancheA >= nbManches) { finNiveau(); return; }
         allerA(DEPART_P[0], DEPART_P[1], () => { RA.tourne = 0; manchePompon(false); });
       });
       return;
@@ -4620,9 +4724,888 @@ function indicePompon() {
   return Q && pomponA && !pomponA.visible ? { x: Q.H.x, z: Q.H.z, h: Q.H.dans ? 2.6 : 2.3 } : null;
 }
 
+/* ── petits modèles pour les nouveaux jeux ── */
+function fabSacA(k) {
+  /* un sac de graines, avec le légume dessiné dessus */
+  const g = grp(P(Bx(.72, .78, .5), '#d6b98c', 0, .39, 0), P(Bx(.52, .16, .36), '#c9a46a', 0, .86, 0), P(Cy(.06, .06, .14, 6), '#8a5a3c', 0, .98, 0, true));
+  const m = fabMini(k); m.scale.setScalar(1.4); m.position.set(0, .45, .28); g.add(m);
+  return g;
+}
+function fabGraineA(k) {
+  /* un sachet de graines (ce que Roullieee porte) */
+  const g = grp(P(Bx(.32, .38, .07), '#f5e6c4', 0, 0, 0, true));
+  const m = fabMini(k); m.scale.setScalar(.55); m.position.z = .06; g.add(m);
+  return g;
+}
+function fabArrosoirA() {
+  const g = grp(P(Cy(.28, .34, .5, 12), '#22c55e', 0, .3, 0), P(Cy(.29, .29, .05, 12), '#16a34a', 0, .56, 0, true));
+  const bec = P(Cy(.04, .06, .7, 6), '#16a34a', .45, .5, 0); bec.rotation.z = -1.0; g.add(bec);
+  const pomme = P(Cy(.11, .05, .08, 8), '#15803d', .74, .72, 0, true); pomme.rotation.z = -1.0; g.add(pomme);
+  const anse = new THREE.Mesh(geo('anseArr', () => new THREE.TorusGeometry(.22, .04, 6, 12, Math.PI)), mat('#16a34a')); anse.position.set(-.05, .58, 0); g.add(anse);
+  return g;
+}
+function fabPanierA() {
+  const g = grp(P(Cy(.6, .45, .5, 12), '#b07a45', 0, .25, 0), P(Cy(.61, .61, .06, 12), '#8a5a3c', 0, .5, 0, true));
+  const anse = new THREE.Mesh(geo('ansePan', () => new THREE.TorusGeometry(.5, .04, 6, 14, Math.PI)), mat('#8a5a3c')); anse.position.y = .5; g.add(anse);
+  const dedans = new THREE.Group(); dedans.position.y = .45; g.add(dedans); g.userData.dedans = dedans;
+  return g;
+}
+function fabParcelleA(w, d) {
+  const g = grp(P(Bx(w, .14, d), '#7b4a26', 0, .07, 0, true));
+  for (let i = 0; i < 3; i++) g.add(P(Bx(w - .3, .04, .14), '#5e381c', 0, .15, (i - 1) * d / 3.4, true));
+  return g;
+}
+function fabPoussinA() {
+  const g = new THREE.Group();
+  const c = P(Sp(.2, 9, 7), '#facc15', 0, .22, 0); c.scale.set(1, .9, 1.1); g.add(c);
+  const bec = P(Co(.04, .1, 4), '#f97316', 0, .42, .24, true); bec.rotation.x = Math.PI / 2;
+  g.add(P(Sp(.14, 8, 6), '#fde047', 0, .42, .1), bec, P(Sp(.025, 4, 3), '#111', -.06, .46, .21, true), P(Sp(.025, 4, 3), '#111', .06, .46, .21, true));
+  for (const x of [-.07, .07]) g.add(P(Cy(.02, .02, .12, 4), '#f97316', x, .05, 0, true));
+  return g;
+}
+function fabCanetonA() {
+  const g = new THREE.Group();
+  const c = P(Sp(.22, 9, 7), '#fde047', 0, .2, 0); c.scale.set(1, .75, 1.3); g.add(c);
+  g.add(P(Sp(.14, 8, 6), '#fde047', 0, .4, .2), P(Bx(.12, .04, .14), '#f97316', 0, .38, .36, true),
+    P(Sp(.025, 4, 3), '#111', -.06, .44, .3, true), P(Sp(.025, 4, 3), '#111', .06, .44, .3, true));
+  return g;
+}
+/* ce que Roullieee porte sur son dos : un produit, un sachet de graines ou l'arrosoir */
+function fabPorteA(k) {
+  if (k.startsWith('graine-')) return fabGraineA(k.slice(7));
+  if (k === 'arrosoir') { const a = fabArrosoirA(); a.scale.setScalar(.55); return a; }
+  return fabMini(k);
+}
+/* un pupitre avec une image (potager niveau 2) */
+function creerPupitre2A(x, z, etat, action) {
+  const g = new THREE.Group(); g.position.set(x, 0, z);
+  g.add(P(Bx(.25, 1.0, .25), '#8a5a3c', 0, .5, 0), P(Bx(1.4, .1, 1.0), '#b5793e', 0, 1.05, 0));
+  mondeA.add(g);
+  cibleA(g, action);
+  return { g, x, z, bulle: bulleA(g, 1.2, etat, action) };
+}
+/* une planche avec une bulle (la frise, le plan, la suite) */
+function creerPanneauA(x, z, w, ofs, etat, action) {
+  const g = new THREE.Group(); g.position.set(x, 0, z);
+  for (const s of [-1, 1]) g.add(P(Bx(.14, 1.5, .14), '#8a5a3c', s * (w / 2 - .2), .75, 0));
+  g.add(P(Bx(w, .9, .12), '#fff8e7', 0, 1.25, .02), P(Bx(w + .2, .1, .2), '#8a5a3c', 0, 1.74, .02));
+  mondeA.add(g);
+  if (action) cibleA(g, action);
+  return { g, bulle: bulleA(g, ofs, etat, action) };
+}
+
+/* ══════════ JEU 5 : LE POTAGER — comment pousse une plante ══════════
+   Niveau 1 : on fait pousser un légume, étape par étape : prendre les
+   graines, semer, arroser (ça pousse avec l'eau et le soleil), récolter,
+   ranger dans le panier. Une étape faite trop tôt est expliquée (« Il faut
+   d'abord semer ! »). Niveau 2 : remettre quatre images dans l'ordre
+   (la carotte, la tomate, le tournesol, la poule, la pomme). Niveau 3 :
+   semer six cases comme sur le plan du jardin (le haut du plan, c'est le
+   fond du jardin), puis la pluie fait tout pousser. */
+const LEGUMES_P = {
+  carotte:   { e: '🥕', les: 'les carottes', des: 'des carottes', une: 'une carotte', prets: 'Les carottes sont prêtes', le: 'les' },
+  tomate:    { e: '🍅', les: 'les tomates', des: 'des tomates', une: 'une tomate', prets: 'Les tomates sont mûres', le: 'les' },
+  mais:      { e: '🌽', les: 'le maïs', des: 'du maïs', une: 'du maïs', prets: 'Le maïs est prêt', le: 'le' },
+  tournesol: { e: '🌻', les: 'les tournesols', des: 'des tournesols', une: 'un tournesol', prets: 'Les tournesols ont fleuri', le: 'les' },
+  ble:       { e: '🌾', les: 'le blé', des: 'du blé', une: 'du blé', prets: 'Le blé est mûr', le: 'le' }
+};
+const SUITES_P = [
+  { q: 'Comment pousse la carotte ?', etapes: [['🌰', 'On sème la graine.'], ['💧', 'On arrose.'], ['🌱', 'La plante pousse.'], ['🥕', 'On récolte les carottes.']] },
+  { q: 'Comment pousse la tomate ?', etapes: [['🌰', 'On sème la graine.'], ['💧', 'On arrose.'], ['🌱', 'La plante pousse.'], ['🍅', 'On cueille les tomates.']] },
+  { q: 'Comment pousse le tournesol ?', etapes: [['🌰', 'On sème la graine.'], ['💧', 'On arrose.'], ['🌱', 'La tige pousse.'], ['🌻', 'La fleur s’ouvre.']] },
+  { q: 'Comment naît une poule ?', etapes: [['🥚', 'La poule pond un œuf.'], ['🐣', 'Le poussin sort de l’œuf.'], ['🐥', 'Le poussin grandit.'], ['🐔', 'Il devient une poule.']] },
+  { q: 'Comment pousse une pomme ?', etapes: [['🌸', 'Le pommier fait des fleurs.'], ['🍏', 'Une petite pomme verte pousse.'], ['🍎', 'La pomme devient rouge.'], ['🧺', 'On cueille la pomme.']] }
+];
+let potA = {};
+function scenePotager(niv) {
+  viderMondeA();
+  sceneCourante = 'potager'; jeuA = 'potager'; nivA = niv; mancheA = 0;
+  nbManches = niv === 2 ? 3 : NB_MANCHES; hudA(jeuA);
+  dindeA.visible = false;
+  decorA([[-9.6, -6.4, 1], [9.4, -6.2, 0], [-3.4, -8.6, 0], [3.8, -8.4, 1]], [[-8.4, 1.6], [8.6, 1.2], [-7.6, 6.4], [7.8, 6.6]]);
+  potA = { niv };
+  if (niv === 0) {
+    /* la terre au fond, le sac à gauche, l'arrosoir à droite, le panier devant */
+    potA.parcelle = poserA(fabParcelleA(3.4, 2.8), 0, -2.6);
+    potA.plantes = new THREE.Group(); potA.plantes.position.set(0, 0, -2.6); mondeA.add(potA.plantes);
+    const allerTerre = () => demander('terre', 0, -.6, terreP, true, [0, -2.6]);
+    cibleA(potA.parcelle, allerTerre);
+    bulleA(potA.parcelle, new THREE.Vector3(0, .5, 1.2), () => potA.etape === 'arrose' ? null : { t: potA.etape === 'mur' ? LEGUMES_P[potA.k].e : '🟫', c: 'caisseA' }, allerTerre);
+    potA.sac = new THREE.Group(); potA.sac.position.set(-4, 0, .4); mondeA.add(potA.sac);
+    const allerSac = () => demander('sac', -4, 1.6, sacP, true, [-4, .4]);
+    cibleA(potA.sac, allerSac);
+    bulleA(potA.sac, 1.4, () => ({ t: '🌰', c: 'caisseA' }), allerSac);
+    /* (dans un groupe : apparaitre() le remet à la taille 1) */
+    potA.arrosoir = poserA(grp(fabArrosoirA()), 4, .4); potA.arrosoir.children[0].scale.setScalar(1.3);
+    const allerEau = () => demander('arrosoir', 4, 1.6, arrosoirP, true, [4, .4]);
+    cibleA(potA.arrosoir, allerEau);
+    bulleA(potA.arrosoir, 1.3, () => potA.arrosoir.visible ? { t: '💧', c: 'caisseA' } : null, allerEau);
+    potA.panier = poserA(fabPanierA(), 2.6, 3.2); potA.panier.scale.setScalar(1.2);
+    const allerPanier = () => demander('panier', 1.4, 3.2, panierP, true, [2.6, 3.2]);
+    cibleA(potA.panier, allerPanier);
+    bulleA(potA.panier, 1.1, () => ({ t: '🧺', c: 'caisseA' }), allerPanier);
+    obstaclesA.push({ x: 0, z: -2.6, r: 2.0 });
+    potA.ordre = melange(Object.keys(LEGUMES_P));
+    cadreA.set(new THREE.Vector3(-5.2, 0, -4.6), new THREE.Vector3(5.2, 2.6, 4.2));
+    zoneMarcheA = [-4.6, -.6, 4.6, 3.6];
+    joueurA.position.set(0, 0, 1.6);
+  } else if (niv === 1) {
+    potA.frise = creerPanneauA(0, -4.2, 5, 1.6, () => {
+      const S = SUITES_P[potA.ordre[mancheA]];
+      return S ? { t: S.etapes.map((e, i) => i < potA.place ? `<span class="case p">${e[0]}</span>` : `<span class="case">${i + 1}</span>`).join(''), c: 'friseA' } : null;
+    });
+    potA.pupitres = [-4.2, -1.4, 1.4, 4.2].map((x, i) => {
+      const O = creerPupitre2A(x, -.4, () => O.carte !== null && O.carte !== undefined ? { t: SUITES_P[potA.ordre[mancheA]].etapes[O.carte][0], c: 'optionA' } : null,
+        () => demander('carte-' + i, x, .8, () => carteP(O), true, [x, -.4]));
+      return O;
+    });
+    potA.ordre = melange([0, 1, 2, 3, 4]);
+    cadreA.set(new THREE.Vector3(-5.6, 0, -5.4), new THREE.Vector3(5.6, 2.8, 3.8));
+    zoneMarcheA = [-5, .6, 5, 3.4];
+    joueurA.position.set(0, 0, 2.6);
+  } else {
+    /* six cases (deux rangées de trois), le plan au fond, trois sacs devant */
+    potA.types = melange(['carotte', 'tomate', 'mais', 'tournesol']).slice(0, 3);
+    potA.cases = [];
+    for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) {
+      const x = (c - 1) * 1.8, z = -3.3 + r * 1.8, o = poserA(fabParcelleA(1.6, 1.6), x, z);
+      const C = { i: r * 3 + c, x, z, obj: o, fait: false, deco: new THREE.Group() };
+      C.deco.position.set(x, 0, z); mondeA.add(C.deco);
+      const action = () => demander('case-' + C.i, x, z + .95, () => semerCaseP(C), true, [x, z]);
+      cibleA(o, action);
+      potA.cases.push(C);
+    }
+    potA.plan = creerPanneauA(0, -5.8, 3.4, 1.85, () => potA.grille ? {
+      t: '<span class="grille">' + potA.grille.map((k, i) => `<span class="${potA.cases[i].fait ? 'ok' : ''}${potA.vu === i && horloge < potA.vuJusqua ? ' vu' : ''}">${LEGUMES_P[k].e}</span>`).join('') + '</span>', c: 'planA' } : null);
+    potA.sacs = potA.types.map((k, i) => {
+      const x = (i - 1) * 3.2, s = poserA(fabSacA(k), x, 2.4);
+      const action = () => demander('sac-' + k, x, 3.5, () => sacPlanP(k, s), false, [x, 2.4]);
+      cibleA(s, action);
+      bulleA(s, 1.35, () => ({ t: LEGUMES_P[k].e, c: 'caisseA' }), action);
+      return { k, x, s };
+    });
+    cadreA.set(new THREE.Vector3(-4.8, 0, -7), new THREE.Vector3(4.8, 2.8, 3.8));
+    zoneMarcheA = [-4.4, -2.4, 4.4, 3.6];
+    joueurA.position.set(0, 0, 3.6);
+  }
+  joueurA.rotation.y = Math.PI;
+  plusTardA(500, () => manchePotager(true));
+}
+function majSacP() {
+  while (potA.sac.children.length) potA.sac.remove(potA.sac.children[0]);
+  potA.sac.add(fabSacA(potA.k));
+}
+function manchePotager(premiere) {
+  occupeA = false; erreursManche = 0;
+  if (potA.niv === 0) {
+    potA.k = potA.ordre[mancheA]; potA.etape = 'semer';
+    while (potA.plantes.children.length) potA.plantes.remove(potA.plantes.children[0]);
+    majSacP(); rebond(potA.sac);
+    const L = LEGUMES_P[potA.k];
+    consigneA(`🌱 On fait pousser ${L.des} ${L.e} ! D’abord : 🌰`, `On va faire pousser ${L.des} !` + (premiere ? ' D’abord, prends les graines : touche le sac.' : ' Touche le sac de graines.'));
+    if (premiere) plusTardA(4000, montrerIndice);
+  } else if (potA.niv === 1) {
+    const S = SUITES_P[potA.ordre[mancheA]];
+    potA.place = 0;
+    const cartes = melange([0, 1, 2, 3]);
+    potA.pupitres.forEach((O, i) => { O.carte = cartes[i]; apparaitre(O.g); });
+    consigneA(`🔢 ${S.q} Remets les images dans l’ordre.`, `${S.q} Remets les images dans l’ordre. Qu’est-ce qui vient en premier ?`);
+  } else {
+    /* un plan au hasard : chaque sorte de graine au moins une fois */
+    const g = melange([...potA.types, ...Array.from({ length: 3 }, () => pick(potA.types))]);
+    potA.grille = g; potA.vu = -1;
+    potA.cases.forEach(C => { C.fait = false; while (C.deco.children.length) C.deco.remove(C.deco.children[0]); });
+    consigneA('🗺️ Sème les graines comme sur le plan !', premiere ? 'Regarde le plan du jardin : sème les graines comme sur le plan ! Prends une graine dans un sac, puis touche la bonne case.' : 'Un nouveau plan ! Sème comme sur le plan.');
+    rebond(potA.plan.g);
+  }
+}
+/* niveau 1 : les étapes */
+function sacP() {
+  if (potA.etape !== 'semer') { dire(potA.etape === 'seme' ? 'Les graines sont déjà dans la terre ! Il leur faut de l’eau.' : 'Les graines sont déjà semées !'); return; }
+  if (RA.porte.includes('graine-' + potA.k)) { dire('Tu as déjà les graines ! Touche la terre pour les semer.'); return; }
+  prendreA('graine-' + potA.k, pos3(-4, .4, 1));
+  consigneA(`🌰 → 🟫 Touche la terre pour semer`, `Voilà les graines ! Maintenant, touche la terre pour les semer.`);
+}
+function arrosoirP() {
+  if (potA.etape === 'semer') { erreursManche++; SFX.non(); voixA = 'Attends ! D’abord, il faut semer les graines. Prends le sac de graines.'; dire(voixA); if (erreursManche >= 2) montrerIndice(); return; }
+  if (potA.etape !== 'seme') { dire('Pas besoin d’eau maintenant !'); return; }
+  if (RA.porte.includes('arrosoir')) { dire('Tu as l’arrosoir ! Touche la terre pour arroser.'); return; }
+  potA.arrosoir.visible = false;
+  RA.porte.push('arrosoir'); majPileA(); SFX.pile();
+  consigneA('💧 → 🟫 Arrose les graines', 'Super ! Maintenant, touche la terre pour arroser les graines.');
+}
+function terreP() {
+  const L = LEGUMES_P[potA.k], p = potA.plantes;
+  if (potA.etape === 'semer') {
+    const i = RA.porte.indexOf('graine-' + potA.k);
+    if (i < 0) { erreursManche++; SFX.non(); voixA = 'Il faut d’abord prendre les graines dans le sac !'; dire(voixA); if (erreursManche >= 2) montrerIndice(); return; }
+    occupeA = true;
+    const depart = retirerDuDos(i);
+    lancerA(fabGraineA(potA.k), depart, () => pos3(0, -2.6, .2), .45, () => {
+      /* les graines dans la terre : des petits points */
+      for (let j = 0; j < 9; j++) p.add(P(Sp(.07, 5, 4), '#3b2412', (j % 3 - 1) * 1.05, .17, (Math.floor(j / 3) - 1) * 1.05, true));
+      SFX.plop(); potA.etape = 'seme'; occupeA = false;
+      consigneA('🌰 semé ! Maintenant : 💧', 'Les graines sont dans la terre. Il leur faut de l’eau pour pousser ! Touche l’arrosoir.');
+    });
+    return;
+  }
+  if (potA.etape === 'seme') {
+    const i = RA.porte.indexOf('arrosoir');
+    if (i < 0) { erreursManche++; SFX.non(); voixA = 'Les graines ont besoin d’eau pour pousser ! Prends l’arrosoir.'; dire(voixA); if (erreursManche >= 2) montrerIndice(); return; }
+    occupeA = true; potA.etape = 'arrose';
+    RA.porte.splice(i, 1); majPileA();
+    /* l'eau tombe, puis ça pousse… pousse… pousse */
+    for (let j = 0; j < 14; j++) {
+      const goutte = P(Sp(.08, 5, 4), '#60a5fa', rand(-1.3, 1.3), 2.6, rand(-3.8, -1.4), true); sceneA.add(goutte);
+      animer(.7 + rand(0, .5), k => { goutte.position.y = 2.6 - k * 2.4; }, () => sceneA.remove(goutte));
+    }
+    SFX.pluie(); dire('On arrose ! Avec l’eau et le soleil, ça pousse… ça pousse… ça pousse !');
+    plusTardA(900, () => {
+      while (p.children.length) p.remove(p.children[0]);
+      const { g, tetes } = fabPlantes(potA.k); p.add(g); potA.tetes = tetes;
+      g.scale.y = .1;
+      animer(3.2, k => { g.scale.y = .1 + .9 * k; }, garde(() => {
+        tetes.forEach(m => { m.material = mat(COULEUR_MUR[potA.k]); });
+        rebond(p); potA.etape = 'mur'; occupeA = false;
+        potA.arrosoir.visible = true; apparaitre(potA.arrosoir);
+        consigneA(`${L.e} ${L.prets} ! Récolte-${L.le}`, `${L.prets} ! Touche-${L.le} pour ${L.le} récolter.`);
+      }));
+    });
+    return;
+  }
+  if (potA.etape === 'arrose') { dire('Attends, ça pousse !'); return; }
+  if (potA.etape === 'mur') {
+    occupeA = true;
+    for (let j = 0; j < 3; j++) plusTardA(j * 260, () => { RA.porte.push(potA.k); RA.enVol++; lancerA(fabMini(potA.k), pos3(rand(-1, 1), -2.6 + rand(-1, 1), .8), hautPileA, .38, () => { RA.enVol--; majPileA(); SFX.pile(); }); });
+    plusTardA(900, () => {
+      while (p.children.length) p.remove(p.children[0]);
+      potA.etape = 'recolte'; occupeA = false;
+      consigneA('🧺 Mets la récolte dans le panier', 'Bravo ! Mets la récolte dans le panier.');
+    });
+    return;
+  }
+  dire('Mets la récolte dans le panier !');
+}
+function panierP() {
+  if (potA.etape !== 'recolte') { dire(potA.etape === 'mur' ? 'Il faut d’abord récolter !' : 'Le panier attend la récolte !'); return; }
+  occupeA = true;
+  const dedans = potA.panier.userData.dedans;
+  const etape = () => {
+    const i = RA.porte.length - 1;
+    if (i < 0) {
+      SFX.achat(); coeurs(potA.panier, 1.4, ['⭐', '✨', LEGUMES_P[potA.k].e]);
+      dire('Bravo ! On a semé, arrosé, ça a poussé, et on a récolté !');
+      mancheFinie();
+      plusTardA(2600, () => { if (mancheA >= nbManches) finNiveau(); else allerA(0, 1.6, () => { RA.tourne = Math.PI; manchePotager(false); }); });
+      return;
+    }
+    const k = RA.porte[i], depart = retirerDuDos(i), n = dedans.children.length;
+    lancerA(fabMini(k), depart, () => potA.panier.localToWorld(new THREE.Vector3((n % 3 - 1) * .25, .45 + Math.floor(n / 6) * .15, (Math.floor(n / 3) % 2 - .5) * .25)), .4, () => {
+      const m = fabMini(k); m.position.set((n % 3 - 1) * .25, Math.floor(n / 6) * .15, (Math.floor(n / 3) % 2 - .5) * .25); dedans.add(m); SFX.pop();
+    });
+    plusTardA(380, etape);
+  };
+  etape();
+}
+/* niveau 2 : la frise */
+function carteP(O) {
+  if (O.carte === null || O.carte === undefined) return;
+  const S = SUITES_P[potA.ordre[mancheA]], [e, phrase] = S.etapes[O.carte];
+  if (O.carte === potA.place) {
+    occupeA = true;
+    O.carte = null;
+    SFX.pop(); flotterA(O.g, e, 1.6);
+    potA.place++;
+    rebond(potA.frise.g);
+    const mots = ['D’abord', 'Ensuite', 'Puis', 'Et enfin'];
+    if (potA.place < 4) { dire(`Oui ! ${mots[potA.place - 1]} : ${phrase.charAt(0).toLowerCase() + phrase.slice(1)}`); occupeA = false; return; }
+    SFX.achat(); coeurs(potA.frise.g, 2, ['⭐', '✨', '🎉']);
+    dire('Bravo ! ' + S.etapes.map((x, i) => `${mots[i]}, ${x[1].charAt(0).toLowerCase() + x[1].slice(1)}`).join(' '));
+    mancheFinie();
+    plusTardA(5200, () => { if (mancheA >= nbManches) finNiveau(); else allerA(0, 2.6, () => { RA.tourne = Math.PI; manchePotager(false); }); });
+    return;
+  }
+  erreursManche++; SFX.non(); secouer(O.g);
+  voixA = `Pas encore ! Ça, c’est : ${phrase.charAt(0).toLowerCase() + phrase.slice(1)} Qu’est-ce qui se passe ${potA.place ? 'juste après' : 'en premier'} ?`;
+  dire(voixA);
+  if (erreursManche >= 2) plusTardA(900, montrerIndice);
+}
+/* niveau 3 : le plan */
+function sacPlanP(k, s) {
+  if (!prendreA('graine-' + k, pos3(s.position.x, s.position.z, 1))) return;
+  rebond(s);
+  plusTardA(330, () => dire(`Une graine ${k === 'mais' ? 'de maïs' : k === 'tournesol' ? 'de tournesol' : 'de ' + (k === 'carotte' ? 'carotte' : 'tomate')}.`));
+}
+function semerCaseP(C) {
+  potA.vu = C.i; potA.vuJusqua = horloge + 1.6;
+  if (C.fait) { dire('Ici, c’est déjà semé !'); return; }
+  const k = potA.grille[C.i], L = LEGUMES_P[k], i = RA.porte.lastIndexOf('graine-' + k);
+  if (i < 0) {
+    erreursManche++; SFX.non();
+    voixA = RA.porte.some(x => x.startsWith('graine-')) ? `Regarde le plan : ici, il faut ${L.une} !` : 'Prends d’abord une graine dans un sac !';
+    dire(voixA);
+    if (erreursManche >= 2) plusTardA(700, montrerIndice);
+    return;
+  }
+  const depart = retirerDuDos(i);
+  C.fait = true;
+  lancerA(fabGraineA(k), depart, () => pos3(C.x, C.z, .2), .4, () => {
+    /* une petite pousse et son étiquette, comme au jardin */
+    C.deco.add(P(Co(.12, .35, 5), '#4caf50', 0, .3, 0, true), P(Cy(.03, .03, .7, 4), '#8a5a3c', .5, .45, .5, true));
+    const et = grp(P(Bx(.36, .3, .04), '#fff8e7', 0, 0, 0, true)), m = fabMini(k); m.scale.setScalar(.8); m.position.z = .04; et.add(m);
+    et.position.set(.5, .85, .5); C.deco.add(et); SFX.plop();
+    if (potA.cases.every(c => c.fait)) gardenFiniP();
+    else dire(`Oui, ${L.une} !`);
+  });
+}
+function gardenFiniP() {
+  occupeA = true;
+  dire('Bravo ! Ton jardin est comme sur le plan ! Voilà la pluie… et tout pousse !');
+  SFX.pluie();
+  for (let j = 0; j < 30; j++) {
+    const goutte = P(Sp(.07, 5, 4), '#60a5fa', rand(-2.6, 2.6), 4, rand(-4.3, -.6), true); sceneA.add(goutte);
+    const d = rand(0, .8);
+    animer(1 + d, k => { goutte.position.y = 4 - Math.max(0, k * (1 + d) - d) * 4.2; }, () => sceneA.remove(goutte));
+  }
+  plusTardA(1100, () => {
+    potA.cases.forEach(C => {
+      const { g, tetes } = fabPlantes(potA.grille[C.i]); g.scale.set(.42, .1, .42); C.deco.add(g);
+      animer(2.4, k => { g.scale.y = .1 + .32 * k; }, () => tetes.forEach(m => { m.material = mat(COULEUR_MUR[potA.grille[C.i]]); }));
+    });
+    SFX.achat(); confettis(40);
+    mancheFinie();
+    plusTardA(3400, () => { if (mancheA >= nbManches) finNiveau(); else allerA(0, 3.6, () => { RA.tourne = Math.PI; manchePotager(false); }); });
+  });
+}
+function indicePotager() {
+  if (potA.niv === 0) {
+    const e = potA.etape;
+    if (e === 'semer') return RA.porte.some(k => k.startsWith('graine-')) ? { x: 0, z: -2.6, h: 2.6, obj: potA.parcelle } : { x: -4, z: .4, h: 2.8, obj: potA.sac };
+    if (e === 'seme') return RA.porte.includes('arrosoir') ? { x: 0, z: -2.6, h: 2.6, obj: potA.parcelle } : { x: 4, z: .4, h: 2.6, obj: potA.arrosoir };
+    if (e === 'mur') return { x: 0, z: -2.6, h: 3, obj: potA.parcelle };
+    if (e === 'recolte') return { x: 2.6, z: 3.2, h: 2.6, obj: potA.panier };
+    return null;
+  }
+  if (potA.niv === 1) { const O = potA.pupitres.find(o => o.carte === potA.place); return O ? { x: O.x, z: O.z, h: 3.3, obj: O.g } : null; }
+  const C = potA.cases.find(c => !c.fait);
+  if (!C) return null;
+  const k = potA.grille[C.i];
+  if (RA.porte.includes('graine-' + k)) return { x: C.x, z: C.z, h: 2.2 };
+  const s = potA.sacs.find(x => x.k === k);
+  return { x: s.x, z: 2.4, h: 2.7, obj: s.s };
+}
+
+/* ══════════ JEU 6 : RANGER L'ÉTAL — trier, classer, continuer une suite ══════════
+   Niveaux 1 et 2 : Roullieee prend les produits du grand panier un par un
+   (la voix les nomme) et on les range dans la bonne caisse : rouge ou jaune
+   (niveau 1), vient d'un animal ou d'une plante (niveau 2 : la voix dit
+   d'où vient chaque produit). Une erreur ? Le produit reste dans ses bras
+   et la voix explique. Niveau 3 : sur l'étal, une suite (pomme, carotte,
+   pomme, carotte…) : on prend ce qui vient après et on le pose. */
+const PRODUITS_E = {
+  tomate:    { la: 'la tomate', La: 'La tomate', un: 'une tomate', il: 'Elle', coul: 'rouge', type: 'plante', ori: 'La tomate pousse sur une plante.' },
+  pomme:     { la: 'la pomme', La: 'La pomme', un: 'une pomme', il: 'Elle', coul: 'rouge', type: 'plante', ori: 'La pomme pousse sur un arbre.' },
+  mais:      { la: 'le maïs', La: 'Le maïs', un: 'un épi de maïs', il: 'Il', coul: 'jaune', type: 'plante', ori: 'Le maïs pousse dans les champs.' },
+  fromage:   { la: 'le fromage', La: 'Le fromage', un: 'un fromage', il: 'Il', coul: 'jaune', type: 'animal', ori: 'Le fromage est fait avec le lait de la vache.' },
+  tournesol: { la: 'le tournesol', La: 'Le tournesol', un: 'un tournesol', il: 'Il', coul: 'jaune', type: 'plante', ori: 'Le tournesol est une fleur.' },
+  oeuf:      { la: 'l’œuf', La: 'L’œuf', un: 'un œuf', il: 'Il', type: 'animal', ori: 'L’œuf vient de la poule.' },
+  lait:      { la: 'le lait', La: 'Le lait', un: 'une bouteille de lait', il: 'Il', type: 'animal', ori: 'Le lait vient de la vache.' },
+  laine:     { la: 'la laine', La: 'La laine', un: 'une pelote de laine', il: 'Elle', type: 'animal', ori: 'La laine vient du mouton.' },
+  miel:      { la: 'le miel', La: 'Le miel', un: 'un pot de miel', il: 'Il', type: 'animal', ori: 'Le miel est fait par les abeilles.' },
+  carotte:   { la: 'la carotte', La: 'La carotte', un: 'une carotte', il: 'Elle', type: 'plante', ori: 'La carotte pousse dans la terre.' },
+  ble:       { la: 'le blé', La: 'Le blé', un: 'une botte de blé', il: 'Il', type: 'plante', ori: 'Le blé pousse dans les champs.' }
+};
+const NOMS_SUITE = { pomme: 'pomme', carotte: 'carotte', oeuf: 'œuf', mais: 'maïs', lait: 'lait', fromage: 'fromage' };
+let etalA = {};
+function fabTableEtalA(w) {
+  const g = grp(P(Bx(w, .12, 1.4), '#b5793e', 0, .86, 0));
+  for (const x of [-w / 2 + .2, w / 2 - .2]) for (const z of [-.55, .55]) g.add(P(Bx(.14, .8, .14), '#8a5a3c', x, .4, z));
+  for (const x of [-w / 2 + .1, w / 2 - .1]) g.add(P(Cy(.06, .06, 2.4, 6), '#8a5a3c', x, 1.2, -.62));
+  g.add(P(Bx(w - .1, .03, .03), '#ffffff', 0, 2.3, -.62, true));
+  for (let i = 0; i < Math.round(w / .48); i++) { const f = P(Pr(.32, .38, .03), ['#ef4444', '#facc15', '#3b82f6', '#22c55e'][i % 4], -w / 2 + .3 + i * .48, 2.29, -.62, true); f.rotation.z = Math.PI; g.add(f); }
+  return g;
+}
+function sceneEtal(niv) {
+  viderMondeA();
+  sceneCourante = 'etal'; jeuA = 'etal'; nivA = niv; mancheA = 0;
+  nbManches = niv === 2 ? NB_MANCHES : 4; hudA(jeuA);
+  dindeA.visible = false;
+  decorA([[-9.4, -6.2, 1], [9.4, -6, 0], [-3.6, -8.4, 1], [3.8, -8.6, 0]], [[-8.2, 1.4], [8.4, 1], [-7.6, 6.2], [7.8, 6.4]]);
+  etalA = { niv };
+  etalA.table = poserA(fabTableEtalA(niv === 2 ? 7.6 : 6.4), 0, -3.2);
+  if (niv < 2) {
+    /* deux caisses sur l'étal ; le grand panier devant */
+    const signes = niv === 0 ? [['rouge', '🔴', '#ef4444'], ['jaune', '🟡', '#facc15']] : [['animal', '🐔 🐄', '#fde68a'], ['plante', '🌱 🌳', '#bbf7d0']];
+    etalA.caisses = signes.map(([id, e, coul], i) => {
+      const x = (i ? 1 : -1) * 1.7, c = poserA(fabCaisse(), x, -3.1); c.position.y = .92; c.scale.setScalar(1.25);
+      c.add(P(Bx(1.1, .4, .05), coul, 0, .32, .48, true));
+      const dedans = new THREE.Group(); dedans.position.y = .66; c.add(dedans);
+      const Cg = { id, e, x, obj: c, dedans };
+      const action = () => demander('caisse-' + id, x, -1.6, () => rangerE(Cg), true, [x, -3.1]);
+      cibleA(c, action);
+      bulleA(c, 1.05, () => ({ t: e, c: 'panneau' }), action);
+      return Cg;
+    });
+    etalA.panier = poserA(fabPanierA(), 0, 2.2); etalA.panier.scale.setScalar(1.5);
+    const allerPanier = () => demander('panier', 0, .9, prendreE, true, [0, 2.2]);
+    cibleA(etalA.panier, allerPanier);
+    bulleA(etalA.panier, 1.2, () => etalA.reste && etalA.reste.length ? { t: '🧺', c: 'caisseA' } : null, allerPanier);
+    obstaclesA.push({ x: 0, z: 2.2, r: 1.1 });
+    cadreA.set(new THREE.Vector3(-4.6, 0, -4.4), new THREE.Vector3(4.6, 2.8, 3.6));
+    zoneMarcheA = [-4, -1.6, 4, .9];
+    joueurA.position.set(0, 0, -.2);
+  } else {
+    /* la suite sur l'étal ; trois caisses de produits devant */
+    etalA.surTable = new THREE.Group(); etalA.surTable.position.set(0, 0, -3.2); mondeA.add(etalA.surTable);
+    const allerEtal = () => demander('etal', 0, -1.7, poserSuiteE, true, [0, -3.2]);
+    cibleA(etalA.table, allerEtal);
+    etalA.bulle = bulleA(etalA.table, 2.5, () => etalA.suite ? { t: etalA.suite.map((k, i) => i < etalA.montre ? `<span>${ITEMS[k].e}</span>` : '<span class="vide"></span>').join(''), c: 'suiteA' } : null, allerEtal);
+    etalA.options = [];
+    cadreA.set(new THREE.Vector3(-4.8, 0, -4.6), new THREE.Vector3(4.8, 3.4, 3.8));
+    zoneMarcheA = [-4.4, -1.7, 4.4, 1.4];
+    joueurA.position.set(0, 0, -.2);
+  }
+  joueurA.rotation.y = 0;
+  plusTardA(500, () => mancheEtal(true));
+}
+function mancheEtal(premiere) {
+  occupeA = false; erreursManche = 0;
+  if (etalA.niv < 2) {
+    etalA.caisses.forEach(C => { while (C.dedans.children.length) C.dedans.remove(C.dedans.children[0]); });
+    /* quatre produits, des deux sortes */
+    const pool = etalA.niv === 0 ? { rouge: ['tomate', 'pomme'], jaune: ['mais', 'fromage', 'tournesol'] } : { animal: ['oeuf', 'lait', 'laine', 'miel', 'fromage'], plante: ['carotte', 'tomate', 'pomme', 'mais', 'ble'] };
+    const [a, b] = Object.keys(pool);
+    etalA.reste = melange([pick(pool[a]), pick(pool[a]), pick(pool[b]), pick(pool[b])]);
+    majPanierE();
+    if (etalA.niv === 0) consigneA('🧺 → 🔴 🟡 Range par couleur', premiere ? 'Range l’étal ! Les produits rouges vont dans la caisse rouge, les jaunes dans la caisse jaune. Touche le panier pour prendre un produit.' : 'De nouveaux produits ! Range-les par couleur.');
+    else consigneA('🧺 → 🐔 ou 🌱 ?', premiere ? 'Range l’étal ! Ce qui vient d’un animal va avec les animaux, ce qui vient d’une plante va avec les plantes. Touche le panier.' : 'De nouveaux produits ! Animal ou plante ?');
+    if (premiere) plusTardA(5000, montrerIndice);
+  } else {
+    const motifs = [[0, 1], [0, 1], [0, 0, 1], [0, 1, 1], [0, 1, 2]], motif = motifs[mancheA];
+    const prod = melange(['pomme', 'carotte', 'oeuf', 'mais', 'lait']), items = prod.slice(0, motif.includes(2) ? 3 : 2);
+    etalA.suite = Array.from({ length: 8 }, (_, i) => items[motif[i % motif.length]]);
+    etalA.montre = 6;
+    /* les caisses : ce qu'il faut, et un intrus quand il reste de la place */
+    const choix = melange(items.length === 3 ? items : [...items, prod[2]]);
+    etalA.options.forEach(C => retirerA(C.obj));
+    etalA.options = choix.map((k, i) => creerCaisseA(k, (i - 1) * 3, 1.8, prendreSuiteE));
+    while (etalA.surTable.children.length) etalA.surTable.remove(etalA.surTable.children[0]);
+    etalA.suite.slice(0, 6).forEach((k, i) => poserSurEtalE(k, i));
+    const lu = etalA.suite.slice(0, 6).map(k => NOMS_SUITE[k]).join(', ');
+    consigneA('❓ Qu’est-ce qui vient après ?', `Regarde la suite : ${lu}… Qu’est-ce qui vient après ?`);
+    rebond(etalA.table);
+  }
+}
+function majPanierE() {
+  const d = etalA.panier.userData.dedans;
+  while (d.children.length) d.remove(d.children[0]);
+  etalA.reste.forEach((k, i) => { const m = fabMini(k); m.position.set((i % 2 - .5) * .3, Math.floor(i / 2) * .16, (i % 3 - 1) * .1); d.add(m); });
+}
+function prendreE() {
+  if (RA.porte.length) { dire(`Range d’abord ${PRODUITS_E[RA.porte[0]].la} !`); return; }
+  if (!etalA.reste.length) return;
+  const k = etalA.reste.pop(); majPanierE();
+  prendreA(k, pos3(0, 2.2, 1.2));
+  plusTardA(350, () => { const P0 = PRODUITS_E[k]; dire(majuscule(P0.un) + ' ! ' + (etalA.niv === 0 ? 'De quelle couleur ?' : 'Animal ou plante ?')); });
+}
+function rangerE(Cg) {
+  if (!RA.porte.length) { voixA = etalA.reste.length ? 'Prends d’abord un produit dans le panier !' : ''; dire(voixA || 'Tout est rangé !'); return; }
+  const k = RA.porte[0], P0 = PRODUITS_E[k], bon = (etalA.niv === 0 ? P0.coul : P0.type) === Cg.id;
+  if (!bon) {
+    erreursManche++; SFX.non(); secouer(Cg.obj);
+    voixA = etalA.niv === 0 ? `${P0.La} est ${P0.coul} ! ${P0.il} va dans la caisse ${P0.coul}.` : `${P0.ori} ${P0.il} va avec ${P0.type === 'animal' ? 'les animaux' : 'les plantes'} !`;
+    dire(voixA);
+    if (erreursManche >= 2) plusTardA(800, montrerIndice);
+    return;
+  }
+  occupeA = true;
+  const depart = retirerDuDos(0), n = Cg.dedans.children.length;
+  lancerA(fabMini(k), depart, () => Cg.obj.localToWorld(new THREE.Vector3((n % 3 - 1) * .3, .7, 0)), .42, () => {
+    const m = fabMini(k); m.position.set((n % 3 - 1) * .3, Math.floor(n / 3) * .18, (n % 2) * .15 - .07); Cg.dedans.add(m); SFX.pop(); rebond(Cg.obj);
+    occupeA = false;
+    if (!etalA.reste.length) {
+      SFX.achat(); coeurs(Cg.obj, 1.6, ['⭐', '✨', '🧺']);
+      dire(`Oui ! ${etalA.niv === 0 ? P0.La + ' est ' + P0.coul + '.' : P0.ori} Bravo, l’étal est bien rangé !`);
+      occupeA = true; mancheFinie();
+      plusTardA(2800, () => { if (mancheA >= nbManches) finNiveau(); else mancheEtal(false); });
+    } else dire(`Oui ! ${etalA.niv === 0 ? P0.La + ' est ' + P0.coul + '.' : P0.ori}`);
+  });
+}
+/* niveau 3 : la suite */
+function poserSurEtalE(k, i) {
+  const m = fabMini(k); m.scale.setScalar(1.5);
+  m.position.set(-3.15 + i * .9, 1.08, .1); etalA.surTable.add(m);
+  return m;
+}
+function prendreSuiteE(C) {
+  if (RA.porte.length) { dire(`Tu as déjà ${PRODUITS_E[RA.porte[0]].un} ! Pose-le sur l’étal.`); return; }
+  if (prendreA(C.k, pos3(C.x, C.z, 1))) { rebond(C.obj); plusTardA(330, () => dire(NOMS_SUITE[C.k])); }
+}
+function poserSuiteE() {
+  if (!RA.porte.length) { voixA = `Regarde la suite : ${etalA.suite.slice(0, etalA.montre).map(k => NOMS_SUITE[k]).join(', ')}… Prends ce qui vient après dans une caisse !`; dire(voixA); montrerIndice(); return; }
+  const k = RA.porte[0], attendu = etalA.suite[etalA.montre];
+  if (k !== attendu) {
+    erreursManche++; SFX.non();
+    const C = etalA.options.find(c => c.k === k), depart = retirerDuDos(0);
+    lancerA(fabMini(k), depart, () => pos3(C.x, C.z, .9), .55, () => rebond(C.obj));
+    voixA = `Hum… Écoute bien : ${etalA.suite.slice(0, etalA.montre).map(x => NOMS_SUITE[x]).join(', ')}… et après ? Essaie encore !`;
+    dire(voixA);
+    if (erreursManche >= 2) plusTardA(900, montrerIndice);
+    return;
+  }
+  occupeA = true;
+  const i = etalA.montre, depart = retirerDuDos(0);
+  lancerA(fabMini(k), depart, () => etalA.surTable.localToWorld(new THREE.Vector3(-3.15 + i * .9, 1.08, .1)), .42, () => {
+    poserSurEtalE(k, i); etalA.montre++; SFX.pop(); occupeA = false;
+    const lu = etalA.suite.slice(0, etalA.montre).map(x => NOMS_SUITE[x]).join(', ');
+    if (etalA.montre >= 8) {
+      occupeA = true; SFX.achat(); coeurs(etalA.table, 2.6, ['⭐', '✨', '🎉']);
+      dire(`${majuscule(lu)} ! Bravo, tu as continué la suite !`);
+      mancheFinie();
+      plusTardA(3600, () => { if (mancheA >= nbManches) finNiveau(); else mancheEtal(false); });
+    } else { voixA = `Oui ! ${majuscule(lu)}… et après ?`; dire(voixA); }
+  });
+}
+function indiceEtal() {
+  if (etalA.niv < 2) {
+    if (!RA.porte.length) return etalA.reste.length ? { x: 0, z: 2.2, h: 2.8, obj: etalA.panier } : null;
+    const P0 = PRODUITS_E[RA.porte[0]], C = etalA.caisses.find(c => c.id === (etalA.niv === 0 ? P0.coul : P0.type));
+    return { x: C.x, z: -3.1, h: 3, obj: C.obj };
+  }
+  const attendu = etalA.suite[etalA.montre];
+  if (RA.porte[0] === attendu) return { x: 0, z: -3.2, h: 3.2, obj: etalA.table };
+  const C = etalA.options.find(c => c.k === attendu);
+  return C ? { x: C.x, z: C.z, h: 2.9, obj: C.obj } : null;
+}
+
+/* ══════════ JEU 7 : LE CONCERT DE LA FERME — écouter, se souvenir ══════════
+   Quatre animaux sur une estrade. Niveau 1 : on entend un cri, sans voir
+   qui chante : qui fait ce bruit ? Niveaux 2 et 3 : les animaux chantent
+   une petite chanson (2 ou 3 cris, puis 3 à 5) ; on la rejoue en touchant
+   les animaux dans le même ordre, comme le jeu « Simon ». Ici on touche les
+   animaux directement (pas besoin d'y aller) ; 🔊 fait réentendre. */
+const MUSICIENS = {
+  vache:  { fab: fabVache, e: '🐄', La: 'La vache', la: 'la vache', cri: 'meuh', ech: .62, h: 1.6 },
+  mouton: { fab: fabMouton, e: '🐑', La: 'Le mouton', la: 'le mouton', cri: 'bê', ech: .85, h: 1.6 },
+  cochon: { fab: fabCochon, e: '🐷', La: 'Le cochon', la: 'le cochon', cri: 'groin groin', ech: .85, h: 1.5 },
+  poule:  { fab: fabPoule, e: '🐔', La: 'La poule', la: 'la poule', cri: 'cot cot codet', ech: 1.05, h: 1.6 },
+  canard: { fab: fabCanard, e: '🦆', La: 'Le canard', la: 'le canard', cri: 'coin coin', ech: 1.6, h: 1.4 },
+  chien:  { fab: fabChien, e: '🐶', La: 'Le chien', la: 'le chien', cri: 'ouaf ouaf', ech: 1.35, h: 1.6 },
+  chat:   { fab: fabChat, e: '🐱', La: 'Le chat', la: 'le chat', cri: 'miaou', ech: 1.45, h: 1.5 }
+};
+let concertA = {};
+function sceneConcert(niv) {
+  viderMondeA();
+  sceneCourante = 'concert'; jeuA = 'concert'; nivA = niv; mancheA = 0; hudA(jeuA);
+  dindeA.visible = false;
+  decorA([[-9.4, -6.2, 1], [9.4, -6, 0], [-4, -8.2, 0], [4.2, -8.4, 1]], [[-8.2, 1.4], [8.4, 1], [-7.6, 6.2], [7.8, 6.4]]);
+  /* l'estrade, un fond et des fanions */
+  mondeA.add(P(Cy(6.4, 6.6, .3, 24, 1), '#c98b4b', 0, .15, -3.4));
+  const fond = grp(P(Bx(11, 3, .2), '#7c3aed', 0, 1.5, 0), P(Bx(11.2, .2, .3), '#5b21b6', 0, 3.05, 0));
+  for (let i = 0; i < 18; i++) { const f = P(Pr(.4, .45, .03), ['#ef4444', '#facc15', '#3b82f6', '#22c55e'][i % 4], -5.1 + i * .6, 2.9, .15, true); f.rotation.z = Math.PI; fond.add(f); }
+  fond.position.set(0, 0, -6.6); mondeA.add(fond);
+  const ids = melange(niv === 0 ? Object.keys(MUSICIENS) : ['vache', 'mouton', 'cochon', 'poule', 'canard', 'chien']).slice(0, 4);
+  const places = [[-4.5, -2.2], [-1.5, -3.5], [1.5, -3.5], [4.5, -2.2]];
+  concertA = { niv, mus: ids.map((id, i) => {
+    const M = MUSICIENS[id], [x, z] = places[i];
+    const socle = P(Cy(.95, 1.05, .45, 16), '#fde68a', x, .52, z); mondeA.add(socle);
+    const g = new THREE.Group(); g.position.set(x, .75, z);
+    const corps = M.fab(); corps.scale.setScalar(M.ech); g.add(corps); mondeA.add(g);
+    const A = { id, M, x, z, g, socle };
+    const action = () => toucherMusicien(A);
+    cibleA(g, action); cibleA(socle, action);
+    A.bulle = bulleA(g, M.h, () => ({ t: M.e, c: 'caisseA' }), action);
+    return A;
+  }) };
+  rejouerA = () => { if (!occupeA) ecouterConcert(); };
+  cadreA.set(new THREE.Vector3(-5.8, 0, -6.8), new THREE.Vector3(5.8, 3.4, 3.4));
+  zoneMarcheA = [-1, 1.8, 1, 2.6];
+  joueurA.position.set(0, 0, 2.2); joueurA.rotation.y = Math.PI;
+  plusTardA(500, () => mancheConcert(true));
+}
+/* un animal chante : il saute, sa note s'envole, son socle s'allume */
+function chanter(A, voixAussi) {
+  rebond(A.g); SFX[A.id](); flotterA(A.g, '🎵', A.M.h + .4);
+  A.socle.material = mat('#ffd23f'); A.bulle.brille = horloge + .9;
+  plusTardA(800, () => { A.socle.material = mat('#fde68a'); });
+  RA.tourne = Math.atan2(A.x - joueurA.position.x, A.z - joueurA.position.z);
+  if (voixAussi) dire(A.M.cri);
+}
+function mancheConcert(premiere) {
+  erreursManche = 0;
+  const C = concertA;
+  if (C.niv === 0) {
+    const autres = C.mus.filter(A => A !== C.cible);
+    C.cible = pick(autres);
+    occupeA = true;
+    consigneA('👂 Qui fait ce bruit ?', premiere ? 'Écoute bien… Qui fait ce bruit ? Touche l’animal qui chante.' : 'Écoute bien… Qui fait ce bruit ?');
+    plusTardA(premiere ? 3600 : 2200, () => { SFX[C.cible.id](); plusTardA(900, () => { occupeA = false; }); });
+  } else {
+    const longs = C.niv === 1 ? [2, 2, 3, 3, 3] : [3, 4, 4, 5, 5], n = longs[mancheA];
+    C.seq = [];
+    while (C.seq.length < n) { const A = pick(C.mus.filter(x => x !== C.seq[C.seq.length - 1])); C.seq.push(A); }
+    occupeA = true;   /* on attend d'avoir entendu la chanson avant de toucher */
+    consigneA(`🎵 Écoute la chanson, puis rejoue-la (${n} 🎵)`, premiere ? `Écoute la chanson des animaux, puis rejoue-la en les touchant dans le même ordre !` : `Une nouvelle chanson ! Écoute bien.`);
+    plusTardA(premiere ? 4200 : 2200, jouerChanson);
+  }
+}
+function jouerChanson() {
+  const C = concertA, pas = C.niv === 1 ? 1450 : 1250;
+  occupeA = true; C.pos = 0;
+  C.seq.forEach((A, i) => plusTardA(i * pas, () => chanter(A)));
+  plusTardA(C.seq.length * pas + 200, () => { occupeA = false; dire('À toi !'); dernierToucherA = horloge; });
+}
+function ecouterConcert() {
+  ac(); SFX.pop();
+  if (concertA.niv === 0) { occupeA = true; dire('Écoute…'); plusTardA(900, () => { SFX[concertA.cible.id](); plusTardA(900, () => { occupeA = false; }); }); }
+  else jouerChanson();
+}
+function toucherMusicien(A) {
+  const C = concertA;
+  if (occupeA) return;
+  dernierToucherA = horloge; flecheA.visible = false; relancesA = 0;
+  if (C.niv === 0) {
+    if (A === C.cible) {
+      occupeA = true; chanter(A);
+      plusTardA(700, () => dire(`Bravo ! C’est ${A.M.la} qui fait ${A.M.cri} !`));
+      SFX.achat(); coeurs(A.g, A.M.h, ['⭐', '🎵', '✨']);
+      mancheFinie();
+      plusTardA(3400, () => { if (mancheA >= nbManches) finNiveau(); else mancheConcert(false); });
+      return;
+    }
+    erreursManche++; occupeA = true; chanter(A);
+    voixA = `Non, ça, c’est ${A.M.la} : ${A.M.cri}. Écoute encore…`;
+    plusTardA(900, () => dire(voixA));
+    plusTardA(3600, () => { SFX[C.cible.id](); plusTardA(900, () => { occupeA = false; if (erreursManche >= 2) montrerIndice(); }); });
+    return;
+  }
+  /* niveaux 2 et 3 : rejouer la chanson dans l'ordre */
+  chanter(A);
+  if (A === C.seq[C.pos]) {
+    C.pos++;
+    if (C.pos >= C.seq.length) {
+      occupeA = true; SFX.achat(); confettis(30);
+      plusTardA(600, () => dire('Bravo ! Tu as rejoué toute la chanson !'));
+      mancheFinie();
+      plusTardA(3200, () => { if (mancheA >= nbManches) finNiveau(); else mancheConcert(false); });
+    }
+    return;
+  }
+  erreursManche++; occupeA = true; SFX.non();
+  voixA = 'Oups ! Ce n’était pas le bon. Écoute encore la chanson.';
+  plusTardA(500, () => dire(voixA));
+  plusTardA(2600, jouerChanson);
+}
+function indiceConcert() {
+  const C = concertA, A = C.niv === 0 ? C.cible : C.seq && C.seq[C.pos];
+  return A ? { x: A.x, z: A.z, h: A.M.h + 2.2, obj: A.g } : null;
+}
+
+/* ══════════ JEU 8 : LES BÉBÉS ANIMAUX — mamans et petits ══════════
+   Niveau 1 : un bébé s'est échappé : on le prend et on le ramène à sa
+   maman (le veau → la vache). Niveau 2 : tous les bébés sont sortis ;
+   la voix en nomme un (« Trouve l'agneau ! ») : on le trouve, puis on le
+   ramène. Niveau 3 : le mémory des familles : dix cases retournées, on
+   retrouve chaque maman et son bébé (ici on touche les cases directement).
+   Le vocabulaire : veau, agneau et brebis, porcelet et truie, poussin,
+   chevreau, caneton et cane. */
+const FAMILLES = {
+  vache:  { fab: fabVache, mE: .55, bE: .3, Maman: 'La vache', maman: 'la vache', bebe: 'le veau', Bebe: 'Le veau', du: 'du veau', cri: 'vache' },
+  mouton: { fab: fabMouton, mE: .72, bE: .4, Maman: 'La brebis', maman: 'la brebis', bebe: 'l’agneau', Bebe: 'L’agneau', du: 'de l’agneau', cri: 'mouton' },
+  cochon: { fab: fabCochon, mE: .72, bE: .38, Maman: 'La truie', maman: 'la truie', bebe: 'le porcelet', Bebe: 'Le porcelet', du: 'du porcelet', cri: 'cochon' },
+  poule:  { fab: fabPoule, fabB: fabPoussinA, mE: .9, bE: 1.1, Maman: 'La poule', maman: 'la poule', bebe: 'le poussin', Bebe: 'Le poussin', du: 'du poussin', cri: 'poule' },
+  chevre: { fab: fabChevre, mE: .85, bE: .46, Maman: 'La chèvre', maman: 'la chèvre', bebe: 'le chevreau', Bebe: 'Le chevreau', du: 'du chevreau', cri: 'chevre' },
+  canard: { fab: fabCanard, fabB: fabCanetonA, mE: 1.4, bE: 1.2, Maman: 'La cane', maman: 'la cane', bebe: 'le caneton', Bebe: 'Le caneton', du: 'du caneton', cri: 'canard' }
+};
+let bebesA = {};
+function fabAnimalA(F, bebe) { const g = new THREE.Group(), c = (bebe && F.fabB ? F.fabB : F.fab)(); c.scale.setScalar(bebe ? F.bE : F.mE); g.add(c); return g; }
+function sceneBebes(niv) {
+  viderMondeA();
+  sceneCourante = 'bebes'; jeuA = 'bebes'; nivA = niv; mancheA = 0; hudA(jeuA);
+  dindeA.visible = false;
+  decorA([[-9.4, -6.2, 1], [9.4, -6, 0], [-3.6, -8.4, 1], [3.8, -8.6, 0]], [[-8.2, 1.4], [8.4, 1], [-7.6, 6.2], [7.8, 6.4]]);
+  bebesA = { niv, porte: null };
+  if (niv < 2) {
+    const ids = melange(Object.keys(FAMILLES)).slice(0, niv === 0 ? 3 : 4), xs = ids.length === 3 ? [-3.8, 0, 3.8] : [-4.8, -1.6, 1.6, 4.8];
+    bebesA.parcs = ids.map((id, i) => {
+      const F = FAMILLES[id], x = xs[i], z = -3.2, g = new THREE.Group(); g.position.set(x, 0, z);
+      g.add(P(Bx(2.6, .04, 2.2), '#a5dc7c', 0, .03, 0, true), fabBarriere(2.8, 2.4, '#fff3dc'));
+      mondeA.add(g);
+      const maman = fabAnimalA(F, false); maman.position.set(x, 0, z - .2); mondeA.add(maman);
+      const P0 = { id, F, x, z, g, maman, quai: [x, z + 2.0] };
+      const action = () => demander('parc-' + id, P0.quai[0], P0.quai[1], () => rendreB(P0), true, [x, z]);
+      cibleA(g, action); cibleA(maman, action);
+      bulleA(g, 2.1, () => ({ t: '🏠', c: 'caisseA' }), action);
+      /* le bébé, d'abord près de sa maman */
+      P0.bebe = { P: P0, F, id, obj: fabAnimalA(F, true), libre: false, cible: null, attente: 0, ph: rand(0, 6) };
+      P0.bebe.obj.position.set(x + .7, 0, z + .3); mondeA.add(P0.bebe.obj);
+      const prendre = () => {
+        const b = P0.bebe;
+        if (!b.libre) { action(); return; }
+        if (occupeA) return;
+        b.attente = 99;   /* il attend Roullieee */
+        demander('bebe-' + id, b.obj.position.x, b.obj.position.z + .9, () => prendreB(b), true, [b.obj.position.x, b.obj.position.z]);
+      };
+      cibleA(P0.bebe.obj, prendre);
+      /* un biberon au-dessus des bébés échappés : on voit où toucher (sans dire lequel c'est) */
+      bulleA(P0.bebe.obj, 1.0, () => P0.bebe.libre && P0.bebe !== bebesA.porte ? { t: '🍼', c: 'caisseA bebeA' } : null, prendre);
+      return P0;
+    });
+    const bord = Math.max(...xs) + 1.6;
+    cadreA.set(new THREE.Vector3(-bord, 0, -4.8), new THREE.Vector3(bord, 2.6, 3.8));
+    zoneMarcheA = [-bord + .6, -1.2, bord - .6, 3.4];
+    joueurA.position.set(0, 0, 2.8);
+  } else {
+    /* le mémory : 10 cases, 5 familles */
+    const ids = melange(Object.keys(FAMILLES)).slice(0, 5);
+    const cartes = melange(ids.flatMap(id => [{ id, bebe: false }, { id, bebe: true }]));
+    bebesA.cases = cartes.map((c, i) => {
+      const x = (i % 5 - 2) * 2.2, z = -3 + Math.floor(i / 5) * 2.4, F = FAMILLES[c.id];
+      const tuile = P(Bx(1.7, .16, 1.7), '#c4b5fd', x, .08, z); mondeA.add(tuile);
+      const animal = fabAnimalA(F, c.bebe); animal.children[0].scale.multiplyScalar(1.4); animal.position.set(x, .16, z); animal.visible = false; mondeA.add(animal);
+      const q = new THREE.Sprite(matQuestion); q.scale.setScalar(.95); q.position.set(x, .9, z); mondeA.add(q);
+      const T = { ...c, F, x, z, tuile, animal, q, ouverte: false, trouvee: false };
+      cibleA(tuile, () => retournerB(T));
+      cibleA(animal, () => retournerB(T));
+      return T;
+    });
+    nbManches = 5;
+    cadreA.set(new THREE.Vector3(-5.6, 0, -4.4), new THREE.Vector3(5.6, 2.2, 1.8));
+    zoneMarcheA = [-1, 2, 1, 3];
+    joueurA.position.set(0, 0, 2.6);
+  }
+  joueurA.rotation.y = Math.PI;
+  plusTardA(500, () => mancheBebes(true));
+}
+function nomBebe(b) { return b.F.bebe; }
+function mancheBebes(premiere) {
+  erreursManche = 0;
+  const B = bebesA;
+  if (B.niv === 0) {
+    /* un bébé s'échappe de son parc */
+    const P0 = pick(B.parcs.filter(p => p !== B.dernier)); B.dernier = P0;
+    B.cible = P0.bebe;
+    libererB(P0.bebe);
+    consigneA(`😢 ${P0.F.Bebe} s’est échappé ! Ramène-le à sa maman`, `Oh non ! ${P0.F.Bebe} s’est échappé ! ` + (premiere ? 'Touche-le pour le prendre, puis ramène-le à sa maman.' : 'Ramène-le à sa maman !'));
+    occupeA = false;
+    if (premiere) plusTardA(5000, montrerIndice);
+  } else if (B.niv === 1) {
+    /* quand il n'y a presque plus de bébés dehors, ils s'échappent tous */
+    if (B.parcs.filter(p => p.bebe.libre).length < 2) { B.parcs.forEach(p => libererB(p.bebe)); dire('Oh ! Les bébés se sont échappés !'); }
+    const dehors = B.parcs.filter(p => p.bebe.libre && p.bebe !== B.cible).map(p => p.bebe);
+    B.cible = pick(dehors);
+    plusTardA(1400, () => { consigneA(`🔎 Trouve ${nomBebe(B.cible)} !`, `Trouve ${nomBebe(B.cible)} ! ` + (premiere ? 'Touche-le, puis ramène-le à sa maman.' : '')); occupeA = false; });
+  } else {
+    consigneA('❓ Retrouve chaque maman et son bébé', premiere ? 'Le mémory des familles ! Retourne deux cases : trouve une maman et son bébé.' : '');
+    occupeA = false;
+  }
+}
+function libererB(b) {
+  if (b.libre) return;
+  b.libre = true; b.attente = 0;
+  b.cible = new THREE.Vector3(rand(-3.5, 3.5), 0, rand(-.6, 1.6));
+  SFX[b.F.cri]();
+}
+function bougerBebesA(dt, t) {
+  if (!bebesA.parcs) return;
+  for (const P0 of bebesA.parcs) {
+    const b = P0.bebe, p = b.obj.position;
+    if (b === bebesA.porte) continue;
+    if (!b.libre) continue;
+    if (b.attente > 0) { b.attente -= dt; p.y = 0; continue; }
+    const dx = b.cible.x - p.x, dz = b.cible.z - p.z, d = Math.hypot(dx, dz);
+    if (d < .15) { b.attente = rand(1.5, 3.5); b.cible = new THREE.Vector3(clamp(p.x + rand(-1.6, 1.6), -4.5, 4.5), 0, clamp(p.z + rand(-1, 1), -.6, 1.8)); continue; }
+    const s = Math.min(d, 1.6 * dt);
+    p.x += dx / d * s; p.z += dz / d * s;
+    b.obj.rotation.y = angle(b.obj.rotation.y, Math.atan2(dx, dz), .15);
+    p.y = Math.abs(Math.sin(t * 10 + b.ph)) * .08;
+  }
+  /* le bébé recherché saute de temps en temps */
+  const c = bebesA.cible;
+  if (c && c.libre && c !== bebesA.porte && Math.sin(t * 2.4) > .97 && !c.saut) { c.saut = true; rebond(c.obj); plusTardA(600, () => { c.saut = false; }); }
+}
+function prendreB(b) {
+  const B = bebesA;
+  if (B.porte) { b.attente = 1; dire(`Ramène d’abord ${nomBebe(B.porte)} à sa maman !`); return; }
+  if (B.niv === 1 && b !== B.cible) {
+    erreursManche++; SFX.non(); rebond(b.obj); b.attente = 1;
+    voixA = `Ça, c’est ${nomBebe(b)}, le bébé de ${b.F.maman}. Trouve ${nomBebe(B.cible)} !`;
+    dire(voixA);
+    if (erreursManche >= 2) plusTardA(900, montrerIndice);
+    return;
+  }
+  /* dans les bras de Roullieee */
+  B.porte = b;
+  joueurA.add(b.obj); b.obj.position.set(0, 1.55, .45); b.obj.rotation.set(0, 0, 0);
+  SFX[b.F.cri](); rebond(joueurA);
+  if (B.niv === 1) dire(`Oui, c’est ${nomBebe(b)} ! Ramène-le à sa maman.`);
+  else dire(`${b.F.Bebe} ! Où est sa maman ?`);
+  consigneA(`🏠 Ramène ${nomBebe(b)} à sa maman`, '');
+}
+function rendreB(P0) {
+  const B = bebesA, b = B.porte;
+  if (!b) { voixA = B.cible ? `Prends d’abord ${nomBebe(B.cible)} !` : ''; if (voixA) dire(voixA); montrerIndice(); return; }
+  if (b.P !== P0) {
+    erreursManche++; SFX.non(); secouer(P0.maman);
+    voixA = erreursManche >= 2 ? `Ce n’est pas sa maman ! La maman ${b.F.du}, c’est ${b.F.maman}.` : `Ce n’est pas sa maman ! C’est ${P0.F.maman}. Cherche encore !`;
+    dire(voixA);
+    if (erreursManche >= 2) plusTardA(900, montrerIndice);
+    return;
+  }
+  occupeA = true;
+  /* le bébé retrouve sa maman */
+  joueurA.remove(b.obj); mondeA.add(b.obj);
+  const a = pos3(joueurA.position.x, joueurA.position.z, 1.4), dest = new THREE.Vector3(P0.x + .7, 0, P0.z + .3);
+  animer(.6, k => { b.obj.position.lerpVectors(a, dest, k); b.obj.position.y = a.y * (1 - k) + Math.sin(k * Math.PI) * 1.2; }, garde(() => { b.obj.position.y = 0; rebond(b.obj); rebond(P0.maman); }));
+  B.porte = null; b.libre = false;
+  SFX[b.F.cri](); plusTardA(500, () => SFX[b.F.cri]());
+  coeurs(P0.maman, 1.6, ['❤️', '💕', '✨']); SFX.achat();
+  dire(`${b.F.Bebe} a retrouvé sa maman, ${b.F.maman} !`);
+  mancheFinie();
+  plusTardA(3000, () => { if (mancheA >= nbManches) finNiveau(); else mancheBebes(false); });
+}
+/* niveau 3 : le mémory */
+function retournerB(T) {
+  const B = bebesA;
+  if (occupeA || T.ouverte || T.trouvee) return;
+  dernierToucherA = horloge; relancesA = 0;
+  ac(); SFX.pop();
+  T.ouverte = true; T.q.visible = false; T.animal.visible = true; apparaitre(T.animal);
+  T.tuile.material = mat('#ede9fe');
+  RA.tourne = Math.atan2(T.x - joueurA.position.x, T.z - joueurA.position.z);
+  dire(T.bebe ? T.F.Bebe : T.F.Maman);
+  if (!B.premiere) { B.premiere = T; return; }
+  const A = B.premiere; B.premiere = null;
+  occupeA = true;
+  if (A.id === T.id) {
+    A.trouvee = T.trouvee = true;
+    plusTardA(900, () => {
+      const [m, b] = A.bebe ? [T, A] : [A, T];
+      SFX[T.F.cri](); SFX.achat(); coeurs(m.animal, 1.6, ['❤️', '💕', '✨']); coeurs(b.animal, 1, ['❤️', '✨']);
+      dire(`${m.F.Maman} et son bébé, ${m.F.bebe} !`);
+      [A, T].forEach(x => { x.tuile.material = mat('#bbf7d0'); });
+      mancheFinie();
+      plusTardA(2400, () => { occupeA = false; if (mancheA >= nbManches) finNiveau(); });
+    });
+    return;
+  }
+  plusTardA(1900, () => {
+    [A, T].forEach(x => { x.ouverte = false; x.animal.visible = false; x.q.visible = true; x.tuile.material = mat('#c4b5fd'); });
+    occupeA = false;
+  });
+}
+function indiceBebes() {
+  const B = bebesA;
+  if (B.niv === 2) return null;
+  if (B.porte) { const P0 = B.porte.P; return { x: P0.x, z: P0.z, h: 3.2, obj: P0.g }; }
+  const b = B.cible;
+  return b && b.libre ? { x: b.obj.position.x, z: b.obj.position.z, h: 2 } : null;
+}
+
 /* ── la flèche d'aide : quand l'enfant hésite, après deux erreurs, ou avec 🔊 ── */
 function montrerIndice() {
-  const c = ({ livraison: indiceLivraison, nourrir: indiceNourrir, syllabes: indiceSyllabes, pompon: indicePompon, ferme: indiceFerme })[sceneCourante]();
+  const c = ({ livraison: indiceLivraison, nourrir: indiceNourrir, syllabes: indiceSyllabes, pompon: indicePompon, potager: indicePotager,
+    etal: indiceEtal, concert: indiceConcert, bebes: indiceBebes, ferme: indiceFerme })[sceneCourante]();
   if (!c) return;
   flecheA.userData.y = c.h; flecheA.userData.obj = c.obj || null; flecheA.position.set(c.x, c.h, c.z); flecheA.visible = true;
   flecheA.userData.jusqua = horloge + 8;
@@ -4633,6 +5616,8 @@ function indicesA() {
   const delai = sceneCourante === 'ferme' ? 14 : [7, 10, 13][nivA];
   if (horloge - dernierToucherA < delai) return;
   dernierToucherA = horloge;
+  /* le concert : on fait réentendre (la flèche donnerait la réponse) */
+  if (rejouerA) { if (relancesA < 2) { relancesA++; rejouerA(); } return; }
   /* la consigne est redite deux fois au plus ; ensuite, seule la flèche revient (sans parler) */
   if (voixA && relancesA < 2) { relancesA++; dire(voixA); }
   montrerIndice();
@@ -4683,6 +5668,7 @@ function boucleApprendre(dt, t) {
   deplacerA(dt, t);
   majFileA();
   betesA.forEach(b => bougerBeteA(b, dt, t));
+  if (sceneCourante === 'bebes') bougerBebesA(dt, t);
   /* dans la petite ferme, la dinde suit Roullieee */
   if (dindeA.visible) {
     const derriere = new THREE.Vector3(-Math.sin(joueurA.rotation.y) * 1.5, 0, -Math.cos(joueurA.rotation.y) * 1.5).add(joueurA.position);
