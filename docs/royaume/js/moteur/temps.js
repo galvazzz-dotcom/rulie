@@ -7,8 +7,15 @@ let mode = 'vraie';
 export const regler = m => { mode = m; };
 export const modeHeure = () => mode;
 
+/* une heure « forcée » pour un moment (le coq de Gaston fait venir le matin…) */
+let force = null;
+export const forcerHeure = (h, ms) => { force = { h, fin: Date.now() + ms }; };
+export const finForcage = () => { force = null; };
+export const heureForcee = () => (force && Date.now() < force.fin ? force : null);
+
 /* l'heure (de 0 à 24, avec les minutes) */
 export function heure() {
+  if (heureForcee()) return force.h;
   if (mode === 'jour') return 11;
   if (mode === 'nuit') return 23;
   const d = new Date();
@@ -46,3 +53,6 @@ export function lumiere(h = heure()) {
 }
 const smooth = x => { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); };
 export const estNuit = (h = heure()) => lumiere(h).nuit > .5;
+/* les moments qui comptent pour les dindies sauvages */
+export const estMatin = (h = heure()) => h >= 6 && h < 12;
+export const estJour = (h = heure()) => !estNuit(h);

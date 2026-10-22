@@ -5,16 +5,16 @@ import { ESPECES, PAR_ID } from '../donnees/especes.js';
 import { TYPES, RARETES, ORDRE_TYPES } from '../donnees/types.js';
 import { variante } from '../dindies/adn.js';
 import { portraitDindie } from '../dindies/portrait.js';
-import { fenetre, toast, $, $$, el, echapper, barre, fermerTout } from '../moteur/ui.js';
+import { fenetre, toast, $, $$, el, echapper, barre, fermerTout, fenetreOuverte, enDialogue } from '../moteur/ui.js';
 import { pop, tada, glouglou } from '../moteur/sons.js';
 import * as J from '../jeu/etat.js';
-import { OBJETS, enBoutique } from '../jeu/objets.js';
+import { OBJETS, enBoutique, meilleurFilet } from '../jeu/objets.js';
+import { texteConditions, regleDe } from '../donnees/regions.js';
 import { CARACTERES, NOMS_RIGOLOS, nomDe, stats, xpPourNiveau, vaDans } from '../jeu/individus.js';
 import * as S from '../jeu/scenario.js';
-import { QUETES } from '../jeu/scenario.js';
+import { QUETES, CHAPITRES } from '../jeu/scenario.js';
 import * as SAUVE from '../moteur/sauvegarde.js';
-import { LIEUX, ORDRE_ENCLOS } from '../monde/domaine.js';
-import { forme } from '../monde/decor.js';
+import { ORDRE_ENCLOS } from '../monde/domaine.js';
 
 const E = () => J.etat();
 const PASTILLE = { commune: '⚪', rare: '🔵', epique: '🟣', mythique: '🌈' };
@@ -30,7 +30,7 @@ export function ouvrirBoutique() {
   const dessiner = () => {
     const ids = Object.keys(OBJETS).filter(id => enBoutique(id, E()));
     F.contenu.innerHTML = `<p class="bourse">Tu as <b>${E().pieces} 🪙</b></p><div class="rayons">` + ids.map(id => {
-      const O = OBJETS[id], q = id === 'friandise' ? 5 : 1;
+      const O = OBJETS[id], q = id === 'friandise' || O.prefere ? 5 : 1;
       return `<div class="article"><span class="em">${O.e}</span><div><b>${O.nom}</b><small>${O.desc}</small><small class="possede">Tu en as : ${J.combien(id)}</small></div>
         <button class="btn acheter" data-id="${id}" data-q="${q}" ${E().pieces < O.prix * q ? 'disabled' : ''}>${q > 1 ? q + ' pour ' : ''}${O.prix * q} 🪙</button></div>`;
     }).join('') + '</div>';
@@ -61,7 +61,11 @@ export function ouvrirLabo() {
     pop();
     const C = ['Touche une dindie pour voir sa fiche : tu peux la nourrir, la caresser ou la déplacer.', 'Chaque habitat accueille les dindies de son type. Le Clapier, lui, accueille tout le monde !',
       'Le courrier arrive chaque jour dans la boîte aux lettres, près de ta maison.', 'La nuit, les dindies dorment. Chut !', 'Fais un vœu à la fontaine : on ne sait jamais…',
-      'Glisse ton doigt sur l’écran pour te déplacer comme avec un joystick, ou touche l’endroit où aller.'];
+      'Glisse ton doigt sur l’écran pour te déplacer comme avec un joystick, ou touche l’endroit où aller.',
+      'Pour attraper une dindie sauvage : des friandises d’abord (sa préférée compte double), puis le filet quand le cercle blanc passe dans la zone verte !',
+      'Chaque jour, des coffres, des œufs mystère et des pierres d’éveil sont cachés dans les îles. Ouvre l’œil !',
+      'Une dindie sur 64 naît chromatique ✨ : ses couleurs sont toutes différentes. Une vraie rareté !',
+      'Dans la maison, le mode aide rend la capture plus facile.'];
     toast('💡 ' + C[Math.floor(Math.random() * C.length)], { duree: 4500 });
   };
 }
@@ -99,7 +103,7 @@ function pageLivre(id) {
     <p><span class="pill rar">${PASTILLE[e.rarete]} ${R.nom}</span> ${v ? e.types.map(t => `<span class="pill">${TYPES[t].e} ${TYPES[t].nom}</span>`).join(' ') : ''}</p>
     ${a ? `<p>${e.desc}</p><p class="cri">« ${e.cri} »</p>${['⚡ Vitesse', '💪 Endurance', '🦘 Saut'].map((t, i) => `<div class="stat"><span>${t}</span>${barre(e.stats[i] / 10, R.couleur)}<b>${e.stats[i]}</b></div>`).join('')}`
       : v ? `<p>Tu l’as déjà vue, mais pas encore attrapée.</p>` : '<p>Tu ne l’as encore jamais vue…</p>'}
-    <p class="indice">${indice(e)}</p></div>`);
+    <p class="indice">${indice(e)}</p>${v && regleDe(id) ? `<p class="indice">🔎 ${texteConditions(id, nomObjet)}.</p>` : ''}</div>`);
 }
 
 /* ── le Musée : les portraits des espèces attrapées, dans des cadres dorés ── */
@@ -206,9 +210,10 @@ export function ouvrirEnclos(type, { surChange } = {}) {
 
 /* ── le sac ── */
 export function ouvrirSac() {
-  const inv = Object.entries(E().inventaire).filter(([, q]) => q > 0);
+  const inv = Object.entries(E().inventaire).filter(([id, q]) => q > 0 && OBJETS[id]);
   const imp = inv.filter(([id]) => OBJETS[id]?.important), autres = inv.filter(([id]) => !OBJETS[id]?.important);
-  const ligne = ([id, q]) => `<div class="article"><span class="em">${OBJETS[id].e}</span><div><b>${OBJETS[id].nom}${q > 1 ? ' × ' + q : ''}</b><small>${OBJETS[id].desc}</small></div></div>`;
+  const filet = meilleurFilet(E().inventaire);
+  const ligne = ([id, q]) => `<div class="article"><span class="em">${OBJETS[id].e}</span><div><b>${OBJETS[id].nom}${q > 1 ? ' × ' + q : ''}${id === filet ? ' · <i class="pill">utilisé</i>' : ''}</b><small>${OBJETS[id].desc}</small></div></div>`;
   fenetre('🎒 Mon sac', `<p class="bourse">🪙 <b>${E().pieces}</b> pièces · 🪶 <b>${E().plumesOr}</b> plume${E().plumesOr > 1 ? 's' : ''} d’or</p>
     ${imp.length ? `<h3>⭐ Objets importants</h3>${imp.map(ligne).join('')}` : ''}<h3>🧺 Objets</h3>${autres.map(ligne).join('') || '<p class="petitTexte">Ton sac est vide.</p>'}`);
 }
@@ -216,28 +221,35 @@ export function ouvrirSac() {
 /* ── le journal des quêtes ── */
 export function ouvrirJournal() {
   const e = E(), cur = S.queteDe(e.quete.etape);
-  fenetre('📜 Journal des quêtes', `<p class="chapitre">Chapitre 1 : Le Domaine en ruine</p>` + QUETES.map(Q => {
-    const finie = e.quete.finies.includes(Q.id), active = cur && cur.id === Q.id;
-    if (!finie && !active) return `<div class="quete verrou">🔒 ???</div>`;
-    return `<div class="quete ${finie ? 'finie' : 'active'}"><b>${finie ? '✅' : '📜'} ${Q.titre}</b>${active ? `<p>➡️ ${S.texteEtape()}</p>` : ''}
-      <small>Récompense : ${Q.recompense.pieces || 0} 🪙${Object.keys(Q.recompense.objets || {}).map(o => ' + ' + OBJETS[o].e).join('')}</small></div>`;
-  }).join('') + (e.quete.etape === 'fin' ? '<div class="quete active"><b>🎈 Chapitre 2 : l’expédition aux Prés</b><p>Bientôt !</p></div>' : ''));
+  const chap = cur ? cur.chapitre : 3;
+  let h = '';
+  for (const [n, titre] of Object.entries(CHAPITRES)) {
+    if (+n > chap) { h += `<p class="chapitre verrou">🔒 Chapitre ${n} : ${+n === chap + 1 ? titre + ' (bientôt !)' : '???'}</p>`; break; }
+    h += `<p class="chapitre">Chapitre ${n} : ${titre}</p>` + QUETES.filter(Q => Q.chapitre === +n).map(Q => {
+      const finie = e.quete.finies.includes(Q.id), active = cur && cur.id === Q.id;
+      if (!finie && !active) return `<div class="quete verrou">🔒 ???</div>`;
+      return `<div class="quete ${finie ? 'finie' : 'active'}"><b>${finie ? '✅' : '📜'} ${Q.titre}</b>${active ? `<p>➡️ ${S.texteEtape()}</p>` : ''}
+        <small>Récompense : ${Q.recompense.pieces || 0} 🪙${Q.recompense.plumesOr ? ' + ' + Q.recompense.plumesOr + ' 🪶' : ''}${Object.keys(Q.recompense.objets || {}).map(o => ' + ' + OBJETS[o].e).join('')}</small></div>`;
+    }).join('');
+    if (!QUETES.some(Q => Q.chapitre === +n)) h += '<div class="quete active"><b>🥚 Bientôt !</b><p>Le Couvoir, les œufs et les premiers croisements arrivent à la prochaine étape.</p></div>';
+  }
+  fenetre('📜 Journal des quêtes', h);
 }
 
-/* ── la carte du Domaine (on peut toucher un lieu pour y aller) ── */
-export function ouvrirCarte({ position, cible, allerA }) {
-  const W = 120, H = 100, X = x => (x + 60) / 120 * W, Z = z => (z + 50) / 100 * H;
+/* ── la carte du lieu où l'on est (on peut toucher un endroit pour y aller) ── */
+export function ouvrirCarte({ titre, forme, a, b, lieux, position, cible, allerA }) {
+  const W = 120, H = Math.round(120 * b / a), X = x => (x + a * 1.18) / (a * 2.36) * W, Z = z => (z + b * 1.18) / (b * 2.36) * H;
   let contour = '';
-  for (let k = 0; k <= 120; k++) { const th = k / 120 * Math.PI * 2; let lo = .3, hi = 1.6; for (let it = 0; it < 22; it++) { const m = (lo + hi) / 2; if (forme(Math.cos(th) * 54 * m, Math.sin(th) * 46 * m) < 1) lo = m; else hi = m; } contour += (k ? 'L' : 'M') + X(Math.cos(th) * 54 * lo).toFixed(1) + ' ' + Z(Math.sin(th) * 46 * lo).toFixed(1); }
-  const lieux = Object.entries(LIEUX).map(([id, l]) => `<g class="lieuCarte" data-id="${id}"><circle cx="${X(l.x)}" cy="${Z(l.z)}" r="5.2" fill="#fff" stroke="#b45309" stroke-width=".8"/><text x="${X(l.x)}" y="${Z(l.z) + 2}" font-size="6" text-anchor="middle">${l.e}</text></g>`).join('');
-  const F = fenetre('🗺️ La carte du Domaine', `<svg class="carteSvg" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="#5fd0f3"/><path d="${contour}Z" fill="#8fd16a" stroke="#f3dfa2" stroke-width="2"/>
-    ${lieux}${cible ? `<text x="${X(cible[0])}" y="${Z(cible[1]) - 5}" font-size="7" text-anchor="middle">⭐</text>` : ''}
+  for (let k = 0; k <= 120; k++) { const th = k / 120 * Math.PI * 2; let lo = .3, hi = 1.6; for (let it = 0; it < 22; it++) { const m = (lo + hi) / 2; if (forme(Math.cos(th) * a * m, Math.sin(th) * b * m) < 1) lo = m; else hi = m; } contour += (k ? 'L' : 'M') + X(Math.cos(th) * a * lo).toFixed(1) + ' ' + Z(Math.sin(th) * b * lo).toFixed(1); }
+  const pts = lieux.map((l, i) => `<g class="lieuCarte" data-i="${i}"><circle cx="${X(l.x)}" cy="${Z(l.z)}" r="5.2" fill="#fff" stroke="#b45309" stroke-width=".8"/><text x="${X(l.x)}" y="${Z(l.z) + 2}" font-size="6" text-anchor="middle">${l.e}</text></g>`).join('');
+  const F = fenetre(titre, `<svg class="carteSvg" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="#5fd0f3"/><path d="${contour}Z" fill="#8fd16a" stroke="#f3dfa2" stroke-width="2"/>
+    ${pts}${cible ? `<text x="${X(cible[0])}" y="${Z(cible[1]) - 5}" font-size="7" text-anchor="middle">⭐</text>` : ''}
     <circle cx="${X(position[0])}" cy="${Z(position[1])}" r="2.6" fill="#ea580c" stroke="#fff" stroke-width="1"/></svg>
     <p class="petitTexte">● C’est toi. ⭐ C’est là que t’attend ta quête. Touche un lieu pour y aller !</p><div id="cLieu" class="petitTexte"></div>`, { large: true });
   $$('.lieuCarte', F.el).forEach(g => g.onclick = () => {
-    const l = LIEUX[g.dataset.id]; pop();
+    const l = lieux[+g.dataset.i]; pop();
     $('#cLieu', F.el).innerHTML = `<b>${l.e} ${l.nom}</b> <button class="btn petit vert" id="cAller">🚶 Y aller</button>`;
-    $('#cAller', F.el).onclick = () => { F.fermer(); allerA(l.x, l.z + (g.dataset.id === 'place' ? 4 : 0)); };
+    $('#cAller', F.el).onclick = () => { F.fermer(); allerA(l.x, l.z + (l.x === 0 && l.z === 0 ? 4 : 0)); };
   });
 }
 
@@ -249,6 +261,7 @@ export function ouvrirMaison({ appliquerReglages, changerProfil, idProfil }) {
     <label class="reglage"><input type="checkbox" id="mSon" ${r.son ? 'checked' : ''}> 🔊 Les sons</label>
     <label class="reglage"><input type="checkbox" id="mMus" ${r.musique ? 'checked' : ''}> 🎵 La musique</label>
     <label class="reglage"><input type="checkbox" id="mVoix" ${r.voix ? 'checked' : ''}> 🗣️ La voix lit les dialogues</label>
+    <label class="reglage"><input type="checkbox" id="mAide" ${r.aide ? 'checked' : ''}> 🧸 Mode aide : la capture est plus facile</label>
     <label class="reglage">🕐 L’heure du jeu :
       <select id="mHeure"><option value="vraie">la vraie heure</option><option value="jour">toujours le jour</option><option value="nuit">toujours la nuit</option></select></label>
     <h3>💾 Sauvegarde</h3>
@@ -258,10 +271,12 @@ export function ouvrirMaison({ appliquerReglages, changerProfil, idProfil }) {
     <div class="ligneBtn"><button class="btn vert" id="mCharger">📥 Charger un code</button><label class="btn jaune">📂 Charger un fichier<input type="file" id="mFile" accept=".txt" hidden></label></div>
     <h3>👤 Profil</h3>
     <p class="petitTexte">Tu joues avec le profil <b>${echapper(E().profil.nom)}</b>.</p>
-    <button class="btn" id="mProfil">👥 Changer de profil</button>`);
+    <button class="btn" id="mProfil">👥 Changer de profil</button>
+    <h3>🎵 Crédits</h3><button class="btn petit" id="mCredits">🎶 Les musiques du jeu</button>`);
   $('#mHeure', F.el).value = r.heure;
-  const maj = () => { r.son = $('#mSon', F.el).checked; r.musique = $('#mMus', F.el).checked; r.voix = $('#mVoix', F.el).checked; r.heure = $('#mHeure', F.el).value; appliquerReglages(); J.changer('reglages'); };
-  ['#mSon', '#mMus', '#mVoix', '#mHeure'].forEach(s => $(s, F.el).onchange = maj);
+  const maj = () => { r.son = $('#mSon', F.el).checked; r.musique = $('#mMus', F.el).checked; r.voix = $('#mVoix', F.el).checked; r.aide = $('#mAide', F.el).checked; r.heure = $('#mHeure', F.el).value; appliquerReglages(); J.changer('reglages'); };
+  ['#mSon', '#mMus', '#mVoix', '#mAide', '#mHeure'].forEach(s => $(s, F.el).onchange = maj);
+  $('#mCredits', F.el).onclick = () => { pop(); credits(); };
   $('#mCode', F.el).onclick = () => {
     const z = $('#mZone', F.el), c = SAUVE.exporterCode(E());
     z.classList.remove('cache'); z.value = c; z.select();
@@ -326,4 +341,33 @@ export function voeu(effet) {
   if (e.quotidien.voeu !== aujourdhui()) { e.quotidien.voeu = aujourdhui(); e.plumesOr++; J.changer('pieces'); toast('✨ Ton vœu brille… Une <b>plume d’or</b> 🪶 tombe dans ta main !', { duree: 3500 }); return; }
   const V = ['Plouf ! Ton vœu est parti dans l’eau…', 'La fontaine fait des bulles. C’est bon signe !', 'Un poisson te fait un clin d’œil.', 'Tu entends un tout petit glouglou au fond de l’eau…'];
   toast('⛲ ' + V[Math.floor(Math.random() * V.length)]);
+}
+
+/* ── les crédits des musiques (toutes libres : voir musique/CREDITS.md) ── */
+export function credits() {
+  fenetre('🎶 Les musiques', `<p class="petitTexte">Toutes les musiques du jeu sont libres. Merci à leurs auteurs !</p>
+    <h3>Domaine public</h3><p>• <b>Searchlight Rag</b> — Scott Joplin (1907)<br>• <b>Das Alpenhorn</b> (orgue de foire) — air traditionnel<br><small>Versions du projet libre <b>OpenRCT2 OpenMusic</b>.</small></p>
+    <h3>CC BY-SA 3.0</h3><p>• <b>Harvest Festival</b>, <b>Albian Nocturne</b>, <b>Solstice Festival</b>, <b>Mountain Idyll</b>, <b>Peaks of Atlas</b>, <b>Mirage</b>, <b>Water’s Edge</b><br>
+    <small>Musique d’<b>Omri Lahav</b> pour le jeu libre <b>0 A.D.</b>, © Wildfire Games (wildfiregames.com), licence Creative Commons Attribution - Partage dans les mêmes conditions 3.0. Converties en MP3, volume égalisé.</small></p>
+    <p class="petitTexte">Le détail est dans le fichier <code>musique/CREDITS.md</code> du jeu.</p>`);
+}
+/* « un chapeau de soleil », « un parapluie »… */
+export const nomObjet = id => ({ filet: 'un filet', chapeauSoleil: 'un chapeau de soleil 👒', parapluie: 'un parapluie ☂️' })[id] || (OBJETS[id] ? OBJETS[id].nom : id);
+
+/* ── la fin d'un chapitre ── */
+export function finChapitre(n) {
+  /* on attend que la carte de la dindie attrapée (ou un dialogue) soit fermée */
+  if (fenetreOuverte() || enDialogue()) { setTimeout(() => finChapitre(n), 600); return; }
+  tada();
+  const T = {
+    1: ['🎉 Fin du chapitre 1 !', '🏡🦃🎈', 'Tu as réparé le Domaine, adopté tes premières dindies et réparé la montgolfière du Capitaine Zéphyr. Bravo, exploratrice !',
+      '<b>Le chapitre 2 commence : l’expédition !</b> Va voir le Capitaine Zéphyr au port : direction les Prés, où vivent des dindies sauvages.'],
+    2: ['🎉 Fin du chapitre 2 !', '🌿🏜️💧', `Les Prés, le Maroc imaginaire, la Belgique : tu as attrapé les dindies de 3 îles, et même le Coquelicot, la Dinde Dingue et l’Atomium !`,
+      '<b>La suite :</b> le chapitre 3, <b>le premier œuf</b> : le Couvoir, la Nurserie et les premiers croisements… arrive bientôt !']
+  }[n];
+  if (!T) return;
+  const F = fenetre(T[0], `<div class="finChap"><p class="grosEmoji">${T[1]}</p><p>${T[2]}</p><p>${T[3]}</p>
+    <p class="petitTexte">En attendant : explore les îles chaque jour (coffres, œufs mystère, pierres d’éveil), prends soin de tes dindies et cherche les chromatiques ✨ !</p>
+    <button class="btn grand vert" id="finOk">Super !</button></div>`, { classe: 'finChapF' });
+  $('#finOk', F.el).onclick = () => { pop(); F.fermer(); };
 }

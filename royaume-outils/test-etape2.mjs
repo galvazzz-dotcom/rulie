@@ -100,7 +100,7 @@ try {
   await aller('objet-corde'); await agir('objet-corde'); await attendreEtape('toile'); await log('corde trouvée');
   await parlerMimi('toile', false); await attendreEtape('ballon'); await fermer();
   await aller('pnj-zephyr', false); await agir('pnj-zephyr'); await pg.waitForTimeout(400);
-  await jusqua('fin'); await pg.waitForTimeout(600); await pg.screenshot({ path: `${OUT}/fin.png` });
+  await jusqua('decollage'); await pg.waitForTimeout(600); await pg.screenshot({ path: `${OUT}/fin.png` });
   await pg.evaluate(() => document.getElementById('finOk')?.click()); await pg.waitForTimeout(1200);
   await pg.screenshot({ path: `${OUT}/ballon.png` });
   await log(`chapitre 1 fini en ${((Date.now() - t0) / 1000).toFixed(0)} s`);

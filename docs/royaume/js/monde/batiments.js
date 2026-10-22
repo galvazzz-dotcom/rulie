@@ -4,7 +4,7 @@
    Les fenêtres ont leur propre matériau : elles s'allument la nuit. */
 import * as THREE from 'three';
 import { sphere, demiSphere, cylindre, cone, tore, boite, prisme, fusion } from '../moteur/formes.js';
-import { toon, contourPour, TONS, texRonde } from '../moteur/materiaux.js';
+import { toon, contourPour, TONS, texRonde, partager } from '../moteur/materiaux.js';
 import { assombrir, eclaircir, hasard } from '../moteur/couleurs.js';
 import { TYPES } from '../donnees/types.js';
 
@@ -16,7 +16,7 @@ const SP = (c, p, s, r = [0, 0, 0]) => ({ g: sphere(16, 12), c, p, s, r });
 const DS = (c, p, s, r = [0, 0, 0]) => ({ g: demiSphere(20, 10), c, p, s, r });
 const TO = (c, p, s, r = [0, 0, 0], ep = .3, arc = Math.PI * 2) => ({ g: tore(1, ep, arc), c, p, s, r });
 
-export const matFenetres = new THREE.MeshToonMaterial({ gradientMap: TONS, vertexColors: true, emissive: '#ffc95c', emissiveIntensity: 0 });
+export const matFenetres = partager(new THREE.MeshToonMaterial({ gradientMap: TONS, vertexColors: true, emissive: '#ffc95c', emissiveIntensity: 0 }));
 const aJeter = [];
 function construire(parts, fen = [], ep = .035) {
   const g = new THREE.Group();

@@ -1,7 +1,7 @@
 /* ══════════ LE DÉCOR DU DOMAINE : l'île, la mer, les chemins, la végétation, les lampes ══════════ */
 import * as THREE from 'three';
 import { sphere, cylindre, cone, boite, fusion } from '../moteur/formes.js';
-import { toon, contour, contourPour, TONS, texRonde } from '../moteur/materiaux.js';
+import { toon, contour, contourPour, TONS, texRonde, partager } from '../moteur/materiaux.js';
 import { hasard } from '../moteur/couleurs.js';
 
 /* ── la forme de l'île : un « super-ovale » un peu irrégulier ──
@@ -159,7 +159,7 @@ export function construireVegetation(scene, grille, peutPlanter) {
 }
 
 /* ── les lampadaires : allumés la nuit (une lueur, pas une vraie lumière : c'est léger) ── */
-export const matLampe = new THREE.MeshToonMaterial({ gradientMap: TONS, color: '#fff7d6', emissive: '#ffd27a', emissiveIntensity: 0 });
+export const matLampe = partager(new THREE.MeshToonMaterial({ gradientMap: TONS, color: '#fff7d6', emissive: '#ffd27a', emissiveIntensity: 0 }));
 export function construireLampes(scene, positions) {
   const parts = [], tetes = [];
   for (const [x, z] of positions) {

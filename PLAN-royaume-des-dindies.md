@@ -86,19 +86,22 @@ On y va en montgolfière. Chaque région est une île 3D à explorer, avec ses d
 
 **Les apparitions :**
 - Les communes se voient tout le temps.
-- Les rares demandent l’équipement de la région.
-- Les épiques apparaissent seulement après avoir battu le champion de la région, et sous une condition : la nuit, la pluie, le matin…
+- Les rares demandent l’équipement de la région. Sans lui, elles ne sont qu’un **mirage** : elles clignotent et s’effacent quand on approche.
+- Les épiques apparaissent après la **piste de leur légende** (une petite quête du guide de l’île : 3 plumes rouges, 3 lanternes, 3 boules d’argent…), et sous une condition : le matin, la nuit, la pluie…
 - Le **jour et la nuit suivent l’heure réelle**. La **météo** change toutes les heures, calculée d’après la date pour être la même pour tout le monde.
+- Pour que personne ne reste bloqué, chaque île a son **gadget** qui fait venir la condition pendant 10 minutes : le coq de Gaston (le matin), le cadran magique (la nuit), la bouteille à nuages (la pluie).
+- Chaque île a son **guide** : Gaston le berger (les Prés), Leïla des Dunes (le Maroc imaginaire), Monsieur Waffel (la Belgique). Une fois sa quête finie, il offre chaque jour 2 friandises préférées de son type.
 
 **Attraper une dindie :**
-1. On s’approche. Si on court, elle se méfie.
-2. On lance des friandises : la **jauge de confiance** se remplit, deux fois plus vite avec sa friandise préférée.
+1. On touche la dindie : Roullieee s’approche toute seule, sur la pointe des pieds. La dindie, curieuse, la regarde.
+2. On lance des friandises : la **jauge de confiance** se remplit, deux fois plus vite avec sa friandise préférée (une par type : trèfle sucré 🌿, miel des dunes 🏜️, gaufre de Liège 💧…). Sans friandise, on peut toujours lui parler doucement (🤲), plus lentement.
 3. On lance le **filet** quand le cercle qui rétrécit est dans la zone verte.
 
-- **La zone verte** dépend de la rareté (commune ×1, rare ×0,7, épique ×0,45) et du filet (simple ×1, solide ×1,3, doré ×1,7). En mode aide, elle est 1,5 fois plus grande.
+- **La zone verte** grandit avec la confiance, et dépend de la rareté (commune ×1, rare ×0,8, épique ×0,62) et du filet (simple ×1, solide ×1,3, doré ×1,7). En mode aide, elle est 1,5 fois plus grande. Le cercle va un peu plus vite pour les rares et les épiques.
+- **La prime du Grand Livre :** chaque nouvelle espèce attrapée rapporte 50 pièces.
 - **Si on rate,** la dindie fait un bond, la confiance baisse de 30 %, et on réessaie. Après 3 ratés, elle part, et revient plus tard.
 
-**Trouvés en chemin :** coffres (pièces), œufs mystère, pierres d’éveil, objets de quête.
+**Trouvés en chemin :** chaque jour, dans chaque île, 3 coffres (pièces, parfois des friandises), souvent un œuf mystère, parfois une pierre d’éveil, cachés à des endroits tirés d’après la date ; et les objets de quête.
 
 ## 5. Les 4 raretés et les 72 espèces
 
@@ -330,16 +333,15 @@ En mode aide, les compétences se déclenchent toutes seules.
 
 ## 10. Les quêtes et la durée de vie
 
-**L’histoire en 9 chapitres** (environ 60 quêtes) :
-1. *Le Domaine en ruine* : tutoriel, les Prés, le premier enclos, le Clapier.
-2. *Le premier œuf* : le Couvoir, la Nurserie, le premier croisement.
-3. *Le Dindodrome ouvre* : l’entraînement, le championnat 1, Gontran.
-4. *Le Maroc imaginaire* : la région 2, le championnat 2.
-5. *La Belgique* : la région 3, le championnat 3, l’Atelier des plumes.
-6. *Jungle et Banquise* : les régions 4 et 5, les championnats 4 et 5, les missions.
-7. *Volcan et Forêt de la Lune* : les régions 6 et 7, les championnats 6 et 7, l’éveil.
-8. *Le Royaume des Nuages* : la région 8, le championnat 8, les mythiques.
-9. *La Légende* : la Ligue des Légendes, la plume arc-en-ciel, le Dindromakus, la fin et le générique.
+**L’histoire en 8 chapitres** (environ 60 quêtes) :
+1. *Le Domaine en ruine* (7 quêtes) : tutoriel, le premier enclos, le Clapier, la montgolfière.
+2. *L’expédition* (10 quêtes) : la carte du monde, les Prés, le Maroc imaginaire et la Belgique, les 12 premières espèces sauvages, le chapeau de soleil et le parapluie, les légendes du Coquelicot, de la Dinde Dingue et de l’Atomium.
+3. *Le premier œuf* : le Couvoir, la Nurserie, le premier croisement, les œufs mystère.
+4. *Le Dindodrome ouvre* : l’entraînement, les championnats 1 à 3, Gontran, l’Atelier des plumes.
+5. *Jungle et Banquise* : les régions 4 et 5, les championnats 4 et 5, les missions.
+6. *Volcan et Forêt de la Lune* : les régions 6 et 7, les championnats 6 et 7, l’éveil.
+7. *Le Royaume des Nuages* : la région 8, le championnat 8, les mythiques.
+8. *La Légende* : la Ligue des Légendes, la plume arc-en-ciel, le Dindromakus, la fin et le générique.
 
 **Les autres activités :**
 - environ 40 quêtes des habitants ;
@@ -355,6 +357,7 @@ En mode aide, les compétences se déclenchent toutes seules.
 - **Le style :** bulles et boutons comme dans la ferme, polices *Lilita One* et *Fredoka*, cartes de couleur selon la rareté, et des retours vivants (rebonds, étincelles, confettis).
 - **Le toucher :** on touche le sol pour marcher et on touche un bâtiment ou une dindie pour agir. Ça marche aussi à la souris et au clavier.
 - **Le mode aide** (réglable par profil) : la voix lit tout, la capture est plus facile, les compétences sont automatiques, les minuteurs sont divisés par 2 et il n’y a pas de malus de terrain.
+- **La musique :** de vrais morceaux libres (domaine public et CC BY-SA), un par lieu, le jour et la nuit, enchaînés avec un fondu. Les auteurs et les licences sont dans `docs/royaume/musique/CREDITS.md` et dans la maison (🎶 Crédits).
 - **La sauvegarde :**
   - **3 profils**, pour les frères et sœurs ;
   - une sauvegarde automatique ;
@@ -384,13 +387,17 @@ docs/royaume/
   js/moteur/              rendu (toon, contours, ciel), formes, caméra, entrées, interface,
                           sons, voix, sauvegarde, temps (jour/nuit, météo, lune)
   js/dindies/             adn, modele (3D), portrait (SVG), elevage, stats
-  js/donnees/             types, especes, regions, batiments, objets, competences,
-                          courses, quetes, pnj
+  js/donnees/             types, especes, regions (les 8 îles, qui y vit et quand),
+                          batiments, objets, competences, courses, quetes, pnj
   js/personnages/         chibi (modèle commun), roullieee, pnj
   js/monde/               carte (grille + A*), decor (île, eau, végétation, nuit),
-                          batiments, domaine
-  js/jeu/                 etat, individus, objets, scenario (quêtes et dialogues)
-  js/ui/                  panneaux (Boutique, Labo, Livre, Musée, Fiche, Clapier…)
+                          batiments, domaine, ile (le sol des régions), nature, fabrique,
+                          region (ce qui est commun aux îles), regions/pres, maroc, belgique
+  js/jeu/                 etat, individus, objets, scenario (quêtes et dialogues),
+                          sauvages (les apparitions), capture, trouvailles (coffres, œufs…)
+  js/ui/                  panneaux (Boutique, Labo, Livre, Musée, Fiche, Clapier…),
+                          monde (la carte du monde, le voyage en montgolfière)
+  musique/                les musiques libres (MP3) et leurs crédits
   js/scenes/              titre, jeu (le Domaine), defile (étape 1), region, capture,
                           couvoir, dindodrome, course, concours
 royaume-outils/           les tests Playwright, le simulateur d'équilibrage,
@@ -430,11 +437,12 @@ Chaque étape se termine par : les tests passent, des captures sur les 4 formats
 - [x] Des dindies de départ, offertes par le Professeur, qui vivent dans les enclos.
 - **Fini quand :** on peut se promener dans le Domaine, ranger ses dindies, sauvegarder et reprendre.
 
-### Étape 3 — L’expédition
-- [ ] Le port, la montgolfière et la carte du monde.
-- [ ] Les régions 1 à 3 en 3D (Prés, Maroc imaginaire, Belgique).
-- [ ] Les apparitions (heure, météo), la capture (confiance et filet) et les équipements.
-- [ ] Les coffres, les œufs mystère et les pierres d’éveil.
+### Étape 3 — L’expédition ✅
+- [x] Le port, la montgolfière et la carte du monde.
+- [x] Les régions 1 à 3 en 3D (Prés, Maroc imaginaire, Belgique).
+- [x] Les apparitions (heure, météo), la capture (confiance et filet) et les équipements.
+- [x] Les coffres, les œufs mystère et les pierres d’éveil.
+- [x] En plus : le chapitre 2 (10 quêtes), les 3 guides, les gadgets des îles, et de vraies musiques libres.
 - **Fini quand :** on peut attraper les 12 espèces sauvages des 3 premières régions.
 
 ### Étape 4 — L’élevage et l’évolution
@@ -471,7 +479,7 @@ Chaque étape se termine par : les tests passent, des captures sur les 4 formats
 
 ### Étape 9 — La version 1.0
 - [ ] L’équilibrage avec le simulateur (durées visées : 15 à 25 h, et plus de 60 h à 100 %).
-- [ ] La musique, les cris de chaque espèce, les sons.
+- [ ] La musique (les morceaux libres sont là depuis l’étape 3 ; il reste les pistes du Dindodrome et des îles 4 à 8), les cris de chaque espèce, les sons.
 - [ ] Les tutoriels, le mode aide, l’accessibilité.
 - [ ] Les performances sur téléphone, une partie complète testée automatiquement, et les 4 formats.
 - [ ] Le site : la page publique « Le Grand Livre des Dindies » (le bouton sur l’accueil existe depuis l’étape 2, avec la mention « en développement »).
@@ -493,3 +501,4 @@ Chaque étape se termine par : les tests passent, des captures sur les 4 formats
 | 2026-10-21 | — | Le plan est écrit, et les données des 72 espèces aussi (`especes.js`). |
 | 2026-10-21 | 1 | Le Grand Défilé est en ligne (`docs/royaume/`) : moteur toon avec contours, modèle 3D de dindie et portrait SVG depuis le même ADN, 72 espèces × 4 stades × chromatique, nouvelle Roullieee, Grand Livre avec filtres, défilé automatique. Tests : `royaume-outils/test-etape1.mjs` (576 dindies sans erreur, mémoire stable, 4 formats). Pas encore de bouton sur l’accueil du site (prévu à l’étape 9). |
 | 2026-10-21 | 2 | Le Domaine est jouable (`docs/royaume/index.html`) : écran titre avec 3 profils, prologue illustré, île 3D (eau, écume, chemins, arbres, fleurs, lampadaires, lucioles), jour et nuit à l’heure réelle (ou réglés), déplacements au toucher (A*), au joystick et au clavier, caméra qui suit, silhouette derrière les murs. Bâtiments : Maison, Labo, Boutique, Musée, 8 enclos (2 à réparer au chapitre 1), Clapier, porte du Dindodrome, port et montgolfière. 5 PNJ en chibi avec portraits SVG, dialogues, journal, carte, sac, fiche des dindies (stats et potentiel), Grand Livre avec silhouettes et indices. Chapitre 1 en 7 quêtes, jusqu’à la montgolfière réparée. Sauvegarde automatique, code de sauvegarde et fichier. Le Défilé passe sur `defile.html`. Bouton sur l’accueil du site, sous la ferme, avec « 🚧 En développement ». Tests : `royaume-outils/test-etape2.mjs` (chapitre 1 joué de bout en bout avec chaque starter, rechargement de la sauvegarde, aucune erreur) et `test-etape1.mjs` (toujours vert). |
+| 2026-10-22 | 3 | L’expédition est jouable : le chapitre 2 en 10 quêtes. La carte du monde (8 îles, 3 ouvertes) et le voyage en montgolfière ; 3 îles en 3D construites à la demande et libérées au départ (mémoire stable) : les Prés (ferme de Gaston, moulin, mare, champ de coquelicots, jardin oublié), le Maroc imaginaire (dunes, ksar, souk et ses lanternes, oasis), la Belgique (canaux et ponts, Grand-Place, beffroi, maisons à pignons, Atomium). La météo par île et par heure (pluie, nuages, soleil). Les dindies sauvages (zones, heure, météo, équipement, mirages), la capture (friandises préférées, jauge de confiance, cercle et zone verte, 3 essais), la carte d’une dindie attrapée et la prime du Grand Livre. Les guides Gaston, Leïla et Monsieur Waffel ; les gadgets (le coq, le cadran magique, la bouteille à nuages) ; les coffres, œufs mystère et pierres d’éveil du jour ; filets solide et doré, chapeau de soleil, parapluie. De vraies musiques libres (0 A.D., OpenRCT2) à la place de la mélodie synthétisée. Les épiques ne dépendent plus des champions mais d’une petite quête de leur île. Les anciennes sauvegardes passent au chapitre 2. Tests : `royaume-outils/test-etape3.mjs` (les 12 espèces attrapées, gadgets, voyages, mémoire, sauvegarde) ; `test-etape1.mjs` et `test-etape2.mjs` toujours verts. |

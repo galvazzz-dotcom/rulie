@@ -1,6 +1,6 @@
 /* ══════════ L'ÉCRAN TITRE ET LE PROLOGUE ══════════ */
 import { $, $$, el, echapper } from '../moteur/ui.js';
-import { pop, tada, audio, glouglou } from '../moteur/sons.js';
+import { pop, tada, audio, glouglou, musique, ambianceMusique } from '../moteur/sons.js';
 import { dire } from '../moteur/voix.js';
 import * as SAUVE from '../moteur/sauvegarde.js';
 import { nouvelEtat, migrer } from '../jeu/etat.js';
@@ -19,8 +19,10 @@ export function ecranTitre({ surJouer }) {
     <div class="titreBoite"><h1><small>Le</small> Royaume <small>des</small> Dindies</h1><p class="sous">Attrape-les, élève-les, fais-les courir !</p>
     <div id="profils"></div>
     <p class="liensTitre"><a href="defile.html">🦃 Le Grand Défilé des 72 dindies</a> · <a href="../index.html">🏠 Le site</a></p>
-    <p class="enDev">🚧 Jeu en développement : chapitre 1 jouable</p></div></div>`);
+    <p class="enDev">🚧 Jeu en développement : chapitres 1 et 2 jouables</p></div></div>`);
   document.body.appendChild(T);
+  /* la musique démarre au premier toucher (les navigateurs l'exigent) */
+  T.addEventListener('pointerdown', () => { audio(); ambianceMusique('titre'); musique(true); }, { once: true });
   const dessiner = () => {
     const P = SAUVE.listeProfils();
     $('#profils', T).innerHTML = P.map(p => `<div class="profil" style="--c:${p.couleur}"><button class="jouer" data-id="${p.id}"><b>${echapper(p.nom)}</b><small>${p.resume || 'Nouvelle partie'}</small></button>

@@ -19,6 +19,12 @@ export const PERSONNAGES = {
     chapeau: 'aviateur', echarpe: '#ef4444', barbe: '#57534e', taille: 1.06, couleur: '#1d4ed8' },
   ginette: { nom: 'Coach Ginette', peau: '#c98b65', cheveux: '#111827', coiffure: 'queue', haut: '#ec4899', gilet: '#7c3aed', bas: '#7c3aed', longBas: true, chaussures: '#f8fafc',
     bandeau: '#f8fafc', sifflet: true, couleur: '#7c3aed' },
+  gaston: { nom: 'Gaston le berger', peau: '#e7b08a', cheveux: '#9a6b3c', coiffure: 'court', haut: '#fef3c7', gilet: '#16a34a', bas: '#1d4ed8', longBas: true, chaussures: '#5b3a22',
+    chapeau: 'paille', ruban: '#ef4444', moustache: '#9a6b3c', taille: 1.05, couleur: '#16a34a' },
+  leila: { nom: 'Leïla des Dunes', peau: '#c68a5e', cheveux: '#1c1917', coiffure: 'queue', haut: '#fde68a', gilet: '#ea580c', bas: '#7c2d12', longBas: true, chaussures: '#a16207',
+    chapeau: 'foulard', foulard: '#0d9488', echarpe: '#facc15', couleur: '#f59e0b' },
+  waffel: { nom: 'Monsieur Waffel', peau: '#f5cba7', cheveux: '#a8a29e', coiffure: 'court', haut: '#ffffff', tablier: '#facc15', bas: '#1f2937', longBas: true, chaussures: '#111827',
+    chapeau: 'toque', moustache: '#78716c', taille: 1.02, couleur: '#3b82f6' },
   gontran: { nom: 'Gontran Gloupi', peau: '#f5cba7', cheveux: '#facc15', coiffure: 'herisse', haut: '#f8fafc', gilet: '#0ea5e9', bas: '#334155', longBas: true, chaussures: '#ef4444',
     malin: true, couleur: '#0284c7' }
 };
@@ -100,6 +106,13 @@ export function creerChibi(p) {
     { g: sphere(12, 8), c: '#7c4a22', p: [-.29, .2, 0], s: [.07, .12, .1] }, { g: sphere(12, 8), c: '#7c4a22', p: [.29, .2, 0], s: [.07, .12, .1] },
     { g: tore(1, .3), c: '#94a3b8', p: [-.09, .52, .2], r: [-.6, 0, 0], s: [.075, .075, .075] }, { g: tore(1, .3), c: '#94a3b8', p: [.09, .52, .2], r: [-.6, 0, 0], s: [.075, .075, .075] },
     { g: sphere(10, 8), c: '#bae6fd', p: [-.09, .52, .2], r: [-.6, 0, 0], s: [.055, .055, .02] }, { g: sphere(10, 8), c: '#bae6fd', p: [.09, .52, .2], r: [-.6, 0, 0], s: [.055, .055, .02] });
+  if (p.chapeau === 'paille') pt.push({ g: cylindre(1, 1, 1, 26), c: '#f2d27a', p: [0, .5, -.02], r: [-.1, 0, 0], s: [.52, .026, .5] },
+    { g: cylindre(.92, 1, 1, 22), c: '#f2d27a', p: [0, .58, -.03], r: [-.1, 0, 0], s: [.25, .15, .24] },
+    { g: cylindre(1, 1, 1, 22), c: p.ruban || '#ef4444', p: [0, .53, -.025], r: [-.1, 0, 0], s: [.258, .045, .248] });
+  if (p.chapeau === 'foulard') pt.push({ g: sphere(24, 16), c: p.foulard, p: [0, .34, -.04], s: [.33, .27, .32] },
+    { g: sphere(16, 12), c: p.foulard, p: [.2, .14, -.2], r: [.3, 0, -.4], s: [.09, .2, .08] }, { g: sphere(10, 8), c: '#facc15', p: [0, .42, .27], s: .04 });
+  if (p.chapeau === 'toque') pt.push({ g: cylindre(1, 1, 1, 22), c: '#ffffff', p: [0, .6, -.03], s: [.22, .2, .22] },
+    { g: sphere(18, 12), c: '#ffffff', p: [0, .76, -.03], s: [.28, .14, .27] }, { g: sphere(12, 8), c: '#ffffff', p: [-.14, .74, -.03], s: .13 }, { g: sphere(12, 8), c: '#ffffff', p: [.14, .74, -.03], s: .13 });
   poser(tete, pt);
   const yeuxG = new THREE.Group(); yeuxG.position.set(0, .27, 0); tete.add(yeuxG);
   const pY = [];
@@ -182,5 +195,8 @@ export function portraitChibi(p, id = 'c' + Math.random().toString(36).slice(2, 
   /* les chapeaux */
   if (p.chapeau === 'exploratrice') o.push(`<ellipse cx="60" cy="34" rx="46" ry="9" ${vol('#e9c46a')}/><path d="M36 34 Q36 10 60 10 Q84 10 84 34Z" ${vol('#e9c46a')}/><path d="M36 28 H84 V34 H36Z" fill="${p.ruban || '#ef4444'}"/>`);
   if (p.chapeau === 'aviateur') o.push(`<path d="M28 54 Q28 18 60 18 Q92 18 92 54 L86 60 Q84 34 60 32 Q36 34 34 60Z" ${vol('#7c4a22')}/><circle cx="50" cy="32" r="8" fill="#bae6fd" stroke="#94a3b8" stroke-width="3"/><circle cx="70" cy="32" r="8" fill="#bae6fd" stroke="#94a3b8" stroke-width="3"/>`);
+  if (p.chapeau === 'paille') o.push(`<ellipse cx="60" cy="36" rx="52" ry="10" ${vol('#f2d27a')}/><path d="M38 36 Q38 14 60 14 Q82 14 82 36Z" ${vol('#f2d27a')}/><path d="M38 30 H82 V36 H38Z" fill="${p.ruban || '#ef4444'}"/>`);
+  if (p.chapeau === 'foulard') o.push(`<path d="M24 62 Q22 16 60 14 Q98 16 96 62 Q86 34 60 32 Q34 34 24 62Z" ${vol(p.foulard)}/><path d="M90 52 Q106 74 98 100 Q88 80 82 66Z" ${vol(p.foulard)}/><circle cx="60" cy="24" r="4.5" fill="#facc15" stroke="#a16207" stroke-width="1.5"/>`);
+  if (p.chapeau === 'toque') o.push(`<rect x="38" y="14" width="44" height="26" rx="4" ${vol('#ffffff')}/><circle cx="44" cy="14" r="12" ${vol('#ffffff')}/><circle cx="60" cy="9" r="14" ${vol('#ffffff')}/><circle cx="76" cy="14" r="12" ${vol('#ffffff')}/>`);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">${o.join('')}</svg>`;
 }

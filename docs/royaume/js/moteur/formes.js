@@ -2,8 +2,10 @@
    une seule géométrie (couleurs par sommet) = un seul appel de dessin. */
 import * as THREE from 'three';
 
-const cache = new Map();
-export function geo(cle, fab) { let g = cache.get(cle); if (!g) { g = fab(); cache.set(cle, g); } return g; }
+const cache = new Map(), partagees = new WeakSet();
+export function geo(cle, fab) { let g = cache.get(cle); if (!g) { g = fab(); cache.set(cle, g); partagees.add(g); } return g; }
+/* une géométrie du cache (sphère, boîte…) sert à tout le monde : on ne la libère jamais */
+export const estGeoPartagee = g => partagees.has(g);
 export const sphere = (l = 22, h = 16) => geo(`s${l}_${h}`, () => new THREE.SphereGeometry(1, l, h));
 export const demiSphere = (l = 22, h = 10) => geo(`d${l}_${h}`, () => new THREE.SphereGeometry(1, l, h, 0, Math.PI * 2, 0, Math.PI / 2));
 export const cylindre = (rh, rb, h, s = 16) => geo(`c${rh}_${rb}_${h}_${s}`, () => new THREE.CylinderGeometry(rh, rb, h, s));

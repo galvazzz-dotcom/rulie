@@ -3,7 +3,7 @@
 import { PAR_ID } from '../donnees/especes.js';
 import { vaDans } from './individus.js';
 
-export const VERSION = 1;
+export const VERSION = 2;
 export function nouvelEtat(nom, couleur) {
   return {
     version: VERSION, profil: { nom, couleur, cree: Date.now() },
@@ -12,9 +12,9 @@ export function nouvelEtat(nom, couleur) {
     enclos: {}, batiments: { clapier: { repare: false, rangees: 1 }, montgolfiere: { reparee: false } },
     livre: { vus: {}, attrapes: {} },
     quete: { etape: 'arrivee', compteur: 0, finies: [], nourries: [] },
-    monde: { position: [0, 33.5], ramasses: {} },
+    monde: { position: [0, 33.5], ramasses: {}, lieu: 'domaine', positions: {} },
     reglages: { son: true, musique: true, voix: false, aide: false, heure: 'vraie' },
-    quotidien: { courrier: '', voeu: '' },
+    quotidien: { courrier: '', voeu: '', trouvailles: null, cadeaux: {} },
     stats: { tempsJeu: 0, pas: 0 }
   };
 }
@@ -22,7 +22,11 @@ export function nouvelEtat(nom, couleur) {
 export function migrer(e) {
   const n = nouvelEtat(e.profil?.nom || 'Joueur', e.profil?.couleur || '#ea580c');
   const fus = (a, b) => { for (const k in b) { if (a[k] === undefined) a[k] = b[k]; else if (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k])) fus(a[k], b[k]); } return a; };
-  fus(e, n); e.version = VERSION;
+  const avant = e.version || 1;
+  fus(e, n);
+  /* version 2 : la fin du chapitre 1 devient le départ du chapitre 2 */
+  if (avant < 2 && e.quete.etape === 'fin') e.quete.etape = 'decollage';
+  e.version = VERSION;
   return e;
 }
 

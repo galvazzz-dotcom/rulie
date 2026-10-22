@@ -44,34 +44,79 @@ export function vent() {
   bip(A, 200, t, .35, 'sine', .04);
 }
 
-/* ── la musique du Domaine : une petite boucle douce (le jour), plus lente la nuit ── */
-const N = { C4: 262, D4: 294, E4: 330, F4: 349, G4: 392, A4: 440, B4: 494, C5: 523, D5: 587, E5: 659, G5: 784, A3: 220, G3: 196, F3: 175, C3: 131, E3: 165 };
-const AIR_JOUR = [['E4', 1], ['G4', 1], ['A4', 1], ['G4', 1], ['C5', 2], ['A4', 1], ['G4', 1], ['E4', 1], ['D4', 1], ['E4', 2], ['G4', 2],
-  ['A4', 1], ['C5', 1], ['D5', 1], ['C5', 1], ['A4', 2], ['G4', 1], ['E4', 1], ['D4', 1], ['C4', 1], ['D4', 2], ['C4', 2]];
-const BASSE_JOUR = ['C3', 'A3', 'F3', 'G3'];
-const AIR_NUIT = [['E4', 2], ['G4', 2], ['B4', 4], ['A4', 2], ['G4', 2], ['E4', 4], ['D4', 2], ['E4', 2], ['G4', 4], ['E4', 4]];
-const BASSE_NUIT = ['A3', 'E3', 'F3', 'C3'];
-let musiqueOn = false, nuitMusique = false, tMus = 0, iMus = 0, minuteur = null;
-export function musique(on, nuit = false) {
-  musiqueOn = on; nuitMusique = nuit;
-  clearInterval(minuteur);
-  if (!on || !actif) return;
-  const A = audio(); tMus = Math.max(tMus, A.currentTime + .1);
-  minuteur = setInterval(planifier, 200);
+/* ── la musique : de vrais morceaux libres (voir musique/CREDITS.md), un par ambiance,
+   enchaînés avec un fondu. Le son passe par l'AudioContext (le volume d'un <audio> ne se règle pas sur iPhone). ── */
+export const AMBIANCES = {
+  titre: { jour: ['ragtime-searchlight'], nuit: ['ragtime-searchlight'] },
+  domaine: { jour: ['0ad-harvest-festival', 'ragtime-searchlight'], nuit: ['0ad-albian-nocturne'] },
+  pres: { jour: ['0ad-solstice-festival', '0ad-harvest-festival'], nuit: ['0ad-mountain-idyll', '0ad-albian-nocturne'] },
+  maroc: { jour: ['0ad-peaks-of-atlas'], nuit: ['0ad-mirage', '0ad-peaks-of-atlas'] },
+  belgique: { jour: ['orgue-das-alpenhorn', '0ad-waters-edge'], nuit: ['0ad-waters-edge'] }
+};
+const VOLUME = .42, FONDU = 2.5;
+let musiqueOn = false, ambianceNom = 'titre', nuitMusique = false, pistes = [], courante = null, iListe = 0, verifie = null;
+function nouvellePiste(nom) {
+  const A = audio(), el = new Audio(`musique/${nom}.mp3`);
+  el.preload = 'auto'; el.crossOrigin = 'anonymous';
+  const g = A.createGain(); g.gain.value = 0;
+  try { A.createMediaElementSource(el).connect(g); } catch { return null; }
+  g.connect(A.destination);
+  return { nom, el, g };
 }
-export const musiqueNuit = n => { nuitMusique = n; };
-function note(A, f, t, d, v, type) {
-  const o = A.createOscillator(), g = A.createGain(); o.type = type; o.frequency.value = f;
-  g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(v, t + .03); g.gain.exponentialRampToValueAtTime(.0001, t + d);
-  o.connect(g); g.connect(A.destination); o.start(t); o.stop(t + d + .05);
+function fondu(P, vers, duree = FONDU) {
+  const A = audio(), t = A.currentTime;
+  P.g.gain.cancelScheduledValues(t); P.g.gain.setValueAtTime(P.g.gain.value, t); P.g.gain.linearRampToValueAtTime(vers, t + duree);
 }
-function planifier() {
-  if (!musiqueOn || !actif || !AC) return;
-  const A = AC, air = nuitMusique ? AIR_NUIT : AIR_JOUR, basse = nuitMusique ? BASSE_NUIT : BASSE_JOUR, temps = 60 / (nuitMusique ? 70 : 104);
-  while (tMus < A.currentTime + .6) {
-    const [n, d] = air[iMus % air.length];
-    note(A, N[n], tMus, Math.min(d * temps * .9, 1.2), nuitMusique ? .028 : .032, 'triangle');
-    if (iMus % 4 === 0) note(A, N[basse[Math.floor(iMus / 4) % basse.length]], tMus, temps * 3.5, .035, 'sine');
-    tMus += d * temps; iMus++;
+function arreter(P, duree = FONDU) {
+  if (!P) return;
+  fondu(P, 0, duree);
+  setTimeout(() => { P.el.pause(); P.el.removeAttribute('src'); P.el.load(); P.g.disconnect(); pistes = pistes.filter(x => x !== P); }, duree * 1000 + 100);
+}
+function liste() { const L = AMBIANCES[ambianceNom] || AMBIANCES.domaine; return nuitMusique ? L.nuit : L.jour; }
+function jouerSuivante(dureeFondu = FONDU) {
+  const L = liste(), nom = L[iListe % L.length]; iListe++;
+  const avant = courante;
+  const P = nouvellePiste(nom); if (!P) return;
+  pistes.push(P); courante = P;
+  P.el.play().then(() => fondu(P, VOLUME, dureeFondu)).catch(() => {});
+  arreter(avant, dureeFondu);
+}
+/* toutes les secondes : la piste se termine-t-elle ? on enchaîne avec la suivante */
+function surveiller() {
+  if (!musiqueOn || !courante) return;
+  const el = courante.el;
+  if (el.duration && el.currentTime > el.duration - FONDU - .3) jouerSuivante();
+}
+export function musique(on) {
+  musiqueOn = on && actif;
+  clearInterval(verifie);
+  if (!musiqueOn) { for (const P of [...pistes]) arreter(P, .6); courante = null; return; }
+  verifie = setInterval(surveiller, 1000);
+  if (!courante) jouerSuivante(1.2);
+}
+/* changer d'ambiance (lieu, jour ou nuit) : on ne coupe que si la liste change */
+export function ambianceMusique(nom, nuit = nuitMusique) {
+  const avant = liste().join();
+  ambianceNom = nom; nuitMusique = nuit;
+  if (liste().join() === avant && courante) return;
+  iListe = 0;
+  if (musiqueOn) jouerSuivante();
+}
+export const musiqueNuit = n => ambianceMusique(ambianceNom, n);
+export const pisteEnCours = () => courante && { nom: courante.nom, t: courante.el.currentTime, volume: courante.g.gain.value };
+
+/* ── le bruit de la pluie : un souffle filtré, qui monte et descend doucement ── */
+let pluieG = null;
+export function pluieSon(k) {
+  if (!AC) { if (!k) return; audio(); }
+  if (!pluieG) {
+    if (!k) return;
+    const A = AC, n = A.sampleRate * 2, buf = A.createBuffer(1, n, A.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    const src = A.createBufferSource(); src.buffer = buf; src.loop = true;
+    const f = A.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 1400;
+    pluieG = A.createGain(); pluieG.gain.value = 0;
+    src.connect(f); f.connect(pluieG); pluieG.connect(A.destination); src.start();
   }
+  pluieG.gain.setTargetAtTime(actif ? k * .05 : 0, AC.currentTime, 1.2);
 }
