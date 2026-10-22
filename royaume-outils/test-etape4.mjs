@@ -137,7 +137,7 @@ try {
   await pg.evaluate(uid => [...document.querySelectorAll('.eveilF .carteDindie')].find(b => b.dataset.uid === uid).click(), uidA);
   await pg.waitForSelector('#vOk', { timeout: 15000 }); await pg.waitForTimeout(400); await pg.screenshot({ path: `${OUT}/eveil.png` });
   await clic('#vOk'); await pg.waitForTimeout(800);
-  await jusqua('fin'); await log('l’Atomium est éveillé !');
+  await jusqua('parlerPlumeau5'); await log('l’Atomium est éveillé !');
   verifier(await pg.evaluate(uid => window.__jeu.J.parUid(uid).stade === 'eveille', uidA), 'l’éveil change le stade de la dindie');
   await pg.waitForTimeout(1500); await pg.screenshot({ path: `${OUT}/fin.png` }); await clic('#finOk');
   console.log(`chapitre 3 joué en ${((Date.now() - t0) / 1000).toFixed(0)} s`);
@@ -146,7 +146,7 @@ try {
   await pg.evaluate(() => document.querySelector('#profils .jouer').click());
   await pg.waitForFunction(() => window.__jeu, null, { timeout: 60000 }); await pg.waitForTimeout(1200);
   const apres = await pg.evaluate(() => ({ etape: window.__jeu.etat().quete.etape, couvoir: window.__jeu.etat().batiments.couvoir.repare, oeufs: window.__jeu.EL.elevage().couveuses.filter(Boolean).length, bebes: window.__jeu.etat().dindies.filter(d => d.stade !== 'adulte' && d.stade !== 'eveille').length }));
-  verifier(apres.etape === 'fin' && apres.couvoir && apres.oeufs === 1, `après rechargement : chapitre 3 fini, le Couvoir réparé, l’œuf mystère toujours en couveuse (${JSON.stringify(apres)})`);
+  verifier(apres.etape === 'parlerPlumeau5' && apres.couvoir && apres.oeufs === 1, `après rechargement : chapitre 3 fini (le 4 commence), le Couvoir réparé, l’œuf mystère toujours en couveuse (${JSON.stringify(apres)})`);
 } catch (e) { console.log('❌', e.message); echecs++; await pg.screenshot({ path: `${OUT}/erreur.png` }); }
 verifier(!errs.length, `aucune erreur dans le navigateur${errs.length ? ' : ' + errs.join(' / ') : ''}`);
 console.log(echecs ? `\n❌ étape 4 : ${echecs} échec(s)` : '\n✅ étape 4 : le chapitre 3 est jouable de bout en bout');

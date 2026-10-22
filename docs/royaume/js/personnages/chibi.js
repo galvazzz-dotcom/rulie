@@ -25,6 +25,10 @@ export const PERSONNAGES = {
     chapeau: 'foulard', foulard: '#0d9488', echarpe: '#facc15', couleur: '#f59e0b' },
   waffel: { nom: 'Monsieur Waffel', peau: '#f5cba7', cheveux: '#a8a29e', coiffure: 'court', haut: '#ffffff', tablier: '#facc15', bas: '#1f2937', longBas: true, chaussures: '#111827',
     chapeau: 'toque', moustache: '#78716c', taille: 1.02, couleur: '#3b82f6' },
+  chrono: { nom: 'Monsieur Chrono', peau: '#e8b48f', cheveux: '#44403c', coiffure: 'court', haut: '#f8fafc', gilet: '#dc2626', bas: '#111827', longBas: true, chaussures: '#111827',
+    chapeau: 'melon', ruban: '#facc15', moustache: '#44403c', taille: 1.03, couleur: '#dc2626' },
+  tarzanette: { nom: 'Tarzanette', peau: '#b07a52', cheveux: '#7c2d12', coiffure: 'queue', haut: '#a3e635', gilet: '#15803d', bas: '#a16207', chaussures: '#78350f',
+    bandeau: '#f97316', couleur: '#10b981' },
   gontran: { nom: 'Gontran Gloupi', peau: '#f5cba7', cheveux: '#facc15', coiffure: 'herisse', haut: '#f8fafc', gilet: '#0ea5e9', bas: '#334155', longBas: true, chaussures: '#ef4444',
     malin: true, couleur: '#0284c7' }
 };
@@ -113,6 +117,8 @@ export function creerChibi(p) {
     { g: sphere(16, 12), c: p.foulard, p: [.2, .14, -.2], r: [.3, 0, -.4], s: [.09, .2, .08] }, { g: sphere(10, 8), c: '#facc15', p: [0, .42, .27], s: .04 });
   if (p.chapeau === 'toque') pt.push({ g: cylindre(1, 1, 1, 22), c: '#ffffff', p: [0, .6, -.03], s: [.22, .2, .22] },
     { g: sphere(18, 12), c: '#ffffff', p: [0, .76, -.03], s: [.28, .14, .27] }, { g: sphere(12, 8), c: '#ffffff', p: [-.14, .74, -.03], s: .13 }, { g: sphere(12, 8), c: '#ffffff', p: [.14, .74, -.03], s: .13 });
+  if (p.chapeau === 'melon') pt.push({ g: cylindre(1, 1, 1, 26), c: '#1f2937', p: [0, .5, -.02], r: [-.1, 0, 0], s: [.36, .024, .35] },
+    { g: demiSphere(), c: '#1f2937', p: [0, .51, -.03], r: [-.1, 0, 0], s: [.24, .2, .23] }, { g: cylindre(1, 1, 1, 22), c: p.ruban || '#facc15', p: [0, .54, -.025], r: [-.1, 0, 0], s: [.245, .04, .235] });
   poser(tete, pt);
   const yeuxG = new THREE.Group(); yeuxG.position.set(0, .27, 0); tete.add(yeuxG);
   const pY = [];
@@ -198,5 +204,6 @@ export function portraitChibi(p, id = 'c' + Math.random().toString(36).slice(2, 
   if (p.chapeau === 'paille') o.push(`<ellipse cx="60" cy="36" rx="52" ry="10" ${vol('#f2d27a')}/><path d="M38 36 Q38 14 60 14 Q82 14 82 36Z" ${vol('#f2d27a')}/><path d="M38 30 H82 V36 H38Z" fill="${p.ruban || '#ef4444'}"/>`);
   if (p.chapeau === 'foulard') o.push(`<path d="M24 62 Q22 16 60 14 Q98 16 96 62 Q86 34 60 32 Q34 34 24 62Z" ${vol(p.foulard)}/><path d="M90 52 Q106 74 98 100 Q88 80 82 66Z" ${vol(p.foulard)}/><circle cx="60" cy="24" r="4.5" fill="#facc15" stroke="#a16207" stroke-width="1.5"/>`);
   if (p.chapeau === 'toque') o.push(`<rect x="38" y="14" width="44" height="26" rx="4" ${vol('#ffffff')}/><circle cx="44" cy="14" r="12" ${vol('#ffffff')}/><circle cx="60" cy="9" r="14" ${vol('#ffffff')}/><circle cx="76" cy="14" r="12" ${vol('#ffffff')}/>`);
+  if (p.chapeau === 'melon') o.push(`<ellipse cx="60" cy="34" rx="36" ry="7" ${vol('#1f2937')}/><path d="M40 34 Q40 8 60 8 Q80 8 80 34Z" ${vol('#1f2937')}/><path d="M40 28 H80 V33 H40Z" fill="${p.ruban || '#facc15'}"/>`);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">${o.join('')}</svg>`;
 }

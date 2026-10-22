@@ -261,7 +261,9 @@ On met **deux adultes** dans le nid du Couvoir. Un œuf apparaît et part dans u
 - **L’éveil :** au niveau 20, au Labo, avec une pierre d’éveil 💎 (une seule sorte de pierre, trouvée dans les îles). La dindie gagne +1 à chaque stat de base (10 au maximum) et une nouvelle apparence ; la place de compétence en plus arrivera avec les compétences (étape 5).
 
 ### 7.4 Les compétences de course (20)
-Chaque espèce a une compétence liée à son type. Le coach en apprend une deuxième, et une troisième après l’éveil.
+Chaque espèce a une compétence liée à son type (deux possibles par type, selon l’espèce ; les mythiques ont l’Arc-en-ciel). Coach Ginette en apprend une deuxième (la première leçon est offerte, puis 200 🪙), et une troisième après l’éveil. On peut en oublier une pour en apprendre une autre.
+
+**Ce que Ginette enseigne :** Turbo-Glou, Départ canon, Sprint final, Second souffle, Aspiration, Esquive, Cri d’encouragement, Coup de vent, Pluie de plumes, Saut de crapaud.
 
 | Compétence | Effet |
 |---|---|
@@ -295,12 +297,23 @@ En mode aide, les compétences se déclenchent toutes seules.
 - ⚡ **la vitesse :** la vitesse de pointe ;
 - 💪 **l’endurance :** la fatigue (en dessous de 30 % d’endurance, on ralentit) ;
 - 🦘 **le saut :** les haies (on peut sauter, trébucher et perdre 1 s, ou faire un saut parfait si on touche au bon moment) ;
-- **le terrain :** +10 % sur la piste de son type, −10 % sur la piste du type opposé (pas de malus en mode aide) ;
+- **le terrain :** +8 % sur la piste de son type, −8 % sur la piste du type opposé (pas de malus en mode aide) ; les zones de sable ou de boue ralentissent tout le monde (− 15 %), sauf avec une compétence de glisse ;
 - **les compétences**, avec un temps de recharge.
 
-**Les sortes de courses :** sprint (400 m), haies (600 m), marathon (1 200 m), relais à 3 dindies (3 × 400 m), et les 8 pistes de type (Prés, Dunes, Boue, Lianes, Glace, Lave, Nuit, Nuages).
+**Les règles (étape 5, réglées avec le simulateur) :**
+- vitesse de pointe `9 + 0,2 × ⚡` m/s, endurance `55 + 1,8 × 💪`, « forme du jour » ± 2,5 % ;
+- la fatigue dépend de l’allure (puissance 4) : chaque dindie règle son effort pour tenir jusqu’au bout, et accélère dans les derniers 15 % s’il lui reste des forces ;
+- les haies : la joueuse touche 🦘 quand l’anneau devient vert (saut parfait : un petit élan) ; trop tôt, c’est la chute (environ 1 s perdue) ; si elle ne touche rien, la dindie saute toute seule, avec une chance de réussite qui dépend de son 🦘 ;
+- « 🔥 Fonce ! » : plus vite, mais beaucoup plus fatigant ; ⏩ accélère l’affichage ;
+- en mode aide : pas de chute, les compétences partent toutes seules, pas de malus de terrain.
 
-**Les 8 championnats :** chacun a 3 courses, puis une finale contre le champion, qui donne le badge, des pièces, un objet et ouvre la région suivante. Les adversaires vont du niveau 8 (championnat 1) au niveau 40 (championnat 8).
+**La piste du Dindodrome** est un anneau de 200 m (6 couloirs, deux lignes droites et deux virages), avec la ligne d’arrivée sous un portique devant la grande tribune. Les pistes de type changent la couleur du sol, les obstacles (haies, bottes de foin, dunes, troncs) et le décor.
+
+**Les sortes de courses :** essai (300 m), sprint (400 m), haies (600 m), marathon (1 000 m, 5 tours), piste de type (500 m), relais à 3 dindies (3 × 400 m, plus tard), et les 8 pistes de type (Prés, Dunes, Boue, Lianes, Glace, Lave, Nuit, Nuages). Les courses libres, contre des dindies de son niveau, rapportent de l’expérience et des pièces.
+
+**Les 8 championnats :** chacun a 3 courses (il faut finir sur le podium), puis une finale contre le champion (il faut gagner), qui donne le badge, des pièces, des plumes d’or et des biscuits. Les adversaires vont du niveau 8 (championnat 1) au niveau 40 (championnat 8). Les 4 premiers (étape 5) : la Coupe des Prés (Gaston, son Trèfle Clochette, niv. 12), la Coupe des Dunes (Leïla, sa Dinde Dingue Sultane, niv. 13), la Coupe de la Pluie (Monsieur Waffel, son Belgicus Speculoos, niv. 21) et la Coupe des Lianes (Tarzanette, venue de la Jungle avec son jaguar Moustique, niv. 20). La finale se court sur la piste du type du champion.
+
+**Le terrain d’entraînement** (Coach Ginette, au Domaine) : 3 petits jeux, un par stat — le sprint des petits pas ⚡ (taper à gauche et à droite le plus vite possible), le souffle régulier 💪 (taper quand la bulle touche l’anneau), les haies de Ginette 🦘 (sauter au bon moment). Chaque partie donne 1 à 3 points d’entraînement (15 au plus par stat ; un maïs doré en donne 1 de plus) et de l’expérience.
 
 **La Ligue des Légendes :** 4 courses contre les Quatre Plumes, puis Gontran (niveau 45 à 50). C’est la fin de l’histoire.
 
@@ -339,8 +352,8 @@ En mode aide, les compétences se déclenchent toutes seules.
 1. *Le Domaine en ruine* (7 quêtes) : tutoriel, le premier enclos, le Clapier, la montgolfière.
 2. *L’expédition* (10 quêtes) : la carte du monde, les Prés, le Maroc imaginaire et la Belgique, les 12 premières espèces sauvages, le chapeau de soleil et le parapluie, les légendes du Coquelicot, de la Dinde Dingue et de l’Atomium.
 3. *Le premier œuf* (5 quêtes) : le Couvoir (kit de construction), l’œuf du Professeur, la Nurserie, le premier croisement (un hybride), l’éveil au Labo.
-4. *Le Dindodrome ouvre* : l’entraînement, les championnats 1 à 3, Gontran, l’Atelier des plumes.
-5. *Jungle et Banquise* : les régions 4 et 5, les championnats 4 et 5, les missions.
+4. *Le Dindodrome ouvre* (8 quêtes) : le portail, la course d’essai avec Monsieur Chrono, le terrain d’entraînement, les championnats 1 à 4 (Tarzanette vient de la Jungle pour le 4e), deux défis de Gontran, une première leçon de compétence.
+5. *Jungle et Banquise* : les régions 4 et 5, les championnats 5 et 6, l’Atelier des plumes, les missions.
 6. *Volcan et Forêt de la Lune* : les régions 6 et 7, les championnats 6 et 7, l’éveil.
 7. *Le Royaume des Nuages* : la région 8, le championnat 8, les mythiques.
 8. *La Légende* : la Ligue des Légendes, la plume arc-en-ciel, le Dindromakus, la fin et le générique.
@@ -398,15 +411,19 @@ docs/royaume/
   js/jeu/                 etat, individus, objets, scenario (quêtes et dialogues),
                           sauvages (les apparitions), capture, trouvailles (coffres, œufs…),
                           elevage (œufs, croisements, minuteurs, croissance, expérience, éveil),
-                          collection (les espèces débloquées de chaque profil)
+                          collection (les espèces débloquées de chaque profil),
+                          course (la simulation d'une course), dindodrome (courses, gains, badges, leçons)
   js/ui/                  panneaux (Boutique, Labo, Livre, Musée, Fiche, Clapier…),
                           monde (la carte du monde, le voyage en montgolfière),
-                          elevage (le Couvoir, la Nurserie, l’éclosion, l’éveil)
+                          elevage (le Couvoir, la Nurserie, l’éclosion, l’éveil),
+                          dindodrome (Bureau des courses, résultats, trophées),
+                          entrainement (le terrain de Coach Ginette et ses 3 mini-jeux)
   musique/                les musiques libres (MP3) et leurs crédits
-  js/scenes/              titre, jeu (le Domaine), defile (étape 1), region, capture,
-                          couvoir, dindodrome, course, concours
-royaume-outils/           les tests Playwright, le simulateur d'équilibrage,
-                          le générateur du tableau des espèces
+  js/scenes/              titre, jeu (le Domaine et tous les lieux), defile (étape 1),
+                          course (la course en 3D : caméra, interface, podium)
+  js/monde/dindodrome.js  le Dindodrome (piste, tribunes, public, tableau, podium)
+royaume-outils/           les tests Playwright (test-etape1 à 5), le simulateur d'équilibrage
+                          des courses (simulateur-courses.mjs), le générateur du tableau des espèces
 ```
 
 - **Des modules ES sans outil de construction :** Three.js 0.160.0 par carte d’import (jsdelivr), mis en ligne tel quel par GitHub Pages.
@@ -458,10 +475,11 @@ Chaque étape se termine par : les tests passent, des captures sur les 4 formats
 - [x] En plus : le chapitre 3 (5 quêtes), l’éclosion animée, les sabliers et les biscuits de champion, et le Défilé limité aux dindies débloquées (pas de « teaser » des 72).
 - **Fini quand :** on peut obtenir des hybrides et faire évoluer une dindie.
 
-### Étape 5 — Le Dindodrome
-- [ ] La piste 3D, la simulation de course, les actions du joueur, les compétences.
-- [ ] Le terrain d’entraînement et ses 3 mini-jeux, et l’apprentissage des compétences.
-- [ ] Les championnats 1 à 4, les badges et Gontran.
+### Étape 5 — Le Dindodrome ✅
+- [x] La piste 3D, la simulation de course, les actions du joueur, les compétences.
+- [x] Le terrain d’entraînement et ses 3 mini-jeux, et l’apprentissage des compétences.
+- [x] Les championnats 1 à 4, les badges et Gontran.
+- [x] En plus : le chapitre 4 (8 quêtes), Monsieur Chrono le présentateur, le public et le podium, la Salle des trophées et les records, les courses libres, deux musiques de course libres (orgue de foire), et le simulateur d’équilibrage dans les tests.
 - **Fini quand :** on peut élever un champion et gagner 4 badges.
 
 ### Étape 6 — La production
@@ -509,3 +527,4 @@ Chaque étape se termine par : les tests passent, des captures sur les 4 formats
 | 2026-10-21 | 2 | Le Domaine est jouable (`docs/royaume/index.html`) : écran titre avec 3 profils, prologue illustré, île 3D (eau, écume, chemins, arbres, fleurs, lampadaires, lucioles), jour et nuit à l’heure réelle (ou réglés), déplacements au toucher (A*), au joystick et au clavier, caméra qui suit, silhouette derrière les murs. Bâtiments : Maison, Labo, Boutique, Musée, 8 enclos (2 à réparer au chapitre 1), Clapier, porte du Dindodrome, port et montgolfière. 5 PNJ en chibi avec portraits SVG, dialogues, journal, carte, sac, fiche des dindies (stats et potentiel), Grand Livre avec silhouettes et indices. Chapitre 1 en 7 quêtes, jusqu’à la montgolfière réparée. Sauvegarde automatique, code de sauvegarde et fichier. Le Défilé passe sur `defile.html`. Bouton sur l’accueil du site, sous la ferme, avec « 🚧 En développement ». Tests : `royaume-outils/test-etape2.mjs` (chapitre 1 joué de bout en bout avec chaque starter, rechargement de la sauvegarde, aucune erreur) et `test-etape1.mjs` (toujours vert). |
 | 2026-10-22 | 3 | L’expédition est jouable : le chapitre 2 en 10 quêtes. La carte du monde (8 îles, 3 ouvertes) et le voyage en montgolfière ; 3 îles en 3D construites à la demande et libérées au départ (mémoire stable) : les Prés (ferme de Gaston, moulin, mare, champ de coquelicots, jardin oublié), le Maroc imaginaire (dunes, ksar, souk et ses lanternes, oasis), la Belgique (canaux et ponts, Grand-Place, beffroi, maisons à pignons, Atomium). La météo par île et par heure (pluie, nuages, soleil). Les dindies sauvages (zones, heure, météo, équipement, mirages), la capture (friandises préférées, jauge de confiance, cercle et zone verte, 3 essais), la carte d’une dindie attrapée et la prime du Grand Livre. Les guides Gaston, Leïla et Monsieur Waffel ; les gadgets (le coq, le cadran magique, la bouteille à nuages) ; les coffres, œufs mystère et pierres d’éveil du jour ; filets solide et doré, chapeau de soleil, parapluie. De vraies musiques libres (0 A.D., OpenRCT2) à la place de la mélodie synthétisée. Les épiques ne dépendent plus des champions mais d’une petite quête de leur île. Les anciennes sauvegardes passent au chapitre 2. Tests : `royaume-outils/test-etape3.mjs` (les 12 espèces attrapées, gadgets, voyages, mémoire, sauvegarde) ; `test-etape1.mjs` et `test-etape2.mjs` toujours verts. |
 | 2026-10-22 | 4 | L’élevage est jouable : le chapitre 3 en 5 quêtes. Le Couvoir (une hutte ronde, le nid et 2 couveuses sous cloche, les œufs visibles en 3D) et la Nurserie (une maison pastel, sa cour clôturée, son bac à sable et son toboggan, où jouent les bébés le jour) se réparent avec un kit de construction de Mimi. Les croisements (hybrides 30 % / 15 %, recettes 25 %, le premier hybride garanti), les minuteurs en temps réel même jeu fermé, le sablier, l’éclosion animée avec le prénom du bébé, les 3 stades (poussin, jeune, adulte) et les repas qui font grandir plus vite. L’expérience (friandises, biscuits de champion, captures, promenades) et les niveaux ; l’éveil au Labo au niveau 20 avec une pierre d’éveil ; les chromatiques (1 sur 64). Les œufs mystère trouvés dans les îles éclosent enfin. Le Défilé (écran titre et page du Défilé) ne montre plus que les dindies débloquées du profil. Les sauvegardes de l’étape 3 passent au chapitre 3. Tests : `royaume-outils/test-etape4.mjs` (chapitre 3 joué de bout en bout, 300 croisements, minuteurs, rechargement) ; `test-etape1.mjs` (avec le Défilé limité), `test-etape2.mjs` et `test-etape3.mjs` toujours verts. |
+| 2026-10-22 | 5 | Le Dindodrome est ouvert : le chapitre 4 en 8 quêtes. Un nouveau lieu au bout de la route de l’est (on y entre par le portail, avec un fondu en damier) : une piste en anneau de 200 m à 6 couloirs, la grande tribune et son public qui s’agite, le portique de l’arrivée, le tableau d’affichage, le podium, le Bureau des courses de Monsieur Chrono (le présentateur) et la Salle des trophées. Les courses en 3D : 6 dindies, la caméra derrière la nôtre, le compte à rebours, le commentateur, les haies (l’anneau vert du bouton 🦘 pour un saut parfait), 20 compétences avec leur recharge, « 🔥 Fonce ! », ⏩, puis le podium et les résultats (gains, expérience, records). La simulation (vitesse, endurance et fatigue, sauts, terrain, zones de sable et de boue, compétences) est réglée avec un simulateur. Les 4 premiers championnats (Prés, Dunes, Pluie, Lianes : 3 courses sur le podium puis la finale), leurs badges, deux défis de Gontran, les courses libres. Le terrain d’entraînement de Coach Ginette au Domaine (3 mini-jeux, un par stat, et les leçons de compétences). Deux nouveaux personnages (Monsieur Chrono, Tarzanette) et trois musiques libres de plus (orgue de foire et ragtime, domaine public). La 3D se met en pause pendant les mini-jeux. Les sauvegardes de l’étape 4 passent au chapitre 4. Tests : `royaume-outils/test-etape5.mjs` (l’équilibre sur des centaines de courses simulées, puis le chapitre 4 joué de bout en bout : 19 courses, les 3 mini-jeux, une leçon, la mémoire du Dindodrome, le rechargement) ; `test-etape1.mjs` à `test-etape4.mjs` toujours verts. |

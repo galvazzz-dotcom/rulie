@@ -234,22 +234,54 @@ export function ruine(texte, w = 6, d = 5, moulin = false) {
   return { g, obst: [[0, 0, w + .4, d + .4], [-w / 2 + .3, d / 2 + .3, 2.2, .8]], porte: [1.2, d / 2 + 1.6] };
 }
 
-/* ── le portail du Dindodrome (fermé pour l'instant) ── */
-export function portailDindodrome() {
+/* ── le portail du Dindodrome (fermé jusqu'au chapitre 4) ── */
+export function portailDindodrome(ouvert = false) {
   const p = [];
   for (const s of [-1, 1]) {
     for (let k = 0; k < 6; k++) p.push(B(k % 2 ? '#111827' : '#f8fafc', [s * 3.2, .55 + k * .8, 0], [1.2, .8, 1.2]));
     p.push(CO('#ef4444', [s * 3.2, 5.4, 0], [.9, 1, .9], [0, Math.PI / 4, 0], 4), CY('#6b7280', [s * 3.2, 6.6, 0], [.04, 1.6, .04]), B('#ef4444', [s * 3.2 + .35, 7.1, 0], [.7, .45, .04]));
   }
   p.push(B('#f59e0b', [0, 4.6, 0], [5.4, .9, .9]));
-  p.push(B('#8a5a3c', [-1.25, 1.5, 0], [2.4, 3, .2]), B('#8a5a3c', [1.25, 1.5, 0], [2.4, 3, .2]));
-  for (const x of [-1.25, 1.25]) for (const y of [.6, 1.5, 2.4]) p.push(B('#6b3a1e', [x, y, .12], [2.3, .14, .06]));
-  p.push(B('#facc15', [0, 1.6, .16], [.6, .5, .1]));
+  /* les deux battants : fermés, ou grands ouverts vers l'intérieur */
+  for (const s of [-1, 1]) {
+    const cx = ouvert ? s * 2.45 : s * 1.25, cz = ouvert ? -1.2 : 0, r = ouvert ? [0, s * Math.PI / 2, 0] : [0, 0, 0];
+    p.push(B('#8a5a3c', [cx, 1.5, cz], [2.4, 3, .2], r));
+    for (const y of [.6, 1.5, 2.4]) p.push(B('#6b3a1e', [cx + (ouvert ? 0 : 0), y, cz + (ouvert ? 0 : .12)], ouvert ? [.06, .14, 2.3] : [2.3, .14, .06]));
+  }
+  if (!ouvert) p.push(B('#facc15', [0, 1.6, .16], [.6, .5, .1]));
+  else for (let k = 0; k < 7; k++) p.push(CO(['#ef4444', '#facc15', '#3b82f6', '#22c55e', '#a855f7', '#f97316', '#ec4899'][k], [-2.6 + k * .87, 3.75, .3], [.22, .38, .03], [Math.PI, 0, 0], 3));
   for (const s of [-1, 1]) for (let k = 1; k < 5; k++) p.push(B('#fff3dc', [s * (3.2 + k * 1.6), .5, 0], [.15, 1, .15]), B('#fff3dc', [s * (3.2 + k * 1.6 - .8), .7, 0], [1.6, .12, .1]));
   const g = construire(p, []);
   const ban = pancarte('🏁 DINDODROME', 5, .8, { fond: '#111827', encre: '#facc15', bord: '#f59e0b' }); ban.position.set(0, 4.6, .48); g.add(ban);
-  const bientot = pancarte('Ouverture bientôt !', 2.4, .5, { fond: '#fef3c7', encre: '#b91c1c', bord: '#ef4444' }); bientot.position.set(0, 2.5, .25); g.add(bientot);
+  if (!ouvert) { const bientot = pancarte('Ouverture bientôt !', 2.4, .5, { fond: '#fef3c7', encre: '#b91c1c', bord: '#ef4444' }); bientot.position.set(0, 2.5, .25); g.add(bientot); }
+  else { const bv = pancarte('🏁 Bienvenue !', 2.2, .5, { fond: '#dcfce7', encre: '#166534', bord: '#22c55e' }); bv.position.set(0, 3.3, .5); g.add(bv); }
   return { g, obst: [[0, 0, 19, 1.4]], porte: [0, 1.8] };
+}
+
+/* ── le terrain d'entraînement de Coach Ginette : une piste, des haies, des plots, le chrono ── */
+export function terrainEntrainement() {
+  const p = [], fen = [];
+  p.push(B('#86cf63', [0, .04, 0], [12, .08, 8]), B('#c8553d', [0, .1, 1.6], [11, .06, 1.8]), B('#ffffff', [0, .14, .7], [11, .02, .06]), B('#ffffff', [0, .14, 2.5], [11, .02, .06]));
+  for (const x of [-2.5, .5, 3.5]) {
+    p.push(CY('#f8fafc', [x, .35, .95], [.035, .5, .035]), CY('#f8fafc', [x, .35, 2.25], [.035, .5, .035]));
+    for (let k = 0; k < 4; k++) p.push(B(k % 2 ? '#ef4444' : '#ffffff', [x, .6, 1.07 + k * .36], [.05, .12, .36]));
+  }
+  for (const [x, z] of [[-4.5, -1.2], [-3, -1.6], [-1.5, -1.2], [0, -1.6], [1.5, -1.2]]) p.push(CO('#f97316', [x, .28, z], [.2, .5, .2]), CY('#ffffff', [x, .3, z], [.13, .07, .13]));
+  /* la cabane du coach, le grand chrono, le banc */
+  p.push(B('#fde68a', [4.3, 1, -2.4], [2.6, 2, 2]), T('#7c3aed', [4.3, 2.1, -2.4], [2.2, 1.1, 2.9], [0, Math.PI / 2, 0]), B('#78350f', [4.3, .8, -1.38], [.8, 1.6, .06]));
+  fenetre(p, fen, 3.4, 1.2, -1.38, .5, .5, '#7c3aed');
+  p.push(CY('#374151', [-4.8, 1.5, -2.6], [.08, 3, .08]), CY('#f8fafc', [-4.8, 3.2, -2.6], [.65, .14, .65], [Math.PI / 2, 0, 0], 24), CY('#facc15', [-4.8, 3.2, -2.67], [.72, .1, .72], [Math.PI / 2, 0, 0], 24));
+  p.push(B('#111827', [-4.8, 3.42, -2.5], [.05, .45, .03]), B('#111827', [-4.65, 3.22, -2.5], [.32, .05, .03], [0, 0, .5]));
+  p.push(B('#a16207', [1.5, .45, -3.2], [3, .12, .6]), B('#78350f', [.3, .22, -3.2], [.12, .45, .5]), B('#78350f', [2.7, .22, -3.2], [.12, .45, .5]));
+  /* la barrière */
+  for (let k = 0; k <= 12; k++) for (const z of [-3.95, 3.95]) p.push(B('#fff3dc', [-6 + k, .4, z], [.12, .8, .12]));
+  for (const z of [-3.95, 3.95]) p.push(B('#fff3dc', [0, .62, z], [12, .1, .08]));
+  for (let k = 0; k <= 8; k++) p.push(B('#fff3dc', [-6, .4, -4 + k], [.12, .8, .12]));
+  p.push(B('#fff3dc', [-6, .62, 0], [.08, .1, 8]));
+  const g = construire(p, fen);
+  const t = pancarte('🏋️ Terrain d’entraînement', 3.4, .65, { fond: '#f5f3ff', encre: '#6d28d9', bord: '#7c3aed' }); t.position.set(-1.2, 1.15, 4.05); g.add(t);
+  g.add(construire([B('#8a5a3c', [-2.4, .55, 4.02], [.1, 1.1, .1]), B('#8a5a3c', [0, .55, 4.02], [.1, 1.1, .1])], [], .02));
+  return { g, obst: [[4.3, -2.4, 2.8, 2.2], [-4.8, -2.6, .4, .4], [1.5, -3.2, 3.1, .7], [0, -4, 12.4, .3], [-6, 0, .3, 8.2]], porte: [0, -5] };
 }
 
 /* ── le port : le ponton, le phare et la montgolfière ── */

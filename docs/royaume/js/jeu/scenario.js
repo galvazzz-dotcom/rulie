@@ -15,9 +15,11 @@ import { forcerHeure, estMatin, estNuit } from '../moteur/temps.js';
 import { forcerMeteo, meteo } from '../moteur/meteo.js';
 import { jour } from './trouvailles.js';
 import { CACHETTES } from '../monde/domaine.js';
+import * as DD from './dindodrome.js';
+import { CHAMPIONNATS } from '../donnees/courses.js';
 
 export const STARTERS = ['paquerette', 'crachin', 'braise'];
-export const CHAPITRES = { 1: 'Le Domaine en ruine', 2: 'L’expédition', 3: 'Le premier œuf', 4: 'Le Dindodrome ouvre' };
+export const CHAPITRES = { 1: 'Le Domaine en ruine', 2: 'L’expédition', 3: 'Le premier œuf', 4: 'Le Dindodrome ouvre', 5: 'Jungle et Banquise' };
 export const QUETES = [
   { id: 'q1', chapitre: 1, titre: 'Bienvenue au Domaine', etapes: ['arrivee', 'choix'], recompense: { pieces: 300 } },
   { id: 'q2', chapitre: 1, titre: 'Un abri pour ta dindie', etapes: ['planches', 'reparer1', 'installer1'], recompense: { pieces: 100 } },
@@ -40,15 +42,23 @@ export const QUETES = [
   { id: 'q19', chapitre: 3, titre: 'Le premier œuf', etapes: ['oeufTuto', 'eclosion'], recompense: { pieces: 100, objets: { sablier: 2 } } },
   { id: 'q20', chapitre: 3, titre: 'La Nurserie', etapes: ['kitNurserie', 'reparerNurserie', 'grandir'], recompense: { pieces: 150, objets: { biscuit: 3 } } },
   { id: 'q21', chapitre: 3, titre: 'Le premier croisement', etapes: ['nid', 'oeufCroise'], recompense: { pieces: 250, objets: { biscuit: 5 } } },
-  { id: 'q22', chapitre: 3, titre: 'L’éveil', etapes: ['parlerPlumeau4', 'eveil'], recompense: { pieces: 300, plumesOr: 2 } }
+  { id: 'q22', chapitre: 3, titre: 'L’éveil', etapes: ['parlerPlumeau4', 'eveil'], recompense: { pieces: 300, plumesOr: 2 } },
+  { id: 'q23', chapitre: 4, titre: 'Le Dindodrome ouvre', etapes: ['parlerPlumeau5', 'parlerGinette', 'entrerDindodrome', 'courseEssai'], recompense: { pieces: 200, objets: { biscuit: 2 } } },
+  { id: 'q24', chapitre: 4, titre: 'Le terrain d’entraînement', etapes: ['kitEntrainement', 'reparerEntrainement', 'entrainement3'], recompense: { pieces: 200, objets: { graineMais: 3 } } },
+  { id: 'q25', chapitre: 4, titre: 'La Coupe des Prés', etapes: ['coupe1'], recompense: { pieces: 150 } },
+  { id: 'q26', chapitre: 4, titre: 'Le défi de Gontran', etapes: ['gontran1'], recompense: { pieces: 300, objets: { biscuit: 2 } } },
+  { id: 'q27', chapitre: 4, titre: 'Une nouvelle compétence', etapes: ['lecon'], recompense: { pieces: 150 } },
+  { id: 'q28', chapitre: 4, titre: 'La Coupe des Dunes', etapes: ['coupe2'], recompense: { pieces: 200 } },
+  { id: 'q29', chapitre: 4, titre: 'La Coupe de la Pluie', etapes: ['coupe3'], recompense: { pieces: 250 } },
+  { id: 'q30', chapitre: 4, titre: 'La Coupe des Lianes', etapes: ['coupe4', 'gontran2'], recompense: { pieces: 500, plumesOr: 2 } }
 ];
 const ORDRE = [...QUETES.flatMap(q => q.etapes), 'fin'];
 export const queteDe = etape => QUETES.find(q => q.etapes.includes(etape));
-export const chapitreActuel = () => { const Q = queteDe(E().quete.etape); return Q ? Q.chapitre : 3; };
+export const chapitreActuel = () => { const Q = queteDe(E().quete.etape); return Q ? Q.chapitre : 4; };
 /* l'histoire en est-elle arrivée à cette étape (ou plus loin) ? */
 export const etapeAtteinte = s => ORDRE.indexOf(E().quete.etape) >= ORDRE.indexOf(s);
 const OUVERTURE = { pres: 'decollage', maroc: 'volMaroc', belgique: 'volBelgique' };
-export const regionOuverte = id => id === 'domaine' || (!!OUVERTURE[id] && etapeAtteinte(OUVERTURE[id]));
+export const regionOuverte = id => id === 'domaine' || (id === 'dindodrome' ? etapeAtteinte('entrerDindodrome') : !!OUVERTURE[id] && etapeAtteinte(OUVERTURE[id]));
 
 const E = () => J.etat();
 const qui = id => ({ nom: PERSONNAGES[id].nom, portrait: portraitChibi(PERSONNAGES[id], 'dlg' + id), couleur: PERSONNAGES[id].couleur });
@@ -71,10 +81,12 @@ const LIEU = { gaston: 'pres', capture1: 'pres', pres3: 'pres', parlerGaston2: '
   leila: 'maroc', maroc3: 'maroc', parlerLeila2: 'maroc', lanternes: 'maroc', dingue: 'maroc', parapluie: 'domaine', waffel: 'belgique', belgique3: 'belgique',
   parlerWaffel2: 'belgique', boules: 'belgique', atomium: 'belgique', volMaroc: 'zephyr', volBelgique: 'zephyr', decollage: 'domaine',
   parlerPlumeau3: 'domaine', kitCouvoir: 'domaine', reparerCouvoir: 'domaine', oeufTuto: 'domaine', eclosion: 'domaine', kitNurserie: 'domaine', reparerNurserie: 'domaine',
-  grandir: 'domaine', nid: 'domaine', oeufCroise: 'domaine', parlerPlumeau4: 'domaine', eveil: 'domaine' };
+  grandir: 'domaine', nid: 'domaine', oeufCroise: 'domaine', parlerPlumeau4: 'domaine', eveil: 'domaine',
+  parlerPlumeau5: 'domaine', parlerGinette: 'domaine', entrerDindodrome: 'domaine', courseEssai: 'dindodrome', kitEntrainement: 'domaine', reparerEntrainement: 'domaine',
+  entrainement3: 'domaine', coupe1: 'dindodrome', gontran1: 'dindodrome', lecon: 'domaine', coupe2: 'dindodrome', coupe3: 'dindodrome', coupe4: 'dindodrome', gontran2: 'dindodrome' };
 export const lieuEtape = () => { const s = E().quete.etape; return ORDRE.indexOf(s) < ORDRE.indexOf('decollage') ? 'domaine' : LIEU[s] || null; };
 let lieuActuel = () => 'domaine';
-const nomLieu = id => id === 'domaine' ? 'au Domaine' : REGIONS[id] ? `${REGIONS[id].nom.replace(/^(Le |La |Les )/, m => ({ 'Le ': 'au ', 'La ': 'en ', 'Les ': 'aux ' })[m])}` : '';
+const nomLieu = id => id === 'domaine' ? 'au Domaine' : id === 'dindodrome' ? 'au Dindodrome' : REGIONS[id] ? `${REGIONS[id].nom.replace(/^(Le |La |Les )/, m => ({ 'Le ': 'au ', 'La ': 'en ', 'Les ': 'aux ' })[m])}` : '';
 
 /* ── le texte de l'étape (le bandeau en haut) et ce que montre la flèche ── */
 export function texteEtape() {
@@ -132,15 +144,36 @@ export function texteEtape() {
     oeufCroise: 'Fais éclore l’œuf du croisement au Couvoir (⏳ un sablier aide !) 🥚',
     parlerPlumeau4: 'Montre ton hybride au Professeur Plumeau 🔬',
     eveil: 'Éveille une dindie au Labo : niveau 20 et une pierre d’éveil 🌟',
-    fin: 'Chapitre 4 bientôt : le Dindodrome ouvre ! 🏁'
+    parlerPlumeau5: 'Va voir le Professeur Plumeau : il a une grande nouvelle ! 🔬',
+    parlerGinette: 'Va voir Coach Ginette, devant le portail du Dindodrome, à l’est 🏁',
+    entrerDindodrome: 'Entre au Dindodrome : touche le portail, au bout de la route de l’est 🏁',
+    courseEssai: 'Parle à Monsieur Chrono, devant le Bureau des courses : ta première course ! 🎙️',
+    kitEntrainement: 'Achète un kit de construction chez Mimi, pour le terrain d’entraînement 🧰',
+    reparerEntrainement: 'Répare le terrain d’entraînement, au bord de la route du Dindodrome 🏋️',
+    entrainement3: `Joue aux 3 jeux d’entraînement de Coach Ginette (${(e.quete.jeux || []).length}/3) 🏋️`,
+    coupe1: `La Coupe des Prés 🍀 : 3 courses sur le podium, puis la finale contre Gaston ! (${coupeTexte(1)})`,
+    gontran1: 'Gontran te lance un défi au Dindodrome ! Va lui parler 😤',
+    lecon: 'Apprends une nouvelle compétence à une dindie, chez Coach Ginette (la 1re leçon est offerte !) 📚',
+    coupe2: `La Coupe des Dunes ☀️ : 3 podiums, puis la finale contre Leïla ! (${coupeTexte(2)})`,
+    coupe3: `La Coupe de la Pluie 💧 : 3 podiums, puis la finale contre Monsieur Waffel ! (${coupeTexte(3)})`,
+    coupe4: `La Coupe des Lianes 🌴 : 3 podiums, puis la finale contre Tarzanette ! (${coupeTexte(4)})`,
+    gontran2: 'Gontran veut sa revanche ! Va lui parler au Dindodrome 😤',
+    fin: 'Chapitre 5 bientôt : la Jungle et la Banquise ! 🌴❄️'
   })[s] || '';
+  if (la === 'dindodrome' && ici === 'domaine') return t + ' <i>(au Dindodrome : par le portail de l’est 🏁)</i>';
+  if (la === 'domaine' && ici === 'dindodrome') return t + ' <i>(au Domaine : par le portail 🏡)</i>';
+  if (la === 'dindodrome' && ici !== 'dindodrome') return t + ' <i>(au Dindodrome : rentre d’abord au Domaine en montgolfière 🎈)</i>';
   if (la && la !== 'zephyr' && la !== ici) return t + ` <i>(${nomLieu(la)} : en montgolfière 🎈)</i>`;
   return t;
 }
 /* l'identifiant de l'objet interactif à montrer (ou une liste : le plus proche) ;
    'sauvage:espece' = une dindie sauvage ; 'zone:nom' = un coin de la région */
+/* les courses déjà réussies d'un championnat : « 2/3 podiums » ou « la finale ! » */
+const coupeTexte = n => { const C = CHAMPIONNATS[n - 1], k = C.courses.filter(c => (DD.meilleurePlace(c.id) || 9) <= 3).length; return k < 3 ? `${k}/3 podiums` : 'la finale !'; };
 export function cibleEtape() {
   const e = E(), s = e.quete.etape, ici = lieuActuel(), la = lieuEtape();
+  if (la === 'dindodrome' && ici === 'domaine') return 'dindodrome';
+  if (la === 'domaine' && ici === 'dindodrome') return 'sortie';
   if (la && la !== 'zephyr' && la !== ici) return 'pnj-zephyr';
   if (s === 'planches') return ['planche1', 'planche2', 'planche3'].filter(p => !e.monde.ramasses[p]).map(p => 'objet-' + p);
   if (s === 'nourrir') {
@@ -162,7 +195,10 @@ export function cibleEtape() {
     decollage: 'pnj-zephyr', gaston: 'pnj-gaston', parlerGaston2: 'pnj-gaston', chapeau: 'pnj-mimi', volMaroc: 'pnj-zephyr', leila: 'pnj-leila',
     parlerLeila2: 'pnj-leila', parapluie: 'pnj-mimi', volBelgique: 'pnj-zephyr', waffel: 'pnj-waffel', parlerWaffel2: 'pnj-waffel',
     parlerPlumeau3: 'pnj-plumeau', kitCouvoir: 'pnj-mimi', reparerCouvoir: 'couvoir', oeufTuto: 'couvoir', eclosion: 'couvoir', kitNurserie: 'pnj-mimi',
-    reparerNurserie: 'nurserie', grandir: 'nurserie', nid: 'couvoir', oeufCroise: 'couvoir', parlerPlumeau4: 'pnj-plumeau', eveil: 'labo'
+    reparerNurserie: 'nurserie', grandir: 'nurserie', nid: 'couvoir', oeufCroise: 'couvoir', parlerPlumeau4: 'pnj-plumeau', eveil: 'labo',
+    parlerPlumeau5: 'pnj-plumeau', parlerGinette: 'pnj-ginette', entrerDindodrome: 'dindodrome', courseEssai: 'pnj-chrono', kitEntrainement: 'pnj-mimi',
+    reparerEntrainement: 'entrainement', entrainement3: 'entrainement', lecon: 'entrainement', coupe1: 'bureau', coupe2: 'bureau', coupe3: 'bureau', coupe4: 'bureau',
+    gontran1: 'pnj-gontran', gontran2: 'pnj-gontran'
   })[s] || null;
 }
 
@@ -199,11 +235,18 @@ function preparerEtape() {
     if (['ballon', 'fin'].includes(s) || e.batiments.montgolfiere.reparee) monde.gonflerBallon(e.batiments.montgolfiere.reparee);
     if (e.batiments.montgolfiere.reparee) monde.montrerGontran && monde.montrerGontran(true);
   }
+  if (ici === 'dindodrome' && monde.ajouterPnj) {
+    const PLACES = { gaston: [-19, 32.5, .6], leila: [-11.5, 34.2, .3], waffel: [11.5, 34.2, -.3], tarzanette: [19, 32.5, -.6] };
+    for (const C of CHAMPIONNATS) if (etapeAtteinte('coupe' + C.n)) monde.ajouterPnj(C.champion, ...PLACES[C.champion]);
+    if (etapeAtteinte('gontran1')) monde.ajouterPnj('gontran', 6.5, 27.5, -.4);
+  }
+  if (ici === 'domaine' && e.batiments.dindodrome?.ouvert && monde.ouvrirPortail) monde.ouvrirPortail(false);
   if (ici === 'pres' && s === 'plumesRouges') for (const i of [1, 2, 3]) if (!e.monde.ramasses['plumeRouge' + i]) monde.poserObjet('plumeRouge' + i, 'plume');
   if (ici === 'belgique' && s === 'boules') for (const i of [1, 2, 3]) if (!e.monde.ramasses['bouleArgent' + i]) monde.poserObjet('bouleArgent' + i, 'boule');
   if (ici === 'maroc' && monde.allumerLanterne) for (const i of [1, 2, 3]) monde.allumerLanterne(i, !!e.monde.ramasses['lanterne' + i]);
   /* déjà fait avant d'y arriver (des captures en avance) : on passe à la suite */
   if (s === 'grandir' && e.dindies.some(d => d.stade === 'jeune' && d.lieu === 'nurserie')) setTimeout(() => { if (E().quete.etape === s) avancer(); }, 600);
+  if ((/^coupe[1-4]$/.test(s) && DD.badge(+s.slice(5))) || (s === 'entrainement3' && (e.quete.jeux || []).length >= 3) || (s === 'lecon' && DD.courses().lecons > 0)) setTimeout(() => { if (E().quete.etape === s) avancer(); }, 600);
   if ((s === 'capture1' && attrapeesDans('pres').size) || (s === 'pres3' && !manquantes('pres').length) || (s === 'maroc3' && !manquantes('maroc').length) || (s === 'belgique3' && !manquantes('belgique').length)) setTimeout(() => { if (E().quete.etape === s) avancer(); }, 600);
 }
 
@@ -286,6 +329,13 @@ export async function parler(id) {
       avancer();
       return;
     }
+    if (s === 'parlerPlumeau5') {
+      await dialogue([L('plumeau', 'Roullieee ! Grande nouvelle : <b>le Dindodrome rouvre ses portes</b> ! C’est Coach Ginette qui me l’a dit.'),
+        L('plumeau', 'Le Dindodrome, c’est là que les dindies font la course : vitesse ⚡, endurance 💪 et saut 🦘. Et il y a des <b>championnats</b>, avec des badges !'),
+        L('plumeau', 'Ginette t’attend devant le portail, au bout de la route de l’est. File !')]);
+      avancer();
+      return;
+    }
     if (etapeAtteinte('capture1') && !e.quete.plumeauCapture && e.dindies.some(d => d.origine.startsWith('sauvage:'))) {
       e.quete.plumeauCapture = true;
       await dialogue([L('plumeau', 'Ho ho ! Une dindie sauvage ! Chaque nouvelle espèce attrapée te rapporte une prime de 50 pièces. C’est le règlement du Grand Livre !'),
@@ -294,7 +344,7 @@ export async function parler(id) {
     return monde.ouvrirLabo();
   }
   if (id === 'mimi') {
-    const besoin = { clous: 'clous', kit: 'kitPlanches', friandises: 'friandise', toile: 'toile', chapeau: 'chapeauSoleil', parapluie: 'parapluie', kitCouvoir: 'kitConstruction', kitNurserie: 'kitConstruction' }[s] || (s === 'corde' ? 'toile' : null);
+    const besoin = { clous: 'clous', kit: 'kitPlanches', friandises: 'friandise', toile: 'toile', chapeau: 'chapeauSoleil', parapluie: 'parapluie', kitCouvoir: 'kitConstruction', kitNurserie: 'kitConstruction', kitEntrainement: 'kitConstruction' }[s] || (s === 'corde' ? 'toile' : null);
     if (besoin && !J.combien(besoin) && E().pieces < OBJETS[besoin].prix * (besoin === 'friandise' ? 2 : 1)) {
       await dialogue([L('mimi', `Oh, il te manque des pièces ? Ce n’est pas grave : je te l’offre ! Les amis des dindies sont mes amis.`)]);
       J.ajouterObjet(besoin, besoin === 'friandise' ? 2 : 1);
@@ -303,7 +353,7 @@ export async function parler(id) {
     }
     if (!e.quete.mimiVue) { e.quete.mimiVue = true; await dialogue([L('mimi', 'Bonjour ! Moi c’est Mimi. Graines, friandises, outils… j’ai tout ce qu’il faut pour tes dindies !')]); }
     if (s === 'chapeau' && !e.quete.mimiChapeau) { e.quete.mimiChapeau = true; await dialogue([L('mimi', 'Le Maroc imaginaire ? Il y fait un soleil de plomb ! Il te faut absolument un <b>chapeau de soleil</b> 👒. J’en ai un pour toi !')]); }
-    if ((s === 'kitCouvoir' || s === 'kitNurserie') && !e.quete['mimi' + s]) { e.quete['mimi' + s] = true; await dialogue([L('mimi', 'Un kit de construction ? Planches, clous, peinture… et même un petit marteau ! Le voilà !')]); }
+    if ((s === 'kitCouvoir' || s === 'kitNurserie' || s === 'kitEntrainement') && !e.quete['mimi' + s]) { e.quete['mimi' + s] = true; await dialogue([L('mimi', 'Un kit de construction ? Planches, clous, peinture… et même un petit marteau ! Le voilà !')]); }
     if (s === 'parapluie' && !e.quete.mimiParapluie) { e.quete.mimiParapluie = true; await dialogue([L('mimi', 'La Belgique ? Là-bas, il pleut souvent… Prends un <b>parapluie</b> ☂️ ! Et rapporte-moi une gaufre, hi hi !')]); }
     return monde.ouvrirBoutique();
   }
@@ -440,16 +490,91 @@ export async function parler(id) {
     await dialogue([L('waffel', ['Une gaufre, ça fait toujours plaisir, une fois !', 'Le beffroi sonne les heures depuis des siècles…', 'Quand il pleut, les dindies 💧 Pluie sont de bonne humeur !'][Math.floor(Math.random() * 3)])]);
     return;
   }
+  if (lieuActuel() === 'dindodrome' && ['chrono', 'gontran', 'gaston', 'leila', 'waffel', 'tarzanette'].includes(id)) return parlerDindodrome(id);
   if (id === 'ginette') {
-    await dialogue([L('ginette', 'Une, deux ! Une, deux ! Salut ! Je suis Coach Ginette. Le Dindodrome ouvre bientôt !'),
-      L('ginette', 'Ici, les dindies font la course : vitesse ⚡, endurance 💪 et saut 🦘. Élève-les bien, et reviens me voir !')]);
+    if (!etapeAtteinte('parlerGinette')) {
+      await dialogue([L('ginette', 'Une, deux ! Une, deux ! Salut ! Je suis Coach Ginette. Le Dindodrome ouvre bientôt !'),
+        L('ginette', 'Ici, les dindies font la course : vitesse ⚡, endurance 💪 et saut 🦘. Élève-les bien, et reviens me voir !')]);
+      return;
+    }
+    if (s === 'parlerGinette') {
+      await dialogue([L('ginette', 'Te voilà, Roullieee ! Une, deux ! Le grand jour est arrivé : <b>le Dindodrome rouvre</b> !'),
+        L('ginette', 'Quatre championnats t’attendent pour commencer : la Coupe des Prés 🍀, des Dunes ☀️, de la Pluie 💧 et des Lianes 🌴. Chaque champion a son badge !'),
+        L('ginette', 'Pour courir, une dindie doit être <b>adulte</b> et dans ton <b>équipe</b> 🎒. Allez, j’ouvre le portail !')]);
+      e.batiments.dindodrome.ouvert = true;
+      monde.ouvrirPortail && await monde.ouvrirPortail(true);
+      avancer();
+      await dialogue([L('ginette', 'Entre, et va voir Monsieur Chrono, le présentateur. Il t’inscrira à ta première course !')]);
+      return;
+    }
+    if (s === 'kitEntrainement' || s === 'reparerEntrainement') {
+      await dialogue([L('ginette', 'Pour progresser, rien ne vaut l’entraînement ! Mais mon vieux <b>terrain d’entraînement</b> est en ruine…'),
+        L('ginette', s === 'kitEntrainement' ? 'Mimi vend des <b>kits de construction</b> 🧰. Rapporte-m’en un, et on le répare ensemble !' : 'Tu as le kit ? Touche le terrain, juste à côté, pour le réparer !')]);
+      return;
+    }
+    if (E().batiments.entrainement?.repare) {
+      await dialogue([L('ginette', ['Une, deux ! Prête pour l’entraînement ?', 'Une dindie bien entraînée court plus vite, plus longtemps, et saute plus haut !', 'Les compétences, ça change tout dans une course. Viens prendre une leçon !'][Math.floor(Math.random() * 3)])]);
+      monde.ouvrirEntrainement && monde.ouvrirEntrainement();
+      return;
+    }
+    await dialogue([L('ginette', 'Le Dindodrome est ouvert ! Va courir, et reviens me voir !')]);
     return;
   }
   if (id === 'gontran') {
+    if (etapeAtteinte('gontran1') && !etapeAtteinte('fin')) { await dialogue([L('gontran', 'Je t’attends au Dindodrome, Roullieee ! Flamby et moi, on s’entraîne. Gloup gloup !')]); return; }
     const n = Object.keys(E().livre.attrapes).length;
     await dialogue([L('gontran', n >= 8 ? `Quoi ?! ${n} espèces dans ton Grand Livre ?! Bon… moi j’en ai… beaucoup aussi. Gloup gloup !` : 'Tu verras, Roullieee : ma dindie sera la plus rapide du Royaume ! Gloup gloup !')]);
     return;
   }
+}
+
+/* ── au Dindodrome : Monsieur Chrono, les champions et Gontran ── */
+async function parlerDindodrome(id) {
+  const e = E(), s = e.quete.etape;
+  if (id === 'chrono') {
+    if (s === 'courseEssai') {
+      await dialogue([L('chrono', 'Mesdames et messieurs… bienvenue au <b>Dindodrome</b> ! Je suis Monsieur Chrono, le présentateur !'),
+        L('chrono', 'Une course, c’est simple : ta dindie court toute seule. Toi, tu l’aides !'),
+        L('chrono', 'Quand une <b>haie</b> arrive, un anneau se resserre autour du bouton 🦘. Touche quand il devient <b>vert</b> : saut parfait ! Trop tôt… patatras ! (Et si tu ne touches rien, elle saute toute seule.)'),
+        L('chrono', 'En bas, ses <b>compétences</b> : un coup de pouce, dès qu’elles sont prêtes. Et 🔥 <b>Fonce !</b> la fait aller plus vite… mais elle se fatigue plus : surveille sa barre 💪 !'),
+        L('chrono', 'Pour la course d’essai, pas de pression : 300 mètres et deux haies. Choisis ta coureuse !')]);
+      await monde.courir('essai');
+      return;
+    }
+    if (/^coupe[1-4]$/.test(s) && !e.quete['chrono' + s]) {
+      e.quete['chrono' + s] = true;
+      const C = CHAMPIONNATS[+s.slice(5) - 1];
+      await dialogue([L('chrono', `${C.badge.e} <b>${C.nom}</b> est ouverte ! Trois courses, puis la grande finale contre ${PERSONNAGES[C.champion].nom} !`),
+        L('chrono', 'Les inscriptions, c’est au <b>Bureau des courses</b>, juste à côté. Bonne chance !')]);
+    } else await dialogue([L('chrono', ['Les inscriptions sont ouvertes ! Le Bureau des courses est juste là.', 'Un record ? La Salle des trophées les garde tous !', 'Sur la piste de son type, une dindie court plus vite. Choisis bien ta coureuse !', 'Une dindie fatiguée ralentit. En 🔥 Fonce !, garde un œil sur sa barre 💪 !'][Math.floor(Math.random() * 4)])]);
+    monde.ouvrirBureau && monde.ouvrirBureau();
+    return;
+  }
+  if (id === 'gontran') {
+    if (s === 'gontran1' || s === 'gontran2') {
+      const re = s === 'gontran2';
+      const choix = await dialogue([L('gontran', re ? 'Quatre badges ?! Bon… c’est pas mal. MAIS ! Flamby s’est entraîné jour et nuit. Je veux ma <b>revanche</b> !' : 'Ha ! Roullieee ! Le Badge Trèfle ? Un coup de chance ! Mon <b>Flamby</b> 🔥 est le plus rapide du Royaume !'),
+        L('gontran', re ? 'Une course de haies, toi contre moi. Si tu gagnes, je… je t’applaudis. Promis !' : 'Une course de haies, toi contre moi. Tu as peur ? Gloup gloup !', [['oui', '🏁 C’est parti !'], ['non', '⏳ Plus tard']])]);
+      if (choix !== 'oui') return;
+      await monde.courir(s);
+      return;
+    }
+    if (etapeAtteinte('fin')) { await dialogue([L('gontran', 'Tu es vraiment forte, Roullieee. Mais la prochaine fois… tu verras ! Gloup gloup !')]); return; }
+    await dialogue([L('gontran', 'Flamby et moi, on s’entraîne. La prochaine fois, c’est nous qui gagnons !')]);
+    return;
+  }
+  /* les champions */
+  const C = CHAMPIONNATS.find(x => x.champion === id);
+  if (!C) return;
+  const gagne = DD.badge(C.n);
+  const T = {
+    gaston: ['Salut l’exploratrice ! Au Dindodrome, je suis le champion des Prés 🍀. Ma Clochette (un Dindon Trèfle !) adore la piste des Prés…', 'Bravo pour le Badge Trèfle ! Mes dindies parlent encore de ta course !'],
+    leila: ['Salam ! Sur la piste des Dunes ☀️, le sable ralentit tout le monde… sauf celles qui savent glisser ! Ma Sultane t’attend.', 'Le Badge Soleil te va bien ! Que les dunes te portent chance.'],
+    waffel: ['Une fois ! La piste de Boue 💧, c’est la spécialité belge. Mon Speculoos est un vrai champion, sapristi !', 'Le Badge Goutte ! Tu mérites une gaufre, une fois !'],
+    tarzanette: ['Ohééé ! Je suis Tarzanette, de la Jungle 🌴 ! Sur la piste des Lianes, il y a des troncs partout. Mon jaguar Moustique saute comme personne !', 'Le Badge Liane ! Un jour, viens voir la Jungle, l’exploratrice !']
+  }[id];
+  if (!gagne && s === 'coupe' + C.n) await dialogue([L(id, T[0]), L(id, DD.finaleOuverte(C.n) ? 'Tu as fini les 3 courses ? Alors on se retrouve <b>en finale</b> ! Inscris-toi au Bureau.' : 'D’abord, monte sur le podium des 3 courses de la Coupe. Je t’attends en finale !')]);
+  else await dialogue([L(id, gagne ? T[1] : T[0])]);
 }
 
 /* ── les autres interactions qui comptent pour les quêtes ── */
@@ -510,6 +635,15 @@ export async function interagir(id) {
     avancer();
     return false;     /* on ouvre ensuite la Nurserie */
   }
+  if (id === 'entrainement' && s === 'reparerEntrainement') {
+    if (!J.retirerObjet('kitConstruction')) { toast('Il faut un kit de construction ! Mimi en vend.'); return true; }
+    e.batiments.entrainement.repare = true;
+    await monde.reparerAnime('entrainement');
+    toast('🔨 Le terrain d’entraînement est réparé !');
+    avancer();
+    await dialogue([L('ginette', 'Magnifique ! Une, deux ! Voici mes <b>3 jeux d’entraînement</b> : un pour la vitesse ⚡, un pour l’endurance 💪, un pour le saut 🦘. Essaie-les tous !')]);
+    return false;     /* on ouvre ensuite le terrain */
+  }
   if (id === 'deco-jardin') { toast('🌸 Un jardin oublié, envahi de fleurs… Une grande quête t’y attendra un jour !', { duree: 3600 }); return true; }
   if (id === 'deco-atomium') { toast('⚛️ L’Atomium : 9 boules d’argent, hautes comme un immeuble ! Il paraît qu’une dindie y vit…', { duree: 3600 }); return true; }
   return false;
@@ -562,7 +696,7 @@ export function evenement(type, valeur) {
     if (e.quete.nourries.length >= Math.min(2, e.dindies.length)) avancer();
   }
   if (type === 'musee' && s === 'musee') avancer();
-  if (type === 'achat' && valeur === 'kitConstruction' && (s === 'kitCouvoir' || s === 'kitNurserie')) avancer();
+  if (type === 'achat' && valeur === 'kitConstruction' && (s === 'kitCouvoir' || s === 'kitNurserie' || s === 'kitEntrainement')) avancer();
   if (type === 'oeufPose' && s === 'oeufTuto' && valeur.origine === 'tutoriel') avancer();
   if (type === 'eclosion') {
     if (s === 'eclosion' && valeur.oeuf.origine === 'tutoriel') { avancer(); setTimeout(() => dialogue([L('moi', 'Un poussin ! Il lui faudrait un endroit douillet pour grandir… La Nurserie, à côté du Couvoir, est en ruine. Encore un kit !')]), 1200); }
@@ -571,8 +705,9 @@ export function evenement(type, valeur) {
   if (type === 'grandir' && s === 'grandir' && valeur.stade !== 'poussin') avancer();
   if (type === 'croisement' && s === 'nid' && ['croisement', 'recette'].includes(PAR_ID[valeur.espece].origine.sorte)) avancer();
   if (type === 'eveil' && s === 'eveil') avancer();
+  if (type === 'course' || type === 'entrainement' || type === 'lecon') evenementCourse(type, valeur);
   if (type === 'arrivee') {
-    if ((s === 'decollage' && valeur === 'pres') || (s === 'volMaroc' && valeur === 'maroc') || (s === 'volBelgique' && valeur === 'belgique')) avancer();
+    if ((s === 'decollage' && valeur === 'pres') || (s === 'volMaroc' && valeur === 'maroc') || (s === 'volBelgique' && valeur === 'belgique') || (s === 'entrerDindodrome' && valeur === 'dindodrome')) avancer();
     preparerEtape();
   }
   if (type === 'capture') {
@@ -584,5 +719,36 @@ export function evenement(type, valeur) {
     if ((s2 === 'coquelicot' && valeur === 'coquelicot') || (s2 === 'dingue' && valeur === 'dingue') || (s2 === 'atomium' && valeur === 'atomium')) avancer();
     J.changer('quete');
   }
+}
+/* ── les courses, l'entraînement, les leçons ── */
+export function evenementCourse(type, v) {
+  const e = E(), s = e.quete.etape;
+  if (type === 'course') {
+    if (s === 'courseEssai' && v.id === 'essai') {
+      avancer();
+      setTimeout(() => dialogue([L('chrono', `${v.place === 1 ? 'Victoire pour ta première course ! Quelle entrée !' : 'Bravo pour ta première course !'} Le public est ravi !`),
+        L('chrono', 'Pour gagner les championnats, il faudra des dindies bien entraînées. Coach Ginette a un <b>terrain d’entraînement</b> au Domaine… mais il est en ruine.'),
+        L('chrono', 'Un <b>kit de construction</b> de chez Mimi, et le tour est joué ! Reviens vite au Dindodrome !')]), 500);
+    }
+    if ((s === 'gontran1' || s === 'gontran2') && v.id === s) {
+      if (v.place < v.placeRival) {
+        avancer();
+        setTimeout(() => dialogue([L('gontran', s === 'gontran2' ? 'Encore toi devant ?! Bon… bravo, Roullieee. Tu es vraiment une championne. (Mais je reviendrai !) Gloup gloup.' : 'Quoi ?! Flamby… battu ?! Hmpf. La prochaine fois, je gagne. Gloup gloup !'),
+          L('moi', s === 'gontran2' ? 'Merci, Gontran ! Flamby a très bien couru, lui aussi.' : 'Bien couru, Gontran ! À la prochaine !')]), 500);
+      } else setTimeout(() => dialogue([L('gontran', 'Ha ha ! Flamby est le plus rapide ! Reviens quand tu veux… si tu oses ! Gloup gloup !')]), 500);
+    }
+    const m = /^coupe([1-4])$/.exec(s);
+    if (m && DD.badge(+m[1])) {
+      const C = CHAMPIONNATS[+m[1] - 1];
+      avancer();
+      setTimeout(() => dialogue([L(C.champion, `Bravo, Roullieee ! Tu as gagné <b>${C.badge.nom}</b> ${C.badge.e} ! C’était une course magnifique.`)]), 500);
+    }
+  }
+  if (type === 'entrainement') {
+    e.quete.jeux = [...new Set([...(e.quete.jeux || []), v.stat])];
+    J.changer('quete');
+    if (s === 'entrainement3' && e.quete.jeux.length >= 3) avancer();
+  }
+  if (type === 'lecon' && s === 'lecon') avancer();
 }
 export const etapeActuelle = () => E().quete.etape;

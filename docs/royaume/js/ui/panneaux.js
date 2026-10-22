@@ -369,7 +369,7 @@ export function voeu(effet) {
 /* ── les crédits des musiques (toutes libres : voir musique/CREDITS.md) ── */
 export function credits() {
   fenetre('🎶 Les musiques', `<p class="petitTexte">Toutes les musiques du jeu sont libres. Merci à leurs auteurs !</p>
-    <h3>Domaine public</h3><p>• <b>Searchlight Rag</b> — Scott Joplin (1907)<br>• <b>Das Alpenhorn</b> (orgue de foire) — air traditionnel<br><small>Versions du projet libre <b>OpenRCT2 OpenMusic</b>.</small></p>
+    <h3>Domaine public</h3><p>• <b>Searchlight Rag</b> — Scott Joplin (1907)<br>• <b>Something Doing Rag</b> — Scott Joplin et Scott Hayden (1903)<br>• <b>Das Alpenhorn</b> (orgue de foire) — air traditionnel<br>• <b>El Capitan</b> (orgue de foire) — John Philip Sousa (1896)<br>• <b>Unter dem Doppeladler</b> (orgue de foire) — Josef Franz Wagner (1893)<br><small>Versions du projet libre <b>OpenRCT2 OpenMusic</b>.</small></p>
     <h3>CC BY-SA 3.0</h3><p>• <b>Harvest Festival</b>, <b>Albian Nocturne</b>, <b>Solstice Festival</b>, <b>Mountain Idyll</b>, <b>Peaks of Atlas</b>, <b>Mirage</b>, <b>Water’s Edge</b><br>
     <small>Musique d’<b>Omri Lahav</b> pour le jeu libre <b>0 A.D.</b>, © Wildfire Games (wildfiregames.com), licence Creative Commons Attribution - Partage dans les mêmes conditions 3.0. Converties en MP3, volume égalisé.</small></p>
     <p class="petitTexte">Le détail est dans le fichier <code>musique/CREDITS.md</code> du jeu.</p>`);
@@ -388,11 +388,13 @@ export function finChapitre(n) {
     2: ['🎉 Fin du chapitre 2 !', '🌿🏜️💧', `Les Prés, le Maroc imaginaire, la Belgique : tu as attrapé les dindies de 3 îles, et même le Coquelicot, la Dinde Dingue et l’Atomium !`,
       '<b>Le chapitre 3 commence : le premier œuf !</b> Va raconter ton expédition au Professeur Plumeau : le Couvoir, la Nurserie et les croisements t’attendent.'],
     3: ['🎉 Fin du chapitre 3 !', '🥚🐣🌟', 'Le Couvoir, la Nurserie, ton premier hybride et ta première dindie éveillée : tu es une vraie éleveuse !',
-      '<b>La suite :</b> le chapitre 4, <b>le Dindodrome ouvre</b> : l’entraînement, les courses et les premiers championnats… arrive bientôt !']
+      '<b>Le chapitre 4 commence : le Dindodrome ouvre !</b> Va voir le Professeur Plumeau : il a une grande nouvelle.'],
+    4: ['🎉 Fin du chapitre 4 !', '🍀☀️💧🌴', 'Quatre badges, et Gontran battu deux fois : tu es une vraie championne du Dindodrome !',
+      '<b>La suite :</b> le chapitre 5, <b>la Jungle et la Banquise</b> : deux nouvelles îles, de nouvelles dindies et les championnats 5 et 6… arrive bientôt !']
   }[n];
   if (!T) return;
   const F = fenetre(T[0], `<div class="finChap"><p class="grosEmoji">${T[1]}</p><p>${T[2]}</p><p>${T[3]}</p>
-    <p class="petitTexte">${n === 3 ? 'En attendant : croise tes dindies pour remplir le Grand Livre (28 hybrides et 4 recettes secrètes !), et cherche les chromatiques ✨.' : 'En attendant : explore les îles chaque jour (coffres, œufs mystère, pierres d’éveil), prends soin de tes dindies et cherche les chromatiques ✨ !'}</p>
+    <p class="petitTexte">${n === 4 ? 'En attendant : bats tes records, gagne des courses libres, entraîne tes dindies au maximum et apprends-leur de nouvelles compétences !' : n === 3 ? 'En attendant : croise tes dindies pour remplir le Grand Livre (28 hybrides et 4 recettes secrètes !), et cherche les chromatiques ✨.' : 'En attendant : explore les îles chaque jour (coffres, œufs mystère, pierres d’éveil), prends soin de tes dindies et cherche les chromatiques ✨ !'}</p>
     <button class="btn grand vert" id="finOk">Super !</button></div>`, { classe: 'finChapF' });
   $('#finOk', F.el).onclick = () => { pop(); F.fermer(); };
 }

@@ -48,7 +48,9 @@ export function vent() {
    enchaînés avec un fondu. Le son passe par l'AudioContext (le volume d'un <audio> ne se règle pas sur iPhone). ── */
 export const AMBIANCES = {
   titre: { jour: ['ragtime-searchlight'], nuit: ['ragtime-searchlight'] },
-  domaine: { jour: ['0ad-harvest-festival', 'ragtime-searchlight'], nuit: ['0ad-albian-nocturne'] },
+  domaine: { jour: ['0ad-harvest-festival', 'ragtime-searchlight', 'ragtime-something-doing'], nuit: ['0ad-albian-nocturne'] },
+  dindodrome: { jour: ['orgue-doppeladler', 'ragtime-something-doing'], nuit: ['orgue-doppeladler', '0ad-albian-nocturne'] },
+  course: { jour: ['orgue-el-capitan'], nuit: ['orgue-el-capitan'] },
   pres: { jour: ['0ad-solstice-festival', '0ad-harvest-festival'], nuit: ['0ad-mountain-idyll', '0ad-albian-nocturne'] },
   maroc: { jour: ['0ad-peaks-of-atlas'], nuit: ['0ad-mirage', '0ad-peaks-of-atlas'] },
   belgique: { jour: ['orgue-das-alpenhorn', '0ad-waters-edge'], nuit: ['0ad-waters-edge'] }

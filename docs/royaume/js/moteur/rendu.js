@@ -60,12 +60,17 @@ redimensionner();
 /* la boucle : chaque fonction inscrite reçoit (dt, t) */
 const abonnes = new Set();
 export const chaqueImage = f => { abonnes.add(f); return () => abonnes.delete(f); };
-let avant = performance.now(), t = 0;
+let avant = performance.now(), t = 0, enPause = false;
 export const horloge = () => t;
+/* en pause (pendant un mini-jeu en plein écran) : la 3D ne bouge plus et ne se redessine plus */
+export const pauseRendu = v => { enPause = !!v; };
 function image(maintenant) {
-  const dt = Math.min(.05, (maintenant - avant) / 1000); avant = maintenant; t += dt;
-  for (const f of abonnes) f(dt, t);
-  renderer.render(scene, camera);
+  const dt = Math.min(.05, (maintenant - avant) / 1000); avant = maintenant;
+  if (!enPause) {
+    t += dt;
+    for (const f of abonnes) f(dt, t);
+    renderer.render(scene, camera);
+  }
   requestAnimationFrame(image);
 }
 requestAnimationFrame(image);

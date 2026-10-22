@@ -81,3 +81,18 @@ export function voyager(dest, installer) {
     }, 480);
   });
 }
+
+/* aller au Dindodrome (ou en revenir) : un fondu en damier, pendant que le lieu se construit */
+export function fondu(dest, installer) {
+  return new Promise(resoudre => {
+    const V = el(`<div id="fondu"><div class="damierF"></div><p class="titreV">${dest.e} ${dest.nom}</p></div>`);
+    document.body.appendChild(V);
+    vent();
+    requestAnimationFrame(() => V.classList.add('visible'));
+    setTimeout(() => {
+      try { installer(); } catch (e) { console.error(e); }
+      V.classList.add('arrive'); tada();
+      setTimeout(() => { V.classList.remove('visible'); setTimeout(() => { V.remove(); resoudre(); }, 450); }, 900);
+    }, 420);
+  });
+}

@@ -10,6 +10,9 @@ Source : https://github.com/OpenRCT2/OpenMusic (le projet déclare ces styles «
 |---|---|---|
 | `ragtime-searchlight.mp3` | Searchlight Rag | Scott Joplin (1907), version du projet OpenRCT2 OpenMusic |
 | `orgue-das-alpenhorn.mp3` | Das Alpenhorn (orgue de foire) | air traditionnel, version du projet OpenRCT2 OpenMusic |
+| `orgue-el-capitan.mp3` | El Capitan (orgue de foire) | John Philip Sousa (1896), version du projet OpenRCT2 OpenMusic (« Fairground organ style 2 », Karst van Galen Last et Herman Riddering) |
+| `orgue-doppeladler.mp3` | Unter dem Doppeladler (orgue de foire) | Josef Franz Wagner (1893), même version |
+| `ragtime-something-doing.mp3` | Something Doing Rag | Scott Joplin et Scott Hayden (1903), version du projet OpenRCT2 OpenMusic (« Ragtime style 2 ») |
 
 ## CC BY-SA 3.0 — 0 A.D. (Wildfire Games)
 
@@ -34,7 +37,9 @@ Les fichiers MP3 ci-dessous (versions converties) sont eux aussi sous licence CC
 | Lieu | Le jour | La nuit |
 |---|---|---|
 | Écran titre | Searchlight Rag | Searchlight Rag |
-| Le Domaine | Harvest Festival, Searchlight Rag | Albian Nocturne |
+| Le Domaine | Harvest Festival, Searchlight Rag, Something Doing Rag | Albian Nocturne |
 | Les Prés | Solstice Festival, Harvest Festival | Mountain Idyll, Albian Nocturne |
 | Le Maroc imaginaire | Peaks of Atlas | Mirage, Peaks of Atlas |
 | La Belgique | Das Alpenhorn, Water's Edge | Water's Edge |
+| Le Dindodrome | Unter dem Doppeladler, Something Doing Rag | Unter dem Doppeladler, Albian Nocturne |
+| Pendant une course | El Capitan | El Capitan |

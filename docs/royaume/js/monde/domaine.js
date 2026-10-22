@@ -20,7 +20,8 @@ export const LIEUX = {
   enclos: { nom: 'L’allée des enclos', e: '🐔', x: -33.5, z: 0 },
   clapier: { nom: 'Le Clapier à dindes', e: '🐾', x: -33.5, z: 24 },
   elevage: { nom: 'Le Couvoir et la Nurserie', e: '🥚', x: 0, z: -27 },
-  dindodrome: { nom: 'Le Dindodrome (bientôt)', e: '🏁', x: 44, z: 0 },
+  dindodrome: { nom: 'Le Dindodrome', e: '🏁', x: 44, z: 0 },
+  entrainement: { nom: 'Le terrain d’entraînement', e: '🏋️', x: 33, z: 15 },
   port: { nom: 'Le port', e: '⛵', x: 0, z: 37 }
 };
 export const ORDRE_ENCLOS = [['prairie', -40.5, -12, 'e'], ['pluie', -40.5, -3.5, 'e'], ['feu', -40.5, 5, 'e'], ['sable', -40.5, 13.5, 'e'],
@@ -120,11 +121,29 @@ export function construireDomaine(scene, etat) {
   });
   const moulin = placer(BAT.ruine('Le Moulin', 5, 5, true), 21, -29);
   ajouterInteractif({ id: 'ruine-moulin', e: '🚧', texte: 'Le Moulin', x: moulin.porteMonde[0], z: moulin.porteMonde[1], cible: moulin.g, ruine: 'Le Moulin à friandises' });
-  /* ── l'est : le Dindodrome ── */
-  const portail = placer(BAT.portailDindodrome(), 44, 0, -Math.PI / 2);
-  ajouterInteractif({ id: 'dindodrome', e: '🏁', texte: 'Le Dindodrome', x: portail.porteMonde[0], z: portail.porteMonde[1], cible: portail.g, rayon: 2.6 });
-  const entr = placer(BAT.ruine('Le terrain d’entraînement', 7, 5), 33, 14);
-  ajouterInteractif({ id: 'ruine-entrainement', e: '🚧', texte: 'L’entraînement', x: entr.porteMonde[0], z: entr.porteMonde[1], cible: entr.g, ruine: 'Le terrain d’entraînement' });
+  /* ── l'est : le Dindodrome (le portail s'ouvre au chapitre 4) et le terrain d'entraînement ── */
+  let portail = null, portailOuvert = null;
+  const majPortail = () => {
+    const ouvert = !!etat.batiments.dindodrome?.ouvert;
+    if (ouvert === portailOuvert) return portail;
+    if (portail) scene.remove(portail.g);
+    portail = placer(BAT.portailDindodrome(ouvert), 44, 0, -Math.PI / 2); portailOuvert = ouvert;
+    const I = interactifs.find(i => i.id === 'dindodrome'); if (I) { I.cible = portail.g; I.texte = ouvert ? 'Entrer au Dindodrome' : 'Le Dindodrome'; }
+    return portail;
+  };
+  majPortail();
+  ajouterInteractif({ id: 'dindodrome', e: '🏁', texte: etat.batiments.dindodrome?.ouvert ? 'Entrer au Dindodrome' : 'Le Dindodrome', x: portail.porteMonde[0], z: portail.porteMonde[1], cible: portail.g, rayon: 2.6 });
+  let entr = null;
+  const majEntrainement = () => {
+    if (entr) { scene.remove(entr.g); grille.libererRect(33, 15, 13, 9); }
+    const repare = !!etat.batiments.entrainement?.repare;
+    entr = placer(repare ? BAT.terrainEntrainement() : BAT.ruine('Le terrain d’entraînement', 7, 5), 33, 14.5);
+    const I = interactifs.find(i => i.id === 'entrainement');
+    if (I) { I.cible = entr.g; I.x = entr.porteMonde[0]; I.z = entr.porteMonde[1]; I.e = repare ? '🏋️' : '🚧'; delete I.ruine; if (!repare) I.ruine = 'Le terrain d’entraînement'; }
+    return entr;
+  };
+  ajouterInteractif({ id: 'entrainement', e: '🚧', texte: 'L’entraînement', x: 0, z: 0, cible: null, ruine: 'Le terrain d’entraînement' });
+  majEntrainement();
   /* ── le sud : le port ── */
   const lePort = placer(BAT.port(), LIEUX.port.x, LIEUX.port.z);
   grille.libererRect(LIEUX.port.x, LIEUX.port.z + 4, 2.6, 11.4);   /* on peut marcher sur le ponton */
@@ -135,7 +154,7 @@ export function construireDomaine(scene, etat) {
 
   /* ── les habitants ── */
   const pnj = {};
-  const POS_PNJ = { plumeau: [15.6, -6.6, -.4], mimi: [18.6, 12.4, -.5], zephyr: [2.8, 34.2, .3], ginette: [40.2, 3.2, -1.2] };
+  const POS_PNJ = { plumeau: [15.6, -6.6, -.4], mimi: [18.6, 12.4, -.5], zephyr: [2.8, 34.2, .3], ginette: etat.batiments.entrainement?.repare ? [37.4, 8.6, 3] : [40.2, 3.2, -1.2] };
   for (const [id, [x, z, r]] of Object.entries(POS_PNJ)) {
     const c = creerChibi(PERSONNAGES[id]); c.racine.position.set(x, 0, z); c.racine.rotation.y = r; scene.add(c.racine);
     grille.boucherCercle(x, z, .45);
@@ -161,6 +180,8 @@ export function construireDomaine(scene, etat) {
     if (Math.abs(x + 33.5) < 15 && z > -18 && z < 28) return false;
     /* la place du Couvoir et de la Nurserie, une fois réparés (ils sont plus grands que leurs ruines) */
     if (Math.abs(x) < 14.5 && z > -38 && z < -24.5) return false;
+    /* le terrain d'entraînement, une fois réparé */
+    if (Math.abs(x - 33) < 8 && Math.abs(z - 14.5) < 6) return false;
     if (Math.hypot(x - LIEUX.port.x, z - LIEUX.port.z) < 10) return false;
     for (const [x1, z1, x2, z2, w] of SEGMENTS) if (distSegment(x, z, x1, z1, x2, z2) < w / 2 + r + .6) return false;
     for (const [dx, dz] of [[0, 0], [r, 0], [-r, 0], [0, r], [0, -r]]) if (!grille.libreEn(x + dx, z + dz)) return false;
@@ -184,7 +205,13 @@ export function construireDomaine(scene, etat) {
 
   return {
     grille, interactifs, pnj, enclosInfo, lieux: LIEUX, fontaine, lampes: lum,
-    majEnclos, majClapier, majCouvoir, majNurserie, elevage, gonflerBallon: v => lePort.setGonfle(v), poserObjet, retirerObjet, objets,
+    majEnclos, majClapier, majCouvoir, majNurserie, elevage, majPortail, majEntrainement,
+    /* Coach Ginette va s'installer à côté de son terrain réparé */
+    deplacerPnj(id, x, z, r) {
+      const P = pnj[id]; if (!P) return;
+      grille.libererRect(P.x, P.z, 1.2, 1.2); P.c.racine.position.set(x, 0, z); P.c.racine.rotation.y = r; P.x = x; P.z = z; P.r0 = r; grille.boucherCercle(x, z, .45);
+      const I = interactifs.find(i => i.id === 'pnj-' + id); if (I) { I.x = x; I.z = z + 1.2; }
+    }, gonflerBallon: v => lePort.setGonfle(v), poserObjet, retirerObjet, objets,
     maj(dt, t, nuit, camPos) {
       terrain.maj(dt, t, nuit); nuitCiel.maj(t, nuit, camPos); lum.majNuit(nuit);
       BAT.matFenetres.emissiveIntensity = nuit * 1.4;

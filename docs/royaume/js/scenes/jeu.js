@@ -28,7 +28,12 @@ import * as P from '../ui/panneaux.js';
 import { creerSauvages } from '../jeu/sauvages.js';
 import { lancerCapture, captureActive } from '../jeu/capture.js';
 import { ramasser } from '../jeu/trouvailles.js';
-import { ouvrirMonde, voyager } from '../ui/monde.js';
+import { ouvrirMonde, voyager, fondu } from '../ui/monde.js';
+import { construireDindodrome } from '../monde/dindodrome.js';
+import { lancerCourse, courseActive } from './course.js';
+import * as DD from '../jeu/dindodrome.js';
+import { ouvrirBureau, choisirCoureuse, ouvrirResultats, ouvrirTrophees } from '../ui/dindodrome.js';
+import { ouvrirEntrainement, miniJeuActif } from '../ui/entrainement.js';
 import { ouvrirCouvoir, ouvrirNurserie, grandiToast } from '../ui/elevage.js';
 import * as EL from '../jeu/elevage.js';
 
@@ -59,12 +64,14 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
   ombreRonde.rotation.x = -Math.PI / 2; scene.add(ombreRonde);
 
   /* ── la caméra qui suit (vue de trois quarts, un peu plus large sur un écran en hauteur) ── */
-  let zoom = 22, cadre = null;
+  let zoom = 22, cadre = null, camCourse = false;
   const objectifCamera = () => { camera.fov = innerWidth < innerHeight ? 50 : 38; redimensionner(); };
   objectifCamera(); addEventListener('resize', objectifCamera);
   const cible = new THREE.Vector3();
   const vC = new THREE.Vector3();
   const placerCamera = (dt = 1) => {
+    /* pendant une course, c'est la course qui tient la caméra (l'ombre suit la caméra) */
+    if (camCourse) { soleil.target.position.set(Math.round(camera.position.x), 0, Math.round(camera.position.z)); return; }
     /* pendant une capture, la caméra cadre Roullieee et la dindie */
     const visee = cadre ? vC.copy(moi.racine.position).lerp(cadre.s.m.racine.position, .55) : moi.racine.position;
     cible.lerp(visee, Math.min(1, dt * (cadre ? 3 : 5)));
@@ -192,7 +199,17 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
       else if (id === 'lettres') P.courrier();
       else if (id === 'fontaine') P.voeu(() => { particules(new THREE.Vector3(0, 2.4, 0), { n: 30, couleur: '#fde68a', taille: .4, vitesse: 3, monte: 3 }); pop(); });
       else if (id === 'montgolfiere' || id === 'ballon') await S.parler('zephyr');
-      else if (id === 'dindodrome') await S.parler('ginette');
+      else if (id === 'dindodrome') { if (S.regionOuverte('dindodrome')) await partirVers('dindodrome'); else await S.parler('ginette'); }
+      else if (id === 'entrainement') {
+        const fait = await S.interagir(id);
+        if (!fait) {
+          if (E().batiments.entrainement?.repare) ouvrirEntrainement({ surChange: syncDindies });
+          else toast(S.etapeAtteinte('kitEntrainement') ? '🚧 Le terrain d’entraînement est en ruine. Un kit de construction (chez Mimi) permettrait de le réparer !' : '🚧 Le terrain d’entraînement : en travaux. Il ouvrira dans un prochain chapitre !', { duree: 3200 });
+        }
+      }
+      else if (id === 'bureau') ouvrirBureau({ courir });
+      else if (id === 'trophees') ouvrirTrophees();
+      else if (id === 'sortie') await partirVers('domaine');
       else if (id === 'couvoir' || id === 'nurserie') {
         const fait = await S.interagir(id);
         if (!fait) {
@@ -365,7 +382,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
   }
   const v3 = new THREE.Vector3();
   function majMarque(t) {
-    const c = cadre ? null : positionCible();
+    const c = cadre || camCourse ? null : positionCible();
     marque.visible = etoileSol.visible = !!c;
     $('#hFleche').classList.add('cache');
     if (!c) return;
@@ -430,6 +447,11 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
       domaine.majClapier(); tada(); await attendre(.5);
     },
     async reparerAnime(id) {
+      if (id === 'entrainement') {
+        for (let k = 0; k < 5; k++) { poussiere(33 + (Math.random() - .5) * 10, 14.5 + (Math.random() - .5) * 6); bruitMarteau(); await attendre(.35); }
+        grandir(domaine.majEntrainement().g); domaine.deplacerPnj('ginette', 37.4, 8.6, 3); tada();
+        await attendre(.6); return;
+      }
       const A = domaine.elevage[id];
       for (let k = 0; k < 5; k++) { poussiere(A.x + (Math.random() - .5) * 6, A.z + (Math.random() - .5) * 5); bruitMarteau(); await attendre(.35); }
       (id === 'couvoir' ? domaine.majCouvoir : domaine.majNurserie)(); grandir(domaine.elevage[id].b.g); tada(); syncDindies(); majElevage();
@@ -442,7 +464,18 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
       domaine.grille.boucherCercle(9.5, 34.5, .45);
       domaine.interactifs.push({ id: 'pnj-gontran', e: '💬', texte: 'Gontran', x: 9.5, z: 35.7, cible: gontran.racine, pnj: 'gontran', rayon: 2.2 });
     },
-    finChapitre(n) { P.finChapitre(n); }
+    finChapitre(n) { P.finChapitre(n); },
+    /* le portail du Dindodrome s'ouvre (avec des confettis la première fois) */
+    async ouvrirPortail(anim) {
+      domaine.majPortail();
+      if (!anim) return;
+      for (let k = 0; k < 3; k++) { particules(new THREE.Vector3(43, 5, (Math.random() - .5) * 6), { n: 30, couleur: ['#facc15', '#ef4444', '#3b82f6'][k], taille: .45, vitesse: 5, monte: 3, duree: 1.8 }); await attendre(.3); }
+      tada(); await attendre(.5);
+    },
+    ouvrirEntrainement: () => ouvrirEntrainement({ surChange: syncDindies }),
+    ouvrirBureau: () => ouvrirBureau({ courir }),
+    courir: id => courir(id),
+    ajouterPnj: (...a) => monde.ajouterPnj && monde.ajouterPnj(...a)
   });
   const bruitMarteau = () => { try { const A = audio(), o = A.createOscillator(), g = A.createGain(); o.type = 'square'; o.frequency.value = 180; g.gain.setValueAtTime(.08, A.currentTime); g.gain.exponentialRampToValueAtTime(.001, A.currentTime + .12); o.connect(g); g.connect(A.destination); o.start(); o.stop(A.currentTime + .13); } catch { /* pas de son */ } };
   function grandir(g) { const t0 = performance.now(); const f = () => { const k = Math.min(1, (performance.now() - t0) / 700); g.scale.set(1, .01 + .99 * (1 - Math.pow(1 - k, 3)) * (1 + Math.sin(k * Math.PI) * .12), 1); if (k < 1) requestAnimationFrame(f); }; f(); }
@@ -454,7 +487,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     for (const A of affichees.values()) A.m.liberer(); affichees.clear();
     if (monde.racine.parent) scene.remove(monde.racine);
     if (monde !== domaine) monde.liberer();
-    monde = id === 'domaine' ? domaine : construireRegion(id);
+    monde = id === 'domaine' ? domaine : id === 'dindodrome' ? construireDindodrome() : construireRegion(id);
     scene.add(monde.racine);
     const [x, z] = position || monde.depart;
     moi.racine.position.set(x, monde.sol(x, z), z); moi.racine.rotation.y = Math.PI;
@@ -474,7 +507,11 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     occupe = true;
     try {
       sauver();
-      await voyager(id === 'domaine' ? { nom: 'Le Domaine', e: '🏡' } : REGIONS[id], () => { finForcage(); installerLieu(id); });
+      /* le Dindodrome est au bout de la route : on y va à pied (un simple fondu), pas en montgolfière */
+      if (id === 'dindodrome' || monde.id === 'dindodrome') {
+        const retour = monde.id === 'dindodrome';
+        await fondu(id === 'dindodrome' ? { nom: 'Le Dindodrome', e: '🏁' } : { nom: 'Le Domaine', e: '🏡' }, () => { finForcage(); installerLieu(id, retour ? [40.8, .6] : null); });
+      } else await voyager(id === 'domaine' ? { nom: 'Le Domaine', e: '🏡' } : REGIONS[id], () => { finForcage(); installerLieu(id); });
       S.evenement('arrivee', id);
       majHud(); sale = true;
     } finally { occupe = false; }
@@ -494,7 +531,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
   addEventListener('pagehide', sauver);
 
   /* ── la boucle ── */
-  const lieuDepart = S.regionOuverte(E().monde.lieu) && (E().monde.lieu === 'domaine' || REGIONS[E().monde.lieu]?.especes) ? E().monde.lieu : 'domaine';
+  const lieuDepart = S.regionOuverte(E().monde.lieu) && (E().monde.lieu === 'domaine' || E().monde.lieu === 'dindodrome' || REGIONS[E().monde.lieu]?.especes) ? E().monde.lieu : 'domaine';
   installerLieu(lieuDepart, lieuDepart === 'domaine' ? etat.monde.position : E().monde.positions[lieuDepart]);
   appliquerReglages();
   if (E().quete.etape === 'arrivee') setTimeout(() => toast(matchMedia('(pointer: coarse)').matches ? '👆 Touche le sol pour marcher, ou glisse ton doigt comme un joystick. Touche un habitant pour lui parler !' : '🖱️ Clique pour marcher (ou les flèches / ZQSD). Clique sur un habitant pour lui parler ! E = agir.', { duree: 6500, classe: 'grand' }), 900);
@@ -525,7 +562,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     const sd = soleil.userData.dir || [.5, 1, .5];
     soleil.position.set(soleil.target.position.x + sd[0] * 30, sd[1] * 30, soleil.target.position.z + sd[2] * 30);
     /* le bouton d'action */
-    const I = fenetreOuverte() || enDialogue() || captureActive() ? null : plusProche();
+    const I = fenetreOuverte() || enDialogue() || captureActive() || camCourse ? null : plusProche();
     const b = $('#hAction');
     if (I) { b.classList.remove('cache'); const t2 = `${I.e} ${I.texte}`; if (b.textContent !== t2) b.textContent = t2; } else b.classList.add('cache');
     /* les dindies */
@@ -542,6 +579,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
 
   function majDindie(A, dt, t) {
     const m = A.m, q = m.racine.position;
+    if (camCourse) { m.racine.visible = false; return; }
     const dc = Math.hypot(q.x - cible.x, q.z - cible.z);
     m.racine.visible = dc < 48; m.montrerContours(dc < 30);
     if (!m.racine.visible) return;
@@ -590,12 +628,45 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
   J.surChangement(quoi => { if (quoi === 'elevage') majElevage(); });
   verifierElevage();
 
+  /* ── une course au Dindodrome : choisir sa coureuse, courir, les résultats ── */
+  let enCourse = false;
+  async function courir(id) {
+    if (enCourse || courseActive()) return null;
+    const def = DD.defCourse(id); if (!def) return null;
+    if (monde.id !== 'dindodrome') { toast('Les courses, c’est au Dindodrome !'); return null; }
+    const d = await choisirCoureuse(def);
+    if (!d) return null;
+    enCourse = true; const avant = occupe; occupe = true; chemin = null; anneau.visible = false;
+    let res = null;
+    try {
+      ambianceMusique('course', false);
+      const { C, nettoyer } = await lancerCourse(def, d, {
+        lieu: monde, chaqueImage, nuit: nuitK > .5, nomJoueuse: 'Roullieee', particules,
+        cadrer: on => { camCourse = on; if (!on) { cible.copy(moi.racine.position); placerCamera(1); } },
+        cacher: on => { moi.racine.visible = !on; ombreRonde.visible = !on; marque.visible = etoileSol.visible = false; for (const A of affichees.values()) A.m.racine.visible = !on; }
+      });
+      res = DD.enregistrer(def, C, d);
+      const niv = EL.donnerXp(d, res.gains.xp);
+      sauver();
+      await ouvrirResultats(def, C, res, niv);
+      nettoyer();
+      /* Roullieee revient près du Bureau des courses */
+      const p = monde.grille.plusProcheLibre(-10.5, 29.6); moi.racine.position.set(p[0], monde.sol(p[0], p[1]), p[1]); moi.racine.rotation.y = Math.PI;
+      cible.copy(moi.racine.position); placerCamera(1);
+      ambianceMusique(monde.ambiance, nuitK > .5);
+      const rival = C.coureurs.find(x => x.id === 'star');
+      S.evenement('course', { id: def.id, place: res.place, placeRival: rival ? rival.place : 9, badge: res.badge });
+      S.preparer();
+    } finally { enCourse = false; occupe = avant; majHud(); }
+    return res;
+  }
+
   /* pour les tests automatiques */
   window.__jeu = {
     appliquerReglages, moi, allerVers, agir, affichees, etat: E, S, P, J, sauver, toucher, positionCible, partirVers, capturer, approcher,
     get monde() { return monde; }, get interactifs() { return monde.interactifs; }, get sauvages() { return sauvages; },
     get chemin() { return chemin; }, get occupe() { return occupe; }, get capture() { return captureActive(); }, domaine,
-    forcerMeteo, forcerHeure, majLumiere, EL, verifierElevage
+    forcerMeteo, forcerHeure, majLumiere, EL, verifierElevage, courir, DD, get course() { return courseActive(); }, get miniJeu() { return miniJeuActif(); }, get camCourse() { return camCourse; }
   };
   return { sauver };
 }

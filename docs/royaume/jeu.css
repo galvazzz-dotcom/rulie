@@ -324,3 +324,174 @@ body.enCapture #toasts{top:calc(max(10px,env(safe-area-inset-top)) + 118px)}
 #eclosion .texteE{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:18px;max-width:440px}
 #eclosion .texteE b{font-family:'Lilita One',sans-serif;font-weight:400;font-size:26px;color:#7c2d12}
 #eclosion .nouv{font-weight:700;color:#15803d}
+
+/* ══════════ ÉTAPE 5 : le Dindodrome, la course, l'entraînement ══════════ */
+/* le fondu en damier (pour aller au Dindodrome) */
+#fondu{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .4s;overflow:hidden}
+#fondu.visible{opacity:1}
+.damierF{position:absolute;inset:-20%;background:repeating-conic-gradient(#111827 0 25%,#f8fafc 0 50%) 0 0/90px 90px;animation:damierF 1.4s linear infinite;transform:rotate(-8deg)}
+@keyframes damierF{to{background-position:180px 0}}
+#fondu .titreV{background:rgba(17,24,39,.85);padding:10px 26px;border-radius:24px;text-shadow:0 4px 0 #f59e0b}
+#fondu.arrive .titreV{opacity:1;transform:scale(1)}
+
+/* la course */
+body.enCourse #hud{display:none}
+body.enCourse #toasts{top:calc(max(10px,env(safe-area-inset-top)) + 110px)}
+#course{position:fixed;inset:0;z-index:20;pointer-events:none;font-weight:700;user-select:none;-webkit-user-select:none}
+#course button{pointer-events:auto;touch-action:manipulation}
+.cHaut{position:absolute;left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));top:max(8px,env(safe-area-inset-top));display:flex;align-items:center;gap:10px}
+.cPlace{flex:none;min-width:70px;text-align:center;background:#fff;border:4px solid #f59e0b;border-radius:18px;padding:4px 10px;box-shadow:0 4px 0 rgba(0,0,0,.18)}
+.cPlace b{font-family:'Lilita One',sans-serif;font-weight:400;font-size:28px;color:#ea580c}.cPlace small{font-size:13px;color:#6b4f33;margin-left:2px}
+.cProgres{flex:1;min-width:0;background:rgba(255,255,255,.92);border-radius:16px;padding:8px 12px 5px;box-shadow:0 4px 0 rgba(0,0,0,.15)}
+.cBarre{position:relative;height:12px;border-radius:9px;background:linear-gradient(90deg,#e5e7eb 96%,#111827 96%)}
+.cBarre i{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#9ca3af;border:2px solid #fff;transition:left .1s linear}
+.cBarre i.star{background:#7c3aed;z-index:1}.cBarre i.moi{background:#ea580c;width:20px;height:20px;margin:-10px 0 0 -10px;z-index:2}
+.cDist{display:block;text-align:right;font-size:12px;color:#6b4f33;margin-top:2px}
+.cVite{flex:none;width:50px;height:50px;border-radius:16px;background:rgba(255,255,255,.92);font-size:24px;box-shadow:0 4px 0 rgba(0,0,0,.18)}
+.cVite.actif{background:#facc15}
+.cTitre{position:absolute;left:50%;top:calc(max(8px,env(safe-area-inset-top)) + 64px);transform:translateX(-50%);background:rgba(17,24,39,.72);color:#fff;border-radius:12px;padding:3px 12px;font-size:13px;white-space:nowrap;text-align:center}
+.cTitre small{display:block;font-weight:600;opacity:.8;font-size:11.5px}
+.cCom{position:absolute;left:50%;top:calc(max(8px,env(safe-area-inset-top)) + 106px);transform:translate(-50%,-8px);max-width:min(92vw,520px);background:#fffbeb;border:3px solid #f59e0b;border-radius:14px;padding:5px 12px;font-size:15px;text-align:center;opacity:0;transition:all .3s}
+.cCom.vu{opacity:1;transform:translate(-50%,0)}
+.cMsg{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%) scale(.6);font-family:'Lilita One',sans-serif;font-weight:400;font-size:clamp(28px,7vw,46px);color:#fff;text-shadow:0 3px 0 #1f2937,0 6px 14px rgba(0,0,0,.35);opacity:0;white-space:nowrap;transition:transform .25s cubic-bezier(.34,1.56,.64,1),opacity .2s}
+.cMsg.vu{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.cMsg.or{color:#fde047}.cMsg.rouge{color:#fca5a5}.cMsg.violet{color:#ddd6fe}
+.cCompte{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);text-align:center}
+.cCompte b{display:block;font-family:'Lilita One',sans-serif;font-weight:400;font-size:clamp(80px,22vw,150px);color:#fff;text-shadow:0 6px 0 #ea580c,0 10px 24px rgba(0,0,0,.35);animation:pop .4s cubic-bezier(.34,1.56,.64,1)}
+.cCompte b.go{color:#4ade80;text-shadow:0 6px 0 #15803d,0 10px 24px rgba(0,0,0,.35)}
+.cCompte b.arrivee{font-size:clamp(40px,10vw,76px);white-space:nowrap}
+.cCompte b.p1{color:#fde047}
+.cEnergie{position:absolute;left:max(10px,env(safe-area-inset-left));bottom:calc(max(10px,env(safe-area-inset-bottom)) + 104px);width:min(46vw,240px);display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.9);border-radius:14px;padding:6px 10px;box-shadow:0 3px 0 rgba(0,0,0,.15)}
+.cEnergie .barreP{height:14px}.cEnergie b{transition:width .2s}
+.cBas{position:absolute;left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));display:flex;align-items:flex-end;gap:10px}
+.cComps{display:flex;gap:8px;flex:1;min-width:0;flex-wrap:wrap}
+.cComp{position:relative;width:74px;height:74px;border-radius:20px;background:#7c3aed;color:#fff;box-shadow:0 5px 0 #4c1d95;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding:2px}
+.cComp span{font-size:28px;line-height:1}.cComp small{font-size:9.5px;line-height:1.05;margin-top:2px;max-width:70px}
+.cComp i{position:absolute;left:0;right:0;top:0;background:rgba(17,24,39,.55);pointer-events:none}
+.cComp:disabled{filter:grayscale(.6);opacity:.75}
+.cComp.prete{animation:pouls3 .9s ease-in-out infinite alternate}
+@keyframes pouls3{from{box-shadow:0 5px 0 #4c1d95,0 0 0 0 rgba(196,181,253,.8)}to{box-shadow:0 5px 0 #4c1d95,0 0 0 7px rgba(196,181,253,0)}}
+.cFonce{flex:none;width:78px;height:78px;border-radius:50%;background:#f97316;color:#fff;box-shadow:0 5px 0 #c2410c;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.cFonce span{font-size:30px;line-height:1}.cFonce small{font-size:11px}
+.cFonce.appuye{transform:translateY(4px) scale(.96);box-shadow:0 1px 0 #c2410c;background:#ea580c}
+.cSaut{position:relative;flex:none;width:112px;height:112px;border-radius:50%;background:#22c55e;color:#fff;box-shadow:0 6px 0 #15803d;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.cSaut span{font-size:44px;line-height:1}.cSaut small{font-size:13px}
+.cSaut:active{transform:translateY(4px);box-shadow:0 2px 0 #15803d}
+.cSaut .anneau{position:absolute;inset:-6px;border-radius:50%;border:6px solid #fff;opacity:0;pointer-events:none;transition:border-color .1s}
+.cSaut .anneau.bon{border-color:#facc15;box-shadow:0 0 14px #facc15}
+#course.fini .cBas,#course.fini .cEnergie{opacity:0;pointer-events:none;transition:opacity .4s}
+@media (max-width:560px){
+  .cComp{width:60px;height:60px;border-radius:16px}.cComp span{font-size:23px}.cComp small{display:none}
+  .cFonce{width:66px;height:66px}.cSaut{width:96px;height:96px}.cSaut span{font-size:38px}
+  .cEnergie{bottom:calc(max(10px,env(safe-area-inset-bottom)) + 92px)}
+}
+@media (max-height:480px){
+  .cTitre{display:none}.cCom{top:calc(max(8px,env(safe-area-inset-top)) + 62px)}
+  .cEnergie{bottom:max(10px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:180px}
+}
+
+/* le Bureau des courses */
+.champ{border:4px solid var(--type);border-radius:20px;background:#fff;padding:10px;margin:10px 0}
+.champ.gagne{background:linear-gradient(#fffbeb,#fff)}
+.champHaut{display:flex;gap:10px;align-items:center}
+.champPortrait{flex:none;width:58px;height:58px;border-radius:16px;background:#fef3c7;overflow:hidden}
+.champPortrait svg{width:100%;height:100%}
+.champHaut b{font-family:'Lilita One',sans-serif;font-weight:400;font-size:19px;color:#9a3412}
+.champHaut small{display:block;font-size:12.5px;color:#6b4f33}
+.badgeOk{color:#15803d!important;font-weight:700}
+.champCourses{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.ligneCourse{display:flex;align-items:center;gap:8px;background:#fff8e7;border-radius:14px;padding:6px 8px}
+.ligneCourse.reussie{background:#f0fdf4}
+.ligneCourse.finale{background:#f5f3ff;border:3px solid #c4b5fd}
+.ligneCourse.verrou{opacity:.6}
+.ligneCourse > div{flex:1;min-width:0}.ligneCourse b{font-size:15px}.ligneCourse small{display:block;font-size:12px;color:#6b4f33}
+.lcE{font-size:24px;width:32px;text-align:center}.lcMed{font-size:22px;min-width:30px;text-align:center}
+.libres{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.libres .btn{flex-direction:column}.libres .btn small{font-size:11px;opacity:.85}
+/* choisir sa coureuse */
+.coureuses{display:flex;flex-direction:column;gap:8px}
+.coureuse{display:flex;gap:10px;align-items:center;text-align:left;background:#fff;border:4px solid var(--rar);border-radius:18px;padding:8px;box-shadow:0 4px 0 rgba(0,0,0,.1)}
+.coureuse:active{transform:translateY(3px)}
+.coureuse .mini{flex:none;width:64px;height:64px;border-radius:14px;overflow:hidden;background:#fef3c7}
+.coureuse .mini svg{width:100%;height:100%}
+.coureuse b{font-size:16px}.coureuse small{color:#6b4f33}
+.statsMini{display:flex;gap:10px;font-size:14px;margin:2px 0}
+.compsMini{display:flex;gap:6px;flex-wrap:wrap;font-size:12px}
+.compsMini span{background:#ede9fe;color:#5b21b6;border-radius:9px;padding:1px 7px}
+.tBon,.tMal{display:inline-block;margin-top:3px;font-size:12.5px;border-radius:9px;padding:1px 8px}
+.tBon{background:#dcfce7;color:#166534}.tMal{background:#fee2e2;color:#991b1b}
+/* les résultats */
+.classementF{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.classementF li{display:flex;align-items:center;gap:8px;background:#fff;border-radius:14px;padding:4px 8px}
+.classementF li.moi{background:#ffedd5;border:3px solid #fb923c}
+.classementF li.star{background:#f5f3ff}
+.classementF .pl{font-size:22px;min-width:34px;text-align:center;font-weight:700}
+.classementF .mini{flex:none;width:44px;height:44px;border-radius:12px;overflow:hidden;background:#fef3c7}
+.classementF .mini svg{width:100%;height:100%}
+.classementF li > div:not(.mini){flex:1;min-width:0}.classementF small{display:block;font-size:11.5px;color:#6b4f33}
+.classementF .tps{font-variant-numeric:tabular-nums;font-size:14px;color:#374151}
+.gains{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 6px}
+.gains span{background:#fff;border-radius:12px;padding:5px 10px;font-weight:700;box-shadow:0 3px 0 rgba(0,0,0,.08)}
+.gains .niv{background:#dbeafe}.gains .rec{background:#fef9c3}
+.badgeGagne{text-align:center;background:radial-gradient(#fef9c3,#fff8e7);border:4px solid #facc15;border-radius:20px;padding:8px;margin:8px 0}
+.badgeGagne .grosEmoji{font-size:64px;animation:pop .6s cubic-bezier(.34,1.56,.64,1)}
+.badgeGagne p{margin:0;font-size:18px}
+.conseilC{background:#eff6ff;border-radius:12px;padding:6px 10px}
+.resultatsF .resultats{text-align:center}
+.resultatsF .classementF{text-align:left}
+/* la Salle des trophées */
+.badges{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.badgeCase{display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1;border-radius:50%;background:#e5e7eb;border:4px dashed #9ca3af;color:#6b7280;text-align:center}
+.badgeCase span{font-size:30px}.badgeCase small{font-size:10.5px;padding:0 4px;line-height:1.1}
+.badgeCase.ok{background:radial-gradient(#fef9c3,#facc15);border:4px solid #b45309;color:#7c2d12}
+.records{display:flex;flex-direction:column;gap:5px}
+.record{display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:6px 10px}
+.record span{flex:1}.record small{color:#6b4f33}
+
+/* le terrain d'entraînement */
+.onglets{display:flex;gap:6px;justify-content:center;margin-bottom:8px}
+.onglets button{padding:8px 14px;border-radius:14px;background:#fef3c7;font-weight:700;color:#9a3412}
+.onglets button.actif{background:#7c3aed;color:#fff;box-shadow:0 3px 0 #4c1d95}
+.choixEnt .carteDindie.choisie{outline:4px solid #7c3aed;outline-offset:2px}
+.jeuxEnt{display:flex;flex-direction:column;gap:8px}
+.jeuEnt,.lecon{display:flex;align-items:center;gap:10px;background:#fff;border-radius:16px;padding:8px 10px}
+.jeuEnt .em,.lecon .em{font-size:32px;flex:none;width:40px;text-align:center}
+.jeuEnt > div,.lecon > div{flex:1;min-width:0}.jeuEnt small,.lecon small{display:block;font-size:12.5px;color:#6b4f33}
+.entBarre{display:flex;align-items:center;gap:8px;margin-top:4px}.entBarre small{white-space:nowrap}
+.lecons{display:flex;flex-direction:column;gap:6px}
+.lecon.deja{opacity:.6}
+.mais{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:10px;font-weight:700}
+.mais input{width:22px;height:22px}
+/* les mini-jeux */
+#miniJeu{position:fixed;inset:0;z-index:45;background:rgba(20,40,60,.55);display:flex;align-items:center;justify-content:center;padding:12px;user-select:none;-webkit-user-select:none}
+.mjCarte{position:relative;width:min(96vw,680px);max-height:96vh;background:#fff8e7;border:6px solid #7c3aed;border-radius:28px;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 12px 34px rgba(0,0,0,.35)}
+.mjHaut{display:flex;gap:10px;align-items:center}
+.mjHaut .mini{flex:none;width:54px;height:54px;border-radius:14px;overflow:hidden;background:#fef3c7}.mjHaut .mini svg{width:100%;height:100%}
+.mjHaut > div:not(.mini){flex:1}.mjHaut b{font-family:'Lilita One',sans-serif;font-weight:400;font-size:20px;color:#6d28d9}.mjHaut small{display:block;font-size:13px;color:#6b4f33}
+.mjHaut .fermer{flex:none;width:42px;height:42px;border-radius:50%;background:#ef4444;color:#fff;font-size:18px;box-shadow:0 4px 0 #991b1b}
+.mjInfo{display:flex;justify-content:space-between;font-weight:700;font-size:18px;color:#374151;padding:0 6px}
+.mjZone{position:relative;min-height:200px;border-radius:20px;background:#e0f2fe;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.mjBas{display:flex;gap:12px;justify-content:center}
+.mjBas .btn{flex-direction:column;min-width:130px;touch-action:manipulation}.mjBas .btn small{font-size:13px}
+.mjMsg{text-align:center;min-height:28px;margin:0;font-size:20px;font-weight:700;color:#7c2d12}
+.mjMsg b{font-family:'Lilita One',sans-serif;font-weight:400;font-size:30px}
+.mjPiste{position:relative;width:100%;height:200px;background:linear-gradient(#bae6fd 55%,#86cf63 55%)}
+.mjPiste::after{content:'';position:absolute;left:0;right:0;top:62%;height:16%;background:#c8553d;border-top:3px solid #fff;border-bottom:3px solid #fff}
+.mjArrivee{position:absolute;right:4%;top:36%;font-size:44px;z-index:1}
+.mjCoureuse{position:absolute;left:0;top:34%;width:84px;height:84px;z-index:2;transition:left .12s ease-out}
+.mjCoureuse svg{width:100%;height:100%}
+.mjCoureuse.glisse{animation:glisseMJ .2s}
+@keyframes glisseMJ{0%,100%{transform:rotate(0)}50%{transform:rotate(-14deg)}}
+.mjSouffle{position:relative;width:100%;height:240px}
+.mjAnneau{position:absolute;left:50%;top:50%;width:200px;height:200px;margin:-100px 0 0 -100px;border-radius:50%;border:10px solid #c4b5fd;box-sizing:border-box}
+.mjAnneau.ok{border-color:#22c55e;box-shadow:0 0 20px #4ade80}
+.mjBulle{position:absolute;left:50%;top:50%;width:200px;height:200px;border-radius:50%;background:radial-gradient(#fff,#bfdbfe);overflow:hidden;transform:translate(-50%,-50%) scale(.42)}
+.mjBulle svg{width:100%;height:100%}
+.mjToile{width:100%;height:auto;display:block}
+.mjFin{text-align:center;padding:10px}.mjFin .grosEmoji{font-size:64px;margin:0}.mjEtoiles{font-size:36px;margin:4px 0}
+@media (max-width:560px){ .ligneCourse{flex-wrap:wrap}.ligneCourse > div{flex-basis:calc(100% - 80px)}.ligneCourse .btn{margin-left:auto} }
+.record{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 8px}
+.record span{grid-column:1/3;font-size:14px}.record b{font-size:16px;text-align:right}
+#course.fini .cTitre,#course.fini .cCom{opacity:0;transition:opacity .4s}
+#course.fini .cCompte{top:24%}
+@media (max-height:480px){ #course.fini .cCompte{top:15%}#course.fini .cCompte b.arrivee{font-size:34px} }

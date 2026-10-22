@@ -3,15 +3,16 @@
 import { PAR_ID } from '../donnees/especes.js';
 import { vaDans } from './individus.js';
 
-export const VERSION = 3;
+export const VERSION = 4;
 export function nouvelEtat(nom, couleur) {
   return {
     version: VERSION, profil: { nom, couleur, cree: Date.now() },
     pieces: 0, plumesOr: 0, inventaire: {},
     dindies: [], compagnon: null,
-    enclos: {}, batiments: { clapier: { repare: false, rangees: 1 }, montgolfiere: { reparee: false }, couvoir: { repare: false }, nurserie: { repare: false } },
+    enclos: {}, batiments: { clapier: { repare: false, rangees: 1 }, montgolfiere: { reparee: false }, couvoir: { repare: false }, nurserie: { repare: false }, dindodrome: { ouvert: false }, entrainement: { repare: false } },
     elevage: { couveuses: [null, null], croisements: 0, eclosions: 0, premierHybride: false, compteur: 0 },
     livre: { vus: {}, attrapes: {}, chromas: {} },
+    courses: { badges: [], places: {}, faites: 0, victoires: 0, records: {}, entrainements: 0, lecons: 0 },
     quete: { etape: 'arrivee', compteur: 0, finies: [], nourries: [] },
     monde: { position: [0, 33.5], ramasses: {}, lieu: 'domaine', positions: {} },
     reglages: { son: true, musique: true, voix: false, aide: false, heure: 'vraie' },
@@ -29,6 +30,8 @@ export function migrer(e) {
   if (avant < 2 && e.quete.etape === 'fin') e.quete.etape = 'decollage';
   /* version 3 : la fin du chapitre 2 devient le début du chapitre 3 */
   else if (avant < 3 && e.quete.etape === 'fin') e.quete.etape = 'parlerPlumeau3';
+  /* version 4 : la fin du chapitre 3 devient le début du chapitre 4 */
+  else if (avant < 4 && e.quete.etape === 'fin') e.quete.etape = 'parlerPlumeau5';
   e.version = VERSION;
   return e;
 }
