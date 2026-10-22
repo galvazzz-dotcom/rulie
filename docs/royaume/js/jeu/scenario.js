@@ -17,7 +17,7 @@ import { jour } from './trouvailles.js';
 import { CACHETTES } from '../monde/domaine.js';
 
 export const STARTERS = ['paquerette', 'crachin', 'braise'];
-export const CHAPITRES = { 1: 'Le Domaine en ruine', 2: 'L’expédition', 3: 'Le premier œuf' };
+export const CHAPITRES = { 1: 'Le Domaine en ruine', 2: 'L’expédition', 3: 'Le premier œuf', 4: 'Le Dindodrome ouvre' };
 export const QUETES = [
   { id: 'q1', chapitre: 1, titre: 'Bienvenue au Domaine', etapes: ['arrivee', 'choix'], recompense: { pieces: 300 } },
   { id: 'q2', chapitre: 1, titre: 'Un abri pour ta dindie', etapes: ['planches', 'reparer1', 'installer1'], recompense: { pieces: 100 } },
@@ -35,7 +35,12 @@ export const QUETES = [
   { id: 'q14', chapitre: 2, titre: 'Les lanternes du souk', etapes: ['parlerLeila2', 'lanternes', 'dingue'], recompense: { pieces: 350, plumesOr: 1 } },
   { id: 'q15', chapitre: 2, titre: 'Cap sur la Belgique', etapes: ['parapluie', 'volBelgique', 'waffel'], recompense: { pieces: 150, objets: { gaufre: 3 } } },
   { id: 'q16', chapitre: 2, titre: 'Les canaux de Monsieur Waffel', etapes: ['belgique3'], recompense: { pieces: 250 } },
-  { id: 'q17', chapitre: 2, titre: 'Le mystère de l’Atomium', etapes: ['parlerWaffel2', 'boules', 'atomium'], recompense: { pieces: 400, plumesOr: 2 } }
+  { id: 'q17', chapitre: 2, titre: 'Le mystère de l’Atomium', etapes: ['parlerWaffel2', 'boules', 'atomium'], recompense: { pieces: 400, plumesOr: 2 } },
+  { id: 'q18', chapitre: 3, titre: 'Le Couvoir', etapes: ['parlerPlumeau3', 'kitCouvoir', 'reparerCouvoir'], recompense: { pieces: 150 } },
+  { id: 'q19', chapitre: 3, titre: 'Le premier œuf', etapes: ['oeufTuto', 'eclosion'], recompense: { pieces: 100, objets: { sablier: 2 } } },
+  { id: 'q20', chapitre: 3, titre: 'La Nurserie', etapes: ['kitNurserie', 'reparerNurserie', 'grandir'], recompense: { pieces: 150, objets: { biscuit: 3 } } },
+  { id: 'q21', chapitre: 3, titre: 'Le premier croisement', etapes: ['nid', 'oeufCroise'], recompense: { pieces: 250, objets: { biscuit: 5 } } },
+  { id: 'q22', chapitre: 3, titre: 'L’éveil', etapes: ['parlerPlumeau4', 'eveil'], recompense: { pieces: 300, plumesOr: 2 } }
 ];
 const ORDRE = [...QUETES.flatMap(q => q.etapes), 'fin'];
 export const queteDe = etape => QUETES.find(q => q.etapes.includes(etape));
@@ -64,7 +69,9 @@ const ramasses = (prefixe, n = 3) => Array.from({ length: n }, (_, i) => prefixe
 /* ── où se passe l'étape (null = partout) ── */
 const LIEU = { gaston: 'pres', capture1: 'pres', pres3: 'pres', parlerGaston2: 'pres', plumesRouges: 'pres', coquelicot: 'pres', chapeau: 'domaine',
   leila: 'maroc', maroc3: 'maroc', parlerLeila2: 'maroc', lanternes: 'maroc', dingue: 'maroc', parapluie: 'domaine', waffel: 'belgique', belgique3: 'belgique',
-  parlerWaffel2: 'belgique', boules: 'belgique', atomium: 'belgique', volMaroc: 'zephyr', volBelgique: 'zephyr', decollage: 'domaine' };
+  parlerWaffel2: 'belgique', boules: 'belgique', atomium: 'belgique', volMaroc: 'zephyr', volBelgique: 'zephyr', decollage: 'domaine',
+  parlerPlumeau3: 'domaine', kitCouvoir: 'domaine', reparerCouvoir: 'domaine', oeufTuto: 'domaine', eclosion: 'domaine', kitNurserie: 'domaine', reparerNurserie: 'domaine',
+  grandir: 'domaine', nid: 'domaine', oeufCroise: 'domaine', parlerPlumeau4: 'domaine', eveil: 'domaine' };
 export const lieuEtape = () => { const s = E().quete.etape; return ORDRE.indexOf(s) < ORDRE.indexOf('decollage') ? 'domaine' : LIEU[s] || null; };
 let lieuActuel = () => 'domaine';
 const nomLieu = id => id === 'domaine' ? 'au Domaine' : REGIONS[id] ? `${REGIONS[id].nom.replace(/^(Le |La |Les )/, m => ({ 'Le ': 'au ', 'La ': 'en ', 'Les ': 'aux ' })[m])}` : '';
@@ -113,7 +120,19 @@ export function texteEtape() {
     parlerWaffel2: 'Raconte tes captures à Monsieur Waffel 🧇',
     boules: `Retrouve les 3 boules perdues de l’Atomium 🔘 (${ramasses('bouleArgent')}/3)`,
     atomium: 'Attrape le Dindonus Atomium : sous la pluie, près de l’Atomium ☔',
-    fin: 'Chapitre 3 bientôt : le premier œuf ! 🥚'
+    parlerPlumeau3: 'Raconte ton expédition au Professeur Plumeau 🔬',
+    kitCouvoir: 'Achète un kit de construction chez Mimi 🧰',
+    reparerCouvoir: 'Répare le Couvoir, au nord du Domaine 🥚',
+    oeufTuto: 'Mets l’œuf du Professeur dans une couveuse du Couvoir 🥚',
+    eclosion: 'Attends un peu, puis fais éclore l’œuf au Couvoir 🐣',
+    kitNurserie: 'Achète un autre kit de construction chez Mimi 🧰',
+    reparerNurserie: 'Répare la Nurserie, à côté du Couvoir 🍼',
+    grandir: 'Nourris ton poussin à la Nurserie : il deviendra une jeune dindie 🐥',
+    nid: 'Mets deux dindies adultes de types différents dans le nid du Couvoir 💕',
+    oeufCroise: 'Fais éclore l’œuf du croisement au Couvoir (⏳ un sablier aide !) 🥚',
+    parlerPlumeau4: 'Montre ton hybride au Professeur Plumeau 🔬',
+    eveil: 'Éveille une dindie au Labo : niveau 20 et une pierre d’éveil 🌟',
+    fin: 'Chapitre 4 bientôt : le Dindodrome ouvre ! 🏁'
   })[s] || '';
   if (la && la !== 'zephyr' && la !== ici) return t + ` <i>(${nomLieu(la)} : en montgolfière 🎈)</i>`;
   return t;
@@ -141,7 +160,9 @@ export function cibleEtape() {
     clous: 'pnj-mimi', reparerClapier: 'clapier', ranger: 'clapier', kit: 'pnj-mimi', reparer2: 'enclos-' + type2(), friandises: 'pnj-mimi',
     musee: 'musee', livre: 'pnj-plumeau', zephyr: 'pnj-zephyr', corde: 'objet-corde', toile: 'pnj-mimi', ballon: 'pnj-zephyr',
     decollage: 'pnj-zephyr', gaston: 'pnj-gaston', parlerGaston2: 'pnj-gaston', chapeau: 'pnj-mimi', volMaroc: 'pnj-zephyr', leila: 'pnj-leila',
-    parlerLeila2: 'pnj-leila', parapluie: 'pnj-mimi', volBelgique: 'pnj-zephyr', waffel: 'pnj-waffel', parlerWaffel2: 'pnj-waffel'
+    parlerLeila2: 'pnj-leila', parapluie: 'pnj-mimi', volBelgique: 'pnj-zephyr', waffel: 'pnj-waffel', parlerWaffel2: 'pnj-waffel',
+    parlerPlumeau3: 'pnj-plumeau', kitCouvoir: 'pnj-mimi', reparerCouvoir: 'couvoir', oeufTuto: 'couvoir', eclosion: 'couvoir', kitNurserie: 'pnj-mimi',
+    reparerNurserie: 'nurserie', grandir: 'nurserie', nid: 'couvoir', oeufCroise: 'couvoir', parlerPlumeau4: 'pnj-plumeau', eveil: 'labo'
   })[s] || null;
 }
 
@@ -182,6 +203,7 @@ function preparerEtape() {
   if (ici === 'belgique' && s === 'boules') for (const i of [1, 2, 3]) if (!e.monde.ramasses['bouleArgent' + i]) monde.poserObjet('bouleArgent' + i, 'boule');
   if (ici === 'maroc' && monde.allumerLanterne) for (const i of [1, 2, 3]) monde.allumerLanterne(i, !!e.monde.ramasses['lanterne' + i]);
   /* déjà fait avant d'y arriver (des captures en avance) : on passe à la suite */
+  if (s === 'grandir' && e.dindies.some(d => d.stade === 'jeune' && d.lieu === 'nurserie')) setTimeout(() => { if (E().quete.etape === s) avancer(); }, 600);
   if ((s === 'capture1' && attrapeesDans('pres').size) || (s === 'pres3' && !manquantes('pres').length) || (s === 'maroc3' && !manquantes('maroc').length) || (s === 'belgique3' && !manquantes('belgique').length)) setTimeout(() => { if (E().quete.etape === s) avancer(); }, 600);
 }
 
@@ -240,16 +262,39 @@ export async function parler(id) {
       avancer();
       return;
     }
+    if (s === 'parlerPlumeau3') {
+      await dialogue([L('plumeau', 'Roullieee ! Les Prés, le Maroc, la Belgique… et même l’Atomium ! Quelle exploratrice !'),
+        L('plumeau', 'Maintenant, place au cœur du métier d’éleveuse : <b>les œufs</b>. Deux dindies adultes qui s’aiment bien… et hop, un œuf !'),
+        L('plumeau', 'Et les <b>œufs mystère</b> que tu as trouvés dans les îles ? Il leur faut un <b>Couvoir</b> bien chaud.'),
+        L('plumeau', 'Le vieux Couvoir, au nord du Domaine, est en ruine. Mimi vend des <b>kits de construction</b> : à toi de jouer !')]);
+      avancer();
+      return;
+    }
+    if (s === 'eclosion' || s === 'oeufTuto') { await dialogue([L('plumeau', s === 'oeufTuto' ? 'Mets mon œuf dans une couveuse du Couvoir. Il éclora en un rien de temps !' : 'Patience… Un œuf, ça ne se presse pas ! Enfin, celui-là, c’est l’affaire de quelques secondes.')]); return; }
+    if (s === 'nid') {
+      await dialogue([L('plumeau', 'Pour un <b>hybride</b>, choisis deux parents de <b>types différents</b> : par exemple une dindie 🌿 Prairie et une dindie 💧 Pluie.'),
+        L('plumeau', 'Leur bébé peut prendre un type de chaque parent ! Le Grand Livre te donne des indices : « un parent 🔥, un parent ❄️ »…')]);
+      return;
+    }
+    if (s === 'parlerPlumeau4') {
+      await dialogue([L('plumeau', 'Un hybride ! Fantastique ! Tu es une vraie éleveuse, maintenant.'),
+        L('plumeau', 'Dernière leçon : <b>l’éveil</b>. Une dindie de <b>niveau 20</b> peut s’éveiller avec une <b>pierre d’éveil</b> 💎 : elle devient plus forte, et change d’allure !'),
+        L('plumeau', 'Pour gagner des niveaux : des friandises, des <b>biscuits de champion</b> 🍘, des captures, et des promenades avec ta compagne. Tiens, voici de quoi commencer.')]);
+      const pierre = !J.combien('pierreEveil');
+      J.ajouterObjet('biscuit', 5); if (pierre) J.ajouterObjet('pierreEveil');
+      toast('🎁 Le Professeur t’offre 🍘 5 biscuits de champion' + (pierre ? ' et 💎 une pierre d’éveil' : '') + ' !', { duree: 3500 });
+      avancer();
+      return;
+    }
     if (etapeAtteinte('capture1') && !e.quete.plumeauCapture && e.dindies.some(d => d.origine.startsWith('sauvage:'))) {
       e.quete.plumeauCapture = true;
       await dialogue([L('plumeau', 'Ho ho ! Une dindie sauvage ! Chaque nouvelle espèce attrapée te rapporte une prime de 50 pièces. C’est le règlement du Grand Livre !'),
         L('plumeau', 'Un conseil : les dindies rares ont besoin d’un équipement spécial. Les épiques, elles, sont liées à une vieille légende de leur région…')]);
-      return;
     }
     return monde.ouvrirLabo();
   }
   if (id === 'mimi') {
-    const besoin = { clous: 'clous', kit: 'kitPlanches', friandises: 'friandise', toile: 'toile', chapeau: 'chapeauSoleil', parapluie: 'parapluie' }[s] || (s === 'corde' ? 'toile' : null);
+    const besoin = { clous: 'clous', kit: 'kitPlanches', friandises: 'friandise', toile: 'toile', chapeau: 'chapeauSoleil', parapluie: 'parapluie', kitCouvoir: 'kitConstruction', kitNurserie: 'kitConstruction' }[s] || (s === 'corde' ? 'toile' : null);
     if (besoin && !J.combien(besoin) && E().pieces < OBJETS[besoin].prix * (besoin === 'friandise' ? 2 : 1)) {
       await dialogue([L('mimi', `Oh, il te manque des pièces ? Ce n’est pas grave : je te l’offre ! Les amis des dindies sont mes amis.`)]);
       J.ajouterObjet(besoin, besoin === 'friandise' ? 2 : 1);
@@ -258,6 +303,7 @@ export async function parler(id) {
     }
     if (!e.quete.mimiVue) { e.quete.mimiVue = true; await dialogue([L('mimi', 'Bonjour ! Moi c’est Mimi. Graines, friandises, outils… j’ai tout ce qu’il faut pour tes dindies !')]); }
     if (s === 'chapeau' && !e.quete.mimiChapeau) { e.quete.mimiChapeau = true; await dialogue([L('mimi', 'Le Maroc imaginaire ? Il y fait un soleil de plomb ! Il te faut absolument un <b>chapeau de soleil</b> 👒. J’en ai un pour toi !')]); }
+    if ((s === 'kitCouvoir' || s === 'kitNurserie') && !e.quete['mimi' + s]) { e.quete['mimi' + s] = true; await dialogue([L('mimi', 'Un kit de construction ? Planches, clous, peinture… et même un petit marteau ! Le voilà !')]); }
     if (s === 'parapluie' && !e.quete.mimiParapluie) { e.quete.mimiParapluie = true; await dialogue([L('mimi', 'La Belgique ? Là-bas, il pleut souvent… Prends un <b>parapluie</b> ☂️ ! Et rapporte-moi une gaufre, hi hi !')]); }
     return monde.ouvrirBoutique();
   }
@@ -444,6 +490,26 @@ export async function interagir(id) {
     avancer();
     return false;     /* on ouvre ensuite le Clapier */
   }
+  if (id === 'couvoir' && s === 'reparerCouvoir') {
+    if (!J.retirerObjet('kitConstruction')) { toast('Il faut un kit de construction ! Mimi en vend.'); return true; }
+    e.batiments.couvoir.repare = true;
+    await monde.reparerAnime('couvoir');
+    toast('🔨 Le Couvoir est réparé !');
+    avancer();
+    J.ajouterObjet('oeufProfesseur');
+    await dialogue([L('plumeau', '(le Professeur arrive en courant) Magnifique, ce Couvoir ! Tiens : voici un œuf de mon Labo. Mets-le dans une couveuse, il éclora en quelques secondes !')]);
+    return false;     /* on ouvre ensuite le Couvoir */
+  }
+  if (id === 'nurserie' && s === 'reparerNurserie') {
+    if (!J.retirerObjet('kitConstruction')) { toast('Il faut un kit de construction ! Mimi en vend.'); return true; }
+    e.batiments.nurserie.repare = true;
+    for (const d of e.dindies) if ((d.stade === 'poussin' || d.stade === 'jeune') && d.lieu !== 'nurserie') d.lieu = 'nurserie';
+    J.changer('dindies');
+    await monde.reparerAnime('nurserie');
+    toast('🔨 La Nurserie est réparée ! Ton poussin s’y installe.');
+    avancer();
+    return false;     /* on ouvre ensuite la Nurserie */
+  }
   if (id === 'deco-jardin') { toast('🌸 Un jardin oublié, envahi de fleurs… Une grande quête t’y attendra un jour !', { duree: 3600 }); return true; }
   if (id === 'deco-atomium') { toast('⚛️ L’Atomium : 9 boules d’argent, hautes comme un immeuble ! Il paraît qu’une dindie y vit…', { duree: 3600 }); return true; }
   return false;
@@ -496,6 +562,15 @@ export function evenement(type, valeur) {
     if (e.quete.nourries.length >= Math.min(2, e.dindies.length)) avancer();
   }
   if (type === 'musee' && s === 'musee') avancer();
+  if (type === 'achat' && valeur === 'kitConstruction' && (s === 'kitCouvoir' || s === 'kitNurserie')) avancer();
+  if (type === 'oeufPose' && s === 'oeufTuto' && valeur.origine === 'tutoriel') avancer();
+  if (type === 'eclosion') {
+    if (s === 'eclosion' && valeur.oeuf.origine === 'tutoriel') { avancer(); setTimeout(() => dialogue([L('moi', 'Un poussin ! Il lui faudrait un endroit douillet pour grandir… La Nurserie, à côté du Couvoir, est en ruine. Encore un kit !')]), 1200); }
+    if (s === 'oeufCroise' && valeur.oeuf.origine === 'croisement' && ['croisement', 'recette'].includes(PAR_ID[valeur.oeuf.espece].origine.sorte)) avancer();
+  }
+  if (type === 'grandir' && s === 'grandir' && valeur.stade !== 'poussin') avancer();
+  if (type === 'croisement' && s === 'nid' && ['croisement', 'recette'].includes(PAR_ID[valeur.espece].origine.sorte)) avancer();
+  if (type === 'eveil' && s === 'eveil') avancer();
   if (type === 'arrivee') {
     if ((s === 'decollage' && valeur === 'pres') || (s === 'volMaroc' && valeur === 'maroc') || (s === 'volBelgique' && valeur === 'belgique')) avancer();
     preparerEtape();

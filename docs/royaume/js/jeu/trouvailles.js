@@ -31,7 +31,8 @@ export function ramasser(o, region) {
   J.gagnerPieces(pieces);
   let t = `🧰 Un coffre ! <b>+ ${pieces} 🪙</b>`;
   const k = r();
-  if (k < .3) { J.ajouterObjet('friandise', 2); t += ' et 🍪 2 friandises'; }
+  if (k < .1) { J.ajouterObjet('sablier'); t += ' et ⏳ un sablier'; }
+  else if (k < .3) { J.ajouterObjet('friandise', 2); t += ' et 🍪 2 friandises'; }
   else if (k < .5) { const f = friandisePreferee(REGIONS[region].type); J.ajouterObjet(f, 2); t += ` et ${OBJETS[f].e} ${OBJETS[f].nom} × 2`; }
   return t;
 }

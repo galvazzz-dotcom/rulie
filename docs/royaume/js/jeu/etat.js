@@ -3,14 +3,15 @@
 import { PAR_ID } from '../donnees/especes.js';
 import { vaDans } from './individus.js';
 
-export const VERSION = 2;
+export const VERSION = 3;
 export function nouvelEtat(nom, couleur) {
   return {
     version: VERSION, profil: { nom, couleur, cree: Date.now() },
     pieces: 0, plumesOr: 0, inventaire: {},
     dindies: [], compagnon: null,
-    enclos: {}, batiments: { clapier: { repare: false, rangees: 1 }, montgolfiere: { reparee: false } },
-    livre: { vus: {}, attrapes: {} },
+    enclos: {}, batiments: { clapier: { repare: false, rangees: 1 }, montgolfiere: { reparee: false }, couvoir: { repare: false }, nurserie: { repare: false } },
+    elevage: { couveuses: [null, null], croisements: 0, eclosions: 0, premierHybride: false, compteur: 0 },
+    livre: { vus: {}, attrapes: {}, chromas: {} },
     quete: { etape: 'arrivee', compteur: 0, finies: [], nourries: [] },
     monde: { position: [0, 33.5], ramasses: {}, lieu: 'domaine', positions: {} },
     reglages: { son: true, musique: true, voix: false, aide: false, heure: 'vraie' },
@@ -26,6 +27,8 @@ export function migrer(e) {
   fus(e, n);
   /* version 2 : la fin du chapitre 1 devient le départ du chapitre 2 */
   if (avant < 2 && e.quete.etape === 'fin') e.quete.etape = 'decollage';
+  /* version 3 : la fin du chapitre 2 devient le début du chapitre 3 */
+  else if (avant < 3 && e.quete.etape === 'fin') e.quete.etape = 'parlerPlumeau3';
   e.version = VERSION;
   return e;
 }
@@ -62,6 +65,9 @@ export function ajouterDindie(d) {
 /* déplacer une dindie : renvoie un message d'erreur, ou null si c'est fait */
 export function deplacer(d, lieu) {
   if (d.lieu === lieu) return null;
+  const bebe = d.stade === 'poussin' || d.stade === 'jeune';
+  if (bebe && (lieu === 'equipe' || lieu.startsWith('enclos:'))) return 'Elle est encore toute petite : elle grandit à la Nurserie (ou au Clapier).';
+  if (lieu === 'nurserie') { if (!E.batiments.nurserie?.repare) return 'La Nurserie est encore en ruine.'; if (!bebe) return 'La Nurserie, c’est pour les bébés !'; if (E.dindies.filter(x => x.lieu === 'nurserie').length >= 6) return 'La Nurserie est pleine (6 bébés).'; }
   if (lieu === 'equipe' && equipe().length >= 6) return 'Ton équipe est pleine (6 dindies).';
   if (lieu === 'clapier') { if (!E.batiments.clapier.repare) return 'Le Clapier est encore en ruine.'; if (dansClapier().length >= placesClapier()) return 'Le Clapier est plein.'; }
   if (lieu.startsWith('enclos:')) {

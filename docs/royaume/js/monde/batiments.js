@@ -341,3 +341,74 @@ export function objetQuete(sorte) {
   return { g, maj: (dt, t) => { g.children[0].position.y = Math.sin(t * 2.5) * .08; g.rotation.y = t * .6; l.material.opacity = .5 + Math.sin(t * 3) * .3; } };
 }
 export const libererBatiments = () => { aJeter.forEach(g => g.dispose()); aJeter.length = 0; };
+
+/* ── le Couvoir : une hutte ronde au toit de paille, 2 couveuses (des cloches de verre chauffées) et le nid ── */
+export function couvoir() {
+  const p = [], f = [];
+  p.push(CY('#fde7c4', [0, 1.3, 0], [2.6, 2.6, 2.6], [0, 0, 0], 24), CY('#e7c9a0', [0, .12, 0], [2.75, .24, 2.75], [0, 0, 0], 24));
+  p.push(CO('#d4a24c', [0, 3.6, 0], [3.3, 2.4, 3.3], [0, 0, 0], 24), CY('#b45309', [0, 2.62, 0], [3.25, .14, 3.25], [0, 0, 0], 24));
+  p.push(SP('#fef3c7', [0, 5.1, 0], [.42, .56, .42]), SP('#f472b6', [.2, 5.2, .32], .09), SP('#60a5fa', [-.25, 5, .28], .08), SP('#a3e635', [.05, 5.45, .3], .07));
+  p.push(B('#7c4a22', [0, 1.05, 2.56], [1.3, 2.1, .12]), TO('#b45309', [0, 2.1, 2.58], [.65, .65, .65], [0, 0, 0], .14, Math.PI), SP('#facc15', [.4, 1, 2.65], .06));
+  for (const a of [-1.1, 1.1]) { const x = Math.sin(a) * 2.6, z = Math.cos(a) * 2.6; p.push(TO('#b45309', [x, 1.6, z], [.42, .42, .42], [0, a, 0], .22)); f.push(CY('#bfe3ff', [x, 1.6, z], [.4, .06, .4], [Math.PI / 2, 0, -a], 18)); }
+  const g = construire(p, f);
+  const t = pancarte('🥚 Le Couvoir', 2.2, .5, { fond: '#fffbeb', encre: '#9a3412', bord: '#f59e0b' }); t.position.set(0, 2.55, 2.75); g.add(t);
+  /* les deux couveuses, de chaque côté de la porte */
+  const couveuses = [-2.4, 2.4].map(x => {
+    const c = new THREE.Group(); c.position.set(x, 0, 3.1); g.add(c);
+    c.add(construire([CY('#a0764a', [0, .35, 0], [.55, .7, .55], [0, 0, 0], 16), CY('#facc15', [0, .72, 0], [.6, .06, .6], [0, 0, 0], 16), CY('#fef3c7', [0, .76, 0], [.45, .04, .45], [0, 0, 0], 16),
+      CY('#57534e', [.45, 1.3, -.3], [.03, 1.2, .03]), B('#57534e', [.25, 1.88, -.15], [.45, .04, .04], [0, -.5, 0]), CO('#dc2626', [0, 1.75, 0], [.2, .22, .2], [0, 0, 0], 12)], [], .02));
+    const cloche = new THREE.Mesh(demiSphere(20, 10), new THREE.MeshToonMaterial({ gradientMap: TONS, color: '#e0f2fe', transparent: true, opacity: .32, depthWrite: false }));
+    cloche.scale.set(.48, .62, .48); cloche.position.y = .76; c.add(cloche);
+    const chaleur = new THREE.Sprite(new THREE.SpriteMaterial({ map: texRonde(), color: '#fb923c', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: .5 }));
+    chaleur.scale.setScalar(1.4); chaleur.position.y = 1.15; c.add(chaleur);
+    const place = new THREE.Group(); place.position.y = .8; c.add(place);
+    return { c, place, chaleur, oeuf: null, cle: null };
+  });
+  /* le nid */
+  const brins = Array.from({ length: 9 }, (_, k) => B('#d6a35a', [Math.cos(k * .7) * .72, .32, Math.sin(k * .7) * .72], [.04, .04, .55], [0, k * .7 + .6, .2]));
+  const nid = construire([TO('#c08a3e', [0, .18, 0], [.75, .75, .5], [Math.PI / 2, 0, 0], .4), CY('#a16207', [0, .1, 0], [.6, .1, .6], [0, 0, 0], 16), ...brins], [], .02);
+  nid.position.set(3.9, 0, .8); g.add(nid);
+  /* un œuf dans une couveuse (ses couleurs viennent de ses parents) ; pret = il brille et tremble */
+  const majOeufs = (oeufs, pret) => couveuses.forEach((C, i) => {
+    const o = oeufs[i], cle = o ? o.id : null;
+    if (cle !== C.cle) {
+      if (C.oeuf) { C.place.remove(C.oeuf); C.oeuf.traverse(m => m.geometry && !m.geometry.parameters && m.geometry.dispose()); }
+      C.oeuf = o ? construire([SP('#fef9ec', [0, .28, 0], [.22, .29, .22]), SP(o.couleurs[0], [.12, .36, .13], .055), SP(o.couleurs[1], [-.13, .24, .12], .05), SP(o.couleurs[0], [.02, .45, -.15], .045), SP(o.couleurs[1], [-.1, .4, -.1], .04)], [], .015) : null;
+      if (C.oeuf) C.place.add(C.oeuf);
+      C.cle = cle;
+    }
+    C.pret = o && pret(o);
+  });
+  return {
+    g, obst: [[0, 0, 5.6, 5.6], [-2.4, 3.1, 1.3, 1.3], [2.4, 3.1, 1.3, 1.3], [3.9, .8, 1.6, 1.6]], porte: [0, 4.6], majOeufs,
+    maj: (dt, t) => couveuses.forEach((C, i) => {
+      C.chaleur.material.opacity = C.oeuf ? (C.pret ? .55 + Math.sin(t * 6) * .3 : .45 + Math.sin(t * 2 + i) * .1) : .15;
+      if (C.oeuf) C.oeuf.rotation.z = C.pret ? Math.sin(t * 14) * .12 * (Math.sin(t * 2) > 0 ? 1 : 0) : Math.sin(t * 1.5 + i) * .03;
+    })
+  };
+}
+
+/* ── la Nurserie : une maison toute douce, et sa petite cour où jouent les bébés ── */
+export function nurserie() {
+  const p = [], f = [];
+  p.push(B('#fbcfe8', [0, 1.4, -1.6], [4.6, 2.8, 3.4]), T('#93c5fd', [0, 2.8, -1.6], [5.2, 1.9, 3.9]), B('#f9a8d4', [0, .12, -1.6], [4.8, .24, 3.6]));
+  p.push(B('#fde68a', [0, 1.05, .12], [1.1, 2.1, .1]), SP('#f472b6', [0, 1.55, .19], [.16, .14, .05]), SP('#facc15', [.35, 1, .2], .05));
+  for (const x of [-1.5, 1.5]) fenetre(p, f, x, 1.6, .12, .8, .8, '#f472b6');
+  /* la petite cour : une barrière blanche (ouverte devant), un bac à sable, un toboggan, un ballon */
+  const W = 6.4, D = 4.4, cz = 2.6;
+  /* la barrière : une ouverture devant (pour entrer) et derrière (la porte de la maison) */
+  for (let k = 0; k <= 12; k++) { const x = -W / 2 + k * W / 12; if (Math.abs(x) > .9) p.push(B('#fff7ed', [x, .35, cz + D / 2], [.1, .7, .1]), B('#fff7ed', [x, .35, cz - D / 2 + .05], [.1, .7, .1])); }
+  for (let k = 0; k <= 8; k++) { const z = cz - D / 2 + k * D / 8; p.push(B('#fff7ed', [-W / 2, .35, z], [.1, .7, .1]), B('#fff7ed', [W / 2, .35, z], [.1, .7, .1])); }
+  for (const s of [-1, 1]) p.push(B('#fde68a', [s * (W / 4 + .45), .5, cz + D / 2], [W / 2 - .9, .08, .05]), B('#fde68a', [s * (W / 4 + .45), .5, cz - D / 2 + .05], [W / 2 - .9, .08, .05]));
+  p.push(B('#fde68a', [-W / 2, .5, cz], [.05, .08, D]), B('#fde68a', [W / 2, .5, cz], [.05, .08, D]));
+  p.push(B('#fcd34d', [-2, .1, cz + 1], [1.6, .2, 1.2]), B('#a16207', [-2, .16, cz + 1], [1.8, .12, .08], [0, 0, 0]));
+  p.push(B('#60a5fa', [2, .5, cz - .8], [.5, 1, .5]), B('#f472b6', [2, .45, cz + .1], [.45, .06, 1.6], [.55, 0, 0]), B('#fde047', [2, .75, cz - 1.15], [.08, .5, .08]));
+  p.push(SP('#ef4444', [.9, .2, cz + 1.4], .2), SP('#ffffff', [.95, .25, cz + 1.5], .07));
+  const g = construire(p, f, .03);
+  const t = pancarte('🍼 La Nurserie', 2.4, .5, { fond: '#fdf2f8', encre: '#9d174d', bord: '#f472b6' }); t.position.set(0, 2.55, .2); g.add(t);
+  return {
+    g, porte: [0, cz + D / 2 + 1.4], cour: { x: 0, z: cz, w: W - 1, d: D - 1 },
+    obst: [[0, -1.6, 5, 3.8], [-W / 2, cz, .3, D], [W / 2, cz, .3, D], [-W / 4 - .45, cz + D / 2, W / 2 - .9, .3], [W / 4 + .45, cz + D / 2, W / 2 - .9, .3],
+      [-W / 4 - .45, cz - D / 2, W / 2 - .9, .3], [W / 4 + .45, cz - D / 2, W / 2 - .9, .3], [-2, cz + 1, 1.8, 1.4], [2, cz - .5, .8, 2.2]]
+  };
+}

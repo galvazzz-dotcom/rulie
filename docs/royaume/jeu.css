@@ -250,7 +250,7 @@ body.pageJeu #chargement{z-index:50}
 .mondeSvg .route.pale{opacity:.3}
 .mondeSvg .nomIle{font-family:'Lilita One',sans-serif;fill:#1e3a5f;paint-order:stroke;stroke:#fff;stroke-width:.9px}
 .mondeSvg .fermee .nomIle{fill:#64748b}
-.mondeSvg .ballonIci{animation:flotte 2s ease-in-out infinite}
+.mondeSvg .ballonIci{animation:flotteV 2s ease-in-out infinite}
 .mondeInfo{margin-top:10px;text-align:center}
 .mondeEspeces{display:flex;justify-content:center;gap:8px;margin:8px 0}
 .mondeEspeces div{position:relative;width:62px;height:62px;border-radius:14px;background:#fff;border:3px solid #e5e7eb;overflow:hidden}
@@ -268,8 +268,8 @@ body.pageJeu #chargement{z-index:50}
 .nuagesV i:nth-child(3){top:62%;animation-delay:-2.2s}.nuagesV i:nth-child(4){top:78%;animation-delay:-.6s;transform:scale(.8)}
 .nuagesV i:nth-child(5){top:46%;animation-delay:-1.7s;transform:scale(.6)}.nuagesV i:nth-child(6){top:4%;animation-delay:-2.7s;transform:scale(.5)}
 @keyframes nuageV{from{left:110%}to{left:-60%}}
-.ballonV{font-size:110px;animation:flotte 1.6s ease-in-out infinite;filter:drop-shadow(0 8px 10px rgba(0,0,0,.2));z-index:1}
-@keyframes flotte{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.ballonV{font-size:110px;animation:flotteV 1.6s ease-in-out infinite;filter:drop-shadow(0 8px 10px rgba(0,0,0,.2));z-index:1}
+@keyframes flotteV{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
 .texteV{z-index:1;font-weight:700;font-size:20px;color:#1e3a5f;background:rgba(255,255,255,.8);padding:6px 16px;border-radius:14px}
 .titreV{position:absolute;z-index:2;font-family:'Lilita One',sans-serif;font-size:clamp(34px,8vw,64px);color:#fff;text-shadow:0 4px 0 #ea580c,0 8px 18px rgba(0,0,0,.3);opacity:0;transform:scale(.6);transition:all .5s cubic-bezier(.34,1.56,.64,1)}
 #voyage.arrive .titreV{opacity:1;transform:scale(1)}
@@ -278,3 +278,49 @@ body.pageJeu #chargement{z-index:50}
 #capture.attente .capBas{opacity:.55;pointer-events:none}
 body.enCapture #hud{display:none}
 body.enCapture #toasts{top:calc(max(10px,env(safe-area-inset-top)) + 118px)}
+
+.profil .defileProfil{flex:none;display:flex;align-items:center;justify-content:center;width:46px;font-size:22px;text-decoration:none;border-radius:14px;background:#fff8e7;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+
+/* ══════════ ÉTAPE 4 : le Couvoir, la Nurserie, l'éclosion, l'éveil ══════════ */
+.nid{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.placeNid{position:relative;display:flex;flex-direction:column;align-items:center}
+.placeNid.vide{width:112px;height:128px;border-radius:18px;border:4px dashed #f59e0b;background:#fffbeb;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-weight:700;color:#9a3412}
+.placeNid.vide span{font-size:34px}
+.placeNid [data-retire]{position:absolute;top:-8px;right:-8px;width:30px;height:30px;padding:0;border-radius:50%;background:#ef4444;box-shadow:0 3px 0 #991b1b}
+.coeurNid{font-size:30px;animation:pouls2 .8s ease-in-out infinite alternate}
+.infoCouple{text-align:center;font-weight:700;background:#f0fdf4;border:3px solid #86efac;border-radius:14px;padding:6px 10px;margin:8px 0}
+.infoCouple.pale{background:#f8fafc;border-color:#e2e8f0;color:#64748b}
+.ligneBtn{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:8px 0}
+.couveuses{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.couveuse{display:flex;flex-direction:column;align-items:center;gap:6px;background:#fff;border:4px solid #fdba74;border-radius:20px;padding:10px;text-align:center}
+.couveuse.prete{border-color:#22c55e;animation:pouls2 .7s ease-in-out infinite alternate}
+.couveuse.vide{border-style:dashed;color:#9ca3af}
+.oeufBox{width:72px;height:86px}
+.oeufBox.vide{display:flex;align-items:center;justify-content:center;font-size:44px;opacity:.6}
+.oeufSvg{width:100%;height:100%}
+.couveuse.prete .oeufBox{animation:secoue .5s ease-in-out infinite}
+.minuteur{width:100%;display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:14px}
+.bebeLigne{display:flex;align-items:center;gap:10px;background:#fff;border:3px solid #fbcfe8;border-radius:18px;padding:8px 10px;margin:8px 0}
+.bebeLigne .mini{width:64px;height:64px;flex:none;border-radius:14px;overflow:hidden;background:#fdf2f8}
+.bebeLigne .mini svg{width:100%;height:100%}
+.infoBebe{flex:1;min-width:0}
+.infoBebe small{display:block;color:#6b4f33;margin-bottom:4px}
+.nurserieF .vide{text-align:center;font-weight:700;color:#9d174d}
+.carteDindie.pale{opacity:.55;filter:grayscale(.4)}
+.carteDindie.prete{border-color:#a855f7;box-shadow:0 0 0 3px #e9d5ff}
+.livreJeu .case em.chromaL{left:4px;right:auto}
+#eclosion{position:fixed;inset:0;z-index:45;background:radial-gradient(circle at 50% 40%,#fff7ed,#fed7aa 55%,#fb923c);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;text-align:center;animation:fondu .3s}
+#eclosion.eveil{background:radial-gradient(circle at 50% 40%,#faf5ff,#e9d5ff 55%,#a855f7)}
+#eclosion.part{opacity:0;transition:opacity .35s}
+#eclosion .scene{width:min(52vw,240px);height:min(60vw,280px);display:flex;align-items:center;justify-content:center}
+#eclosion .oeufAnime{width:80%;height:100%}
+#eclosion .oeufAnime.secoue{animation:secoue .45s ease-in-out}
+@keyframes secoue{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
+#eclosion .bebe{width:100%;aspect-ratio:1;border-radius:28px;overflow:hidden;border:6px solid var(--rar,#f59e0b);background:#fff;animation:pop .5s cubic-bezier(.34,1.56,.64,1);box-shadow:0 10px 30px rgba(0,0,0,.2)}
+#eclosion .bebe svg{width:100%;height:100%}
+#eclosion .bebe.eveillee{border-color:#a855f7;box-shadow:0 0 40px #e9d5ff,0 10px 30px rgba(0,0,0,.2)}
+#eclosion .scene.flash{animation:flash .8s}
+@keyframes flash{50%{filter:brightness(3) saturate(0)}}
+#eclosion .texteE{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:18px;max-width:440px}
+#eclosion .texteE b{font-family:'Lilita One',sans-serif;font-weight:400;font-size:26px;color:#7c2d12}
+#eclosion .nouv{font-weight:700;color:#15803d}

@@ -211,7 +211,7 @@ Chaque espèce a un **ADN** : couleurs du corps, des ailes, du ventre, de la tê
 ## 7. L’élevage
 
 ### 7.1 Les croisements (au Couvoir)
-On met **deux adultes** dans un nid. Un œuf apparaît.
+On met **deux adultes** dans le nid du Couvoir. Un œuf apparaît et part dans une des **2 couveuses**. Ensuite, les deux parents se reposent **10 minutes**.
 
 | Résultat | Chance |
 |---|---|
@@ -220,7 +220,9 @@ On met **deux adultes** dans un nid. Un œuf apparaît.
 | **Mythique** (deux espèces précises, l’objet de la grande quête et la condition remplie) | 100 %, c’est une récompense de quête |
 | Sinon | l’espèce de la mère ou du père, à 50/50 |
 
+- **Le tout premier croisement de deux types différents** donne toujours un hybride (pour que la découverte arrive tout de suite).
 - **Les bonus :** le Gâteau d’amour (+10 %) et le Couvoir de niveau 3 ou plus (+5 %).
+- **Les chromatiques ✨ :** 1 chance sur 64 à chaque œuf ; elles ont leur marque dans le Grand Livre.
 - **Le Grand Livre aide :** les espèces pas encore trouvées sont des silhouettes « ? » avec un indice, par exemple « un parent 🔥, un parent ❄️ ».
 
 ### 7.2 Les minuteurs (en temps réel, même jeu fermé)
@@ -233,11 +235,11 @@ On met **deux adultes** dans un nid. Un œuf apparaît.
 | Mythique | 4 h |
 | Le premier œuf du tutoriel | 30 s |
 
-- **La Nurserie :** de poussin à jeune en 10 min, de jeune à adulte en 30 min. Chaque repas fait gagner 3 minutes.
+- **La Nurserie** (6 places) : de poussin à jeune en 10 min, de jeune à adulte en 30 min. Chaque repas fait gagner 3 minutes. Les bébés ne vont ni en équipe ni dans les enclos.
 - **Le Sablier**, un objet gagné en jouant, fait gagner 30 minutes. En mode aide, les durées sont divisées par 2.
 
 ### 7.3 Les niveaux, les talents, les caractères
-- **Le niveau** va de 1 à 50. L’expérience vient des courses, de l’entraînement, des missions et des baies.
+- **Le niveau** va de 1 à 50. L’expérience vient des friandises (20, ou 35 pour la friandise préférée), des **biscuits de champion** 🍘 (150), des captures (25 pour l’équipe, 50 pour la compagne), des promenades avec la compagne (10 tous les 40 m), et plus tard des courses, de l’entraînement et des missions.
 - **Le temps pour monter :** passer du niveau *n* au niveau *n+1* demande `10 × n^1,4` points d’expérience (à régler avec le simulateur).
 - **Les stats affichées**, de 5 à 100 : `stat = 5 + ⌊(6 × base + 4 × talent + entraînement) × niveau / 50⌋`
   - *base* : celle de l’espèce, de 1 à 10 ;
@@ -256,7 +258,7 @@ On met **deux adultes** dans un nid. Un œuf apparaît.
   - Pressée (+⚡ −🦘) ;
   - Gourmande (expérience des friandises ×2) ;
   - Calme (neutre).
-- **L’éveil :** au niveau 25, au Labo, avec la pierre d’éveil de son type. La dindie gagne +1 à chaque stat de base (10 au maximum), une nouvelle apparence et une place de compétence en plus.
+- **L’éveil :** au niveau 20, au Labo, avec une pierre d’éveil 💎 (une seule sorte de pierre, trouvée dans les îles). La dindie gagne +1 à chaque stat de base (10 au maximum) et une nouvelle apparence ; la place de compétence en plus arrivera avec les compétences (étape 5).
 
 ### 7.4 Les compétences de course (20)
 Chaque espèce a une compétence liée à son type. Le coach en apprend une deuxième, et une troisième après l’éveil.
@@ -336,7 +338,7 @@ En mode aide, les compétences se déclenchent toutes seules.
 **L’histoire en 8 chapitres** (environ 60 quêtes) :
 1. *Le Domaine en ruine* (7 quêtes) : tutoriel, le premier enclos, le Clapier, la montgolfière.
 2. *L’expédition* (10 quêtes) : la carte du monde, les Prés, le Maroc imaginaire et la Belgique, les 12 premières espèces sauvages, le chapeau de soleil et le parapluie, les légendes du Coquelicot, de la Dinde Dingue et de l’Atomium.
-3. *Le premier œuf* : le Couvoir, la Nurserie, le premier croisement, les œufs mystère.
+3. *Le premier œuf* (5 quêtes) : le Couvoir (kit de construction), l’œuf du Professeur, la Nurserie, le premier croisement (un hybride), l’éveil au Labo.
 4. *Le Dindodrome ouvre* : l’entraînement, les championnats 1 à 3, Gontran, l’Atelier des plumes.
 5. *Jungle et Banquise* : les régions 4 et 5, les championnats 4 et 5, les missions.
 6. *Volcan et Forêt de la Lune* : les régions 6 et 7, les championnats 6 et 7, l’éveil.
@@ -381,7 +383,7 @@ En mode aide, les compétences se déclenchent toutes seules.
 ```
 docs/royaume/
   index.html              la page du jeu (écran titre, puis le Domaine)
-  defile.html             le Grand Défilé des 72 dindies (étape 1)
+  defile.html             le Défilé des dindies débloquées d’un profil (étape 1, limité à l’étape 4)
   style.css, jeu.css
   js/main.js              démarrage, boucle, passage d'une scène à l'autre
   js/moteur/              rendu (toon, contours, ciel), formes, caméra, entrées, interface,
@@ -394,9 +396,12 @@ docs/royaume/
                           batiments, domaine, ile (le sol des régions), nature, fabrique,
                           region (ce qui est commun aux îles), regions/pres, maroc, belgique
   js/jeu/                 etat, individus, objets, scenario (quêtes et dialogues),
-                          sauvages (les apparitions), capture, trouvailles (coffres, œufs…)
+                          sauvages (les apparitions), capture, trouvailles (coffres, œufs…),
+                          elevage (œufs, croisements, minuteurs, croissance, expérience, éveil),
+                          collection (les espèces débloquées de chaque profil)
   js/ui/                  panneaux (Boutique, Labo, Livre, Musée, Fiche, Clapier…),
-                          monde (la carte du monde, le voyage en montgolfière)
+                          monde (la carte du monde, le voyage en montgolfière),
+                          elevage (le Couvoir, la Nurserie, l’éclosion, l’éveil)
   musique/                les musiques libres (MP3) et leurs crédits
   js/scenes/              titre, jeu (le Domaine), defile (étape 1), region, capture,
                           couvoir, dindodrome, course, concours
@@ -445,11 +450,12 @@ Chaque étape se termine par : les tests passent, des captures sur les 4 formats
 - [x] En plus : le chapitre 2 (10 quêtes), les 3 guides, les gadgets des îles, et de vraies musiques libres.
 - **Fini quand :** on peut attraper les 12 espèces sauvages des 3 premières régions.
 
-### Étape 4 — L’élevage et l’évolution
-- [ ] Le Couvoir (nids, couveuses), les minuteurs en temps réel, la Nurserie.
-- [ ] Les niveaux, l’expérience, les talents, les caractères, la fiche complète.
-- [ ] Les croisements : mélanges de types, recettes spéciales, indices du Livre.
-- [ ] L’éveil au Labo et les chromatiques.
+### Étape 4 — L’élevage et l’évolution ✅
+- [x] Le Couvoir (nid, 2 couveuses), les minuteurs en temps réel, la Nurserie.
+- [x] Les niveaux, l’expérience, les talents, les caractères, la fiche complète.
+- [x] Les croisements : mélanges de types, recettes spéciales, indices du Livre.
+- [x] L’éveil au Labo et les chromatiques.
+- [x] En plus : le chapitre 3 (5 quêtes), l’éclosion animée, les sabliers et les biscuits de champion, et le Défilé limité aux dindies débloquées (pas de « teaser » des 72).
 - **Fini quand :** on peut obtenir des hybrides et faire évoluer une dindie.
 
 ### Étape 5 — Le Dindodrome
@@ -502,3 +508,4 @@ Chaque étape se termine par : les tests passent, des captures sur les 4 formats
 | 2026-10-21 | 1 | Le Grand Défilé est en ligne (`docs/royaume/`) : moteur toon avec contours, modèle 3D de dindie et portrait SVG depuis le même ADN, 72 espèces × 4 stades × chromatique, nouvelle Roullieee, Grand Livre avec filtres, défilé automatique. Tests : `royaume-outils/test-etape1.mjs` (576 dindies sans erreur, mémoire stable, 4 formats). Pas encore de bouton sur l’accueil du site (prévu à l’étape 9). |
 | 2026-10-21 | 2 | Le Domaine est jouable (`docs/royaume/index.html`) : écran titre avec 3 profils, prologue illustré, île 3D (eau, écume, chemins, arbres, fleurs, lampadaires, lucioles), jour et nuit à l’heure réelle (ou réglés), déplacements au toucher (A*), au joystick et au clavier, caméra qui suit, silhouette derrière les murs. Bâtiments : Maison, Labo, Boutique, Musée, 8 enclos (2 à réparer au chapitre 1), Clapier, porte du Dindodrome, port et montgolfière. 5 PNJ en chibi avec portraits SVG, dialogues, journal, carte, sac, fiche des dindies (stats et potentiel), Grand Livre avec silhouettes et indices. Chapitre 1 en 7 quêtes, jusqu’à la montgolfière réparée. Sauvegarde automatique, code de sauvegarde et fichier. Le Défilé passe sur `defile.html`. Bouton sur l’accueil du site, sous la ferme, avec « 🚧 En développement ». Tests : `royaume-outils/test-etape2.mjs` (chapitre 1 joué de bout en bout avec chaque starter, rechargement de la sauvegarde, aucune erreur) et `test-etape1.mjs` (toujours vert). |
 | 2026-10-22 | 3 | L’expédition est jouable : le chapitre 2 en 10 quêtes. La carte du monde (8 îles, 3 ouvertes) et le voyage en montgolfière ; 3 îles en 3D construites à la demande et libérées au départ (mémoire stable) : les Prés (ferme de Gaston, moulin, mare, champ de coquelicots, jardin oublié), le Maroc imaginaire (dunes, ksar, souk et ses lanternes, oasis), la Belgique (canaux et ponts, Grand-Place, beffroi, maisons à pignons, Atomium). La météo par île et par heure (pluie, nuages, soleil). Les dindies sauvages (zones, heure, météo, équipement, mirages), la capture (friandises préférées, jauge de confiance, cercle et zone verte, 3 essais), la carte d’une dindie attrapée et la prime du Grand Livre. Les guides Gaston, Leïla et Monsieur Waffel ; les gadgets (le coq, le cadran magique, la bouteille à nuages) ; les coffres, œufs mystère et pierres d’éveil du jour ; filets solide et doré, chapeau de soleil, parapluie. De vraies musiques libres (0 A.D., OpenRCT2) à la place de la mélodie synthétisée. Les épiques ne dépendent plus des champions mais d’une petite quête de leur île. Les anciennes sauvegardes passent au chapitre 2. Tests : `royaume-outils/test-etape3.mjs` (les 12 espèces attrapées, gadgets, voyages, mémoire, sauvegarde) ; `test-etape1.mjs` et `test-etape2.mjs` toujours verts. |
+| 2026-10-22 | 4 | L’élevage est jouable : le chapitre 3 en 5 quêtes. Le Couvoir (une hutte ronde, le nid et 2 couveuses sous cloche, les œufs visibles en 3D) et la Nurserie (une maison pastel, sa cour clôturée, son bac à sable et son toboggan, où jouent les bébés le jour) se réparent avec un kit de construction de Mimi. Les croisements (hybrides 30 % / 15 %, recettes 25 %, le premier hybride garanti), les minuteurs en temps réel même jeu fermé, le sablier, l’éclosion animée avec le prénom du bébé, les 3 stades (poussin, jeune, adulte) et les repas qui font grandir plus vite. L’expérience (friandises, biscuits de champion, captures, promenades) et les niveaux ; l’éveil au Labo au niveau 20 avec une pierre d’éveil ; les chromatiques (1 sur 64). Les œufs mystère trouvés dans les îles éclosent enfin. Le Défilé (écran titre et page du Défilé) ne montre plus que les dindies débloquées du profil. Les sauvegardes de l’étape 3 passent au chapitre 3. Tests : `royaume-outils/test-etape4.mjs` (chapitre 3 joué de bout en bout, 300 croisements, minuteurs, rechargement) ; `test-etape1.mjs` (avec le Défilé limité), `test-etape2.mjs` et `test-etape3.mjs` toujours verts. |

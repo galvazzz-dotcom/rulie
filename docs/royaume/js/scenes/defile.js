@@ -1,5 +1,5 @@
 /* ══════════ ÉTAPE 1 : LE GRAND DÉFILÉ ══════════
-   Une petite île avec un podium : les 72 dindies y défilent une par une,
+   Une petite île avec un podium : les dindies débloquées y défilent une par une,
    en 3D, avec leur carte et le Grand Livre (portraits SVG, filtres).
    Sert de vitrine au style 3D et de banc d'essai pour les modèles. */
 import * as THREE from 'three';
@@ -14,6 +14,8 @@ import { variante } from '../dindies/adn.js';
 import { creerDindie } from '../dindies/modele.js';
 import { portraitDindie } from '../dindies/portrait.js';
 import { creerRoullieee } from '../personnages/roullieee.js';
+import * as SAUVE from '../moteur/sauvegarde.js';
+import { especesDe, especesDeTous } from '../jeu/collection.js';
 
 const $ = s => document.querySelector(s);
 const REGIONS = { pres: 'les Prés', maroc: 'le Maroc imaginaire', belgique: 'la Belgique', jungle: 'la Jungle', banquise: 'la Banquise', volcan: 'le Volcan', foret: 'la Forêt de la Lune', nuages: 'le Royaume des Nuages' };
@@ -116,7 +118,12 @@ const etat = { i: 0, stade: 'adulte', chroma: false, filtre: 'toutes', auto: fal
 let courante = null, roullieee = null;
 const sortantes = [];
 let arrivee = null;     /* la dindie qui entre et va au centre */
-const liste = () => ESPECES.filter(e => etat.filtre === 'toutes' || e.rarete === etat.filtre || e.types.includes(etat.filtre));
+/* seulement les dindies déjà attrapées : celles du profil choisi (?profil=…), sinon du dernier profil joué (sans profil : celles de tous) */
+const PROFIL = new URLSearchParams(location.search).get('profil') || SAUVE.profilActif();
+const NOM = (SAUVE.listeProfils().find(p => p.id === PROFIL) || {}).nom;
+const OK = PROFIL ? especesDe(PROFIL) : especesDeTous();
+const debloquee = e => OK.has(e.id);
+const liste = () => ESPECES.filter(e => debloquee(e) && (etat.filtre === 'toutes' || e.rarete === etat.filtre || e.types.includes(etat.filtre)));
 
 function construireDindie(e) {
   const a = variante(e, { stade: etat.stade, chroma: etat.chroma });
@@ -126,7 +133,9 @@ function construireDindie(e) {
   return d;
 }
 function choisir(i, sens = 1, instantane = false) {
-  etat.i = (i + ESPECES.length) % ESPECES.length;
+  i = (i + ESPECES.length) % ESPECES.length;
+  if (!debloquee(ESPECES[i])) { const L = liste().length ? liste() : ESPECES.filter(debloquee); if (!L.length) return; i = L[0].n - 1; }
+  etat.i = i;
   const e = ESPECES[etat.i];
   criJusqua = 0; $('#cri').classList.add('cache');
   if (courante) {
@@ -188,10 +197,12 @@ function majCarte(e) {
 
 /* ── le Grand Livre ── */
 function construireLivre() {
-  const F = [['toutes', 'Toutes (72)'], ...Object.entries(RARETES).map(([k, r]) => [k, { commune: '⚪', rare: '🔵', epique: '🟣', mythique: '🌈' }[k] + ' ' + r.nom]), ...ORDRE_TYPES.map(t => [t, TYPES[t].e + ' ' + TYPES[t].nom])];
+  const D = ESPECES.filter(debloquee);
+  const F = [['toutes', `Toutes (${D.length})`], ...Object.entries(RARETES).filter(([k]) => D.some(e => e.rarete === k)).map(([k, r]) => [k, { commune: '⚪', rare: '🔵', epique: '🟣', mythique: '🌈' }[k] + ' ' + r.nom]),
+    ...ORDRE_TYPES.filter(t => D.some(e => e.types.includes(t))).map(t => [t, TYPES[t].e + ' ' + TYPES[t].nom])];
   $('#filtres').innerHTML = F.map(([k, n]) => `<button data-f="${k}">${n}</button>`).join('');
   $('#filtres').onclick = ev => { const b = ev.target.closest('button'); if (!b) return; pop(); etat.filtre = b.dataset.f; majGrille(); };
-  $('#grille').innerHTML = ESPECES.map(e => `<button class="case ${e.rarete}" data-i="${e.n - 1}" style="--rar:${RARETES[e.rarete].couleur}" aria-label="${e.nom}"><span>${e.n}</span>${portraitDindie(variante(e), { id: 'L' + e.n })}</button>`).join('');
+  $('#grille').innerHTML = D.map(e => `<button class="case ${e.rarete}" data-i="${e.n - 1}" style="--rar:${RARETES[e.rarete].couleur}" aria-label="${e.nom}"><span>${e.n}</span>${portraitDindie(variante(e), { id: 'L' + e.n })}</button>`).join('');
   $('#grille').onclick = ev => {
     const b = ev.target.closest('.case'); if (!b) return;
     pop(); fermerLivre();
@@ -222,6 +233,16 @@ export function demarrerDefile() {
   construireDecor();
   roullieee = creerRoullieee(); scene.add(roullieee.racine);
   construireLivre();
+  const n = ESPECES.filter(debloquee).length;
+  $('.titre span').innerHTML = `<b>${NOM ? 'Le défilé de ' + NOM.replace(/[&<>"]/g, '') : 'Le Grand Défilé'}</b><small>${n} dindie${n > 1 ? 's' : ''} débloquée${n > 1 ? 's' : ''} · le Royaume des Dindies</small>`;
+  if (!n) {
+    $('#carte').innerHTML = '<div class="vide"><p class="grosEmoji">🥚</p><h2>Ton défilé est vide</h2><p>Attrape des dindies dans le Royaume : elles viendront défiler ici, une par une !</p><a class="btn" href="index.html">🎈 Jouer</a></div>';
+    ['#bPrec', '#bSuiv', '#bDefile', '#actions', '#bLivre'].forEach(s => $(s).classList.add('cache'));
+    cadrer(); addEventListener('resize', cadrer);
+    chaqueImage((dt, t) => roullieee.maj(dt, t));
+    window.__defile = { etat, choisir, ESPECES, vide: true };
+    return;
+  }
   cadrer(); addEventListener('resize', cadrer);
   /* au départ : l'espèce de l'adresse (#belgicus&eveille&chroma), sinon le Dindon Glouglou */
   const h = decodeURIComponent(location.hash.slice(1)).split('&');
@@ -292,7 +313,7 @@ export function demarrerDefile() {
     }
     if (etat.auto && !arrivee && t > prochainAuto) { prochainAuto = t + 7; choisir(voisin(1), 1); }
   });
-  window.__defile = { etat, choisir, ESPECES, get courante() { return courante; }, get arrivee() { return arrivee; }, crier, ouvrirLivre, fermerLivre };
+  window.__defile = { etat, choisir, ESPECES, debloquees: n, get courante() { return courante; }, get arrivee() { return arrivee; }, crier, ouvrirLivre, fermerLivre };
 }
 function majBoutons() {
   const s = STADES.find(x => x[0] === etat.stade);

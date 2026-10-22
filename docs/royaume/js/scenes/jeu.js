@@ -29,6 +29,8 @@ import { creerSauvages } from '../jeu/sauvages.js';
 import { lancerCapture, captureActive } from '../jeu/capture.js';
 import { ramasser } from '../jeu/trouvailles.js';
 import { ouvrirMonde, voyager } from '../ui/monde.js';
+import { ouvrirCouvoir, ouvrirNurserie, grandiToast } from '../ui/elevage.js';
+import * as EL from '../jeu/elevage.js';
 
 const VITESSE = 4.6;
 
@@ -87,7 +89,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
   const majHud = () => {
     $('#hPieces').textContent = E().pieces; $('#hPlumes').textContent = E().plumesOr;
     const q = S.queteDe(E().quete.etape);
-    $('#hQuete').innerHTML = `<small>${q ? q.titre : 'Chapitre 2 terminé !'}</small>${S.texteEtape()}`;
+    $('#hQuete').innerHTML = `<small>${q ? q.titre : `Chapitre ${S.QUETES[S.QUETES.length - 1].chapitre} terminé !`}</small>${S.texteEtape()}`;
     $('#hLivre').classList.toggle('cache', !J.combien('grandLivre'));
   };
   $('#hCarte').onclick = () => { pop(); P.ouvrirCarte({ titre: monde.id === 'domaine' ? '🗺️ La carte du Domaine' : `🗺️ ${monde.nom}`, ...carteDe(monde), position: [moi.racine.position.x, moi.racine.position.z], cible: positionCible(), allerA: (x, z) => allerVers(x, z) }); };
@@ -112,6 +114,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     const voulu = new Map();
     for (const d of E().dindies) {
       if (monde === domaine && d.lieu.startsWith('enclos:') && E().enclos[d.lieu.slice(7)]?.construit) voulu.set(d.uid, 'enclos');
+      else if (monde === domaine && d.lieu === 'nurserie' && domaine.elevage.nurserie?.cour) voulu.set(d.uid, 'nurserie');
       else if (E().compagnon === d.uid) voulu.set(d.uid, 'compagnon');
     }
     for (const [uid, A] of affichees) if (voulu.get(uid) !== A.mode || A.cle !== cleDe(A.d)) { A.m.liberer(); affichees.delete(uid); }
@@ -120,7 +123,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
       const d = J.parUid(uid), m = creerDindie(variante(PAR_ID[d.espece], { stade: d.stade, chroma: d.chroma }));
       scene.add(m.racine);
       const A = { d, m, mode, cle: cleDe(d), cible: null, attente: Math.random() * 2, prochaineAction: 3 + Math.random() * 6 };
-      if (mode === 'enclos') { const I = domaine.enclosInfo[d.lieu.slice(7)]; A.I = I; const p = pointDansEnclos(I); m.racine.position.set(p[0], 0, p[1]); }
+      if (mode === 'enclos' || mode === 'nurserie') { const I = mode === 'enclos' ? domaine.enclosInfo[d.lieu.slice(7)] : domaine.elevage.nurserie.cour; A.I = I; const p = pointDansEnclos(I); m.racine.position.set(p[0], 0, p[1]); }
       else { const p = moi.racine.position; m.racine.position.set(p.x - 1.2, p.y, p.z + .8); }
       m.racine.traverse(o => { o.userData.uid = uid; });
       affichees.set(uid, A);
@@ -190,6 +193,13 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
       else if (id === 'fontaine') P.voeu(() => { particules(new THREE.Vector3(0, 2.4, 0), { n: 30, couleur: '#fde68a', taille: .4, vitesse: 3, monte: 3 }); pop(); });
       else if (id === 'montgolfiere' || id === 'ballon') await S.parler('zephyr');
       else if (id === 'dindodrome') await S.parler('ginette');
+      else if (id === 'couvoir' || id === 'nurserie') {
+        const fait = await S.interagir(id);
+        if (!fait) {
+          if (E().batiments[id]?.repare) { if (id === 'couvoir') ouvrirCouvoir({ surChange: majElevage, surEclosion: () => { syncDindies(); majElevage(); } }); else ouvrirNurserie({ surChange: () => { syncDindies(); majElevage(); } }); }
+          else toast(S.etapeAtteinte('parlerPlumeau3') ? `🚧 ${I.texte} est en ruine. Un kit de construction (chez Mimi) permettrait de le réparer !` : `🚧 ${I.texte} : en travaux. Il ouvrira dans un prochain chapitre !`, { duree: 3200 });
+        }
+      }
       else if (id.startsWith('ruine-')) toast(`🚧 ${I.ruine} : en travaux. Il ouvrira dans un prochain chapitre !`, { duree: 3200 });
       else if (id.startsWith('objet-') || id.startsWith('deco-')) await S.interagir(id);
       else if (I.trouvaille) {
@@ -225,6 +235,8 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
         moi.jouer('content');
         particules(new THREE.Vector3(q.x, q.y + 1, q.z), { n: 50, couleur: '#facc15', taille: .45, vitesse: 5, monte: 4, duree: 2 });
         S.evenement('capture', R.dindie.espece);
+        /* toute l'équipe gagne de l'expérience (la compagne, deux fois plus) */
+        for (const d of J.equipe()) if (d !== R.dindie && EL.estAdulte(d)) { const niv = EL.donnerXp(d, E().compagnon === d.uid ? EL.XP.compagnonCapture : EL.XP.capture); if (niv) P.niveauToast(d, niv); }
       }
     } finally { occupe = false; cadre = null; majHud(); }
   }
@@ -394,7 +406,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     musiqueNuit(nuitK > .5);
     $('#hHeure').innerHTML = `${monde.region ? monde.region.e + ' ' : ''}${nuitK > .5 ? (m === 'soleil' ? '🌙' : METEOS[m].e) : METEOS[m].e} ${texteHeure()}`;
     $('#hHeure').title = monde.nom + (monde.region ? ' · ' + METEOS[m].nom : '');
-    for (const A of affichees.values()) if (A.mode === 'enclos') A.m.dormir(nuitK > .7);
+    for (const A of affichees.values()) if (A.mode === 'enclos' || A.mode === 'nurserie') A.m.dormir(nuitK > .7);
   }
 
   /* ── les étapes spéciales demandées par le scénario ── */
@@ -416,6 +428,12 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     async reparerClapierAnime() {
       for (let k = 0; k < 4; k++) { poussiere(LIEUX.clapier.x + (Math.random() - .5) * 7, LIEUX.clapier.z + (Math.random() - .5) * 3); bruitMarteau(); await attendre(.35); }
       domaine.majClapier(); tada(); await attendre(.5);
+    },
+    async reparerAnime(id) {
+      const A = domaine.elevage[id];
+      for (let k = 0; k < 5; k++) { poussiere(A.x + (Math.random() - .5) * 6, A.z + (Math.random() - .5) * 5); bruitMarteau(); await attendre(.35); }
+      (id === 'couvoir' ? domaine.majCouvoir : domaine.majNurserie)(); grandir(domaine.elevage[id].b.g); tada(); syncDindies(); majElevage();
+      await attendre(.6);
     },
     async gonflerBallonAnime() { domaine.gonflerBallon(true); particules(new THREE.Vector3(6, 4, 35), { n: 40, couleur: '#ffffff', taille: .8, vitesse: 3, monte: 2, duree: 2 }); tada(); await attendre(1); },
     montrerGontran(v) {
@@ -498,6 +516,8 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
       vitesse = 1;
     }
     p.y = monde.sol(p.x, p.z);
+    if (vitesse && E().compagnon) { promenade += VITESSE * dt * Math.min(1, vitesse); if (promenade > 40) { promenade = 0; const d = J.parUid(E().compagnon); if (d) { const niv = EL.donnerXp(d, 10); if (niv) P.niveauToast(d, niv); } } }
+    tempsElevage += dt; if (tempsElevage > 2) { tempsElevage = 0; verifierElevage(); }
     moi.marcher(vitesse); moi.maj(dt, t);
     ombreRonde.position.set(p.x, p.y + .03, p.z);
     if (anneau.visible) { anneau.userData.t += dt; anneau.scale.setScalar(1 + Math.sin(anneau.userData.t * 6) * .15); }
@@ -553,12 +573,29 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     m.maj(dt, t);
   }
 
+  /* ── l'élevage : les œufs dans les couveuses (en 3D), les bébés qui grandissent, l'œuf prêt à éclore ── */
+  let promenade = 0, tempsElevage = 0;
+  const prevenus = new Set();
+  function majElevage() {
+    const C = domaine.elevage.couvoir;
+    if (C && C.repare && C.b.majOeufs) C.b.majOeufs(EL.elevage().couveuses, EL.pret);
+    majHud();
+  }
+  function verifierElevage() {
+    const evts = EL.majCroissance();
+    if (evts.length) { evts.forEach(grandiToast); S.evenement('grandir', evts[0]); syncDindies(); }
+    for (const o of EL.elevage().couveuses) if (o && EL.pret(o) && !prevenus.has(o.id)) { prevenus.add(o.id); toast('🥚 Un œuf est prêt à éclore au Couvoir !', { duree: 3200 }); }
+    majElevage();
+  }
+  J.surChangement(quoi => { if (quoi === 'elevage') majElevage(); });
+  verifierElevage();
+
   /* pour les tests automatiques */
   window.__jeu = {
     appliquerReglages, moi, allerVers, agir, affichees, etat: E, S, P, J, sauver, toucher, positionCible, partirVers, capturer, approcher,
     get monde() { return monde; }, get interactifs() { return monde.interactifs; }, get sauvages() { return sauvages; },
     get chemin() { return chemin; }, get occupe() { return occupe; }, get capture() { return captureActive(); }, domaine,
-    forcerMeteo, forcerHeure, majLumiere
+    forcerMeteo, forcerHeure, majLumiere, EL, verifierElevage
   };
   return { sauver };
 }

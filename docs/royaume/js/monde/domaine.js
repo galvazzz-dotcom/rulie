@@ -19,7 +19,7 @@ export const LIEUX = {
   musee: { nom: 'Le Musée du Grand Livre', e: '📖', x: -14, z: 8 },
   enclos: { nom: 'L’allée des enclos', e: '🐔', x: -33.5, z: 0 },
   clapier: { nom: 'Le Clapier à dindes', e: '🐾', x: -33.5, z: 24 },
-  elevage: { nom: 'L’élevage (bientôt)', e: '🥚', x: 0, z: -27 },
+  elevage: { nom: 'Le Couvoir et la Nurserie', e: '🥚', x: 0, z: -27 },
   dindodrome: { nom: 'Le Dindodrome (bientôt)', e: '🏁', x: 44, z: 0 },
   port: { nom: 'Le port', e: '⛵', x: 0, z: 37 }
 };
@@ -96,8 +96,25 @@ export function construireDomaine(scene, etat) {
   majClapier();
   ajouterInteractif({ id: 'clapier', e: '🐾', texte: 'Le Clapier', x: clap.porteMonde[0], z: clap.porteMonde[1], cible: clap.g });
 
-  /* ── le nord : l'élevage (bientôt) ── */
-  [['Le Couvoir', -7, -31, 'couvoir'], ['La Nurserie', 7, -31, 'nurserie'], ['Le Potager', -21, -29, 'potager'], ['L’Atelier des plumes', 30, -18, 'atelier']].forEach(([n, x, z, id]) => {
+  /* ── le nord : l'élevage (le Couvoir et la Nurserie se réparent au chapitre 3) ── */
+  const elevage = {};
+  const majBatimentElevage = (id, nom, fab, x, z) => {
+    const A = elevage[id];
+    if (A && A.b) { scene.remove(A.b.g); grille.libererRect(x, z + 1.5, 9, 10); }
+    const repare = !!etat.batiments[id]?.repare;
+    const b = placer(repare ? fab() : BAT.ruine(nom, 6, 5), x, z);
+    const I = interactifs.find(i => i.id === id);
+    if (I) { I.cible = b.g; I.x = b.porteMonde[0]; I.z = b.porteMonde[1]; I.e = repare ? (id === 'couvoir' ? '🥚' : '🍼') : '🚧'; delete I.ruine; if (!repare) I.ruine = nom; }
+    elevage[id] = { b, repare, x, z };
+    if (id === 'nurserie' && repare) elevage[id].cour = { x: x + b.cour.x, z: z + b.cour.z, b: { interieur: [b.cour.w, b.cour.d] } };
+    return b;
+  };
+  const majCouvoir = () => majBatimentElevage('couvoir', 'Le Couvoir', BAT.couvoir, -8, -31.5);
+  const majNurserie = () => majBatimentElevage('nurserie', 'La Nurserie', BAT.nurserie, 8, -33);
+  ajouterInteractif({ id: 'couvoir', e: '🚧', texte: 'Le Couvoir', x: 0, z: 0, cible: null, ruine: 'Le Couvoir' });
+  ajouterInteractif({ id: 'nurserie', e: '🚧', texte: 'La Nurserie', x: 0, z: 0, cible: null, ruine: 'La Nurserie' });
+  majCouvoir(); majNurserie();
+  [['Le Potager', -21, -29, 'potager'], ['L’Atelier des plumes', 30, -18, 'atelier']].forEach(([n, x, z, id]) => {
     const b = placer(BAT.ruine(n, 6, 5), x, z);
     ajouterInteractif({ id: 'ruine-' + id, e: '🚧', texte: n, x: b.porteMonde[0], z: b.porteMonde[1], cible: b.g, ruine: n });
   });
@@ -142,6 +159,8 @@ export function construireDomaine(scene, etat) {
     if (Math.hypot(x, z) < 13.5) return false;
     for (const [cx, cz] of Object.values(CACHETTES)) if (Math.hypot(x - cx, z - cz) < r + 2.6) return false;
     if (Math.abs(x + 33.5) < 15 && z > -18 && z < 28) return false;
+    /* la place du Couvoir et de la Nurserie, une fois réparés (ils sont plus grands que leurs ruines) */
+    if (Math.abs(x) < 14.5 && z > -38 && z < -24.5) return false;
     if (Math.hypot(x - LIEUX.port.x, z - LIEUX.port.z) < 10) return false;
     for (const [x1, z1, x2, z2, w] of SEGMENTS) if (distSegment(x, z, x1, z1, x2, z2) < w / 2 + r + .6) return false;
     for (const [dx, dz] of [[0, 0], [r, 0], [-r, 0], [0, r], [0, -r]]) if (!grille.libreEn(x + dx, z + dz)) return false;
@@ -165,7 +184,7 @@ export function construireDomaine(scene, etat) {
 
   return {
     grille, interactifs, pnj, enclosInfo, lieux: LIEUX, fontaine, lampes: lum,
-    majEnclos, majClapier, gonflerBallon: v => lePort.setGonfle(v), poserObjet, retirerObjet, objets,
+    majEnclos, majClapier, majCouvoir, majNurserie, elevage, gonflerBallon: v => lePort.setGonfle(v), poserObjet, retirerObjet, objets,
     maj(dt, t, nuit, camPos) {
       terrain.maj(dt, t, nuit); nuitCiel.maj(t, nuit, camPos); lum.majNuit(nuit);
       BAT.matFenetres.emissiveIntensity = nuit * 1.4;

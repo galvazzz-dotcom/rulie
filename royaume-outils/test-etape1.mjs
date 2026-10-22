@@ -14,10 +14,19 @@ mkdirSync(OUT, { recursive: true });
 const b = await chromium.launch({ executablePath: process.env.CHROMIUM || undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
 let echecs = 0;
 const verifier = (ok, texte) => { console.log((ok ? '✅ ' : '❌ ') + texte); if (!ok) echecs++; };
-const ouvrir = async (w, h, mob, hash = '') => {
+/* le défilé ne montre que les dindies attrapées : on prépare un profil (toutes les espèces, ou quelques-unes) */
+const ouvrir = async (w, h, mob, hash = '', especes = 'toutes') => {
   const pg = await b.newPage({ viewport: { width: w, height: h }, isMobile: mob, hasTouch: mob });
   pg.erreurs = []; pg.on('pageerror', e => pg.erreurs.push(e.message));
-  await pg.goto(URL + hash);
+  await pg.goto(URL);
+  await pg.evaluate(async especes => {
+    const { ESPECES } = await import('./js/donnees/especes.js');
+    const ids = especes === 'toutes' ? ESPECES.map(e => e.id) : especes;
+    localStorage.clear();
+    localStorage.setItem('royaumeDindies.v1', JSON.stringify({ profils: [{ id: 'pTest', nom: 'Test', couleur: '#ea580c', resume: '' }], actif: 'pTest' }));
+    localStorage.setItem('royaumeDindies.v1.pTest', JSON.stringify({ livre: { vus: {}, attrapes: Object.fromEntries(ids.map(i => [i, 1])) } }));
+  }, especes);
+  await pg.goto(URL + '?profil=pTest' + hash); await pg.reload();
   await pg.waitForFunction(() => window.__defile && !document.getElementById('chargement'), null, { timeout: 30000 });
   return pg;
 };
@@ -51,6 +60,21 @@ const ouvrir = async (w, h, mob, hash = '') => {
   await pg.waitForTimeout(300);
   verifier(await pg.evaluate(a => window.__defile.etat.i !== a, avant), 'glisser du doigt change de dindie');
   await pg.close();
+}
+/* 3 bis. seulement les dindies débloquées : 12 attrapées = 12 dans le défilé ; aucune = un défilé vide */
+{
+  const douze = ['glouglou', 'paquerette', 'trefle', 'coquelicot', 'dindasable', 'dromadaire', 'mirageus', 'dingue', 'gaufrette', 'crachin', 'belgicus', 'atomium'];
+  const pg = await ouvrir(390, 844, true, '#ruuulius', douze);
+  const r = await pg.evaluate(async () => {
+    const vues = new Set(), D = window.__defile;
+    for (let k = 0; k < 30; k++) { document.getElementById('bSuiv').click(); await new Promise(r => setTimeout(r, 30)); vues.add(D.ESPECES[D.etat.i].id); }
+    return { cases: document.querySelectorAll('#grille .case').length, vues: [...vues], depart: D.ESPECES[D.etat.i].id, titre: document.querySelector('.titre').textContent };
+  });
+  verifier(r.cases === 12 && r.vues.every(id => douze.includes(id)) && !r.vues.includes('ruuulius'), `12 dindies attrapées : 12 dans le défilé (${r.cases} cases, aucune autre espèce ; « ${r.titre.trim()} »)`);
+  await pg.close();
+  const pv = await ouvrir(390, 844, true, '', []);
+  verifier(await pv.evaluate(() => window.__defile.vide && !!document.querySelector('.carte .vide')), 'aucune dindie attrapée : le défilé est vide (pas de « teaser »)');
+  await pv.close();
 }
 /* 4. les 4 formats d'écran */
 for (const [nom, w, h, mob] of [['tel', 390, 844, true], ['paysage', 844, 390, true], ['tablette', 1024, 768, true], ['ordi', 1366, 768, false]]) {

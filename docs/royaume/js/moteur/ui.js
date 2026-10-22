@@ -29,10 +29,16 @@ export function fermerTout() { while (pile.length) pile[pile.length - 1].fermer(
 export function fermerDerniere() { if (pile.length) { pile[pile.length - 1].fermer(); return true; } return false; }
 
 /* ── les petites notifications ── */
-export function toast(texte, { duree = 2600, classe = '' } = {}) {
+/* cle : un nouveau message avec la même clé remplace l'ancien (au lieu de s'empiler) ; 4 messages au plus à l'écran */
+export function toast(texte, { duree = 2600, classe = '', cle = '' } = {}) {
   let z = $('#toasts'); if (!z) { z = el('<div id="toasts"></div>'); document.body.appendChild(z); }
-  const t = el(`<div class="toast ${classe}">${texte}</div>`); z.appendChild(t);
-  setTimeout(() => { t.classList.add('part'); setTimeout(() => t.remove(), 400); }, duree);
+  let t = cle ? [...z.children].find(x => x.dataset.cle === cle && !x.classList.contains('part')) : null;
+  if (t) { t.innerHTML = texte; clearTimeout(t.fin); t.style.animation = 'none'; void t.offsetWidth; t.style.animation = ''; }
+  else { t = el(`<div class="toast ${classe}">${texte}</div>`); if (cle) t.dataset.cle = cle; z.appendChild(t); }
+  const partir = x => { x.classList.add('part'); setTimeout(() => x.remove(), 400); };
+  t.fin = setTimeout(() => partir(t), duree);
+  const restent = [...z.children].filter(x => !x.classList.contains('part'));
+  for (const x of restent.slice(0, Math.max(0, restent.length - 4))) { clearTimeout(x.fin); partir(x); }
 }
 
 /* ── les dialogues : une boîte en bas, avec le portrait de celui qui parle ──

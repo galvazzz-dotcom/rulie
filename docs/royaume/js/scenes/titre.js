@@ -9,23 +9,35 @@ import { variante } from '../dindies/adn.js';
 import { portraitDindie } from '../dindies/portrait.js';
 import { portraitChibi, PERSONNAGES } from '../personnages/chibi.js';
 
+import { especesDe, especesDeTous, dansLOrdre } from '../jeu/collection.js';
+import { hasard } from '../moteur/couleurs.js';
+
 const COULEURS = ['#ea580c', '#2563eb', '#16a34a', '#db2777', '#7c3aed', '#0891b2'];
-const DEFILANTES = ['glouglou', 'belgicus', 'dingue', 'coquelicot', 'etoile', 'perroquet', 'dindofeu', 'ruuulius'];
+/* les dindies qui flottent autour du titre : seulement celles qu'on a déjà attrapées
+   (au tout début : les 3 dindies que le Professeur propose) */
+function defilantes() {
+  const L = dansLOrdre(especesDeTous()).map(e => e.id);
+  if (!L.length) return ['paquerette', 'crachin', 'braise'];
+  const r = hasard('titre' + L.length);
+  for (let i = L.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [L[i], L[j]] = [L[j], L[i]]; }
+  return L.slice(0, 8);
+}
 
 export function ecranTitre({ surJouer }) {
   /* les dindies qui flottent autour du titre (en haut et en bas, pour ne pas cacher la boîte) */
-  const POS = [[4, 4], [30, 2], [58, 5], [80, 3], [6, 78], [30, 84], [56, 80], [80, 82]];
-  const T = el(`<div id="titre"><div class="titreFond">${DEFILANTES.map((id, i) => `<div class="flotte" style="--i:${i};left:${POS[i][0]}%;top:${POS[i][1]}%">${portraitDindie(variante(PAR_ID[id]), { id: 'T' + i, fond: false })}</div>`).join('')}</div>
+  const POS = [[4, 4], [80, 82], [58, 5], [6, 78], [30, 2], [56, 80], [80, 3], [30, 84]];
+  const T = el(`<div id="titre"><div class="titreFond">${defilantes().map((id, i) => `<div class="flotte" style="--i:${i};left:${POS[i][0]}%;top:${POS[i][1]}%">${portraitDindie(variante(PAR_ID[id]), { id: 'T' + i, fond: false })}</div>`).join('')}</div>
     <div class="titreBoite"><h1><small>Le</small> Royaume <small>des</small> Dindies</h1><p class="sous">Attrape-les, élève-les, fais-les courir !</p>
     <div id="profils"></div>
-    <p class="liensTitre"><a href="defile.html">🦃 Le Grand Défilé des 72 dindies</a> · <a href="../index.html">🏠 Le site</a></p>
-    <p class="enDev">🚧 Jeu en développement : chapitres 1 et 2 jouables</p></div></div>`);
+    <p class="liensTitre"><a href="../index.html">🏠 Le site</a></p>
+    <p class="enDev">🚧 Jeu en développement : chapitres 1 à 3 jouables</p></div></div>`);
   document.body.appendChild(T);
   /* la musique démarre au premier toucher (les navigateurs l'exigent) */
   T.addEventListener('pointerdown', () => { audio(); ambianceMusique('titre'); musique(true); }, { once: true });
   const dessiner = () => {
     const P = SAUVE.listeProfils();
     $('#profils', T).innerHTML = P.map(p => `<div class="profil" style="--c:${p.couleur}"><button class="jouer" data-id="${p.id}"><b>${echapper(p.nom)}</b><small>${p.resume || 'Nouvelle partie'}</small></button>
+      ${especesDe(p.id).size ? `<a class="defileProfil" href="defile.html?profil=${p.id}" aria-label="Le défilé de ${echapper(p.nom)}" title="Le défilé de ${echapper(p.nom)}">🦃</a>` : ''}
       <button class="supprimer" data-id="${p.id}" aria-label="Effacer">🗑️</button></div>`).join('') +
       (SAUVE.peutCreer() ? `<button class="btn grand vert" id="tNouveau">➕ Nouvelle partie</button>` : '<p class="petitTexte">3 profils au maximum : efface-en un pour recommencer.</p>');
     $$('.jouer', T).forEach(b => b.onclick = () => {

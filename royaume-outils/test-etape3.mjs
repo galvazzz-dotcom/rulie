@@ -153,7 +153,7 @@ try {
   await agir('gadget-nuage'); await pg.waitForTimeout(3000);
   await pg.screenshot({ path: `${OUT}/belgique-pluie.png` });
   verifier(await pg.evaluate(() => document.getElementById('hHeure').textContent.includes('🌧️')), 'la bouteille à nuages fait pleuvoir');
-  await attraper('atomium'); await jusqua('fin'); await log('le Dindonus Atomium !');
+  await attraper('atomium'); await jusqua('parlerPlumeau3'); await log('le Dindonus Atomium !');
   await pg.waitForTimeout(1500); await pg.screenshot({ path: `${OUT}/fin.png` });
   await pg.evaluate(() => document.getElementById('finOk')?.click()); await pg.waitForTimeout(500);
   const sauvages12 = ['glouglou', 'paquerette', 'trefle', 'coquelicot', 'dindasable', 'dromadaire', 'mirageus', 'dingue', 'gaufrette', 'crachin', 'belgicus', 'atomium'];
@@ -170,7 +170,7 @@ try {
   await pg.evaluate(() => document.querySelector('#profils .jouer').click());
   await pg.waitForFunction(() => window.__jeu && window.__jeu.monde, null, { timeout: 90000 }); await pg.waitForTimeout(1500);
   const apres = await pg.evaluate(() => ({ lieu: window.__jeu.monde.id, etape: window.__jeu.etat().quete.etape, livre: Object.keys(window.__jeu.etat().livre.attrapes).length }));
-  verifier(apres.lieu === 'maroc' && apres.etape === 'fin', `après rechargement : on reprend au Maroc, à la fin du chapitre 2 (${JSON.stringify(apres)})`);
+  verifier(apres.lieu === 'maroc' && apres.etape === 'parlerPlumeau3', `après rechargement : on reprend au Maroc, au début du chapitre 3 (${JSON.stringify(apres)})`);
 } catch (e) { console.log('❌', e.message); echecs++; await pg.screenshot({ path: `${OUT}/erreur.png` }); }
 verifier(!errs.length, `aucune erreur dans le navigateur${errs.length ? ' : ' + errs.join(' / ') : ''}`);
 console.log(echecs ? `\n❌ étape 3 : ${echecs} échec(s)` : '\n✅ étape 3 : le chapitre 2 est jouable de bout en bout');
