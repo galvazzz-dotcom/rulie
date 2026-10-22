@@ -126,6 +126,50 @@ try {
   verifier(E.c4f20.p1 < .3 && E.c4f24.p1 > .4, `la finale des Lianes : difficile au niveau 20 (${Math.round(E.c4f20.p1 * 100)} %), faisable après l’entraînement (${Math.round(E.c4f24.p1 * 100)} %)`);
   verifier(E.g2.p1 > .4, `la revanche de Gontran se gagne avec une dindie entraînée (${Math.round(E.g2.p1 * 100)} %)`);
 
+  /* les règles d'une course, une par une (sans dessin) */
+  const RG = await pg.evaluate(async () => {
+    const { creerCourse } = await import('./js/jeu/course.js'), DD = await import('./js/jeu/dindodrome.js'), { nouvelleDindie } = await import('./js/jeu/individus.js');
+    const { COMPETENCES, competencesDe } = await import('./js/donnees/courses.js'), { hasard } = await import('./js/moteur/couleurs.js');
+    const course = ({ id = 'c1b', comps = [], aide = false, stade = 'adulte', espece = 'glouglou', niveau = 15 } = {}) => {
+      const d = nouvelleDindie(espece, { niveau, stade, talents: [2, 2, 2], caractere: 'calme' }); d.competences = comps;
+      const o = DD.optionsCourse(DD.defCourse(id), d); o.aide = aide; o.rng = hasard('regles' + id); return creerCourse(o);
+    };
+    /* sauter toujours au même moment (tau = le temps avant la haie) */
+    const sauts = (aide, tau) => {
+      const C = course({ aide }), R = C.joueur();
+      while (!R.fini && C.t < 200) { const h = C.haies[R.prochaine]; if (C.phase === 'course' && h !== undefined && !R.saut && R.chute <= 0) { const t = (h - R.pos) / Math.max(4, R.v); if (t <= tau && t > tau - .06) C.sauter(); } C.maj(1 / 60); }
+      const H = C.evenements.filter(e => e.type === 'haie' && e.r === R.i);
+      return { haies: H.length, chutes: H.filter(e => e.q === 'chute' || e.q === 'tot').length, parfaits: H.filter(e => e.q === 'parfait').length };
+    };
+    const tot = sauts(false, 1.05), bien = sauts(false, .3), aideTot = sauts(true, 1.05);
+    /* « Fonce ! » : plus de fatigue */
+    const fatigue = f => { const C = course({ id: 'c1a' }); C.foncer(f); while (C.t < 12) C.maj(1 / 60); return C.joueur().E / C.joueur().Emax; };
+    /* chacune des 20 compétences se lance (pour une dindie éveillée qui la connaît) */
+    const lancees = Object.keys(COMPETENCES).filter(id => {
+      const C = course({ id: id === 'glissade' || id === 'velours' ? 'c2c' : 'c1b', comps: [id], stade: 'eveille' }), R = C.joueur(), k = competencesDe(R.d).indexOf(id);
+      if (k < 0) return false;
+      while (!R.fini && C.t < 200) { C.competence(k); C.maj(1 / 30); if (C.evenements.some(e => e.type === 'competence' && e.r === R.i && e.id === id)) return true; }
+      return false;
+    });
+    /* le Turbo-Glou fait vraiment aller plus vite */
+    const apres = turbo => { const C = course({ id: 'c1a', comps: turbo ? ['turbo'] : [] }), k = C.joueur().competences.indexOf('turbo'); while (C.t < 8) { if (turbo && C.t > 2) C.competence(k); C.maj(1 / 60); } return C.joueur().pos; };
+    /* une finale perdue : pas de badge (et un conseil dans les résultats) */
+    const Cf = course({ id: 'c1f', espece: 'crachin', niveau: 5 }); while (!Cf.fini && Cf.t < 300) Cf.maj(1 / 30);
+    const res = DD.enregistrer(DD.defCourse('c1f'), Cf, Cf.joueur().d);
+    const UI = await import('./js/ui/dindodrome.js');
+    const fen = UI.ouvrirResultats(DD.defCourse('c1f'), Cf, res, null);
+    const conseil = !!document.querySelector('.resultatsF .conseilC');
+    document.querySelector('.resultatsF #rOk').click(); await fen;
+    return { tot, bien, aideTot, fonce: fatigue(true), normal: fatigue(false), lancees, total: Object.keys(COMPETENCES).length, turbo: apres(true) - apres(false), perdue: { place: res.place, badge: DD.badge(1), conseil } };
+  });
+  verifier(RG.tot.chutes === RG.tot.haies && RG.tot.haies > 5, `sauter trop tôt, c’est la chute à chaque haie (${RG.tot.chutes}/${RG.tot.haies})`);
+  verifier(RG.bien.parfaits === RG.bien.haies && !RG.bien.chutes, `sauter quand l’anneau est vert : que des sauts parfaits (${RG.bien.parfaits}/${RG.bien.haies})`);
+  verifier(RG.aideTot.chutes === 0, 'en mode aide, on ne tombe jamais, même en sautant trop tôt');
+  verifier(RG.fonce < RG.normal - .1, `« Fonce ! » fatigue beaucoup plus (endurance après 12 s : ${Math.round(RG.fonce * 100)} % au lieu de ${Math.round(RG.normal * 100)} %)`);
+  verifier(RG.lancees.length === RG.total, `les ${RG.total} compétences se lancent en course (${RG.lancees.length}/${RG.total})`);
+  verifier(RG.turbo > 2, `le Turbo-Glou fait gagner du terrain (+ ${RG.turbo.toFixed(1)} m en 8 s)`);
+  verifier(RG.perdue.place > 1 && !RG.perdue.badge && RG.perdue.conseil, `une finale perdue ne donne pas de badge, et les résultats donnent un conseil (${RG.perdue.place}e place)`);
+
   /* une sauvegarde de l'étape 4, à la fin du chapitre 3 : une dindie éveillée bien entraînée, et deux autres */
   await pg.evaluate(async () => {
     const J = window.__jeu, e = J.etat(), { nouvelleDindie } = await import('./js/jeu/individus.js');
@@ -198,6 +242,14 @@ try {
   await coupe(3); await jusqua('coupe4'); await log('la Coupe de la Pluie est gagnée');
   await coupe(4); await jusqua('gontran2'); await log('la Coupe des Lianes est gagnée');
   await courir(() => agir('pnj-gontran')); await jusqua('fin'); await log('la revanche de Gontran est gagnée');
+  /* une deuxième leçon coûte 200 pièces ; on peut oublier une compétence */
+  const L2 = await pg.evaluate(() => {
+    const D = window.__jeu.DD, d = window.__jeu.etat().dindies.find(x => x.espece === 'glouglou'), p = window.__jeu.etat().pieces;
+    const err = D.apprendre(d, 'sprint'), paye = p - window.__jeu.etat().pieces, appris = d.competences.includes('sprint');
+    D.oublier(d, 'sprint');
+    return { err, paye, appris, oubliee: !d.competences.includes('sprint') };
+  });
+  verifier(!L2.err && L2.paye === 200 && L2.appris && L2.oubliee, `une deuxième leçon coûte 200 🪙, et on peut oublier une compétence (${JSON.stringify(L2)})`);
   verifier(await pg.evaluate(() => window.__jeu.DD.nbBadges()) === 4, '4 badges dans la Salle des trophées');
   verifier(await attendre('#finOk', 20000), 'la fin du chapitre 4 s’affiche');
   await pg.waitForTimeout(500); await pg.screenshot({ path: `${OUT}/fin.png` }); await clic('#finOk');
