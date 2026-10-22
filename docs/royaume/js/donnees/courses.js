@@ -60,7 +60,11 @@ export const PISTES = {
   prairie: { nom: 'La piste des Prés', court: 'Prés', e: '🌿', type: 'prairie', sol: '#7cb342', ligne: '#f7fee7', obstacle: 'foin', deco: 'fleurs', haies: [40, 140, 175], zones: [] },
   sable: { nom: 'La piste des Dunes', court: 'Dunes', e: '🏜️', type: 'sable', sol: '#e6c27a', ligne: '#fff7ed', obstacle: 'dune', deco: 'cactus', haies: [35, 135], zones: [[62, 88], [162, 188]], zone: 'sable' },
   pluie: { nom: 'La piste de Boue', court: 'Boue', e: '💧', type: 'pluie', sol: '#8d6e4f', ligne: '#e7e5e4', obstacle: 'tronc', deco: 'flaques', haies: [25, 120], zones: [[45, 65], [140, 160]], zone: 'boue' },
-  jungle: { nom: 'La piste des Lianes', court: 'Lianes', e: '🌴', type: 'jungle', sol: '#5b7f3a', ligne: '#ecfccb', obstacle: 'tronc', deco: 'palmiers', haies: [20, 50, 120, 150, 175], zones: [[80, 92]], zone: 'boue' }
+  jungle: { nom: 'La piste des Lianes', court: 'Lianes', e: '🌴', type: 'jungle', sol: '#5b7f3a', ligne: '#ecfccb', obstacle: 'tronc', deco: 'palmiers', haies: [20, 50, 120, 150, 175], zones: [[80, 92]], zone: 'boue' },
+  glace: { nom: 'La piste de Glace', court: 'Glace', e: '❄️', type: 'glace', sol: '#cfe8f3', ligne: '#ffffff', obstacle: 'congere', deco: 'sapins', haies: [30, 100, 160], zones: [[50, 72], [120, 142]], zone: 'verglas' },
+  feu: { nom: 'La piste de Lave', court: 'Lave', e: '🔥', type: 'feu', sol: '#57534e', ligne: '#fdba74', obstacle: 'rocher', deco: 'braseros', haies: [25, 75, 125, 175], zones: [[90, 110]], zone: 'cendre' },
+  nuit: { nom: 'La piste de Nuit', court: 'Nuit', e: '🌙', type: 'nuit', sol: '#3730a3', ligne: '#c7d2fe', obstacle: 'champignons', deco: 'lanternes', haies: [40, 90, 140, 190], zones: [[60, 75], [160, 175]], zone: 'brume' },
+  ciel: { nom: 'La piste des Nuages', court: 'Nuages', e: '☁️', type: 'ciel', sol: '#dbeafe', ligne: '#60a5fa', obstacle: 'nuage', deco: 'ballons', haies: [20, 60, 100, 140, 180], zones: [[70, 85], [150, 165]], zone: 'nuage' }
 };
 /* les mètres de course où se trouvent les haies et les zones (la course part de « depart » sur l'anneau) */
 export function obstaclesCourse(pisteId, sorte, distance) {
@@ -99,7 +103,27 @@ export const CHAMPIONNATS = [
     niveaux: [18, 21], especes: ['perroquet', 'banane', 'liane', 'fougere', 'grenouille'],
     courses: [{ id: 'c4a', sorte: 'marathon', piste: 'neutre' }, { id: 'c4b', sorte: 'haies', piste: 'neutre' }, { id: 'c4c', sorte: 'piste', piste: 'jungle' }],
     finale: { id: 'c4f', sorte: 'piste', piste: 'jungle', star: { espece: 'jaguar', nom: 'Moustique', niveau: 20, talents: [2, 3, 3], caractere: 'calme', competences: ['sprint'] } },
-    recompense: { pieces: 1200, plumesOr: 2, objets: { biscuit: 5 } } }
+    recompense: { pieces: 1200, plumesOr: 2, objets: { biscuit: 5 } } },
+  { n: 5, id: 'glace', nom: 'La Coupe de Glace', champion: 'inuk', type: 'glace', badge: { nom: 'le Badge Flocon', e: '❄️' },
+    niveaux: [23, 26], especes: ['dindingloo', 'pingouin', 'aurore', 'givre', 'flocon'],
+    courses: [{ id: 'c5a', sorte: 'sprint', piste: 'neutre' }, { id: 'c5b', sorte: 'marathon', piste: 'neutre' }, { id: 'c5c', sorte: 'piste', piste: 'glace' }],
+    finale: { id: 'c5f', sorte: 'piste', piste: 'glace', star: { espece: 'cristal', nom: 'Banquisette', niveau: 28, talents: [4, 4, 4], caractere: 'calme', competences: ['souffle'] } },
+    recompense: { pieces: 1400, plumesOr: 2, objets: { biscuit: 6 } } },
+  { n: 6, id: 'lave', nom: 'La Coupe de Lave', champion: 'lava', type: 'feu', badge: { nom: 'le Badge Braise', e: '🔥' },
+    niveaux: [26, 29], especes: ['cendre', 'braise', 'dindofeu', 'tournesol', 'vapeur'],
+    courses: [{ id: 'c6a', sorte: 'haies', piste: 'neutre' }, { id: 'c6b', sorte: 'sprint', piste: 'neutre' }, { id: 'c6c', sorte: 'piste', piste: 'feu' }],
+    finale: { id: 'c6f', sorte: 'piste', piste: 'feu', star: { espece: 'magma', nom: 'Volcanix', niveau: 24, talents: [3, 3, 3], caractere: 'calme', competences: ['turbo'] } },
+    recompense: { pieces: 1600, plumesOr: 2, objets: { biscuit: 6 } } },
+  { n: 7, id: 'nuit', nom: 'La Coupe de la Nuit', champion: 'hibou', type: 'nuit', badge: { nom: 'le Badge Lune', e: '🌙' },
+    niveaux: [29, 32], especes: ['lune', 'hibou', 'luciole', 'brume', 'amanite'],
+    courses: [{ id: 'c7a', sorte: 'marathon', piste: 'neutre' }, { id: 'c7b', sorte: 'haies', piste: 'neutre' }, { id: 'c7c', sorte: 'piste', piste: 'nuit' }],
+    finale: { id: 'c7f', sorte: 'piste', piste: 'nuit', star: { espece: 'etoile', nom: 'Minuit', niveau: 31, talents: [3, 3, 3], caractere: 'calme', competences: ['canon'] } },
+    recompense: { pieces: 1800, plumesOr: 3, objets: { biscuit: 7 } } },
+  { n: 8, id: 'nuages', nom: 'La Coupe des Nuages', champion: 'azur', type: 'ciel', badge: { nom: 'le Badge Nuage', e: '☁️' },
+    niveaux: [32, 35], especes: ['nuage', 'zephyr', 'dindarc', 'nimbus', 'pissenlit'],
+    courses: [{ id: 'c8a', sorte: 'sprint', piste: 'neutre' }, { id: 'c8b', sorte: 'marathon', piste: 'neutre' }, { id: 'c8c', sorte: 'piste', piste: 'ciel' }],
+    finale: { id: 'c8f', sorte: 'piste', piste: 'ciel', star: { espece: 'orage', nom: 'Tonnerre', niveau: 34, talents: [3, 3, 3], caractere: 'calme', competences: ['turbo'] } },
+    recompense: { pieces: 2200, plumesOr: 3, objets: { biscuit: 8 } } }
 ];
 /* les courses de l'histoire (hors championnat) */
 export const SPECIALES = {

@@ -6,7 +6,8 @@ import { hasard } from './couleurs.js';
 export const METEOS = {
   soleil: { e: '☀️', nom: 'Grand soleil' },
   nuages: { e: '⛅', nom: 'Nuageux' },
-  pluie: { e: '🌧️', nom: 'Pluie' }
+  pluie: { e: '🌧️', nom: 'Pluie' },
+  neige: { e: '❄️', nom: 'Neige' }
 };
 const forcees = {};
 export function forcerMeteo(region, type, ms) { forcees[region] = { type, fin: Date.now() + ms }; }

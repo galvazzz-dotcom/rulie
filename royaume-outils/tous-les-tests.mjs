@@ -1,7 +1,7 @@
 /* Lancer tous les tests du Royaume des Dindies, l'un après l'autre, puis afficher un résumé.
    Usage : node royaume-outils/tous-les-tests.mjs [options]
-     --etapes=1,2,3,4,5,6      les tests à lancer (par défaut : tous)
-     --formats=tel             les formats pour les tests 2 à 6 : tel, paysage, tablette, ordi, ou « tous »
+     --etapes=1,2,3,4,5,6,7    les tests à lancer (par défaut : tous)
+     --formats=tel             les formats pour les tests 2 à 7 : tel, paysage, tablette, ordi, ou « tous »
                                (par défaut : tel ; le test 1 essaie déjà les 4 formats tout seul)
      --adresse=URL             tester un site déjà en ligne, par exemple https://galvazzz-dotcom.github.io/rulie
                                (sans cette option, docs/ est servi par un petit serveur local)
@@ -9,7 +9,7 @@
                                (pour tester sans Internet)
      --captures=dossier        où ranger les captures d'écran (par défaut : captures-tests)
    Il faut Playwright (npm i playwright) ; CHROMIUM=/chemin/vers/chromium si besoin.
-   Chaque test joue son chapitre de bout en bout : la série complète prend environ une heure. */
+   Chaque test joue son chapitre de bout en bout : la série complète prend environ une heure et demie. */
 import { spawn } from 'child_process';
 import { createServer } from 'http';
 import { readFile, stat } from 'fs/promises';
@@ -18,7 +18,7 @@ import { dirname, join, extname, normalize } from 'path';
 
 const ICI = dirname(fileURLToPath(import.meta.url)), DOCS = join(ICI, '..', 'docs');
 const opt = Object.fromEntries(process.argv.slice(2).map(a => { const m = /^--([^=]+)=?(.*)$/.exec(a); return m ? [m[1], m[2]] : [a, '']; }));
-const ETAPES = (opt.etapes || '1,2,3,4,5,6').split(',').map(Number);
+const ETAPES = (opt.etapes || '1,2,3,4,5,6,7').split(',').map(Number);
 const FORMATS = { tel: '390,844,1', paysage: '844,390,1', tablette: '820,1180,1', ordi: '1280,800,0' };
 const formats = opt.formats === 'tous' ? Object.keys(FORMATS) : (opt.formats || 'tel').split(',');
 for (const f of formats) if (!FORMATS[f]) { console.error(`format inconnu : ${f} (tel, paysage, tablette, ordi)`); process.exit(2); }
@@ -67,6 +67,7 @@ for (const f of formats) {
   if (ETAPES.includes(4)) resultats.push(await lancer(`étape 4 · l’élevage, chapitre 3 (${f})`, 'test-etape4.mjs', [J, FORMATS[f], `${CAPTURES}/etape4-${f}`]));
   if (ETAPES.includes(5)) resultats.push(await lancer(`étape 5 · le Dindodrome, chapitre 4 (${f})`, 'test-etape5.mjs', [J, FORMATS[f], `${CAPTURES}/etape5-${f}`]));
   if (ETAPES.includes(6)) resultats.push(await lancer(`étape 6 · la production, les quêtes du Domaine (${f})`, 'test-etape6.mjs', [J, FORMATS[f], `${CAPTURES}/etape6-${f}`]));
+  if (ETAPES.includes(7)) resultats.push(await lancer(`étape 7 · le monde entier, chapitres 5 à 7 (${f})`, 'test-etape7.mjs', [J, FORMATS[f], `${CAPTURES}/etape7-${f}`]));
 }
 S && S.close();
 console.log('\n══════════ Résumé ══════════');

@@ -32,7 +32,7 @@ export function ouvrirBureau({ courir }) {
     for (const C of ouverts) {
       const fo = DD.finaleOuverte(C.n), b = DD.badge(C.n), Pc = PERSONNAGES[C.champion];
       h += `<div class="champ ${b ? 'gagne' : ''}" style="--type:${TYPES[C.type].couleur}"><div class="champHaut"><div class="champPortrait">${portraitChibi(Pc, 'bur' + C.champion)}</div>
-        <div><b>${C.badge.e} ${C.nom}</b><small>${['leila', 'tarzanette'].includes(C.champion) ? 'Championne' : 'Champion'} : ${Pc.nom} · ${TYPES[C.type].e} ${TYPES[C.type].nom} · niv. ${C.niveaux[0]} à ${C.finale.star.niveau}</small>
+        <div><b>${C.badge.e} ${C.nom}</b><small>${['leila', 'tarzanette', 'lava', 'azur'].includes(C.champion) ? 'Championne' : 'Champion'} : ${Pc.nom} · ${TYPES[C.type].e} ${TYPES[C.type].nom} · niv. ${C.niveaux[0]} à ${C.finale.star.niveau}</small>
         ${b ? `<small class="badgeOk">${C.badge.e} Tu as ${C.badge.nom} !</small>` : ''}</div></div>
         <div class="champCourses">${C.courses.map(c => ligne(c.id, c.sorte, c.piste, C.n)).join('')}
         ${fo ? ligne(C.finale.id, C.finale.sorte, C.finale.piste, C.n, true) : `<div class="ligneCourse verrou"><span class="lcE">🔒</span><div><b>La finale contre ${Pc.nom}</b><small>Finis d’abord les 3 courses sur le podium.</small></div></div>`}</div></div>`;
@@ -99,7 +99,7 @@ export function ouvrirResultats(def, C, res, niveau) {
 export function ouvrirTrophees() {
   const Sc = DD.courses();
   const recs = Object.entries(Sc.records);
-  fenetre('🏆 La Salle des trophées', `<div class="badges">${[...CHAMPIONNATS, ...[5, 6, 7, 8].map(n => ({ n }))].map(C => C.badge && DD.badge(C.n)
+  fenetre('🏆 La Salle des trophées', `<div class="badges">${CHAMPIONNATS.map(C => C.badge && DD.badge(C.n)
       ? `<div class="badgeCase ok"><span>${C.badge.e}</span><small>${C.badge.nom.replace(/^le /, '')}</small></div>` : `<div class="badgeCase"><span>?</span><small>Badge ${C.n}</small></div>`).join('')}</div>
     <p class="petitTexte">🏁 ${Sc.faites} course${Sc.faites > 1 ? 's' : ''} · 🥇 ${Sc.victoires} victoire${Sc.victoires > 1 ? 's' : ''} · 🏋️ ${Sc.entrainements} entraînement${Sc.entrainements > 1 ? 's' : ''}</p>
     <h3>⏱️ Tes records</h3>${recs.length ? `<div class="records">${recs.map(([cle, r]) => { const [so, pi] = cle.split(':'); return `<div class="record"><span>${SORTES[so].e} ${SORTES[so].nom} · ${PISTES[pi].e} ${PISTES[pi].court}</span><small>${echapper(r.qui)}</small><b>${r.temps.toFixed(2)} s</b></div>`; }).join('')}</div>` : '<p class="vide">Pas encore de record. Cours une première course !</p>'}`, { classe: 'tropheesF' });

@@ -57,7 +57,7 @@ export function adversaires(def) {
   }
   return liste;
 }
-export const CHAMPION_NOMS = { gaston: 'Gaston', leila: 'Leïla', waffel: 'Monsieur Waffel', tarzanette: 'Tarzanette' };
+export const CHAMPION_NOMS = { gaston: 'Gaston', leila: 'Leïla', waffel: 'Monsieur Waffel', tarzanette: 'Tarzanette', inuk: 'Inuk', lava: 'Madame Lava', hibou: 'le Comte Hibou', azur: 'Aurélie Azur' };
 
 /* les options de la simulation pour une course, avec la dindie de la joueuse */
 export function optionsCourse(def, d, { nom = 'Roullieee' } = {}) {

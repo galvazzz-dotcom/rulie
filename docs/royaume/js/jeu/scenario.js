@@ -1,4 +1,4 @@
-/* ══════════ L'HISTOIRE : CHAPITRE 1 (LE DOMAINE EN RUINE) ET CHAPITRE 2 (L'EXPÉDITION) ══════════
+/* ══════════ L'HISTOIRE : LES CHAPITRES 1 À 7 ══════════
    Une suite d'étapes (une seule à la fois, pour que ce soit clair) regroupées en quêtes.
    La scène appelle : parler(pnj), interagir(id), gadget(id), evenement(type, valeur) ;
    et lit : texteEtape(), cibleEtape() (pour la flèche qui guide), lieuEtape(). */
@@ -18,9 +18,10 @@ import { CACHETTES } from '../monde/domaine.js';
 import * as DD from './dindodrome.js';
 import { CHAMPIONNATS } from '../donnees/courses.js';
 import * as QD from './quetesDomaine.js';
+import * as GQ from './grandesQuetes.js';
 
 export const STARTERS = ['paquerette', 'crachin', 'braise'];
-export const CHAPITRES = { 1: 'Le Domaine en ruine', 2: 'L’expédition', 3: 'Le premier œuf', 4: 'Le Dindodrome ouvre', 5: 'Jungle et Banquise' };
+export const CHAPITRES = { 1: 'Le Domaine en ruine', 2: 'L’expédition', 3: 'Le premier œuf', 4: 'Le Dindodrome ouvre', 5: 'Jungle et Banquise', 6: 'Volcan et Forêt de la Lune', 7: 'Le Royaume des Nuages', 8: 'La Légende' };
 export const QUETES = [
   { id: 'q1', chapitre: 1, titre: 'Bienvenue au Domaine', etapes: ['arrivee', 'choix'], recompense: { pieces: 300 } },
   { id: 'q2', chapitre: 1, titre: 'Un abri pour ta dindie', etapes: ['planches', 'reparer1', 'installer1'], recompense: { pieces: 100 } },
@@ -51,7 +52,28 @@ export const QUETES = [
   { id: 'q27', chapitre: 4, titre: 'Une nouvelle compétence', etapes: ['lecon'], recompense: { pieces: 150 } },
   { id: 'q28', chapitre: 4, titre: 'La Coupe des Dunes', etapes: ['coupe2'], recompense: { pieces: 200 } },
   { id: 'q29', chapitre: 4, titre: 'La Coupe de la Pluie', etapes: ['coupe3'], recompense: { pieces: 250 } },
-  { id: 'q30', chapitre: 4, titre: 'La Coupe des Lianes', etapes: ['coupe4', 'gontran2'], recompense: { pieces: 500, plumesOr: 2 } }
+  { id: 'q30', chapitre: 4, titre: 'La Coupe des Lianes', etapes: ['coupe4', 'gontran2'], recompense: { pieces: 500, plumesOr: 2 } },
+  { id: 'q31', chapitre: 5, titre: 'Une lettre de Tarzanette', etapes: ['parlerPlumeau6', 'jumelles', 'volJungle', 'tarzanette'], recompense: { pieces: 200, objets: { banane: 3 } } },
+  { id: 'q32', chapitre: 5, titre: 'La page de la Jungle', etapes: ['jungle3'], recompense: { pieces: 300 } },
+  { id: 'q33', chapitre: 5, titre: 'Les statuettes d’or', etapes: ['parlerTarzanette2', 'statuettes', 'jaguar'], recompense: { pieces: 450, plumesOr: 2 } },
+  { id: 'q34', chapitre: 5, titre: 'Une Serre au Domaine', etapes: ['serre'], recompense: { pieces: 250, objets: { banane: 5 } } },
+  { id: 'q35', chapitre: 5, titre: 'Cap sur la Banquise', etapes: ['moufles', 'volBanquise', 'inuk'], recompense: { pieces: 200, objets: { sorbet: 3 } } },
+  { id: 'q36', chapitre: 5, titre: 'La page de la Banquise', etapes: ['banquise3'], recompense: { pieces: 350 } },
+  { id: 'q37', chapitre: 5, titre: 'Les étoiles de glace', etapes: ['parlerInuk2', 'etoilesGlace', 'cristal'], recompense: { pieces: 500, plumesOr: 2 } },
+  { id: 'q38', chapitre: 5, titre: 'La Coupe de Glace', etapes: ['coupe5'], recompense: { pieces: 600, plumesOr: 2 } },
+  { id: 'q39', chapitre: 6, titre: 'Cap sur le Volcan', etapes: ['parlerPlumeau7', 'bottesLave', 'volVolcan', 'lava'], recompense: { pieces: 250, objets: { piment: 3 } } },
+  { id: 'q40', chapitre: 6, titre: 'La page du Volcan', etapes: ['volcan3'], recompense: { pieces: 400 } },
+  { id: 'q41', chapitre: 6, titre: 'Les pierres de lave', etapes: ['parlerLava2', 'pierresLave', 'magma'], recompense: { pieces: 550, plumesOr: 2 } },
+  { id: 'q42', chapitre: 6, titre: 'La Coupe de Lave', etapes: ['coupe6'], recompense: { pieces: 650, plumesOr: 2 } },
+  { id: 'q43', chapitre: 6, titre: 'Cap sur la Forêt de la Lune', etapes: ['lanterne', 'volForet', 'hibou'], recompense: { pieces: 250, objets: { myrtille: 3 } } },
+  { id: 'q44', chapitre: 6, titre: 'La page de la Forêt', etapes: ['foret3'], recompense: { pieces: 400 } },
+  { id: 'q45', chapitre: 6, titre: 'Les éclats de lune', etapes: ['parlerHibou2', 'eclatsLune', 'etoile'], recompense: { pieces: 600, plumesOr: 2 } },
+  { id: 'q46', chapitre: 6, titre: 'La Coupe de la Nuit', etapes: ['coupe7'], recompense: { pieces: 700, plumesOr: 2 } },
+  { id: 'q47', chapitre: 7, titre: 'Cap sur les Nuages', etapes: ['parlerPlumeau8', 'ailes', 'volNuages', 'azur'], recompense: { pieces: 300, objets: { barbeAPapa: 3 } } },
+  { id: 'q48', chapitre: 7, titre: 'La page des Nuages', etapes: ['nuages3'], recompense: { pieces: 450 } },
+  { id: 'q49', chapitre: 7, titre: 'Les plumes d’éclair', etapes: ['parlerAzur2', 'plumesEclair', 'orage'], recompense: { pieces: 650, plumesOr: 3 } },
+  { id: 'q50', chapitre: 7, titre: 'La Coupe des Nuages', etapes: ['coupe8'], recompense: { pieces: 800, plumesOr: 3 } },
+  { id: 'q51', chapitre: 7, titre: 'Les légendes mythiques', etapes: ['parlerPlumeau9', 'grandeQuete', 'mythique'], recompense: { pieces: 1000, plumesOr: 5 } }
 ];
 const ORDRE = [...QUETES.flatMap(q => q.etapes), 'fin'];
 export const queteDe = etape => QUETES.find(q => q.etapes.includes(etape));
@@ -62,10 +84,13 @@ export function titreQuete() {
   if (QD.active()) return '🏡 ' + QD.queteActuelle().titre;
   return `Chapitre ${QUETES[QUETES.length - 1].chapitre} terminé !`;
 }
-export const chapitreActuel = () => { const Q = queteDe(E().quete.etape); return Q ? Q.chapitre : 4; };
+export const chapitreActuel = () => { const Q = queteDe(E().quete.etape); return Q ? Q.chapitre : QUETES[QUETES.length - 1].chapitre; };
 /* l'histoire en est-elle arrivée à cette étape (ou plus loin) ? */
 export const etapeAtteinte = s => ORDRE.indexOf(E().quete.etape) >= ORDRE.indexOf(s);
-const OUVERTURE = { pres: 'decollage', maroc: 'volMaroc', belgique: 'volBelgique' };
+GQ.brancherHistoire(etapeAtteinte);
+const OUVERTURE = { pres: 'decollage', maroc: 'volMaroc', belgique: 'volBelgique', jungle: 'volJungle', banquise: 'volBanquise', volcan: 'volVolcan', foret: 'volForet', nuages: 'volNuages' };
+/* l'étape « envole-toi vers… » → l'île */
+const VOLS = Object.fromEntries(Object.entries(OUVERTURE).map(([r, v]) => [v, r]));
 export const regionOuverte = id => id === 'domaine' || (id === 'dindodrome' ? etapeAtteinte('entrerDindodrome') : !!OUVERTURE[id] && etapeAtteinte(OUVERTURE[id]));
 
 const E = () => J.etat();
@@ -78,11 +103,90 @@ export const type2 = () => typeStarter() === 'prairie' ? 'pluie' : 'prairie';
 const glouglou = () => E().dindies.find(d => d.origine === 'cadeau');
 const habitat = t => TYPES[t].habitat;
 /* les espèces (non épiques) d'une région, et celles déjà attrapées là-bas */
-const BESOIN = { pres: ['glouglou', 'paquerette', 'trefle'], maroc: ['dindasable', 'dromadaire', 'mirageus'], belgique: ['gaufrette', 'crachin', 'belgicus'] };
+const BESOIN = { pres: ['glouglou', 'paquerette', 'trefle'], maroc: ['dindasable', 'dromadaire', 'mirageus'], belgique: ['gaufrette', 'crachin', 'belgicus'],
+  jungle: ['perroquet', 'banane', 'liane'], banquise: ['dindingloo', 'pingouin', 'aurore'], volcan: ['cendre', 'braise', 'dindofeu'], foret: ['lune', 'hibou', 'luciole'], nuages: ['nuage', 'zephyr', 'dindarc'] };
 export const attrapeesDans = region => new Set(E().dindies.filter(d => d.origine === 'sauvage:' + region).map(d => d.espece));
 const manquantes = region => BESOIN[region].filter(x => !attrapeesDans(region).has(x));
 const compte = region => BESOIN[region].length - manquantes(region).length;
 const ramasses = (prefixe, n = 3) => Array.from({ length: n }, (_, i) => prefixe + (i + 1)).filter(id => E().monde.ramasses[id]).length;
+/* l'étape « attrape 3 espèces de l'île » : jungle3 → jungle */
+const ilePage = s => /3$/.test(s) && BESOIN[s.slice(0, -1)] ? s.slice(0, -1) : null;
+const EQUIPEMENTS = ['jumelles', 'moufles', 'bottesLave', 'lanterne', 'ailes'];
+
+/* ── les îles 4 à 8 : le guide, la page du Grand Livre, les 3 objets de la légende, l'épique et son gadget ── */
+const ILES = {
+  jungle: { guide: 'tarzanette', parler2: 'parlerTarzanette2', etapeObjets: 'statuettes', objet: 'statuette', epique: 'jaguar', zone: 'temple', gadget: 'baton', cadeau: 'banane',
+    ok: () => meteo('jungle') === 'pluie', apres: 'serre',
+    accueil: ['Ohééé ! Te voilà enfin, l’exploratrice ! Bienvenue dans <b>ma Jungle</b> ! Je suis Tarzanette, la reine des lianes.',
+      'Ici vivent le <b>Dindoperroquet</b>, qui jacasse à l’orée de la jungle (le jour !), et le <b>Dindobanane</b>, dans la bananeraie.',
+      'Et tout en haut des arbres géants se cache la <b>Dindoliane</b>. Sans <b>jumelles</b>, impossible de la voir !', ['moi', 'J’ai mes jumelles !'],
+      'Super ! Et si une dindie 🌴 Jungle fait la timide, offre-lui une <b>banane fondante</b> 🍌. Effet garanti !'],
+    page: { perroquet: 'Le Dindoperroquet jacasse à l’orée de la jungle… mais seulement <b>le jour</b> !', banane: 'Le Dindobanane se cache dans la <b>bananeraie</b>, près de ma cabane.', liane: 'La Dindoliane se balance sous les <b>arbres géants</b>. Sors tes jumelles 🔭 !' },
+    legende: ['Trois nouvelles amies ! Bravo ! Maintenant, écoute bien… Tu vois le <b>temple perdu</b>, tout au nord ?',
+      'Son gardien, le <b>Dindojaguar</b>, ne revient que si ses <b>3 statuettes d’or</b> sont retrouvées. Les singes farceurs les ont cachées dans toute la Jungle !'],
+    objets: n => `${n} statuette${n > 1 ? 's' : ''} d’or sur 3. Les singes les ont bien cachées !`,
+    trouve: 'Les 3 statuettes d’or ! Le Dindojaguar va revenir… sous la pluie, devant le temple !',
+    indice: ['Le Dindojaguar n’aime que <b>la pluie</b> 🌧️. Il rôde devant le temple perdu.', 'Il fait beau ? Secoue le <b>bâton de pluie</b>, devant le temple : la pluie tombera… pour un moment !'],
+    bavard: ['Ohééé ! La Jungle est à toi, l’exploratrice !', 'Les dindies 🌴 Jungle adorent les bananes fondantes.', 'La cascade, c’est ma douche du matin. Brrr !'] },
+  banquise: { guide: 'inuk', parler2: 'parlerInuk2', etapeObjets: 'etoilesGlace', objet: 'etoileGlace', epique: 'cristal', zone: 'grotte', gadget: 'cor', cadeau: 'sorbet',
+    ok: () => estMatin(), apres: 'coupe5',
+    accueil: ['Bienvenue sur la <b>Banquise</b>, Roullieee ! Je m’appelle Inuk. Ici, le vent est froid, mais les dindies ont le cœur chaud.',
+      'Le <b>Dindingloo</b> vit près de notre village d’igloos, et le <b>Dindopingouin</b> glisse sur la banquise, au bord de l’eau.',
+      'Au pied du glacier vit la <b>Dindaurore</b>. Elle ne se laisse approcher que par des mains bien au chaud : garde tes <b>moufles</b> !', ['moi', 'Mes moufles sont prêtes !'],
+      'Et pour les dindies ❄️ Glace, rien ne vaut un <b>sorbet givré</b> 🍧. Bonne glisse !'],
+    page: { dindingloo: 'Le Dindingloo se promène près du <b>village d’igloos</b>, à l’ouest.', pingouin: 'Le Dindopingouin glisse sur la <b>banquise</b>, au bord de l’eau.', aurore: 'La Dindaurore brille au pied du <b>glacier</b>. Tes moufles 🧤 la rassurent !' },
+    legende: ['Trois nouvelles amies ! Alors je vais te raconter l’histoire de la <b>grotte de glace</b>…',
+      'Le <b>Dindocristal</b> y dort depuis l’hiver dernier. Pour le réveiller, il faut ses <b>3 étoiles de glace</b>, tombées un peu partout sur la Banquise.'],
+    objets: n => `${n} étoile${n > 1 ? 's' : ''} de glace sur 3. Elles brillent dans la neige !`,
+    trouve: 'Les 3 étoiles de glace ! Le Dindocristal va se réveiller… le matin, devant la grotte de glace !',
+    indice: ['Le Dindocristal ne sort de sa grotte que <b>le matin</b> 🌅, quand le soleil fait briller la glace.', 'Tu ne veux pas attendre ? Souffle dans le <b>cor des glaces</b>, près de la grotte : le soleil se lèvera… pour un moment !'],
+    bavard: ['Le lac gelé est parfait pour glisser. Les Dindopingouins adorent !', 'Les dindies ❄️ Glace raffolent du sorbet givré.', 'Quand il neige, la Banquise devient toute silencieuse… Écoute !'] },
+  volcan: { guide: 'lava', parler2: 'parlerLava2', etapeObjets: 'pierresLave', objet: 'pierreLave', epique: 'magma', zone: 'cratere', gadget: 'sablierLave', cadeau: 'piment',
+    ok: () => estNuit(), apres: 'coupe6',
+    accueil: ['Par mes braises ! Une visiteuse ! Bienvenue au <b>Volcan</b>, petite. Je suis Madame Lava, forgeronne et amie des dindies de feu.',
+      'Dans les champs de cendre vit le <b>Dindocendre</b>. Près des pierres chaudes, le <b>Dindobraise</b> fait sa sieste.',
+      'Le <b>Dindofeu</b>, lui, se baigne au bord de la <b>coulée de lave</b>. Avec tes <b>bottes de lave</b>, tu pourras t’en approcher sans te brûler les pieds !', ['moi', 'J’ai mes bottes !'],
+      'Et un <b>piment doux</b> 🌶️ pour les dindies 🔥 Feu : elles adorent ça !'],
+    page: { cendre: 'Le Dindocendre se roule dans les <b>champs de cendre</b>, à l’ouest.', braise: 'Le Dindobraise dort près des <b>pierres chaudes</b>, au sud.', dindofeu: 'Le Dindofeu se baigne au bord de la <b>coulée de lave</b>. Mets tes bottes de lave 🥾 !' },
+    legende: ['Bien joué, petite ! Tu as l’étoffe d’une forgeronne. Alors écoute…',
+      'Au cœur du cratère dort le <b>Dindomagma</b>. Il ne sort que si on lui rapporte ses <b>3 pierres de lave</b>, crachées par le volcan lors de la dernière éruption.'],
+    objets: n => `${n} pierre${n > 1 ? 's' : ''} de lave sur 3. Elles sont encore toutes chaudes !`,
+    trouve: 'Les 3 pierres de lave ! Le Dindomagma va sortir… la nuit, en haut, près du cratère !',
+    indice: ['Le Dindomagma ne sort que <b>la nuit</b> 🌙, quand le cratère brille dans le noir.', 'Pressée ? Retourne le <b>sablier de lave</b>, sur le chemin du cratère : la nuit tombera… pour un moment !'],
+    bavard: ['Les sources chaudes, c’est bon pour les plumes !', 'Les dindies 🔥 Feu adorent les piments doux.', 'Ma forge ne s’éteint jamais. Jamais !'] },
+  foret: { guide: 'hibou', parler2: 'parlerHibou2', etapeObjets: 'eclatsLune', objet: 'eclatLune', epique: 'etoile', zone: 'colline', gadget: 'boite', cadeau: 'myrtille',
+    ok: () => estNuit(), apres: 'coupe7',
+    accueil: ['Hou hou ! Bonsoir, chère exploratrice. Je suis le <b>Comte Hibou</b>, astronome. Bienvenue dans la <b>Forêt de la Lune</b>.',
+      'Dans la clairière se promène le <b>Dindon Lune</b>. Dans les bois bleus, le <b>Dindhibou</b> ne se réveille que <b>la nuit</b>… comme moi.',
+      'Autour de l’étang de lune danse la <b>Dindoluciole</b>. Elle n’approche que ceux qui portent une <b>lanterne</b>.', ['moi', 'J’ai ma lanterne !'],
+      'Parfait. Et une <b>myrtille de lune</b> 🫐 rendra toute dindie 🌙 Nuit plus confiante. Hou hou !'],
+    page: { lune: 'Le Dindon Lune se promène dans la <b>clairière</b>.', hibou: 'Le Dindhibou se réveille <b>la nuit</b>, dans les bois bleus.', luciole: 'La Dindoluciole danse autour de l’<b>étang de lune</b>. Ta lanterne 🏮 l’attire !' },
+    legende: ['Remarquable ! Hou hou. Alors je vais vous confier une observation…',
+      'Chaque nuit, la <b>Dindétoile</b> descendait sur la colline aux étoiles. Mais <b>3 éclats de lune</b> sont tombés dans la forêt, et depuis, elle ne vient plus…'],
+    objets: n => `${n} éclat${n > 1 ? 's' : ''} de lune sur 3. Ils brillent doucement dans le noir.`,
+    trouve: 'Les 3 éclats de lune ! La Dindétoile va revenir… la nuit, sur la colline aux étoiles !',
+    indice: ['La Dindétoile ne descend que <b>la nuit</b> 🌙, sur la colline aux étoiles.', 'Il fait jour ? Remontez la <b>boîte à musique</b>, près de la colline : sa berceuse fait tomber la nuit… pour un moment.'],
+    bavard: ['Hou hou ! Les champignons brillent plus fort quand il fait nuit.', 'Les dindies 🌙 Nuit adorent les myrtilles de lune.', 'Avec mon télescope, je vois même les cratères de la lune !'] },
+  nuages: { guide: 'azur', parler2: 'parlerAzur2', etapeObjets: 'plumesEclair', objet: 'plumeEclair', epique: 'orage', zone: 'sommet', gadget: 'tambour', cadeau: 'barbeAPapa',
+    ok: () => meteo('nuages') === 'pluie', apres: 'coupe8',
+    accueil: ['Paré au décollage ! Salut, Roullieee ! Je suis <b>Aurélie Azur</b>, aviatrice. Bienvenue au <b>Royaume des Nuages</b> !',
+      'Le <b>Dindinuage</b> rebondit sur les nuages, et le <b>Dindozéphyr</b> joue avec le vent près des moulinets… le jour seulement.',
+      'Le <b>Dindarc</b> vole sous l’arc-en-ciel. Pour le rejoindre, il faut planer : heureusement, tu as tes <b>ailes de planeur</b> !', ['moi', 'Mes ailes sont prêtes !'],
+      'Et de la <b>barbe à papa</b> 🍭 pour les dindies ☁️ Ciel : elles en raffolent !'],
+    page: { nuage: 'Le Dindinuage rebondit <b>sur les nuages</b>, au milieu de l’île.', zephyr: 'Le Dindozéphyr joue près des <b>moulinets</b>, mais seulement <b>le jour</b>.', dindarc: 'Le Dindarc vole sous l’<b>arc-en-ciel</b>. Déploie tes ailes 🪁 !' },
+    legende: ['Wouah ! Tu voles presque aussi bien que moi ! Écoute ça…',
+      'Quand l’orage gronde, le <b>Dindorage</b> se pose au sommet, près du palais. Mais il a perdu ses <b>3 plumes d’éclair</b> dans le vent. Sans elles, il n’ose plus se montrer !'],
+    objets: n => `${n} plume${n > 1 ? 's' : ''} d’éclair sur 3. Elles crépitent : écoute bien !`,
+    trouve: 'Les 3 plumes d’éclair ! Le Dindorage va revenir… sous la pluie, au sommet, près du palais !',
+    indice: ['Le Dindorage n’arrive qu’avec <b>la pluie</b> ⛈️, au sommet, près du palais.', 'Il fait beau ? Tape sur le <b>tambour d’orage</b>, sur le chemin du palais : la pluie arrivera… pour un moment !'],
+    bavard: ['Le vent est bon aujourd’hui ! Parfait pour planer.', 'Les dindies ☁️ Ciel adorent la barbe à papa.', 'Un jour, je volerai jusqu’à la lune. Promis !'] }
+};
+const ILE_DE_GUIDE = Object.fromEntries(Object.entries(ILES).map(([r, I]) => [I.guide, r]));
+/* l'étape d'une île → l'île (accueil, page, légende, objets, épique) */
+const ILE_ETAPE = Object.fromEntries(Object.entries(ILES).flatMap(([r, I]) => [[I.guide, r], [r + '3', r], [I.parler2, r], [I.etapeObjets, r], [I.epique, r]]));
+const mythiqueNee = () => Object.keys(E().livre.attrapes).some(x => PAR_ID[x]?.rarete === 'mythique');
+const oeufLegendaire = () => (E().elevage?.couveuses || []).some(o => o && o.rarete === 'mythique');
+const objetLegendaire = () => Object.keys(E().inventaire).some(o => OBJETS[o]?.legendaire);
 
 /* ── où se passe l'étape (null = partout) ── */
 const LIEU = { gaston: 'pres', capture1: 'pres', pres3: 'pres', parlerGaston2: 'pres', plumesRouges: 'pres', coquelicot: 'pres', chapeau: 'domaine',
@@ -91,8 +195,13 @@ const LIEU = { gaston: 'pres', capture1: 'pres', pres3: 'pres', parlerGaston2: '
   parlerPlumeau3: 'domaine', kitCouvoir: 'domaine', reparerCouvoir: 'domaine', oeufTuto: 'domaine', eclosion: 'domaine', kitNurserie: 'domaine', reparerNurserie: 'domaine',
   grandir: 'domaine', nid: 'domaine', oeufCroise: 'domaine', parlerPlumeau4: 'domaine', eveil: 'domaine',
   parlerPlumeau5: 'domaine', parlerGinette: 'domaine', entrerDindodrome: 'domaine', courseEssai: 'dindodrome', kitEntrainement: 'domaine', reparerEntrainement: 'domaine',
-  entrainement3: 'domaine', coupe1: 'dindodrome', gontran1: 'dindodrome', lecon: 'domaine', coupe2: 'dindodrome', coupe3: 'dindodrome', coupe4: 'dindodrome', gontran2: 'dindodrome' };
+  entrainement3: 'domaine', coupe1: 'dindodrome', gontran1: 'dindodrome', lecon: 'domaine', coupe2: 'dindodrome', coupe3: 'dindodrome', coupe4: 'dindodrome', gontran2: 'dindodrome',
+  parlerPlumeau6: 'domaine', parlerPlumeau7: 'domaine', parlerPlumeau8: 'domaine', parlerPlumeau9: 'domaine', serre: 'domaine',
+  coupe5: 'dindodrome', coupe6: 'dindodrome', coupe7: 'dindodrome', coupe8: 'dindodrome',
+  ...Object.fromEntries(EQUIPEMENTS.map(x => [x, 'domaine'])), ...Object.fromEntries(Object.keys(VOLS).map(x => [x, 'zephyr'])), ...ILE_ETAPE };
 export const lieuEtape = () => { const s = E().quete.etape; return ORDRE.indexOf(s) < ORDRE.indexOf('decollage') ? 'domaine' : LIEU[s] || null; };
+/* VOLS contient aussi 'decollage', qui reste au Domaine */
+LIEU.decollage = 'domaine';
 let lieuActuel = () => 'domaine';
 export const lieuActuelId = () => lieuActuel();
 const nomLieu = id => id === 'domaine' ? 'au Domaine' : id === 'dindodrome' ? 'au Dindodrome' : REGIONS[id] ? `${REGIONS[id].nom.replace(/^(Le |La |Les )/, m => ({ 'Le ': 'au ', 'La ': 'en ', 'Les ': 'aux ' })[m])}` : '';
@@ -168,9 +277,58 @@ export function texteEtape() {
     coupe3: `La Coupe de la Pluie 💧 : 3 podiums, puis la finale contre Monsieur Waffel ! (${coupeTexte(3)})`,
     coupe4: `La Coupe des Lianes 🌴 : 3 podiums, puis la finale contre Tarzanette ! (${coupeTexte(4)})`,
     gontran2: 'Gontran veut sa revanche ! Va lui parler au Dindodrome 😤',
-    fin: 'Chapitre 5 bientôt : la Jungle et la Banquise ! 🌴❄️'
+    parlerPlumeau6: 'Une lettre est arrivée pour toi ! Va voir le Professeur Plumeau 🔬',
+    jumelles: 'Achète des jumelles chez Mimi, pour la Jungle 🔭',
+    volJungle: 'Envole-toi vers la Jungle avec le Capitaine Zéphyr 🎈',
+    tarzanette: 'Va voir Tarzanette, devant sa cabane 🌴',
+    jungle3: page('jungle', 'de la Jungle'),
+    parlerTarzanette2: 'Raconte tes captures à Tarzanette 🌴',
+    statuettes: `Trouve les 3 statuettes d’or de la Jungle 🏺 (${ramasses('statuette')}/3)`,
+    jaguar: 'Attrape le Dindojaguar : sous la pluie, devant le temple perdu 🌧️',
+    serre: `Construis la Serre 🌴 dans l’allée des enclos, au Domaine (${PRIX_SERRE} 🪙)`,
+    moufles: 'Inuk t’invite sur la Banquise ! Achète d’abord des moufles chez Mimi 🧤',
+    volBanquise: 'Envole-toi vers la Banquise avec le Capitaine Zéphyr 🎈',
+    inuk: 'Va voir Inuk, au village d’igloos ❄️',
+    banquise3: page('banquise', 'de la Banquise'),
+    parlerInuk2: 'Raconte tes captures à Inuk ❄️',
+    etoilesGlace: `Trouve les 3 étoiles de glace de la Banquise ❄️ (${ramasses('etoileGlace')}/3)`,
+    cristal: 'Attrape le Dindocristal : le matin, devant la grotte de glace 🌅',
+    coupe5: `La Coupe de Glace ❄️ : 3 podiums, puis la finale contre Inuk ! (${coupeTexte(5)})`,
+    parlerPlumeau7: 'Le Professeur Plumeau a une nouvelle mission pour toi 🔬',
+    bottesLave: 'Achète des bottes de lave chez Mimi, pour le Volcan 🥾',
+    volVolcan: 'Envole-toi vers le Volcan avec le Capitaine Zéphyr 🎈',
+    lava: 'Va voir Madame Lava, devant sa forge 🔨',
+    volcan3: page('volcan', 'du Volcan'),
+    parlerLava2: 'Raconte tes captures à Madame Lava 🔥',
+    pierresLave: `Trouve les 3 pierres de lave du Volcan 🪨 (${ramasses('pierreLave')}/3)`,
+    magma: 'Attrape le Dindomagma : la nuit, en haut, près du cratère 🌋',
+    coupe6: `La Coupe de Lave 🔥 : 3 podiums, puis la finale contre Madame Lava ! (${coupeTexte(6)})`,
+    lanterne: 'Le Comte Hibou t’invite dans la Forêt de la Lune ! Achète d’abord une lanterne chez Mimi 🏮',
+    volForet: 'Envole-toi vers la Forêt de la Lune avec le Capitaine Zéphyr 🎈',
+    hibou: 'Va voir le Comte Hibou, devant son observatoire 🔭',
+    foret3: page('foret', 'de la Forêt'),
+    parlerHibou2: 'Raconte tes captures au Comte Hibou 🌙',
+    eclatsLune: `Trouve les 3 éclats de lune de la Forêt 🌙 (${ramasses('eclatLune')}/3)`,
+    etoile: 'Attrape la Dindétoile : la nuit, sur la colline aux étoiles ⭐',
+    coupe7: `La Coupe de la Nuit 🌙 : 3 podiums, puis la finale contre le Comte Hibou ! (${coupeTexte(7)})`,
+    parlerPlumeau8: 'Le Professeur Plumeau a vu quelque chose dans le ciel ! Va le voir 🔬',
+    ailes: 'Achète des ailes de planeur chez Mimi, pour le Royaume des Nuages 🪁',
+    volNuages: 'Envole-toi vers le Royaume des Nuages avec le Capitaine Zéphyr 🎈',
+    azur: 'Va voir Aurélie Azur, devant sa tour 🪁',
+    nuages3: page('nuages', 'des Nuages'),
+    parlerAzur2: 'Raconte tes captures à Aurélie Azur ☁️',
+    plumesEclair: `Trouve les 3 plumes d’éclair des Nuages ⚡ (${ramasses('plumeEclair')}/3)`,
+    orage: 'Attrape le Dindorage : sous la pluie, au sommet, près du palais ⛈️',
+    coupe8: `La Coupe des Nuages ☁️ : 3 podiums, puis la finale contre Aurélie Azur ! (${coupeTexte(8)})`,
+    parlerPlumeau9: 'Le Professeur Plumeau a trouvé un très vieux livre… Va le voir 🔬',
+    grandeQuete: '🌈 ' + GQ.texteGrandes(),
+    mythique: oeufLegendaire() ? 'Ton œuf légendaire couve au Couvoir… Fais-le éclore ! 🥚🌈'
+      : objetLegendaire() ? 'Au nid du Couvoir, mets les deux bons parents avec ton objet légendaire : une dindie mythique va naître ! 🌈'
+      : '🌈 ' + GQ.texteGrandes(),
+    fin: 'Chapitre 8 bientôt : la légende du Dindromakus ! 🌈'
   })[s] || '';
   if (la === 'dindodrome' && ici === 'domaine') return t + ' <i>(au Dindodrome : par le portail de l’est 🏁)</i>';
+  if (la && la !== 'domaine' && la !== 'dindodrome' && ici === 'dindodrome') return t + ' <i>(rentre d’abord au Domaine 🏡, puis en montgolfière 🎈)</i>';
   if (la === 'domaine' && ici === 'dindodrome') return t + ' <i>(au Domaine : par le portail 🏡)</i>';
   if (la === 'dindodrome' && ici !== 'dindodrome') return t + ' <i>(au Dindodrome : rentre d’abord au Domaine en montgolfière 🎈)</i>';
   if (la && la !== 'zephyr' && la !== ici) return t + ` <i>(${nomLieu(la)} : en montgolfière 🎈)</i>`;
@@ -179,12 +337,15 @@ export function texteEtape() {
 /* l'identifiant de l'objet interactif à montrer (ou une liste : le plus proche) ;
    'sauvage:espece' = une dindie sauvage ; 'zone:nom' = un coin de la région */
 /* les courses déjà réussies d'un championnat : « 2/3 podiums » ou « la finale ! » */
+const page = (r, de) => `Attrape 3 espèces ${de} : ${BESOIN[r].map(x => PAR_ID[x].nom).join(', ')} (${compte(r)}/3)`;
+const PRIX_SERRE = 400;
 const coupeTexte = n => { const C = CHAMPIONNATS[n - 1], k = C.courses.filter(c => (DD.meilleurePlace(c.id) || 9) <= 3).length; return k < 3 ? `${k}/3 podiums` : 'la finale !'; };
 export function cibleEtape() {
   const e = E(), s = e.quete.etape, ici = lieuActuel(), la = lieuEtape();
   if (s === 'fin' && QD.active()) return QD.cible(ici);
   if (la === 'dindodrome' && ici === 'domaine') return 'dindodrome';
   if (la === 'domaine' && ici === 'dindodrome') return 'sortie';
+  if (la && la !== 'dindodrome' && ici === 'dindodrome') return 'sortie';
   if (la && la !== 'zephyr' && la !== ici) return 'pnj-zephyr';
   if (s === 'planches') return ['planche1', 'planche2', 'planche3'].filter(p => !e.monde.ramasses[p]).map(p => 'objet-' + p);
   if (s === 'nourrir') {
@@ -192,7 +353,13 @@ export function cibleEtape() {
     return pas.map(d => d.lieu.startsWith('enclos:') ? 'enclos-' + d.lieu.slice(7) : d.lieu === 'clapier' ? 'clapier' : 'moi');
   }
   if (s === 'capture1') return ['sauvage'];
-  if (s === 'pres3' || s === 'maroc3' || s === 'belgique3') { const r = s.replace('3', ''), m = manquantes(r); return [...m.map(x => 'sauvage:' + x), ...m.map(x => 'zone:' + REGIONS[r].especes[x].zone)]; }
+  if (ilePage(s)) { const r = ilePage(s), m = manquantes(r); return [...m.map(x => 'sauvage:' + x), ...m.map(x => 'zone:' + REGIONS[r].especes[x].zone)]; }
+  const I = ILES[ILE_ETAPE[s]];
+  if (I && s === I.etapeObjets) return [1, 2, 3].filter(i => !e.monde.ramasses[I.objet + i]).map(i => 'objet-' + I.objet + i);
+  if (I && s === I.epique) return ['sauvage:' + s, I.ok() ? 'zone:' + I.zone : 'gadget-' + I.gadget];
+  if (I && (s === I.guide || s === I.parler2)) return 'pnj-' + I.guide;
+  if (s === 'grandeQuete') return GQ.cible(ici);
+  if (s === 'mythique') return (oeufLegendaire() || objetLegendaire()) ? (ici === 'domaine' ? 'couvoir' : ici === 'dindodrome' ? 'sortie' : 'ballon') : GQ.cible(ici);
   if (s === 'plumesRouges') return [1, 2, 3].filter(i => !e.monde.ramasses['plumeRouge' + i]).map(i => 'objet-plumeRouge' + i);
   if (s === 'lanternes') return [1, 2, 3].filter(i => !e.monde.ramasses['lanterne' + i]).map(i => 'gadget-lanterne' + i);
   if (s === 'boules') return [1, 2, 3].filter(i => !e.monde.ramasses['bouleArgent' + i]).map(i => 'objet-bouleArgent' + i);
@@ -209,7 +376,10 @@ export function cibleEtape() {
     reparerNurserie: 'nurserie', grandir: 'nurserie', nid: 'couvoir', oeufCroise: 'couvoir', parlerPlumeau4: 'pnj-plumeau', eveil: 'labo',
     parlerPlumeau5: 'pnj-plumeau', parlerGinette: 'pnj-ginette', entrerDindodrome: 'dindodrome', courseEssai: 'pnj-chrono', kitEntrainement: 'pnj-mimi',
     reparerEntrainement: 'entrainement', entrainement3: 'entrainement', lecon: 'entrainement', coupe1: 'bureau', coupe2: 'bureau', coupe3: 'bureau', coupe4: 'bureau',
-    gontran1: 'pnj-gontran', gontran2: 'pnj-gontran'
+    gontran1: 'pnj-gontran', gontran2: 'pnj-gontran',
+    parlerPlumeau6: 'pnj-plumeau', parlerPlumeau7: 'pnj-plumeau', parlerPlumeau8: 'pnj-plumeau', parlerPlumeau9: 'pnj-plumeau', serre: 'enclos-jungle',
+    coupe5: 'bureau', coupe6: 'bureau', coupe7: 'bureau', coupe8: 'bureau',
+    ...Object.fromEntries(EQUIPEMENTS.map(x => [x, 'pnj-mimi'])), ...Object.fromEntries(Object.keys(VOLS).map(x => [x, 'pnj-zephyr']))
   })[s] || null;
 }
 
@@ -247,7 +417,8 @@ function preparerEtape() {
     if (e.batiments.montgolfiere.reparee) monde.montrerGontran && monde.montrerGontran(true);
   }
   if (ici === 'dindodrome' && monde.ajouterPnj) {
-    const PLACES = { gaston: [-19, 32.5, .6], leila: [-11.5, 34.2, .3], waffel: [11.5, 34.2, -.3], tarzanette: [19, 32.5, -.6] };
+    const PLACES = { gaston: [-19, 32.5, .6], leila: [-11.5, 34.2, .3], waffel: [11.5, 34.2, -.3], tarzanette: [19, 32.5, -.6],
+      inuk: [-19, 39, .6], lava: [-12, 40.5, .3], hibou: [12, 40.5, -.3], azur: [19, 39, -.6] };
     for (const C of CHAMPIONNATS) if (etapeAtteinte('coupe' + C.n)) monde.ajouterPnj(C.champion, ...PLACES[C.champion]);
     if (etapeAtteinte('gontran1')) monde.ajouterPnj('gontran', 6.5, 27.5, -.4);
   }
@@ -255,10 +426,15 @@ function preparerEtape() {
   if (ici === 'pres' && s === 'plumesRouges') for (const i of [1, 2, 3]) if (!e.monde.ramasses['plumeRouge' + i]) monde.poserObjet('plumeRouge' + i, 'plume');
   if (ici === 'belgique' && s === 'boules') for (const i of [1, 2, 3]) if (!e.monde.ramasses['bouleArgent' + i]) monde.poserObjet('bouleArgent' + i, 'boule');
   if (ici === 'maroc' && monde.allumerLanterne) for (const i of [1, 2, 3]) monde.allumerLanterne(i, !!e.monde.ramasses['lanterne' + i]);
+  const I = ILES[ici];
+  if (I && s === I.etapeObjets && monde.poserObjet) for (const i of [1, 2, 3]) if (!e.monde.ramasses[I.objet + i]) monde.poserObjet(I.objet + i, I.objet);
+  if (monde.poserObjet && ici !== 'domaine' && ici !== 'dindodrome') GQ.preparer(ici, monde);
   /* déjà fait avant d'y arriver (des captures en avance) : on passe à la suite */
   if (s === 'grandir' && e.dindies.some(d => d.stade === 'jeune' && d.lieu === 'nurserie')) setTimeout(() => { if (E().quete.etape === s) avancer(); }, 600);
-  if ((/^coupe[1-4]$/.test(s) && DD.badge(+s.slice(5))) || (s === 'entrainement3' && (e.quete.jeux || []).length >= 3) || (s === 'lecon' && DD.courses().lecons > 0)) setTimeout(() => { if (E().quete.etape === s) avancer(); }, 600);
-  if ((s === 'capture1' && attrapeesDans('pres').size) || (s === 'pres3' && !manquantes('pres').length) || (s === 'maroc3' && !manquantes('maroc').length) || (s === 'belgique3' && !manquantes('belgique').length)) setTimeout(() => { if (E().quete.etape === s) avancer(); }, 600);
+  if ((/^coupe[1-8]$/.test(s) && DD.badge(+s.slice(5))) || (s === 'entrainement3' && (e.quete.jeux || []).length >= 3) || (s === 'lecon' && DD.courses().lecons > 0)) setTimeout(() => { if (E().quete.etape === s) avancer(); }, 600);
+  if ((s === 'capture1' && attrapeesDans('pres').size) || (ilePage(s) && !manquantes(ilePage(s)).length)) setTimeout(() => { if (E().quete.etape === s) avancer(); }, 600);
+  if ((EQUIPEMENTS.includes(s) && J.combien(s)) || (ILES[ILE_ETAPE[s]]?.epique === s && E().livre.attrapes[s] && attrapeesDans(ILE_ETAPE[s]).has(s))) setTimeout(() => { if (E().quete.etape === s) avancer(); }, 600);
+  setTimeout(verifierEtat, 400);
 }
 
 /* ── un petit cadeau du guide, une fois par jour ── */
@@ -273,6 +449,10 @@ export async function parler(id) {
   const e = E(), s = e.quete.etape;
   /* les quêtes du Domaine (si l'histoire n'attend rien de cet habitant) */
   if (QD.active() && (s === 'fin' || cibleEtape() !== 'pnj-' + id) && await QD.parler(id)) return;
+  if (lieuActuel() === 'dindodrome' && ['chrono', 'gontran', ...CHAMPIONNATS.map(C => C.champion)].includes(id)) return parlerDindodrome(id);
+  /* la légende d'une île (chapitre 7), si l'histoire n'attend rien de ce guide */
+  if (cibleEtape() !== 'pnj-' + id && await GQ.parler(id, lieuActuel(), monde)) return;
+  if (ILE_DE_GUIDE[id]) return parlerGuide(id);
   if (id === 'plumeau') {
     if (s === 'arrivee') {
       await dialogue([
@@ -349,6 +529,43 @@ export async function parler(id) {
       avancer();
       return;
     }
+    if (s === 'parlerPlumeau6') {
+      await dialogue([L('plumeau', 'Roullieee ! Quatre badges, bravo ! Et regarde : une lettre est arrivée pour toi… de la <b>Jungle</b> !'),
+        L('plumeau', 'C’est <b>Tarzanette</b> : « Ohééé ! Viens voir ma Jungle ! Il y a des dindies partout dans les arbres ! »'),
+        L('plumeau', 'Pour la Jungle, il te faudra des <b>jumelles</b> 🔭 : certaines dindies se cachent tout en haut des arbres. Mimi en vend.'),
+        ...(QD.active() ? [L('plumeau', 'Et entre deux voyages, le Domaine a besoin de toi : les <b>quêtes du Domaine</b> 🏡 t’attendent dans ton Journal 📜 !')] : [])]);
+      avancer();
+      return;
+    }
+    if (s === 'parlerPlumeau7') {
+      await dialogue([L('plumeau', 'Le Badge Flocon ! Tu es incroyable, Roullieee !'),
+        L('plumeau', 'J’ai des nouvelles de <b>Madame Lava</b>, la forgeronne du <b>Volcan</b>. Elle cherche une exploratrice courageuse… Il paraît qu’un Dindomagma dort dans son cratère !'),
+        L('plumeau', 'Au Volcan, le sol est brûlant : il te faut des <b>bottes de lave</b> 🥾. Mimi en vend !')]);
+      avancer();
+      return;
+    }
+    if (s === 'parlerPlumeau8') {
+      await dialogue([L('plumeau', 'Roullieee ! Cette nuit, dans le télescope du Comte Hibou, j’ai vu une île… <b>au-dessus des nuages</b> !'),
+        L('plumeau', 'C’est le <b>Royaume des Nuages</b>, où vit l’aviatrice <b>Aurélie Azur</b>. Les dindies les plus rapides du Royaume y volent !'),
+        L('plumeau', 'Pour aller là-haut, il faut savoir planer : des <b>ailes de planeur</b> 🪁, chez Mimi !')]);
+      avancer();
+      return;
+    }
+    if (s === 'parlerPlumeau9') {
+      await dialogue([L('plumeau', 'Huit badges ! Tu es la plus grande championne du Royaume, Roullieee !'),
+        L('plumeau', 'Et regarde ce que j’ai trouvé au fond du Labo : un très vieux livre… <b>Les légendes des dindies mythiques</b> 🌈.'),
+        L('plumeau', 'Chaque île garde une légende. Quand tu as attrapé l’<b>épique</b> d’une île, son guide te la raconte. Au bout de la quête : un <b>objet légendaire</b>.'),
+        L('plumeau', 'Avec cet objet et les deux bons parents, au nid du Couvoir, une <b>dindie mythique</b> peut naître ! Commence par Gaston, dans les Prés : il connaît la légende du jardin oublié.'),
+        L('moi', 'Une dindie mythique… Et le Dindromakus, Professeur ?'),
+        L('plumeau', 'Ah… Le Dindromakus est la légende des légendes. Fais d’abord naître une mythique. Ensuite… on verra !')]);
+      avancer();
+      return;
+    }
+    if (s === 'grandeQuete' || s === 'mythique') {
+      await dialogue([L('plumeau', s === 'mythique' && (objetLegendaire() || oeufLegendaire()) ? 'Un objet légendaire ! Au nid du Couvoir, mets les deux parents de la légende : le Grand Livre te dit lesquels (page des mythiques). Parfois, il faut aussi le bon moment !'
+        : 'Le vieux livre dit : « Attrape l’épique d’une île, et son guide te contera sa légende. » Le Grand Dindon Coquelicot, tu l’as déjà ! Va voir Gaston, dans les Prés.')]);
+      return monde.ouvrirLabo();
+    }
     if (etapeAtteinte('capture1') && !e.quete.plumeauCapture && e.dindies.some(d => d.origine.startsWith('sauvage:'))) {
       e.quete.plumeauCapture = true;
       await dialogue([L('plumeau', 'Ho ho ! Une dindie sauvage ! Chaque nouvelle espèce attrapée te rapporte une prime de 50 pièces. C’est le règlement du Grand Livre !'),
@@ -357,7 +574,7 @@ export async function parler(id) {
     return monde.ouvrirLabo();
   }
   if (id === 'mimi') {
-    const besoin = { clous: 'clous', kit: 'kitPlanches', friandises: 'friandise', toile: 'toile', chapeau: 'chapeauSoleil', parapluie: 'parapluie', kitCouvoir: 'kitConstruction', kitNurserie: 'kitConstruction', kitEntrainement: 'kitConstruction' }[s] || (s === 'corde' ? 'toile' : null);
+    const besoin = { clous: 'clous', kit: 'kitPlanches', friandises: 'friandise', toile: 'toile', chapeau: 'chapeauSoleil', parapluie: 'parapluie', kitCouvoir: 'kitConstruction', kitNurserie: 'kitConstruction', kitEntrainement: 'kitConstruction' }[s] || (s === 'corde' ? 'toile' : EQUIPEMENTS.includes(s) ? s : null);
     if (besoin && !J.combien(besoin) && E().pieces < OBJETS[besoin].prix * (besoin === 'friandise' ? 2 : 1)) {
       await dialogue([L('mimi', `Oh, il te manque des pièces ? Ce n’est pas grave : je te l’offre ! Les amis des dindies sont mes amis.`)]);
       J.ajouterObjet(besoin, besoin === 'friandise' ? 2 : 1);
@@ -367,6 +584,12 @@ export async function parler(id) {
     if (!e.quete.mimiVue) { e.quete.mimiVue = true; await dialogue([L('mimi', 'Bonjour ! Moi c’est Mimi. Graines, friandises, outils… j’ai tout ce qu’il faut pour tes dindies !')]); }
     if (s === 'chapeau' && !e.quete.mimiChapeau) { e.quete.mimiChapeau = true; await dialogue([L('mimi', 'Le Maroc imaginaire ? Il y fait un soleil de plomb ! Il te faut absolument un <b>chapeau de soleil</b> 👒. J’en ai un pour toi !')]); }
     if ((s === 'kitCouvoir' || s === 'kitNurserie' || s === 'kitEntrainement') && !e.quete['mimi' + s]) { e.quete['mimi' + s] = true; await dialogue([L('mimi', 'Un kit de construction ? Planches, clous, peinture… et même un petit marteau ! Le voilà !')]); }
+    if (EQUIPEMENTS.includes(s) && !e.quete['mimi' + s]) {
+      e.quete['mimi' + s] = true;
+      await dialogue([L('mimi', { jumelles: 'La Jungle ? Ses arbres sont si hauts ! Avec ces <b>jumelles</b> 🔭, tu verras jusqu’à la cime.', moufles: 'La Banquise ? Brrr ! Des <b>moufles</b> 🧤 bien chaudes, tricotées par ma grand-mère !',
+        bottesLave: 'Le Volcan ? Ces <b>bottes de lave</b> 🥾 ne craignent pas la chaleur. Garanti sans brûlure !', lanterne: 'La Forêt de la Lune ? Il y fait si sombre… Cette <b>lanterne</b> 🏮 ne s’éteint jamais.',
+        ailes: 'Le Royaume des Nuages ?! Avec ces <b>ailes de planeur</b> 🪁, tu voleras comme un oiseau !' }[s])]);
+    }
     if (s === 'parapluie' && !e.quete.mimiParapluie) { e.quete.mimiParapluie = true; await dialogue([L('mimi', 'La Belgique ? Là-bas, il pleut souvent… Prends un <b>parapluie</b> ☂️ ! Et rapporte-moi une gaufre, hi hi !')]); }
     return monde.ouvrirBoutique();
   }
@@ -398,7 +621,7 @@ export async function parler(id) {
     if (!etapeAtteinte('decollage')) { await dialogue([L('zephyr', 'Le ciel est bleu, le vent est doux… Un jour parfait pour voler ! Enfin, presque.')]); return; }
     /* la montgolfière marche : on choisit où aller */
     const ici = lieuActuel();
-    await dialogue([L('zephyr', ici === 'domaine' ? (s === 'decollage' ? 'Le vent est parfait aujourd’hui ! Direction les Prés ? Monte dans la nacelle, exploratrice !' : 'Où allons-nous aujourd’hui, exploratrice ?')
+    await dialogue([L('zephyr', ici === 'domaine' ? (s === 'decollage' ? 'Le vent est parfait aujourd’hui ! Direction les Prés ? Monte dans la nacelle, exploratrice !' : VOLS[s] && VOLS[s] !== 'pres' ? `Cap sur ${REGIONS[VOLS[s]].nom.replace(/^Le /, 'le ').replace(/^La /, 'la ')} ? Le vent est avec nous : monte dans la nacelle !` : 'Où allons-nous aujourd’hui, exploratrice ?')
       : 'On rentre au Domaine, ou on s’envole vers une autre île ?')]);
     monde.ouvrirMonde && monde.ouvrirMonde();
     return;
@@ -503,7 +726,6 @@ export async function parler(id) {
     await dialogue([L('waffel', ['Une gaufre, ça fait toujours plaisir, une fois !', 'Le beffroi sonne les heures depuis des siècles…', 'Quand il pleut, les dindies 💧 Pluie sont de bonne humeur !'][Math.floor(Math.random() * 3)])]);
     return;
   }
-  if (lieuActuel() === 'dindodrome' && ['chrono', 'gontran', 'gaston', 'leila', 'waffel', 'tarzanette'].includes(id)) return parlerDindodrome(id);
   if (id === 'ginette') {
     if (!etapeAtteinte('parlerGinette')) {
       await dialogue([L('ginette', 'Une, deux ! Une, deux ! Salut ! Je suis Coach Ginette. Le Dindodrome ouvre bientôt !'),
@@ -534,11 +756,28 @@ export async function parler(id) {
     return;
   }
   if (id === 'gontran') {
-    if (etapeAtteinte('gontran1') && !etapeAtteinte('fin')) { await dialogue([L('gontran', 'Je t’attends au Dindodrome, Roullieee ! Flamby et moi, on s’entraîne. Gloup gloup !')]); return; }
+    if (etapeAtteinte('gontran1') && !etapeAtteinte('parlerPlumeau6')) { await dialogue([L('gontran', 'Je t’attends au Dindodrome, Roullieee ! Flamby et moi, on s’entraîne. Gloup gloup !')]); return; }
     const n = Object.keys(E().livre.attrapes).length;
     await dialogue([L('gontran', n >= 8 ? `Quoi ?! ${n} espèces dans ton Grand Livre ?! Bon… moi j’en ai… beaucoup aussi. Gloup gloup !` : 'Tu verras, Roullieee : ma dindie sera la plus rapide du Royaume ! Gloup gloup !')]);
     return;
   }
+}
+
+/* ── les guides des îles 4 à 8 : Tarzanette, Inuk, Madame Lava, le Comte Hibou, Aurélie Azur ── */
+async function parlerGuide(id) {
+  const s = E().quete.etape, r = ILE_DE_GUIDE[id], I = ILES[r];
+  const Lg = t => Array.isArray(t) ? L(t[0], t[1]) : L(id, t);
+  if (s === I.guide) { await dialogue(I.accueil.map(Lg)); avancer(); return; }
+  if (s === r + '3') {
+    const m = manquantes(r);
+    await dialogue([L(id, `Il te manque : ${m.map(x => '<b>' + PAR_ID[x].nom + '</b>').join(', ')}.`), L(id, I.page[m.includes(BESOIN[r][2]) ? BESOIN[r][2] : m[0]] || I.bavard[0])]);
+    return;
+  }
+  if (s === I.parler2) { await dialogue(I.legende.map(Lg)); avancer(); return; }
+  if (s === I.etapeObjets) { await dialogue([L(id, I.objets(ramasses(I.objet)))]); return; }
+  if (s === I.epique) { await dialogue(I.indice.map(Lg)); return; }
+  if (etapeAtteinte(I.apres)) cadeauDuJour(id, I.cadeau);
+  await dialogue([L(id, I.bavard[Math.floor(Math.random() * I.bavard.length)])]);
 }
 
 /* ── au Dindodrome : Monsieur Chrono, les champions et Gontran ── */
@@ -554,7 +793,7 @@ async function parlerDindodrome(id) {
       await monde.courir('essai');
       return;
     }
-    if (/^coupe[1-4]$/.test(s) && !e.quete['chrono' + s]) {
+    if (/^coupe[1-8]$/.test(s) && !e.quete['chrono' + s]) {
       e.quete['chrono' + s] = true;
       const C = CHAMPIONNATS[+s.slice(5) - 1];
       await dialogue([L('chrono', `${C.badge.e} <b>${C.nom}</b> est ouverte ! Trois courses, puis la grande finale contre ${PERSONNAGES[C.champion].nom} !`),
@@ -572,7 +811,7 @@ async function parlerDindodrome(id) {
       await monde.courir(s);
       return;
     }
-    if (etapeAtteinte('fin')) { await dialogue([L('gontran', 'Tu es vraiment forte, Roullieee. Mais la prochaine fois… tu verras ! Gloup gloup !')]); return; }
+    if (etapeAtteinte('parlerPlumeau6')) { await dialogue([L('gontran', 'Tu es vraiment forte, Roullieee. Mais la prochaine fois… tu verras ! Gloup gloup !')]); return; }
     await dialogue([L('gontran', 'Flamby et moi, on s’entraîne. La prochaine fois, c’est nous qui gagnons !')]);
     return;
   }
@@ -584,7 +823,11 @@ async function parlerDindodrome(id) {
     gaston: ['Salut l’exploratrice ! Au Dindodrome, je suis le champion des Prés 🍀. Ma Clochette (un Dindon Trèfle !) adore la piste des Prés…', 'Bravo pour le Badge Trèfle ! Mes dindies parlent encore de ta course !'],
     leila: ['Salam ! Sur la piste des Dunes ☀️, le sable ralentit tout le monde… sauf celles qui savent glisser ! Ma Sultane t’attend.', 'Le Badge Soleil te va bien ! Que les dunes te portent chance.'],
     waffel: ['Une fois ! La piste de Boue 💧, c’est la spécialité belge. Mon Speculoos est un vrai champion, sapristi !', 'Le Badge Goutte ! Tu mérites une gaufre, une fois !'],
-    tarzanette: ['Ohééé ! Je suis Tarzanette, de la Jungle 🌴 ! Sur la piste des Lianes, il y a des troncs partout. Mon jaguar Moustique saute comme personne !', 'Le Badge Liane ! Un jour, viens voir la Jungle, l’exploratrice !']
+    tarzanette: ['Ohééé ! Je suis Tarzanette, de la Jungle 🌴 ! Sur la piste des Lianes, il y a des troncs partout. Mon jaguar Moustique saute comme personne !', etapeAtteinte('tarzanette') ? 'Le Badge Liane ! Et maintenant, tu connais ma Jungle. Ohééé !' : 'Le Badge Liane ! Un jour, viens voir la Jungle, l’exploratrice !'],
+    inuk: ['Bienvenue sur la piste de Glace ❄️ ! Ici, on glisse… Ma Banquisette, un Dindocristal, connaît chaque virage par cœur.', 'Le Badge Flocon ! Tu glisses comme une vraie fille du Grand Nord.'],
+    lava: ['Par mes braises ! La piste de Lave 🔥 est brûlante ! Mon Volcanix, un Dindomagma, adore la chaleur.', 'Le Badge Braise ! Tu as le feu sacré, petite !'],
+    hibou: ['Hou hou ! La piste de Nuit 🌙 est sombre et pleine de champignons. Ma Minuit, une Dindétoile, y voit comme en plein jour.', 'Le Badge Lune ! Une performance… astronomique. Hou hou !'],
+    azur: ['Paré au décollage ! La piste des Nuages ☁️ est la plus haute du Royaume. Mon Tonnerre, un Dindorage, court plus vite que le vent !', 'Le Badge Nuage ! Tu es la reine du ciel, Roullieee !']
   }[id];
   if (!gagne && s === 'coupe' + C.n) await dialogue([L(id, T[0]), L(id, DD.finaleOuverte(C.n) ? 'Tu as fini les 3 courses ? Alors on se retrouve <b>en finale</b> ! Inscris-toi au Bureau.' : 'D’abord, monte sur le podium des 3 courses de la Coupe. Je t’attends en finale !')]);
   else await dialogue([L(id, gagne ? T[1] : T[0])]);
@@ -599,6 +842,9 @@ export async function interagir(id) {
     if (o.startsWith('planche')) { J.ajouterObjet('planche'); e.quete.compteur = ['planche1', 'planche2', 'planche3'].filter(p => e.monde.ramasses[p]).length; toast(`🪵 Une planche ! (${e.quete.compteur}/3)`); J.changer('quete'); if (e.quete.compteur >= 3) avancer(); }
     if (o === 'corde') { J.ajouterObjet('corde'); toast('🪢 La grosse corde du Capitaine !'); if (s === 'corde') avancer(); if (E().quete.etape === 'toile' && J.combien('toile')) avancer(); }
     if (o.startsWith('plumeRouge')) { J.ajouterObjet('plumeRouge'); const n = ramasses('plumeRouge'); toast(`🪶 Une plume rouge ! (${n}/3)`); J.changer('quete'); if (n >= 3 && s === 'plumesRouges') { await dialogue([L('moi', 'Les 3 plumes rouges ! Le Grand Dindon Coquelicot va se montrer… le matin, dans le champ de coquelicots !')]); avancer(); } }
+    const I = Object.values(ILES).find(x => o.startsWith(x.objet));
+    if (I) { J.ajouterObjet(I.objet); const n = ramasses(I.objet); toast(`${OBJETS[I.objet].e} ${OBJETS[I.objet].nom} ! (${n}/3)`); J.changer('quete'); if (n >= 3 && s === I.etapeObjets) { await dialogue([L('moi', I.trouve)]); avancer(); } }
+    else GQ.ramasser(o);
     if (o.startsWith('bouleArgent')) { J.ajouterObjet('bouleArgent'); const n = ramasses('bouleArgent'); toast(`🔘 Une boule d’argent ! (${n}/3)`); J.changer('quete'); if (n >= 3 && s === 'boules') { await dialogue([L('moi', 'Les 3 boules de l’Atomium ! Maintenant, il faut de la pluie…')]); avancer(); } }
     return true;
   }
@@ -657,7 +903,7 @@ export async function interagir(id) {
     await dialogue([L('ginette', 'Magnifique ! Une, deux ! Voici mes <b>3 jeux d’entraînement</b> : un pour la vitesse ⚡, un pour l’endurance 💪, un pour le saut 🦘. Essaie-les tous !')]);
     return false;     /* on ouvre ensuite le terrain */
   }
-  if (id === 'deco-jardin') { toast('🌸 Un jardin oublié, envahi de fleurs… Une grande quête t’y attendra un jour !', { duree: 3600 }); return true; }
+  if (id === 'deco-jardin') { toast(GQ.grandeOuverte('jardin') ? '🌸 Le jardin oublié… Gaston connaît sa légende !' : '🌸 Un jardin oublié, envahi de fleurs… Une grande quête t’y attendra un jour !', { duree: 3600 }); return true; }
   if (id === 'deco-atomium') { toast('⚛️ L’Atomium : 9 boules d’argent, hautes comme un immeuble ! Il paraît qu’une dindie y vit…', { duree: 3600 }); return true; }
   return false;
 }
@@ -680,6 +926,24 @@ export async function gadget(id) {
     forcerMeteo('belgique', 'pluie', DIX_MINUTES); toast('☁️ Tu débouches la bouteille… <b>Plic, ploc : il pleut sur la Belgique</b>, pour 10 minutes !', { duree: 3600, classe: 'grand' });
     return true;
   }
+  if (id === 'baton' || id === 'tambour') {
+    const r = id === 'baton' ? 'jungle' : 'nuages';
+    if (meteo(r) === 'pluie') { toast('🌧️ Il pleut déjà ! Écoute les gouttes…'); return false; }
+    forcerMeteo(r, 'pluie', DIX_MINUTES);
+    toast(id === 'baton' ? '🎋 Tu secoues le bâton de pluie… <b>Chhhh… la pluie tombe sur la Jungle</b>, pour 10 minutes !' : '🥁 BOUM, BOUM ! <b>L’orage gronde sur le Royaume des Nuages</b>, pour 10 minutes !', { duree: 3600, classe: 'grand' });
+    return true;
+  }
+  if (id === 'cor') {
+    if (estMatin()) { toast('📯 C’est déjà le matin : la glace brille au soleil.'); return false; }
+    forcerHeure(8, DIX_MINUTES); toast('📯 Tu souffles dans le cor… <b>Le soleil se lève sur la Banquise</b>, pour 10 minutes !', { duree: 3600, classe: 'grand' });
+    return true;
+  }
+  if (id === 'sablierLave' || id === 'boite') {
+    if (estNuit()) { toast(id === 'boite' ? '🎵 Il fait déjà nuit. Les lucioles dansent…' : '⏳ Il fait déjà nuit. Le cratère brille dans le noir…'); return false; }
+    forcerHeure(22, DIX_MINUTES);
+    toast(id === 'boite' ? '🎵 La boîte à musique joue sa berceuse… <b>La nuit tombe sur la Forêt</b>, pour 10 minutes !' : '⏳ Tu retournes le sablier de lave… <b>La nuit tombe sur le Volcan</b>, pour 10 minutes !', { duree: 3600, classe: 'grand' });
+    return true;
+  }
   if (id.startsWith('lanterne')) {
     const k = id.slice(8);
     if (e.monde.ramasses[id]) { toast('🏮 Cette lanterne brille déjà.'); return false; }
@@ -695,7 +959,7 @@ export async function gadget(id) {
 export function evenement(type, valeur) {
   const e = E(), s = e.quete.etape;
   if (type === 'achat') {
-    if ((s === 'clous' && valeur === 'clous') || (s === 'kit' && valeur === 'kitPlanches') || (s === 'friandises' && valeur === 'friandise') || (s === 'chapeau' && valeur === 'chapeauSoleil') || (s === 'parapluie' && valeur === 'parapluie')) avancer();
+    if ((s === 'clous' && valeur === 'clous') || (s === 'kit' && valeur === 'kitPlanches') || (s === 'friandises' && valeur === 'friandise') || (s === 'chapeau' && valeur === 'chapeauSoleil') || (s === 'parapluie' && valeur === 'parapluie') || (EQUIPEMENTS.includes(s) && valeur === s)) avancer();
     else if (valeur === 'toile' && (s === 'toile' || s === 'corde')) { if (J.combien('corde')) { if (s === 'corde') avancer(); avancer(); } }
   }
   if (type === 'deplacement') {
@@ -711,6 +975,7 @@ export function evenement(type, valeur) {
   if (type === 'musee' && s === 'musee') avancer();
   if (type === 'achat' && valeur === 'kitConstruction' && (s === 'kitCouvoir' || s === 'kitNurserie' || s === 'kitEntrainement')) avancer();
   if (type === 'oeufPose' && s === 'oeufTuto' && valeur.origine === 'tutoriel') avancer();
+  if (type === 'eclosion' && s === 'mythique' && PAR_ID[valeur.dindie.espece].rarete === 'mythique') avancer();
   if (type === 'eclosion') {
     if (s === 'eclosion' && valeur.oeuf.origine === 'tutoriel') { avancer(); setTimeout(() => dialogue([L('moi', 'Un poussin ! Il lui faudrait un endroit douillet pour grandir… La Nurserie, à côté du Couvoir, est en ruine. Encore un kit !')]), 1200); }
     if (s === 'oeufCroise' && valeur.oeuf.origine === 'croisement' && ['croisement', 'recette'].includes(PAR_ID[valeur.oeuf.espece].origine.sorte)) avancer();
@@ -720,16 +985,14 @@ export function evenement(type, valeur) {
   if (type === 'eveil' && s === 'eveil') avancer();
   if (type === 'course' || type === 'entrainement' || type === 'lecon') evenementCourse(type, valeur);
   if (type === 'arrivee') {
-    if ((s === 'decollage' && valeur === 'pres') || (s === 'volMaroc' && valeur === 'maroc') || (s === 'volBelgique' && valeur === 'belgique') || (s === 'entrerDindodrome' && valeur === 'dindodrome')) avancer();
+    if ((VOLS[s] && VOLS[s] === valeur) || (s === 'entrerDindodrome' && valeur === 'dindodrome')) avancer();
     preparerEtape();
   }
   if (type === 'capture') {
     if (s === 'capture1') avancer();
     const s2 = E().quete.etape;
-    if (s2 === 'pres3' && !manquantes('pres').length) avancer();
-    if (s2 === 'maroc3' && !manquantes('maroc').length) avancer();
-    if (s2 === 'belgique3' && !manquantes('belgique').length) avancer();
-    if ((s2 === 'coquelicot' && valeur === 'coquelicot') || (s2 === 'dingue' && valeur === 'dingue') || (s2 === 'atomium' && valeur === 'atomium')) avancer();
+    if (ilePage(s2) && !manquantes(ilePage(s2)).length) avancer();
+    if (['coquelicot', 'dingue', 'atomium', ...Object.values(ILES).map(I => I.epique)].includes(s2) && valeur === s2) avancer();
     J.changer('quete');
   }
 }
@@ -750,11 +1013,15 @@ export function evenementCourse(type, v) {
           L('moi', s === 'gontran2' ? 'Merci, Gontran ! Flamby a très bien couru, lui aussi.' : 'Bien couru, Gontran ! À la prochaine !')]), 500);
       } else setTimeout(() => dialogue([L('gontran', 'Ha ha ! Flamby est le plus rapide ! Reviens quand tu veux… si tu oses ! Gloup gloup !')]), 500);
     }
-    const m = /^coupe([1-4])$/.exec(s);
+    const m = /^coupe([1-8])$/.exec(s);
     if (m && DD.badge(+m[1])) {
       const C = CHAMPIONNATS[+m[1] - 1];
       avancer();
-      setTimeout(() => dialogue([L(C.champion, `Bravo, Roullieee ! Tu as gagné <b>${C.badge.nom}</b> ${C.badge.e} ! C’était une course magnifique.`)]), 500);
+      const suite = { 5: 'Le Professeur Plumeau te cherchait, je crois… Il a une nouvelle mission pour toi !',
+        6: 'Mon vieil ami le <b>Comte Hibou</b> voudrait te rencontrer, dans la <b>Forêt de la Lune</b>. Il y fait sombre : achète une <b>lanterne</b> 🏮 chez Mimi !',
+        7: 'Le Professeur Plumeau a regardé dans mon télescope… Il a quelque chose à vous montrer. Hou hou !',
+        8: 'Le Professeur Plumeau t’attend au Labo. Il avait l’air tout excité !' }[m[1]];
+      setTimeout(() => dialogue([L(C.champion, `Bravo, Roullieee ! Tu as gagné <b>${C.badge.nom}</b> ${C.badge.e} ! C’était une course magnifique.`), ...(suite ? [L(C.champion, suite)] : [])]), 500);
     }
   }
   if (type === 'entrainement') {
@@ -765,3 +1032,16 @@ export function evenementCourse(type, v) {
   if (type === 'lecon' && s === 'lecon') avancer();
 }
 export const etapeActuelle = () => E().quete.etape;
+/* au Domaine, sous l'histoire : la quête du Domaine en cours (une petite ligne dans le bandeau) */
+export const texteDomaine = () => E().quete.etape !== 'fin' && QD.active() && lieuActuel() === 'domaine' ? `<span class="qd">🏡 ${QD.texte('domaine')}</span>` : '';
+/* les étapes qui dépendent de l'état du jeu (appelé quand quelque chose change) */
+export function verifierEtat() {
+  const e = E(), s = e.quete.etape;
+  if (s === 'serre' && e.enclos.jungle?.construit) {
+    avancer();
+    setTimeout(() => dialogue([L('plumeau', '(le Professeur arrive en courant) Une Serre ! Tes dindies 🌴 Jungle vont adorer. Oh, et une carte postale est arrivée… de la <b>Banquise</b> !'),
+      L('plumeau', 'C’est <b>Inuk</b> : « Viens nous voir ! Mais couvre-toi bien ! » Il te faut des <b>moufles</b> 🧤 : Mimi en a.')]), 1200);
+  }
+  if (s === 'grandeQuete' && GQ.nbFinies() > 0) avancer();
+  if (s === 'mythique' && mythiqueNee()) avancer();
+}

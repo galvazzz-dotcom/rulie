@@ -1,5 +1,5 @@
 /* ══════════ LES 8 RÉGIONS DU ROYAUME ══════════
-   On y va en montgolfière, depuis le port du Domaine. Les 3 premières sont ouvertes à l'étape 3.
+   On y va en montgolfière, depuis le port du Domaine. Les 3 premières s'ouvrent au chapitre 2, les 5 autres aux chapitres 5 à 7.
    especes : qui vit là, et à quelles conditions elle se montre
      zone        : le coin de la région où elle apparaît
      poids       : plus c'est grand, plus on la croise souvent
@@ -41,11 +41,61 @@ export const REGIONS = {
       atomium: { zone: 'atomium', poids: 1, meteo: 'pluie', quete: 'atomium' }
     }
   },
-  jungle: { n: 4, nom: 'La Jungle', e: '🌴', type: 'jungle', equipement: 'jumelles', carte: [80, 30], bientot: true },
-  banquise: { n: 5, nom: 'La Banquise', e: '❄️', type: 'glace', equipement: 'moufles', carte: [87, 60], bientot: true },
-  volcan: { n: 6, nom: 'Le Volcan', e: '🔥', type: 'feu', equipement: 'bottesLave', carte: [70, 84], bientot: true },
-  foret: { n: 7, nom: 'La Forêt de la Lune', e: '🌙', type: 'nuit', equipement: 'lanterne', carte: [26, 86], bientot: true },
-  nuages: { n: 8, nom: 'Le Royaume des Nuages', e: '☁️', type: 'ciel', equipement: 'ailes', carte: [76, 8], bientot: true }
+  jungle: {
+    n: 4, nom: 'La Jungle', e: '🌴', type: 'jungle', equipement: 'jumelles', guide: 'tarzanette', ambiance: 'jungle', carte: [80, 30],
+    niveaux: [15, 20], meteo: { pluie: 40, nuages: 35, soleil: 25 },
+    desc: 'Des arbres géants, des lianes, une cascade… et un vieux temple caché sous la mousse.',
+    especes: {
+      perroquet: { zone: 'canopee', poids: 1, quand: 'jour' },
+      banane: { zone: 'bananeraie', poids: 1 },
+      liane: { zone: 'lianes', poids: .45, equipement: 'jumelles' },
+      jaguar: { zone: 'temple', poids: 1, meteo: 'pluie', quete: 'jaguar' }
+    }
+  },
+  banquise: {
+    n: 5, nom: 'La Banquise', e: '❄️', type: 'glace', equipement: 'moufles', guide: 'inuk', ambiance: 'banquise', carte: [87, 60],
+    niveaux: [18, 23], meteo: { soleil: 40, nuages: 35, neige: 25 },
+    desc: 'Un village d’igloos, un lac gelé, un glacier bleu et une grotte de glace qui scintille.',
+    especes: {
+      dindingloo: { zone: 'igloos', poids: 1 },
+      pingouin: { zone: 'banquise', poids: 1 },
+      aurore: { zone: 'glacier', poids: .45, equipement: 'moufles' },
+      cristal: { zone: 'grotte', poids: 1, quand: 'matin', quete: 'cristal' }
+    }
+  },
+  volcan: {
+    n: 6, nom: 'Le Volcan', e: '🔥', type: 'feu', equipement: 'bottesLave', guide: 'lava', ambiance: 'volcan', carte: [70, 84],
+    niveaux: [21, 26], meteo: { soleil: 50, nuages: 40, pluie: 10 },
+    desc: 'Une montagne qui fume, des rivières de lave, des colonnes de basalte et la forge de Madame Lava.',
+    especes: {
+      cendre: { zone: 'cendres', poids: 1 },
+      braise: { zone: 'braises', poids: 1 },
+      dindofeu: { zone: 'coulee', poids: .45, equipement: 'bottesLave' },
+      magma: { zone: 'cratere', poids: 1, quand: 'nuit', quete: 'magma' }
+    }
+  },
+  foret: {
+    n: 7, nom: 'La Forêt de la Lune', e: '🌙', type: 'nuit', equipement: 'lanterne', guide: 'hibou', ambiance: 'foret', carte: [26, 86],
+    niveaux: [24, 29], meteo: { soleil: 45, nuages: 40, pluie: 15 },
+    desc: 'Une forêt bleue où il fait toujours un peu nuit : des champignons qui brillent, un étang de lune, l’observatoire du Comte Hibou.',
+    especes: {
+      lune: { zone: 'clairiere', poids: 1 },
+      hibou: { zone: 'bois', poids: 1, quand: 'nuit' },
+      luciole: { zone: 'etang', poids: .45, equipement: 'lanterne' },
+      etoile: { zone: 'colline', poids: 1, quand: 'nuit', quete: 'etoile' }
+    }
+  },
+  nuages: {
+    n: 8, nom: 'Le Royaume des Nuages', e: '☁️', type: 'ciel', equipement: 'ailes', guide: 'azur', ambiance: 'nuages', carte: [76, 8],
+    niveaux: [27, 32], meteo: { soleil: 55, nuages: 30, pluie: 15 },
+    desc: 'Une île posée sur une mer de nuages, un arc-en-ciel, des moulinets qui chantent et le palais des nuages.',
+    especes: {
+      nuage: { zone: 'nuages', poids: 1 },
+      zephyr: { zone: 'vents', poids: 1, quand: 'jour' },
+      dindarc: { zone: 'arc', poids: .45, equipement: 'ailes' },
+      orage: { zone: 'sommet', poids: 1, meteo: 'pluie', quete: 'orage' }
+    }
+  }
 };
 export const ORDRE_REGIONS = Object.keys(REGIONS);
 /* le Domaine, sur la carte du monde */
@@ -56,11 +106,16 @@ export function regleDe(espece) {
   for (const [id, R] of Object.entries(REGIONS)) if (R.especes && R.especes[espece]) return { region: id, ...R.especes[espece] };
   return null;
 }
-const QUAND = { jour: '🌞 le jour', nuit: '🌙 la nuit', matin: '🌅 le matin' }, METEO = { soleil: '☀️ quand il fait beau', pluie: '🌧️ quand il pleut' };
+const QUAND = { jour: '🌞 le jour', nuit: '🌙 la nuit', matin: '🌅 le matin' }, METEO = { soleil: '☀️ quand il fait beau', pluie: '🌧️ quand il pleut', neige: '❄️ quand il neige' };
 const ZONES = {
   pre: 'dans l’herbe des Prés', fleurs: 'au milieu des fleurs', trefles: 'près des trèfles', coquelicots: 'dans le champ de coquelicots',
   dunes: 'dans les dunes', oasis: 'près de l’oasis', souk: 'près des lanternes du souk',
-  place: 'sur la Grand-Place', canaux: 'au bord des canaux', beffroi: 'au pied du beffroi', atomium: 'près de l’Atomium'
+  place: 'sur la Grand-Place', canaux: 'au bord des canaux', beffroi: 'au pied du beffroi', atomium: 'près de l’Atomium',
+  canopee: 'à l’orée de la jungle', bananeraie: 'dans la bananeraie', lianes: 'sous les arbres géants', temple: 'devant le temple perdu',
+  igloos: 'près du village d’igloos', banquise: 'sur la banquise, au bord de l’eau', glacier: 'au pied du glacier', grotte: 'devant la grotte de glace',
+  cendres: 'dans les champs de cendre', braises: 'près des pierres chaudes', coulee: 'au bord de la coulée de lave', cratere: 'en haut, près du cratère',
+  clairiere: 'dans la clairière', bois: 'dans les bois bleus', etang: 'autour de l’étang de lune', colline: 'sur la colline aux étoiles',
+  nuages: 'sur les nuages', vents: 'près des moulinets', arc: 'sous l’arc-en-ciel', sommet: 'au sommet, près du palais'
 };
 /* le texte des conditions (pour le Grand Livre) ; nomObjet : (id) → « un chapeau de soleil » */
 export function texteConditions(espece, nomObjet = id => id) {

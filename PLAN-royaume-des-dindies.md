@@ -89,8 +89,9 @@ On y va en montgolfière. Chaque région est une île 3D à explorer, avec ses d
 - Les rares demandent l’équipement de la région. Sans lui, elles ne sont qu’un **mirage** : elles clignotent et s’effacent quand on approche.
 - Les épiques apparaissent après la **piste de leur légende** (une petite quête du guide de l’île : 3 plumes rouges, 3 lanternes, 3 boules d’argent…), et sous une condition : le matin, la nuit, la pluie…
 - Le **jour et la nuit suivent l’heure réelle**. La **météo** change toutes les heures, calculée d’après la date pour être la même pour tout le monde.
-- Pour que personne ne reste bloqué, chaque île a son **gadget** qui fait venir la condition pendant 10 minutes : le coq de Gaston (le matin), le cadran magique (la nuit), la bouteille à nuages (la pluie).
-- Chaque île a son **guide** : Gaston le berger (les Prés), Leïla des Dunes (le Maroc imaginaire), Monsieur Waffel (la Belgique). Une fois sa quête finie, il offre chaque jour 2 friandises préférées de son type.
+- Pour que personne ne reste bloqué, chaque île a son **gadget** qui fait venir la condition pendant 10 minutes : le coq de Gaston (le matin), le cadran magique (la nuit), la bouteille à nuages (la pluie), le bâton de pluie de la Jungle, le cor des glaces (le matin), le sablier de lave (la nuit), la boîte à musique de la Forêt (la nuit), le tambour d’orage des Nuages (la pluie).
+- Chaque île a son **guide** : Gaston le berger (les Prés), Leïla des Dunes (le Maroc imaginaire), Monsieur Waffel (la Belgique), Tarzanette (la Jungle), Inuk (la Banquise), Madame Lava la forgeronne (le Volcan), le Comte Hibou l’astronome (la Forêt de la Lune), Aurélie Azur l’aviatrice (le Royaume des Nuages). Une fois sa quête finie, il offre chaque jour 2 friandises préférées de son type.
+- **Les grandes quêtes (chapitre 7) :** quand on a attrapé l’épique d’une île, son guide raconte la légende de l’île ; on retrouve 3 fragments cachés (graines anciennes, morceaux de carte, clés rouillées, masques de jade, éclats de glace bleue, gouttes de feu, notes de musique) et il confie l’**objet légendaire**. Au nid du Couvoir, avec les deux bons parents (et parfois le bon moment), l’œuf mythique est sûr. La Forêt de la Lune garde « La légende », celle du Dindromakus, pour le chapitre 8.
 
 **Attraper une dindie :**
 1. On touche la dindie : Roullieee s’approche toute seule, sur la pointe des pieds. La dindie, curieuse, la regarde.
@@ -364,14 +365,14 @@ En mode aide, les compétences se déclenchent toutes seules.
 2. *L’expédition* (10 quêtes) : la carte du monde, les Prés, le Maroc imaginaire et la Belgique, les 12 premières espèces sauvages, le chapeau de soleil et le parapluie, les légendes du Coquelicot, de la Dinde Dingue et de l’Atomium.
 3. *Le premier œuf* (5 quêtes) : le Couvoir (kit de construction), l’œuf du Professeur, la Nurserie, le premier croisement (un hybride), l’éveil au Labo.
 4. *Le Dindodrome ouvre* (8 quêtes) : le portail, la course d’essai avec Monsieur Chrono, le terrain d’entraînement, les championnats 1 à 4 (Tarzanette vient de la Jungle pour le 4e), deux défis de Gontran, une première leçon de compétence.
-5. *Jungle et Banquise* : les régions 4 et 5, les championnats 5 et 6, l’Atelier des plumes, les missions.
-6. *Volcan et Forêt de la Lune* : les régions 6 et 7, les championnats 6 et 7, l’éveil.
-7. *Le Royaume des Nuages* : la région 8, le championnat 8, les mythiques.
+5. *Jungle et Banquise* (8 quêtes) : la lettre de Tarzanette, les îles 4 et 5 (jumelles, moufles), les statuettes d’or et le Dindojaguar, la Serre au Domaine, les étoiles de glace et le Dindocristal, le championnat 5.
+6. *Volcan et Forêt de la Lune* (8 quêtes) : les îles 6 et 7 (bottes de lave, lanterne), les pierres de lave et le Dindomagma, les éclats de lune et la Dindétoile, les championnats 6 et 7.
+7. *Le Royaume des Nuages* (5 quêtes) : l’île 8 (ailes de planeur), les plumes d’éclair et le Dindorage, le championnat 8, puis le vieux livre des légendes : une grande quête et la première dindie mythique.
 8. *La Légende* : la Ligue des Légendes, la plume arc-en-ciel, le Dindromakus, la fin et le générique.
 
 **Les autres activités :**
 - environ 40 quêtes des habitants (les 7 premières, les « quêtes du Domaine », arrivent avec l’étape 6 : le Potager, le Moulin, l’Atelier des plumes, la décoration, le Bureau des missions, une amélioration, le Gâteau d’amour) ;
-- 8 grandes quêtes de région, une par mythique ;
+- 7 grandes quêtes d’île, une par mythique (étape 7), et la légende du Dindromakus (étape 8) ;
 - 3 défis par jour et 3 par semaine ;
 - **100 succès** ;
 - la **collection** : 72 espèces, chacune en forme adulte et en forme éveillée, plus toutes les chromatiques ✨.
@@ -419,14 +420,16 @@ docs/royaume/
   js/personnages/         chibi (modèle commun), roullieee, pnj
   js/monde/               carte (grille + A*), decor (île, eau, végétation, nuit),
                           batiments, domaine, ile (le sol des régions), nature, fabrique,
-                          region (ce qui est commun aux îles), regions/pres, maroc, belgique
+                          region (ce qui est commun aux îles), regions/pres, maroc, belgique,
+                          jungle, banquise, volcan, foret, nuages
   js/jeu/                 etat, individus, objets, scenario (quêtes et dialogues),
                           sauvages (les apparitions), capture, trouvailles (coffres, œufs…),
                           elevage (œufs, croisements, minuteurs, croissance, expérience, éveil),
                           collection (les espèces débloquées de chaque profil),
                           course (la simulation d'une course), dindodrome (courses, gains, badges, leçons),
                           production (Potager, Moulin, plumes, Atelier, décoration, missions, améliorations,
-                          rendre à la nature), quetesDomaine (les 7 quêtes du Domaine)
+                          rendre à la nature), quetesDomaine (les 7 quêtes du Domaine),
+                          grandesQuetes (les 7 légendes des îles et les croisements mythiques)
   js/ui/                  panneaux (Boutique, Labo, Livre, Musée, Fiche, Clapier…),
                           monde (la carte du monde, le voyage en montgolfière),
                           elevage (le Couvoir, la Nurserie, l’éclosion, l’éveil),
@@ -438,7 +441,7 @@ docs/royaume/
                           course (la course en 3D : caméra, interface, podium), decorer (le mode Décorer)
   js/monde/dindodrome.js  le Dindodrome (piste, tribunes, public, tableau, podium)
   js/monde/decorations.js les 50 décorations en 3D (et leur « fantôme » pour les poser)
-royaume-outils/           les tests Playwright (test-etape1 à 6, et tous-les-tests.mjs qui les lance
+royaume-outils/           les tests Playwright (test-etape1 à 7, et tous-les-tests.mjs qui les lance
                           tous avec un résumé), le simulateur d'équilibrage des courses
                           (simulateur-courses.mjs), le générateur du tableau des espèces
 ```
@@ -449,7 +452,7 @@ royaume-outils/           les tests Playwright (test-etape1 à 6, et tous-les-te
   - des parties jouées automatiquement par Playwright (comme pour la ferme), sur téléphone, téléphone couché, tablette et ordinateur ;
   - une vérification qu’il n’y a aucune erreur et que la mémoire reste stable ;
   - un **simulateur** qui joue des milliers de croisements et de courses pour régler la progression ;
-  - **une seule commande** pour tout lancer : `node royaume-outils/tous-les-tests.mjs` (options : `--etapes=1,2,3,4,5,6`, `--formats=tel,paysage,tablette,ordi` ou `tous`, `--adresse=` pour tester le site en ligne, `--three=` pour un three.js local sans Internet). Elle sert `docs/` sur un petit serveur local, lance les tests l’un après l’autre et affiche un résumé (environ une heure pour tout).
+  - **une seule commande** pour tout lancer : `node royaume-outils/tous-les-tests.mjs` (options : `--etapes=1,2,3,4,5,6,7`, `--formats=tel,paysage,tablette,ordi` ou `tous`, `--adresse=` pour tester le site en ligne, `--three=` pour un three.js local sans Internet). Elle sert `docs/` sur un petit serveur local, lance les tests l’un après l’autre et affiche un résumé (environ une heure pour tout).
 
 ## 14. Les étapes jusqu’à la version 1.0
 
@@ -507,11 +510,12 @@ Chaque étape se termine par : les tests passent, des captures sur les 4 formats
 - [x] En plus : 7 « quêtes du Domaine » (des habitants) qui font découvrir tout cela après le chapitre 4, le mode 🎨 Décorer (poser, tourner, déplacer, ranger), les 10 formes de chapeaux en 3D et en portrait, le Gâteau d’amour au Couvoir, l’œuf épique, la super-friandise pour attraper, construire les 6 autres habitats, et « rendre à la nature ».
 - **Fini quand :** le Domaine produit et se décore, et les missions rapportent.
 
-### Étape 7 — Le monde entier
-- [ ] Les régions 4 à 8, tous les habitats, tous les équipements.
-- [ ] Les 72 espèces atteignables, les 8 grandes quêtes mythiques.
-- [ ] Les championnats 5 à 8.
-- **Fini quand :** toute la collection peut être obtenue.
+### Étape 7 — Le monde entier ✅
+- [x] Les régions 4 à 8, tous les habitats, tous les équipements.
+- [x] 71 espèces sur 72 atteignables, 7 grandes quêtes mythiques (la 8e, « La légende » du Dindromakus, ouvre le chapitre 8).
+- [x] Les championnats 5 à 8.
+- [x] En plus : les chapitres 5 à 7 (21 quêtes), 5 guides en chibi, 5 gadgets, la neige sur la Banquise, 4 nouvelles pistes (Glace, Lave, Nuit, Nuages) avec leurs obstacles, les champions sur la place du Dindodrome, le Couvoir qui annonce une légende, le Journal des grandes quêtes, les indices du Grand Livre pour les mythiques.
+- **Fini quand :** toute la collection peut être obtenue (sauf le Dindromakus, qui attend la fin de l’histoire).
 
 ### Étape 8 — La fin et l’après-histoire
 - [ ] La Ligue des Légendes, la plume arc-en-ciel, le Dindromakus.
@@ -548,3 +552,4 @@ Chaque étape se termine par : les tests passent, des captures sur les 4 formats
 | 2026-10-22 | 4 | L’élevage est jouable : le chapitre 3 en 5 quêtes. Le Couvoir (une hutte ronde, le nid et 2 couveuses sous cloche, les œufs visibles en 3D) et la Nurserie (une maison pastel, sa cour clôturée, son bac à sable et son toboggan, où jouent les bébés le jour) se réparent avec un kit de construction de Mimi. Les croisements (hybrides 30 % / 15 %, recettes 25 %, le premier hybride garanti), les minuteurs en temps réel même jeu fermé, le sablier, l’éclosion animée avec le prénom du bébé, les 3 stades (poussin, jeune, adulte) et les repas qui font grandir plus vite. L’expérience (friandises, biscuits de champion, captures, promenades) et les niveaux ; l’éveil au Labo au niveau 20 avec une pierre d’éveil ; les chromatiques (1 sur 64). Les œufs mystère trouvés dans les îles éclosent enfin. Le Défilé (écran titre et page du Défilé) ne montre plus que les dindies débloquées du profil. Les sauvegardes de l’étape 3 passent au chapitre 3. Tests : `royaume-outils/test-etape4.mjs` (chapitre 3 joué de bout en bout, 300 croisements, minuteurs, rechargement) ; `test-etape1.mjs` (avec le Défilé limité), `test-etape2.mjs` et `test-etape3.mjs` toujours verts. |
 | 2026-10-22 | 5 | Le Dindodrome est ouvert : le chapitre 4 en 8 quêtes. Un nouveau lieu au bout de la route de l’est (on y entre par le portail, avec un fondu en damier) : une piste en anneau de 200 m à 6 couloirs, la grande tribune et son public qui s’agite, le portique de l’arrivée, le tableau d’affichage, le podium, le Bureau des courses de Monsieur Chrono (le présentateur) et la Salle des trophées. Les courses en 3D : 6 dindies, la caméra derrière la nôtre, le compte à rebours, le commentateur, les haies (l’anneau vert du bouton 🦘 pour un saut parfait), 20 compétences avec leur recharge, « 🔥 Fonce ! », ⏩, puis le podium et les résultats (gains, expérience, records). La simulation (vitesse, endurance et fatigue, sauts, terrain, zones de sable et de boue, compétences) est réglée avec un simulateur. Les 4 premiers championnats (Prés, Dunes, Pluie, Lianes : 3 courses sur le podium puis la finale), leurs badges, deux défis de Gontran, les courses libres. Le terrain d’entraînement de Coach Ginette au Domaine (3 mini-jeux, un par stat, et les leçons de compétences). Deux nouveaux personnages (Monsieur Chrono, Tarzanette) et trois musiques libres de plus (orgue de foire et ragtime, domaine public). La 3D se met en pause pendant les mini-jeux. Les sauvegardes de l’étape 4 passent au chapitre 4. Tests : `royaume-outils/test-etape5.mjs` (l’équilibre sur des centaines de courses simulées, puis les règles une par une — chute si l’on saute trop tôt, saut parfait, mode aide, « Fonce ! », les 20 compétences, leçon payante, finale perdue —, puis le chapitre 4 joué de bout en bout : 19 courses, les 3 mini-jeux, une leçon, la mémoire du Dindodrome, le rechargement), vert sur les 4 formats ; `test-etape1.mjs` à `test-etape4.mjs` toujours verts. Toute la série se lance avec `royaume-outils/tous-les-tests.mjs`. |
 | 2026-10-22 | 6 | La production : le Domaine produit, se décore, et les missions rapportent. Quand le chapitre 4 est fini, 7 « quêtes du Domaine » (Mimi, le Professeur, le Capitaine) font découvrir : le **Potager** réparé (4 à 12 parcelles, maïs, blé, haricot sauteur et baie arc-en-ciel qui poussent en temps réel, l’arrosage, les plantes visibles en 3D), le **Moulin** et ses ailes qui tournent (6 recettes : galette, petit pain et croquant pour l’entraînement, tarte aux baies, super-friandise pour attraper, Gâteau d’amour pour les hybrides), les **plumes du jour** en petit tas dans les enclos, l’**Atelier des plumes** (30 chapeaux en 10 formes, portés en 3D et sur les portraits ; 50 décorations), le mode **🎨 Décorer** (poser, tourner, déplacer, ranger ; la carte se bouche et se libère), le **Bureau des missions** (12 modèles de 15 min à 8 h, 1 à 3 dindies, la chance selon les stats et le type, pièces, plumes, surprises, œuf épique ; le drapeau se lève, un « ! » quand elles rentrent), les **améliorations** (enclos, Clapier, Couvoir jusqu’à 4 couveuses, Nurserie, Potager, Bureau), les 6 autres habitats à construire, et **rendre à la nature**. Sauvegarde en version 5. Tests : `royaume-outils/test-etape6.mjs` (les règles une par une, les 7 quêtes jouées avec les fenêtres, la mémoire, la sauvegarde) sur les 4 formats ; la série complète (`tous-les-tests.mjs`, étapes 1 à 6) reste verte. |
+| 2026-10-22 | 7 | Le monde entier : les chapitres 5, 6 et 7 (21 quêtes). Les 5 dernières îles en 3D, construites à la demande et libérées au départ : la **Jungle** (arbres géants, lianes, cascade, bananeraie, temple perdu, cabane de Tarzanette), la **Banquise** (village d’igloos, lac gelé, glacier, grotte de glace, et la neige qui tombe), le **Volcan** (la montagne qui fume, le cratère et sa lave, la coulée, les sources chaudes, les colonnes de basalte, la forge), la **Forêt de la Lune** (champignons qui brillent, étang de lune, colline aux étoiles, observatoire, lucioles) et le **Royaume des Nuages** (mer de nuages, arc-en-ciel, moulinets, palais, tour de l’aviatrice). 20 nouvelles espèces sauvages, 5 équipements (jumelles, moufles, bottes de lave, lanterne, ailes de planeur) et 5 friandises préférées chez Mimi ; 5 guides en chibi (Tarzanette, Inuk, Madame Lava, le Comte Hibou, Aurélie Azur), leurs légendes (statuettes d’or, étoiles de glace, pierres de lave, éclats de lune, plumes d’éclair) et 5 gadgets (bâton de pluie, cor des glaces, sablier de lave, boîte à musique, tambour d’orage). La Serre à construire. Les **championnats 5 à 8** (Glace, Lave, Nuit, Nuages : 4 nouvelles pistes avec leurs obstacles, leurs zones et leurs décors ; les champions attendent sur la place du Dindodrome), réglés au simulateur. Les **mythiques** : 7 grandes quêtes (3 fragments cachés dans l’île, puis l’objet légendaire), le croisement mythique au Couvoir (les deux bons parents, l’objet, et parfois le matin, la nuit ou la pluie sur la Belgique ; 4 h de couvaison), le Couvoir qui annonce une légende, les indices du Grand Livre et le Journal des grandes quêtes. 71 espèces sur 72 sont atteignables (le Dindromakus attend le chapitre 8). Au Domaine, la quête du Domaine en cours s’affiche sous celle de l’histoire. Sauvegarde en version 6 (la fin du chapitre 4 devient le début du chapitre 5). Tests : `royaume-outils/test-etape7.mjs` (les règles : espèces atteignables, places des objets, les 7 croisements mythiques ; puis les chapitres 5 à 7 joués de bout en bout : 20 captures, 16 courses de championnat, la Serre, la grande quête du jardin oublié, l’œuf mythique et son éclosion, la grande quête du temple perdu, la mémoire, le rechargement) sur les 4 formats ; la série complète (`tous-les-tests.mjs`, étapes 1 à 7) reste verte. |

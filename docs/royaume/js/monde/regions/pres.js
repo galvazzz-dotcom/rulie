@@ -116,7 +116,7 @@ export default {
   depart: [0, 29], ballon: [-8.5, 27], zephyr: [-4.4, 28.8, .5], guide: [-9.5, 8.5, -.5],
   zones: { pre: [[6, 1, 6], [-24, 24, 5], [28, -2, 6], [-8, 20, 5], [8, -24, 5]], fleurs: [FLEURS], trefles: TREFLES, coquelicots: [COQUELICOTS] },
   cachettes: [[-36, -18], [30, -24], [36, 6], [-39, 6], [10, -30], [-12, -28], [22, 28], [-30, 27], [-24, -30], [38, -10], [-6, 21], [18, -30]],
-  quete: { plumeRouge1: [-27, -8], plumeRouge2: [31, -17], plumeRouge3: [-35, 20] },
+  quete: { plumeRouge1: [-27, -8], plumeRouge2: [31, -17], plumeRouge3: [-35, 20], graineAncienne1: [-29, -13], graineAncienne2: [-40, -1], graineAncienne3: [-28, 6] },
   lampes: [[2.4, 21], [2.4, 14], [-5, 6.5], [7, 4.5], [9, -5]],
   lieux: [
     { nom: 'La montgolfière', e: '🎈', x: -8.5, z: 27 }, { nom: 'La ferme de Gaston', e: '🧑‍🌾', x: -14, z: 4 }, { nom: 'Le moulin', e: '🌬️', x: 16, z: -14 },

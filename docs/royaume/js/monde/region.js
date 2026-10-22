@@ -7,7 +7,7 @@ import * as THREE from 'three';
 import { creerGrille } from './carte.js';
 import { creerIle, construireSol } from './ile.js';
 import { construireLampes, construireNuit } from './decor.js';
-import { B, CY, SP, TO, construire } from './fabrique.js';
+import { B, CY, CO, SP, TO, construire } from './fabrique.js';
 import { fusion, sphere } from '../moteur/formes.js';
 import { toon, contourPour, texRonde } from '../moteur/materiaux.js';
 import { libererGroupe } from '../moteur/liberer.js';
@@ -19,8 +19,13 @@ import { hasard } from '../moteur/couleurs.js';
 import PRES from './regions/pres.js';
 import MAROC from './regions/maroc.js';
 import BELGIQUE from './regions/belgique.js';
+import JUNGLE from './regions/jungle.js';
+import BANQUISE from './regions/banquise.js';
+import VOLCAN from './regions/volcan.js';
+import FORET from './regions/foret.js';
+import NUAGES from './regions/nuages.js';
 
-const DEFS = { pres: PRES, maroc: MAROC, belgique: BELGIQUE };
+const DEFS = { pres: PRES, maroc: MAROC, belgique: BELGIQUE, jungle: JUNGLE, banquise: BANQUISE, volcan: VOLCAN, foret: FORET, nuages: NUAGES };
 export const regionConstruite = id => !!DEFS[id];
 
 export function construireRegion(id) {
@@ -77,7 +82,7 @@ export function construireRegion(id) {
   for (const [x, z] of D.lampes || []) grille.boucherCercle(x, z, .25);
   const lum = construireLampes(racine, D.lampes || []);
   const nuitCiel = construireNuit(racine);
-  const pluie = creerPluie(racine);
+  const pluie = creerPluie(racine, !!D.neige);
 
   /* ── les trouvailles du jour ── */
   const trouvailles = new Map();
@@ -99,7 +104,7 @@ export function construireRegion(id) {
   function poserObjet(oid, sorte) {
     if (objets.has(oid) || !D.quete || !D.quete[oid]) return;
     const [x, z] = D.quete[oid], o = modeleObjet(sorte); o.g.position.set(x, ile.sol(x, z), z); racine.add(o.g);
-    const I = ajouterInteractif({ id: 'objet-' + oid, e: sorte === 'plume' ? '🪶' : '🔘', texte: 'Ramasser', x, z, cible: o.g, objet: oid, rayon: 1.6 });
+    const I = ajouterInteractif({ id: 'objet-' + oid, e: (MODELES_OBJETS[sorte] || {}).e || (sorte === 'plume' ? '🪶' : '🔘'), texte: 'Ramasser', x, z, cible: o.g, objet: oid, rayon: 1.6 });
     objets.set(oid, { o, I });
   }
   function retirerObjet(oid) {
@@ -140,10 +145,29 @@ function ballonPose() {
   return { g, obst: [[0, 0, 5.4, 5.4]], porte: [0, 3.4], maj: (dt, t) => { ballon.position.y = .45 + Math.sin(t * 1.2) * .08; env.rotation.y = Math.sin(t * .4) * .05; } };
 }
 
-/* ── la pluie : des traits qui tombent autour de Roullieee ── */
-function creerPluie(racine) {
-  const N = 900, pos = new Float32Array(N * 6), base = [], v = [];
-  for (let i = 0; i < N; i++) { base.push([(Math.random() - .5) * 56, Math.random() * 24, (Math.random() - .5) * 56]); v.push(15 + Math.random() * 7); }
+/* ── la pluie : des traits qui tombent autour de Roullieee (ou, sur la Banquise, de gros flocons qui tombent doucement) ── */
+function creerPluie(racine, neige = false) {
+  const N = neige ? 700 : 900, pos = new Float32Array(N * 6), base = [], v = [];
+  for (let i = 0; i < N; i++) { base.push([(Math.random() - .5) * 56, Math.random() * 24, (Math.random() - .5) * 56]); v.push(neige ? 1.6 + Math.random() * 1.4 : 15 + Math.random() * 7); }
+  if (neige) {
+    const gN = new THREE.BufferGeometry(), pN = new Float32Array(N * 3); gN.setAttribute('position', new THREE.BufferAttribute(pN, 3));
+    const mN = new THREE.PointsMaterial({ color: '#ffffff', size: .22, map: texRonde(), transparent: true, opacity: 0, depthWrite: false });
+    const P = new THREE.Points(gN, mN); P.frustumCulled = false; P.visible = false; racine.add(P);
+    let kN = 0, t = 0;
+    return {
+      force: () => kN,
+      maj(dt, cible, voulu) {
+        kN += (voulu - kN) * Math.min(1, dt * .7); t += dt;
+        mN.opacity = .9 * kN; P.visible = kN > .02;
+        if (!P.visible) return;
+        for (let i = 0; i < N; i++) {
+          const b = base[i]; b[1] -= v[i] * dt; if (b[1] < 0) b[1] += 24;
+          pN[i * 3] = cible.x + b[0] + Math.sin(t * .8 + i) * .6; pN[i * 3 + 1] = b[1]; pN[i * 3 + 2] = cible.z + b[2] + Math.cos(t * .7 + i * 1.3) * .6;
+        }
+        gN.attributes.position.needsUpdate = true;
+      }
+    };
+  }
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   const m = new THREE.LineBasicMaterial({ color: '#dbeafe', transparent: true, opacity: 0, depthWrite: false });
   const L = new THREE.LineSegments(g, m); L.frustumCulled = false; L.visible = false; racine.add(L);
@@ -201,9 +225,30 @@ function modeleTrouvaille(sorte) {
   const l = lueur('#d8b4fe', 2); l.position.y = .8; g.add(l);
   return { g, ouvrir: f => { g.visible = false; f(); }, maj: (dt, t) => { cristal.position.y = .8 + Math.sin(t * 2) * .1; cristal.rotation.y = t * 1.2; l.material.opacity = .4 + Math.sin(t * 3) * .25; } };
 }
-/* une plume rouge ou une boule d'argent à ramasser (elle brille et flotte) */
+/* les objets des légendes et des grandes quêtes : une petite forme, une couleur, une lueur */
+const MODELES_OBJETS = {
+  statuette: { e: '🏺', l: '#fde68a', p: () => [SP('#facc15', [0, .42, 0], [.18, .22, .16]), SP('#facc15', [0, .7, .04], .12), B('#ca8a04', [0, .2, 0], [.26, .14, .26])] },
+  etoileGlace: { e: '❄️', l: '#e0f2fe', p: () => [0, 1, 2].map(k => B('#bae6fd', [0, .5, 0], [.08, .7, .08], [0, 0, k * Math.PI / 3])).concat([SP('#ffffff', [0, .5, 0], .1)]) },
+  pierreLave: { e: '🪨', l: '#fb923c', p: () => [SP('#292524', [0, .45, 0], [.28, .22, .25]), SP('#f97316', [.1, .52, .18], [.08, .05, .04]), SP('#ef4444', [-.12, .48, .16], [.06, .04, .04])] },
+  eclatLune: { e: '🌙', l: '#fef9c3', p: () => [TO('#fde68a', [0, .5, 0], [.28, .28, .28], [0, 0, .6], .28, Math.PI * 1.2)] },
+  plumeEclair: { e: '⚡', l: '#fde047', p: () => [SP('#facc15', [0, .5, 0], [.13, .42, .035]), SP('#ffffff', [0, .6, .02], [.06, .22, .02]), CY('#fef3c7', [0, .18, 0], [.015, .3, .015])] },
+  graineAncienne: { e: '🌾', l: '#bbf7d0', p: () => [SP('#a16207', [0, .45, 0], [.16, .24, .16]), SP('#4ade80', [0, .72, 0], [.05, .12, .05])] },
+  fragmentCarte: { e: '🗺️', l: '#fef3c7', p: () => [CY('#fef3c7', [0, .45, 0], [.1, .55, .1], [0, 0, Math.PI / 2]), CY('#b45309', [.29, .45, 0], [.12, .04, .12], [0, 0, Math.PI / 2]), CY('#b45309', [-.29, .45, 0], [.12, .04, .12], [0, 0, Math.PI / 2])] },
+  cleCanal: { e: '🗝️', l: '#e7e5e4', p: () => [TO('#a8a29e', [0, .7, 0], [.13, .13, .13], [0, 0, 0], .3), CY('#a8a29e', [0, .4, 0], [.04, .45, .04]), B('#a8a29e', [.07, .25, 0], [.12, .06, .04])] },
+  masqueJade: { e: '🎭', l: '#86efac', p: () => [SP('#22c55e', [0, .5, 0], [.26, .32, .1]), SP('#14532d', [-.09, .56, .08], .04), SP('#14532d', [.09, .56, .08], .04), B('#facc15', [0, .38, .08], [.12, .03, .02])] },
+  eclatGlace: { e: '🧊', l: '#93c5fd', p: () => [CO('#60a5fa', [0, .55, 0], [.18, .5, .18], [0, 0, 0], 6), CO('#93c5fd', [0, .3, 0], [.18, .25, .18], [Math.PI, 0, 0], 6)] },
+  goutteFeu: { e: '🔶', l: '#fdba74', p: () => [SP('#f97316', [0, .42, 0], [.2, .2, .2]), CO('#f97316', [0, .65, 0], [.15, .3, .15], [0, 0, 0], 10)] },
+  noteMusique: { e: '🎶', l: '#c4b5fd', p: () => [SP('#7c3aed', [0, .32, 0], [.15, .11, .11], [0, 0, .4]), CY('#7c3aed', [.12, .6, 0], [.025, .55, .025]), B('#7c3aed', [.2, .84, 0], [.18, .07, .03], [0, 0, -.4])] }
+};
+/* une plume rouge, une boule d'argent, ou un objet de légende à ramasser (il brille et flotte) */
 function modeleObjet(sorte) {
   const g = new THREE.Group(), cont = new THREE.Group(); g.add(cont);
+  const M = MODELES_OBJETS[sorte];
+  if (M) {
+    cont.add(construire(M.p(), [], .02));
+    const l = lueur(M.l, 2); l.position.y = .5; g.add(l);
+    return { g, maj: (dt, t) => { cont.position.y = Math.sin(t * 2.5) * .1; cont.rotation.y = t * .8; l.material.opacity = .45 + Math.sin(t * 3) * .25; } };
+  }
   if (sorte === 'plume') {
     cont.add(construire([SP('#dc2626', [0, .5, 0], [.13, .42, .035]), SP('#f87171', [0, .62, .02], [.07, .25, .02]), CY('#fef3c7', [0, .18, 0], [.015, .3, .015])], [], .02));
     cont.rotation.z = .5;

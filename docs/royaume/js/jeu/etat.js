@@ -3,7 +3,7 @@
 import { PAR_ID } from '../donnees/especes.js';
 import { vaDans } from './individus.js';
 
-export const VERSION = 5;
+export const VERSION = 6;
 export function nouvelEtat(nom, couleur) {
   return {
     version: VERSION, profil: { nom, couleur, cree: Date.now() },
@@ -17,7 +17,7 @@ export function nouvelEtat(nom, couleur) {
     /* la production du Domaine (étape 6) : le Potager, les plumes, l'Atelier, la décoration, les missions */
     production: { parcelles: [], plumes: {}, ramassage: {}, chapeaux: {}, decorations: {}, deco: [], missions: { offertes: [], encours: [], compteur: 0 },
       stats: { plantees: 0, arrosees: 0, recoltes: 0, friandises: 0, plumes: 0, chapeaux: 0, decos: 0, posees: 0, envoyees: 0, rapportees: 0, ameliorations: 0, relachees: 0, gateaux: 0, habitats: 0 } },
-    quete: { etape: 'arrivee', compteur: 0, finies: [], nourries: [], domaine: { etape: null, finies: [] } },
+    quete: { etape: 'arrivee', compteur: 0, finies: [], nourries: [], domaine: { etape: null, finies: [] }, grandes: {} },
     monde: { position: [0, 33.5], ramasses: {}, lieu: 'domaine', positions: {} },
     reglages: { son: true, musique: true, voix: false, aide: false, heure: 'vraie' },
     quotidien: { courrier: '', voeu: '', trouvailles: null, cadeaux: {} },
@@ -37,6 +37,8 @@ export function migrer(e) {
   /* version 4 : la fin du chapitre 3 devient le début du chapitre 4 */
   else if (avant < 4 && e.quete.etape === 'fin') e.quete.etape = 'parlerPlumeau5';
   /* version 5 : la production (rien à déplacer : les nouveaux bâtiments sont encore en ruine) */
+  /* version 6 : la fin du chapitre 4 devient le début du chapitre 5 */
+  else if (avant < 6 && e.quete.etape === 'fin') e.quete.etape = 'parlerPlumeau6';
   e.version = VERSION;
   return e;
 }

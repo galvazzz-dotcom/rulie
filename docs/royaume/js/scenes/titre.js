@@ -30,7 +30,7 @@ export function ecranTitre({ surJouer }) {
     <div class="titreBoite"><h1><small>Le</small> Royaume <small>des</small> Dindies</h1><p class="sous">Attrape-les, élève-les, fais-les courir !</p>
     <div id="profils"></div>
     <p class="liensTitre"><a href="../index.html">🏠 Le site</a></p>
-    <p class="enDev">🚧 Jeu en développement : chapitres 1 à 4 jouables, et le Domaine qui produit</p></div></div>`);
+    <p class="enDev">🚧 Jeu en développement : chapitres 1 à 7 jouables, les 8 îles et les mythiques</p></div></div>`);
   document.body.appendChild(T);
   /* la musique démarre au premier toucher (les navigateurs l'exigent) */
   T.addEventListener('pointerdown', () => { audio(); ambianceMusique('titre'); musique(true); }, { once: true });

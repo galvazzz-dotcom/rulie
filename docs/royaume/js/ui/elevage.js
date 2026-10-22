@@ -12,6 +12,7 @@ import * as L from '../jeu/elevage.js';
 import { OBJETS } from '../jeu/objets.js';
 import { nomDe, NOMS_RIGOLOS, xpPourNiveau, adnDe } from '../jeu/individus.js';
 import * as S from '../jeu/scenario.js';
+import * as GQ from '../jeu/grandesQuetes.js';
 import { blocAmeliorer, brancherAmeliorer } from './production.js';
 
 const E = () => J.etat();
@@ -42,8 +43,12 @@ export function ouvrirCouvoir({ surChange, surEclosion } = {}) {
   let minuteur = null, gateau = false;
   const F = fenetre('🥚 Le Couvoir', '', { classe: 'couvoirF', large: true, surFermer: () => clearInterval(minuteur) });
   const dessiner = () => {
-    const C = L.elevage().couveuses, P = nid[0] && nid[1] ? L.possibilites(nid[0], nid[1]) : null;
+    const C = L.elevage().couveuses, P = nid[0] && nid[1] ? L.possibilites(nid[0], nid[1]) : null, M = P && GQ.mythiquePour(nid[0], nid[1]);
+    const O = M && OBJETS[M.G.objet];
     const infoCouple = !P ? '<p class="petitTexte">Choisis deux dindies adultes. Avec deux types différents, un <b>hybride</b> peut naître !</p>'
+      : M && M.ok ? `<p class="infoCouple legende">🌈 Une <b>légende</b> peut naître : <b>${M.M.nom}</b>&nbsp;! (${O.e} ${O.nom} : l’objet légendaire va servir)</p>`
+      : M && M.aObjet ? `<p class="infoCouple legende">🌈 Tu as ${O.e} ${O.nom}… mais la légende ne naît que <b>${M.condition}</b>. Reviens à ce moment-là !</p>`
+      : M ? `<p class="infoCouple legende">🌈 Ce couple pourrait faire naître une <b>légende</b>… Il manque un objet légendaire (grande quête « ${M.G.titre} »).</p>`
       : P.recette && E().livre.vus[P.recette.id] ? `<p class="infoCouple">✨ Une <b>recette secrète</b> est possible : ${P.recette.nom}&nbsp;!</p>`
       : P.recette ? '<p class="infoCouple">✨ Ce couple cache une <b>recette secrète</b>…</p>'
       : P.hybrides.length ? `<p class="infoCouple">🧬 Un hybride est possible : ${[...new Set(P.hybrides.map(h => h.types.map(t => TYPES[t].e).join(' × ')))].join(' ou ')}&nbsp;!</p>`
@@ -54,7 +59,7 @@ export function ouvrirCouvoir({ surChange, surEclosion } = {}) {
       <div class="ligneBtn"><button class="btn grand vert" id="cCroiser" ${P ? '' : 'disabled'}>💕 Croiser</button></div>
       <h3>🔥 Les couveuses</h3><div class="couveuses">${C.map((o, i) => o ? `<div class="couveuse ${L.pret(o) ? 'prete' : ''}">
         <div class="oeufBox">${oeufSvg(o.couleurs, L.pret(o) ? 2 : 0)}</div>
-        <b>${o.origine === 'croisement' ? (o.parents?.length ? 'Œuf de ' + o.parents.map(p => PAR_ID[p]?.nom.split(' ').pop() || '?').join(' × ') : 'Un œuf de croisement') : o.origine === 'tutoriel' ? 'L’œuf du Professeur' : 'Un œuf mystère'}</b>
+        <b>${o.rarete === 'mythique' ? '🌈 Un œuf légendaire !' : o.origine === 'croisement' ? (o.parents?.length ? 'Œuf de ' + o.parents.map(p => PAR_ID[p]?.nom.split(' ').pop() || '?').join(' × ') : 'Un œuf de croisement') : o.origine === 'tutoriel' ? 'L’œuf du Professeur' : 'Un œuf mystère'}</b>
         ${L.pret(o) ? `<button class="btn grand jaune" data-eclore="${i}">🐣 Éclore !</button>`
           : `<div class="minuteur">${barre(1 - L.restant(o) / (o.fin - o.debut), '#f59e0b')}<span data-reste="${i}">⏳ ${duree(L.restant(o))}</span></div>
              ${J.combien('sablier') ? `<button class="btn petit" data-sablier="${i}">⏳ Sablier (${J.combien('sablier')}) : − 30 min</button>` : ''}`}</div>`
@@ -62,7 +67,7 @@ export function ouvrirCouvoir({ surChange, surEclosion } = {}) {
       ${J.combien('oeufProfesseur') ? '<div class="ligneBtn"><button class="btn jaune" id="cProf">🥚 Mettre l’œuf du Professeur en couveuse</button></div>' : ''}
       ${J.combien('oeufEpique') ? `<div class="ligneBtn"><button class="btn jaune" id="cEpique">🟣 Mettre un œuf épique en couveuse (tu en as ${J.combien('oeufEpique')})</button></div>` : ''}
       ${J.combien('oeufMystere') ? `<div class="ligneBtn"><button class="btn" id="cMystere">🥚 Mettre un œuf mystère en couveuse (tu en as ${J.combien('oeufMystere')})</button></div>` : ''}
-      <p class="petitTexte">⏱️ Les œufs couvent même quand le jeu est fermé : commune 5 min, rare 20 min, épique 1 h${E().reglages.aide ? ' (deux fois moins en mode aide)' : ''}.</p>
+      <p class="petitTexte">⏱️ Les œufs couvent même quand le jeu est fermé : commune 5 min, rare 20 min, épique 1 h${GQ.nbFinies() || C.some(o => o?.rarete === 'mythique') ? ', légendaire 4 h' : ''}${E().reglages.aide ? ' (deux fois moins en mode aide)' : ''}.</p>
       ${blocAmeliorer('couvoir')}`;
     brancherAmeliorer(F.el, () => { L.elevage(); surChange && surChange('couvoir'); dessiner(); });
     const gt = $('#cGateau', F.el); if (gt) gt.onchange = () => { gateau = gt.checked; };
@@ -72,7 +77,9 @@ export function ouvrirCouvoir({ surChange, surEclosion } = {}) {
       const r = L.croiser(nid[0], nid[1], { gateau: gateau && J.combien('gateauAmour') > 0 });
       if (typeof r !== 'string') gateau = false;
       if (typeof r === 'string') { toast('⚠️ ' + r, { duree: 3200 }); return; }
-      tada(); glouglou(1.1); toast('💕 Un œuf apparaît dans le nid ! Il part au chaud dans une couveuse.', { duree: 3200 });
+      tada(); glouglou(1.1);
+      if (r.rarete === 'mythique') toast(`🌈 ${O ? O.e + ' ' + O.nom + ' brille' : 'Tout brille'}… Un <b>œuf légendaire</b> apparaît dans le nid ! Il couvera 4 heures.`, { duree: 4600, classe: 'grand' });
+      else toast('💕 Un œuf apparaît dans le nid ! Il part au chaud dans une couveuse.', { duree: 3200 });
       window.dispatchEvent(new CustomEvent('dindie-joie', { detail: nid[0].uid })); window.dispatchEvent(new CustomEvent('dindie-joie', { detail: nid[1].uid }));
       nid[0] = nid[1] = null; S.evenement('croisement', r); surChange && surChange(); dessiner();
     };
@@ -125,7 +132,7 @@ export function eclosionAnimee(o, d) {
       $('.scene', V).innerHTML = `<div class="bebe" style="--rar:${R.couleur}">${portrait(d)}</div>`;
       $('.texteE', V).innerHTML = `<b>C’est… ${esp.nom}${d.chroma ? ' ✨ chromatique' : ''}&nbsp;!</b>
         <span><span class="pill rar" style="--rar:${R.couleur}">${R.nom}</span> ${esp.types.map(t => `<span class="pill">${TYPES[t].e} ${TYPES[t].nom}</span>`).join(' ')}</span>
-        ${['croisement', 'recette'].includes(esp.origine.sorte) ? '<span class="nouv">🧬 Une espèce née d’un croisement !</span>' : ''}
+        ${esp.rarete === 'mythique' ? '<span class="nouv">🌈 Une légende est née !</span>' : ['croisement', 'recette'].includes(esp.origine.sorte) ? '<span class="nouv">🧬 Une espèce née d’un croisement !</span>' : ''}
         <span class="renommer"><input id="eNom" maxlength="14" placeholder="Son prénom"><button class="btn jaune" id="eDe">🎲</button></span>
         <button class="btn grand vert" id="eOk">✅ Bienvenue !</button>`;
       dire(`C’est ${esp.nom} !`);

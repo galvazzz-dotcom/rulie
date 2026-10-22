@@ -120,6 +120,7 @@ export default {
   teinte: { haut: '#7cc8f0', bas: '#ffe2b0', k: .35 }, brume: [60, 170],
   zones: { dunes: [[-30, 18, 7], [-32, -12, 6], [6, 26, 5], [-12, 25, 6], [34, -14, 5]], oasis: [[18, -2, 7]], souk: [[-15, 6, 5]] },
   cachettes: [[-36, -16], [-38, 10], [-24, -28], [30, -22], [36, 12], [10, -32], [-8, 30], [30, 26], [-28, 28], [12, 20], [38, -6], [-20, -30]],
+  quete: { fragmentCarte1: [-34, 20], fragmentCarte2: [24, -28], fragmentCarte3: [20, 22] },
   lampes: [[13, 19], [6.5, 14.5], [-1, 8.6], [3.4, -2], [2.4, -11]],
   lieux: [
     { nom: 'La montgolfière', e: '🎈', x: 28.5, z: 20.5 }, { nom: 'Le souk de Leïla', e: '🏮', x: -15, z: 6 }, { nom: 'Le ksar', e: '🏰', x: 0, z: -21 },

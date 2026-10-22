@@ -19,6 +19,8 @@ import * as SAUVE from '../moteur/sauvegarde.js';
 import { ORDRE_ENCLOS } from '../monde/domaine.js';
 import * as PR from '../jeu/production.js';
 import * as QD from '../jeu/quetesDomaine.js';
+import * as GQ from '../jeu/grandesQuetes.js';
+import { PERSONNAGES } from '../personnages/chibi.js';
 import { CHAPEAUX, DECORATIONS } from '../donnees/production.js';
 import { boutonsFiche, brancherFiche, boutonRelacher, blocAmeliorer, brancherAmeliorer, plumesHtml, proposerHabitat } from './production.js';
 
@@ -106,7 +108,13 @@ function indice(e) {
   if (o.sorte === 'sauvage') return `🧭 On la rencontre dans ${INDICES[o.region]}.`;
   if (o.sorte === 'croisement') return `🥚 Elle naît d’un croisement : un parent ${TYPES[o.types[0]].e} et un parent ${TYPES[o.types[1]].e}.`;
   if (o.sorte === 'recette') return `🥚 Une recette secrète : deux espèces précises… ${E().livre.vus[o.especes[0]] ? PAR_ID[o.especes[0]].nom : '???'} et ${E().livre.vus[o.especes[1]] ? PAR_ID[o.especes[1]].nom : '???'}.`;
-  return `🌈 Une légende… On parle de « ${o.quete} ».`;
+  const G = Object.values(GQ.GRANDES).find(g => g.mythique === e.id), st = G && GQ.etatGrande(Object.keys(GQ.GRANDES).find(k => GQ.GRANDES[k] === G));
+  if (G && (st || J.combien(G.objet))) {
+    const cond = GQ.TEXTES_CONDITION[e.id], couple = `${PAR_ID[o.especes[0]].nom} × ${PAR_ID[o.especes[1]].nom}`;
+    return st === 'fini' || J.combien(G.objet) ? `🌈 Au nid du Couvoir : ${couple}, avec ${OBJETS[G.objet].e} ${OBJETS[G.objet].nom}${cond ? ', ' + cond : ''}.`
+      : `🌈 La légende « ${G.titre} » : ${PERSONNAGES[G.guide].nom} t’aidera à trouver ${OBJETS[G.objet].nom}. Puis, au Couvoir : ${couple}.`;
+  }
+  return `🌈 Une légende… On parle de « ${o.quete} ».${G && S.etapeAtteinte('parlerPlumeau9') ? ` Attrape ${PAR_ID[G.epique].nom} : ${PERSONNAGES[G.guide].nom} te la racontera.` : ''}`;
 }
 function pageLivre(id) {
   const e = PAR_ID[id], a = E().livre.attrapes[id], v = E().livre.vus[id], R = RARETES[e.rarete];
@@ -274,14 +282,25 @@ export function ouvrirJournal() {
   let h = '';
   for (const [n, titre] of Object.entries(CHAPITRES)) {
     if (+n > chap) { h += `<p class="chapitre verrou">🔒 Chapitre ${n} : ${+n === chap + 1 ? titre + ' (bientôt !)' : '???'}</p>`; break; }
-    h += `<p class="chapitre">Chapitre ${n} : ${titre}</p>` + QUETES.filter(Q => Q.chapitre === +n).map(Q => {
+    const QQ = QUETES.filter(Q => Q.chapitre === +n), fini = QQ.length && QQ.every(Q => e.quete.finies.includes(Q.id));
+    /* un chapitre fini se replie (on le rouvre d'un toucher) */
+    h += (fini ? `<details class="chapFini"><summary class="chapitre">✅ Chapitre ${n} : ${titre} <small>(${QQ.length} quêtes)</small></summary>` : `<p class="chapitre">Chapitre ${n} : ${titre}</p>`) + QQ.map(Q => {
       const finie = e.quete.finies.includes(Q.id), active = cur && cur.id === Q.id;
       if (!finie && !active) return `<div class="quete verrou">🔒 ???</div>`;
       return `<div class="quete ${finie ? 'finie' : 'active'}"><b>${finie ? '✅' : '📜'} ${Q.titre}</b>${active ? `<p>➡️ ${S.texteEtape()}</p>` : ''}
         <small>Récompense : ${Q.recompense.pieces || 0} 🪙${Q.recompense.plumesOr ? ' + ' + Q.recompense.plumesOr + ' 🪶' : ''}${Object.keys(Q.recompense.objets || {}).map(o => ' + ' + OBJETS[o].e).join('')}</small></div>`;
-    }).join('');
-    if (!QUETES.some(Q => Q.chapitre === +n)) h += '<div class="quete active"><b>🏁 Bientôt !</b><p>Ce chapitre arrive à la prochaine étape du jeu.</p></div>';
+    }).join('') + (fini ? '</details>' : '');
+    if (!QQ.length) h += '<div class="quete active"><b>🏁 Bientôt !</b><p>Ce chapitre arrive à la prochaine étape du jeu.</p></div>';
   }
+  if (S.etapeAtteinte('parlerPlumeau9')) h += `<p class="chapitre">🌈 Les grandes quêtes</p>` + GQ.ORDRE_GRANDES.map(id => {
+    const G = GQ.GRANDES[id], st = GQ.etatGrande(id), R = REGIONS[G.region], O = OBJETS[G.objet];
+    if (!GQ.grandeOuverte(id)) return `<div class="quete verrou">🔒 ${R.e} ${G.titre} : attrape d’abord ${PAR_ID[G.epique].nom}</div>`;
+    const t = st === 'fini' ? `${O.e} ${O.nom} : au Couvoir, avec ${PAR_ID[PAR_ID[G.mythique].origine.especes[0]].nom} × ${PAR_ID[PAR_ID[G.mythique].origine.especes[1]].nom}`
+      : st === 'rapporter' ? `Rapporte les 3 ${G.pluriel} à ${PERSONNAGES[G.guide].nom}`
+      : st === 'fragments' ? `Les ${G.pluriel}, dans ${INDICES[G.region]} : ${GQ.fragmentsTrouves(id)}/3`
+      : `Va écouter la légende de ${PERSONNAGES[G.guide].nom}, dans ${INDICES[G.region]}`;
+    return `<div class="quete ${st === 'fini' ? 'finie' : 'active'}"><b>${st === 'fini' ? '✅' : '📜'} ${R.e} ${G.titre}</b><p>➡️ ${t}</p></div>`;
+  }).join('');
   if (QD.qd().etape || QD.qd().finies.length) h += `<p class="chapitre">🏡 Les quêtes du Domaine</p>` + QD.QUETES_DOMAINE.map(Q => {
     const st = QD.etatQuete(Q), r = Q.recompense;
     if (st === 'verrou') return `<div class="quete verrou">🔒 ???</div>`;
@@ -425,11 +444,17 @@ export function finChapitre(n) {
     3: ['🎉 Fin du chapitre 3 !', '🥚🐣🌟', 'Le Couvoir, la Nurserie, ton premier hybride et ta première dindie éveillée : tu es une vraie éleveuse !',
       '<b>Le chapitre 4 commence : le Dindodrome ouvre !</b> Va voir le Professeur Plumeau : il a une grande nouvelle.'],
     4: ['🎉 Fin du chapitre 4 !', '🍀☀️💧🌴', 'Quatre badges, et Gontran battu deux fois : tu es une vraie championne du Dindodrome !',
-      '<b>La suite :</b> le chapitre 5, <b>la Jungle et la Banquise</b> : deux nouvelles îles, de nouvelles dindies et les championnats 5 et 6… arrive bientôt !']
+      '<b>Le chapitre 5 commence : la Jungle et la Banquise !</b> Va voir le Professeur Plumeau : une lettre est arrivée pour toi.'],
+    5: ['🎉 Fin du chapitre 5 !', '🌴❄️🏆', 'La Jungle, la Banquise, le Dindojaguar, le Dindocristal… et le Badge Flocon ! Ton Grand Livre se remplit à toute vitesse.',
+      '<b>Le chapitre 6 commence : le Volcan et la Forêt de la Lune !</b> Va voir le Professeur Plumeau : Madame Lava a besoin de toi.'],
+    6: ['🎉 Fin du chapitre 6 !', '🔥🌙🏆', 'Le Volcan, la Forêt de la Lune, le Dindomagma, la Dindétoile… et deux badges de plus !',
+      '<b>Le chapitre 7 commence : le Royaume des Nuages !</b> Va voir le Professeur Plumeau : il a vu une île au-dessus des nuages.'],
+    7: ['🎉 Fin du chapitre 7 !', '☁️🌈🦃', 'Huit îles, huit badges… et ta première dindie mythique ! Tu es devenue une légende du Royaume.',
+      '<b>La suite :</b> le chapitre 8, <b>la Légende</b> : le Dindromakus RUUULIUSSS Maximus… arrive bientôt !']
   }[n];
   if (!T) return;
   const F = fenetre(T[0], `<div class="finChap"><p class="grosEmoji">${T[1]}</p><p>${T[2]}</p><p>${T[3]}</p>
-    <p class="petitTexte">${n === 4 ? 'En attendant : bats tes records, gagne des courses libres, entraîne tes dindies au maximum et apprends-leur de nouvelles compétences !' : n === 3 ? 'En attendant : croise tes dindies pour remplir le Grand Livre (28 hybrides et 4 recettes secrètes !), et cherche les chromatiques ✨.' : 'En attendant : explore les îles chaque jour (coffres, œufs mystère, pierres d’éveil), prends soin de tes dindies et cherche les chromatiques ✨ !'}</p>
+    <p class="petitTexte">${n === 7 ? 'En attendant : finis les 7 grandes quêtes pour faire naître toutes les mythiques, et complète ton Grand Livre (72 pages !).' : n === 5 || n === 6 ? 'Pense aux quêtes du Domaine 🏡 et aux missions : elles rapportent des plumes, des pièces et parfois un œuf épique !' : n === 4 ? 'En attendant : bats tes records, gagne des courses libres, entraîne tes dindies au maximum et apprends-leur de nouvelles compétences !' : n === 3 ? 'En attendant : croise tes dindies pour remplir le Grand Livre (28 hybrides et 4 recettes secrètes !), et cherche les chromatiques ✨.' : 'En attendant : explore les îles chaque jour (coffres, œufs mystère, pierres d’éveil), prends soin de tes dindies et cherche les chromatiques ✨ !'}</p>
     <button class="btn grand vert" id="finOk">Super !</button></div>`, { classe: 'finChapF' });
   $('#finOk', F.el).onclick = () => { pop(); F.fermer(); };
 }

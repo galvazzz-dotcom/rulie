@@ -53,7 +53,12 @@ export const AMBIANCES = {
   course: { jour: ['orgue-el-capitan'], nuit: ['orgue-el-capitan'] },
   pres: { jour: ['0ad-solstice-festival', '0ad-harvest-festival'], nuit: ['0ad-mountain-idyll', '0ad-albian-nocturne'] },
   maroc: { jour: ['0ad-peaks-of-atlas'], nuit: ['0ad-mirage', '0ad-peaks-of-atlas'] },
-  belgique: { jour: ['orgue-das-alpenhorn', '0ad-waters-edge'], nuit: ['0ad-waters-edge'] }
+  belgique: { jour: ['orgue-das-alpenhorn', '0ad-waters-edge'], nuit: ['0ad-waters-edge'] },
+  jungle: { jour: ['0ad-waters-edge', '0ad-solstice-festival'], nuit: ['0ad-mirage', '0ad-waters-edge'] },
+  banquise: { jour: ['0ad-mountain-idyll'], nuit: ['0ad-albian-nocturne', '0ad-mountain-idyll'] },
+  volcan: { jour: ['0ad-peaks-of-atlas', '0ad-mirage'], nuit: ['0ad-mirage'] },
+  foret: { jour: ['0ad-albian-nocturne', '0ad-mirage'], nuit: ['0ad-albian-nocturne'] },
+  nuages: { jour: ['0ad-solstice-festival', '0ad-mountain-idyll'], nuit: ['0ad-mountain-idyll', '0ad-albian-nocturne'] }
 };
 const VOLUME = .42, FONDU = 2.5;
 let musiqueOn = false, ambianceNom = 'titre', nuitMusique = false, pistes = [], courante = null, iListe = 0, verifie = null;

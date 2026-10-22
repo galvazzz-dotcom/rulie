@@ -216,8 +216,8 @@ try {
   await pg.evaluate(() => document.querySelector('#profils .jouer').click());
   await pg.waitForFunction(() => window.__jeu, null, { timeout: 60000 }); await pg.waitForTimeout(1500);
   const mig = await pg.evaluate(() => { const e = window.__jeu.etat(); return { v: e.version, p: !!e.production && Array.isArray(e.production.deco), b: e.batiments.potager && !e.batiments.potager.repare && e.batiments.couvoir.niveau === 1, q: e.quete.domaine.etape, hud: document.querySelector('#hQuete').textContent }; });
-  verifier(mig.v === 5 && mig.p && mig.b, 'une sauvegarde de l’étape 5 passe à la version 5 (la production est prête, ses bâtiments en ruine)');
-  verifier(mig.q === 'parlerMimi' && /Le Potager/.test(mig.hud), `la première quête du Domaine commence : « ${mig.hud.slice(0, 60)}… »`);
+  verifier(mig.v >= 5 && mig.p && mig.b, `une sauvegarde de l’étape 5 passe à la version ${mig.v} (la production est prête, ses bâtiments en ruine)`);
+  verifier(mig.q === 'parlerMimi' && /Potager/.test(mig.hud), `la première quête du Domaine commence : « ${mig.hud.slice(0, 60)}… »`);
   await pg.screenshot({ path: `${OUT}/hud.png` });
 
   /* H1 : le Potager */
@@ -241,7 +241,8 @@ try {
   await jusqua('parlerPlumeau'); await log('une galette de maïs');
   await fermer(); await vers(21, -24); await pg.screenshot({ path: `${OUT}/moulin-3d.png` });
   /* H3 : l'Atelier des plumes */
-  await agir('pnj-plumeau'); await jusqua('plumes');
+  /* (le Professeur a aussi une lettre pour le chapitre 5 : on lui parle une deuxième fois pour les plumes) */
+  await agir('pnj-plumeau'); if (await qd() === 'parlerPlumeau') await agir('pnj-plumeau'); await jusqua('plumes');
   await agir('enclos-prairie'); await attendre('#ePlumes'); await pg.screenshot({ path: `${OUT}/enclos-plumes.png` });
   await clic('#ePlumes'); await pg.waitForTimeout(300); await jusqua('reparerAtelier'); await log('les plumes du jour ramassées');
   await agir('atelier', 'oui'); verifier(await attendre('.atelierF'), 'l’Atelier des plumes se répare, et sa fenêtre s’ouvre');

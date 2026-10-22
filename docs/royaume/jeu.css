@@ -26,6 +26,7 @@
 .hudHaut .heure{flex:none;background:rgba(255,255,255,.94);border-radius:16px;padding:8px 12px;font-weight:700;font-size:15px;box-shadow:0 4px 0 rgba(0,0,0,.15)}
 #hQuete{flex:1;min-width:0;text-align:left;background:#fff8e7;border:4px solid #f59e0b;border-radius:18px;padding:5px 12px 7px;font-weight:700;font-size:14.5px;line-height:1.2;box-shadow:0 4px 0 rgba(0,0,0,.15);animation:pouls 2.4s ease-in-out infinite}
 #hQuete small{display:block;font-size:11.5px;color:#b45309;text-transform:uppercase;letter-spacing:.5px}
+#hQuete .qd{display:block;font-size:12px;color:#15803d;margin-top:3px;padding-top:3px;border-top:2px dashed #fcd34d}
 @keyframes pouls{0%,100%{border-color:#f59e0b}50%{border-color:#fbbf24}}
 .hudBas{position:absolute;left:max(8px,env(safe-area-inset-left));bottom:max(10px,env(safe-area-inset-bottom));display:flex;gap:8px;pointer-events:none}
 .rondHud{width:54px;height:54px;border-radius:18px;background:rgba(255,255,255,.94);font-size:26px;box-shadow:0 4px 0 rgba(0,0,0,.18)}
@@ -152,6 +153,7 @@
 .quete.active{border-color:#f59e0b;background:#fffbeb}
 .quete.finie{opacity:.75}
 .quete.verrou{color:#a8a29e;text-align:center}
+.chapFini > summary{cursor:pointer;list-style:none;opacity:.8}.chapFini > summary::-webkit-details-marker{display:none}.chapFini > summary small{font-family:system-ui,sans-serif;font-size:12px;color:#a16207}.chapFini[open] > summary{opacity:1}
 .carteSvg{width:100%;border-radius:18px;border:4px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.15)}
 .lieuCarte{cursor:pointer}
 .reglage{display:flex;align-items:center;gap:10px;font-weight:600;margin:8px 0}
@@ -290,6 +292,7 @@ body.enCapture #toasts{top:calc(max(10px,env(safe-area-inset-top)) + 118px)}
 .coeurNid{font-size:30px;animation:pouls2 .8s ease-in-out infinite alternate}
 .infoCouple{text-align:center;font-weight:700;background:#f0fdf4;border:3px solid #86efac;border-radius:14px;padding:6px 10px;margin:8px 0}
 .infoCouple.pale{background:#f8fafc;border-color:#e2e8f0;color:#64748b}
+.infoCouple.legende{background:linear-gradient(90deg,#fdf2f8,#fefce8,#ecfeff);border-color:#f0abfc}
 .ligneBtn{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:8px 0}
 .couveuses{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
 .couveuse{display:flex;flex-direction:column;align-items:center;gap:6px;background:#fff;border:4px solid #fdba74;border-radius:20px;padding:10px;text-align:center}

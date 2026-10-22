@@ -129,7 +129,7 @@ export default {
   teinte: { haut: '#8fb8e0', bas: '#dbe7f3', k: .2 }, brume: [55, 160],
   zones: { place: [[2, -2, 5]], canaux: [[6, 8.6, 4], [-24, 4, 3.5], [24, 16.5, 4], [-14, -18, 3.5]], beffroi: [[2, -9, 2.5]], atomium: [[20, -12, 4]] },
   cachettes: [[-36, -18], [-34, 6], [-26, 25], [-20, 30], [10, 26], [30, 26], [37, 4], [36, -14], [10, -27], [-8, -28], [28, -30], [-28, -25]],
-  quete: { bouleArgent1: [-31, -21], bouleArgent2: [34, 21], bouleArgent3: [-23, 18.5] },
+  quete: { bouleArgent1: [-31, -21], bouleArgent2: [34, 21], bouleArgent3: [-23, 18.5], cleCanal1: [-32, 6], cleCanal2: [32, -6], cleCanal3: [-12, -24] },
   lampes: [[-1.6, 19], [-1.6, 8.4], [12, 4.6], [-8, -9.6], [15, -11], [-15, -8.4]],
   lieux: [
     { nom: 'La montgolfière', e: '🎈', x: -12, z: 27 }, { nom: 'La Grand-Place', e: '🏛️', x: 2, z: -2 }, { nom: 'Le beffroi', e: '🔔', x: 2, z: -13 },

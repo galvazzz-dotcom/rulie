@@ -80,6 +80,19 @@ function obstacle(sorte) {
     for (const s of [-1, 1]) p.push(CY('#e2c08d', [s * (LARGEUR / 2 - .14), .32, 0], [.26, .03, .26], [0, 0, Math.PI / 2], 14));
     for (let k = 0; k < 4; k++) p.push(SP('#4d7c0f', [-2.8 + k * 1.9, .62, .05], [.22, .12, .2]));
   }
+  if (sorte === 'congere') {
+    p.push(SP('#f8fafc', [0, 0, 0], [LARGEUR / 2, .55, .85]));
+    for (let k = 0; k < 4; k++) p.push(CO('#bae6fd', [-3 + k * 2, .45, (k % 2 - .5) * .5], [.18, .5, .18], [0, 0, 0], 6));
+  }
+  if (sorte === 'rocher') for (let k = 0; k < 4; k++) {
+    const o = -2.7 + k * 1.8;
+    p.push(SP(k % 2 ? '#292524' : '#44403c', [o, .3, 0], [.75, .45, .5]), SP('#f97316', [o + .2, .5, .3], [.12, .06, .04]));
+  }
+  if (sorte === 'champignons') for (let k = 0; k < 5; k++) {
+    const o = -3 + k * 1.5;
+    p.push(CY('#f5f3ff', [o, .25, 0], [.1, .5, .1]), SP(['#a78bfa', '#60a5fa', '#f472b6'][k % 3], [o, .55, 0], [.42, .22, .42]));
+  }
+  if (sorte === 'nuage') for (let k = 0; k < 6; k++) p.push(SP(k % 2 ? '#ffffff' : '#e0f2fe', [-3.2 + k * 1.3, .35 + (k % 2) * .15, (k % 3 - 1) * .2], [.75, .45, .6]));
   return construire(p, [], .025);
 }
 
@@ -315,7 +328,7 @@ export function construireDindodrome() {
       /* les zones de sable ou de boue */
       for (const [a, b] of obst.zones) {
         const u0 = ((obst.depart + a) % TOUR + TOUR) % TOUR;
-        const z = new THREE.Mesh(ruban(-LARGEUR / 2 + .1, LARGEUR / 2 - .1, .055, u0, u0 + (b - a), .4), toon(P.zone === 'sable' ? '#f3d38e' : '#5b4630'));
+        const z = new THREE.Mesh(ruban(-LARGEUR / 2 + .1, LARGEUR / 2 - .1, .055, u0, u0 + (b - a), .4), toon({ sable: '#f3d38e', verglas: '#e0f7ff', cendre: '#3f3f46', brume: '#6366f1', nuage: '#ffffff' }[P.zone] || '#5b4630'));
         z.receiveShadow = true; g.add(z);
         if (P.zone === 'boue') for (let k = 0; k < 6; k++) { const Q = pointPiste(u0 + (b - a) * (k + .5) / 6, (r() - .5) * 6); const f = new THREE.Mesh(new THREE.CircleGeometry(.5 + r() * .5, 14), new THREE.MeshBasicMaterial({ color: '#8fb3c9', transparent: true, opacity: .55, depthWrite: false })); f.rotation.x = -Math.PI / 2; f.position.set(Q.x, .07, Q.z); g.add(f); }
       }
@@ -335,6 +348,10 @@ export function construireDindodrome() {
         dessinerPalmiers({ racine: g, r }, pal);
         for (let u = 3; u < TOUR; u += 3) { const Q = pointPiste(u, LARGEUR / 2 + .6); deco.push(CY('#4d7c0f', [Q.x, 2.4, Q.z], [.03, 1.6, .03]), SP('#65a30d', [Q.x, 1.55, Q.z], [.12, .12, .12])); }
       }
+      if (P.deco === 'sapins') for (let u = 4; u < TOUR; u += 8) { const Q = pointPiste(u, -LARGEUR / 2 - 1.8); deco.push(CY('#6b4a2b', [Q.x, .4, Q.z], [.12, .8, .12]), CO('#1f6f4a', [Q.x, 1.4, Q.z], [.7, 1.4, .7]), CO('#f8fafc', [Q.x, 1.9, Q.z], [.42, .7, .42])); }
+      if (P.deco === 'braseros') for (let u = 6; u < TOUR; u += 11) { const Q = pointPiste(u, -LARGEUR / 2 - 1.4); deco.push(CY('#292524', [Q.x, .45, Q.z], [.3, .9, .3], [0, 0, 0], 8), SP('#f97316', [Q.x, 1, Q.z], [.32, .4, .32]), SP('#facc15', [Q.x, 1.15, Q.z], [.16, .26, .16])); }
+      if (P.deco === 'lanternes') for (let u = 3; u < TOUR; u += 7) { const Q = pointPiste(u, -LARGEUR / 2 - 1.2); deco.push(CY('#1e1b4b', [Q.x, .8, Q.z], [.05, 1.6, .05]), SP(['#fde68a', '#c4b5fd', '#f9a8d4'][Math.floor(u) % 3], [Q.x, 1.7, Q.z], [.22, .28, .22])); }
+      if (P.deco === 'ballons') for (let u = 5; u < TOUR; u += 6) { const Q = pointPiste(u, -LARGEUR / 2 - 1.2); deco.push(CY('#e5e7eb', [Q.x, 1, Q.z], [.012, 2, .012]), SP(['#f472b6', '#60a5fa', '#facc15', '#a78bfa', '#4ade80'][Math.floor(u) % 5], [Q.x, 2.2, Q.z], [.32, .4, .32])); }
       if (deco.length) g.add(construire(deco, [], 0));
       racine.add(g);
       course = { g, haies };

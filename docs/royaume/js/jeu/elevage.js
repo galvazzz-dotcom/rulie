@@ -6,13 +6,16 @@
      sinon l'espèce de l'un des parents. Le tout premier croisement de types différents donne toujours un hybride.
    - Les œufs (plan, 7.2) : commune 5 min, rare 20 min, épique 1 h ; l'œuf du Professeur 30 s ; mode aide : ÷ 2.
    - La Nurserie : poussin → jeune en 10 min, jeune → adulte en 30 min ; chaque repas fait gagner 3 minutes.
-   - L'éveil : au niveau 20, au Labo, avec une pierre d'éveil (+ 1 à chaque stat de base, nouvelle apparence). */
+   - L'éveil : au niveau 20, au Labo, avec une pierre d'éveil (+ 1 à chaque stat de base, nouvelle apparence).
+   - Les mythiques (étape 7) : les deux bons parents, l'objet de la grande quête (il est utilisé) et parfois une condition :
+     l'œuf mythique est alors sûr (4 h de couvaison). */
 import { ESPECES, PAR_ID } from '../donnees/especes.js';
 import { REGIONS } from '../donnees/regions.js';
 import { TYPES } from '../donnees/types.js';
 import * as J from './etat.js';
 import { nouvelleDindie, gagnerXp, nomDe, CARACTERES } from './individus.js';
 import { OBJETS } from './objets.js';
+import { mythiquePour } from './grandesQuetes.js';
 
 export const MINUTE = 60000;
 export const NIVEAU_EVEIL = 20, REPOS_PARENT = 10;
@@ -83,12 +86,14 @@ export function croiser(p1, p2, { gateau = false } = {}) {
   for (const d of [p1, p2]) if (fatigue(d)) return `${nomDe(d)} se repose encore (${Math.ceil(fatigue(d) / MINUTE)} min).`;
   if (couveuseLibre() < 0) return PLEIN;
   if (gateau && !J.retirerObjet('gateauAmour')) return 'Tu n’as pas de Gâteau d’amour (il se fait au Moulin).';
-  const L = elevage(), P = possibilites(p1, p2), premier = !L.premierHybride && P.hybrides.length > 0;
-  const espece = resultatCroisement(p1, p2, premier, gateau), esp = PAR_ID[espece];
+  const L = elevage(), P = possibilites(p1, p2), premier = !L.premierHybride && P.hybrides.length > 0, M = mythiquePour(p1, p2);
+  if (M && M.ok) J.retirerObjet(M.G.objet);
+  const espece = M && M.ok ? M.M.id : resultatCroisement(p1, p2, premier, gateau), esp = PAR_ID[espece];
   if (gateau) { const pr = E().production; if (pr) pr.stats.gateaux = (pr.stats.gateaux || 0) + 1; }
   if (['croisement', 'recette'].includes(esp.origine.sorte)) L.premierHybride = true;
+  if (esp.rarete === 'mythique') L.mythiques = (L.mythiques || 0) + 1;
   const oeuf = nouvelOeuf(espece, { origine: 'croisement', parents: [p1.espece, p2.espece], talents: talentsDe(p1, p2), caractere: caractereDe(p1, p2),
-    couleurs: [TYPES[PAR_ID[p1.espece].types[0]].couleur, TYPES[PAR_ID[p2.espece].types[0]].couleur] });
+    couleurs: esp.rarete === 'mythique' ? ['#f472b6', '#facc15'] : [TYPES[PAR_ID[p1.espece].types[0]].couleur, TYPES[PAR_ID[p2.espece].types[0]].couleur] });
   p1.dernierCroisement = p2.dernierCroisement = maintenant();
   L.croisements++;
   return couver(oeuf);

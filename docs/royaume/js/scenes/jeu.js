@@ -99,7 +99,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
   document.body.appendChild(hud);
   const majHud = () => {
     $('#hPieces').textContent = E().pieces; $('#hPlumes').textContent = E().plumesOr;
-    $('#hQuete').innerHTML = `<small>${S.titreQuete()}</small>${S.texteEtape()}`;
+    $('#hQuete').innerHTML = `<small>${S.titreQuete()}</small>${S.texteEtape()}${S.texteDomaine()}`;
     $('#hLivre').classList.toggle('cache', !J.combien('grandLivre'));
     const P0 = PR.prod();
     $('#hDeco').classList.toggle('cache', !(monde === domaine && PR.productionOuverte() && (P0.deco.length || Object.values(P0.decorations).some(k => k > 0))));
@@ -427,8 +427,9 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     const m = monde.region ? meteo(monde.id) : 'soleil';
     if (m === 'nuages') { haut = melanger(haut, '#9fb3c8', .35); bas = melanger(bas, '#e2e8f0', .3); sF *= .72; }
     if (m === 'pluie') { haut = melanger(haut, '#64748b', .62); bas = melanger(bas, '#b6c2d1', .55); sol = melanger(sol, '#94a3b8', .5); sF *= .45; cF *= .9; }
-    distancesBrume(...(m === 'pluie' ? [36, 125] : monde.brume));
-    pluieVoulue = m === 'pluie' ? 1 : 0; pluieSon(pluieVoulue);
+    if (m === 'neige') { haut = melanger(haut, '#cbd5e1', .5); bas = melanger(bas, '#f1f5f9', .5); sF *= .65; }
+    distancesBrume(...(m === 'pluie' ? [36, 125] : m === 'neige' ? [40, 140] : monde.brume));
+    pluieVoulue = m === 'pluie' || m === 'neige' ? 1 : 0; pluieSon(m === 'pluie' ? 1 : 0);
     couleursCiel(haut, bas, sol);
     soleil.color.set(L.soleilCouleur); soleil.intensity = sF; ciel.intensity = cF;
     ciel.color.set(nuitK > .5 ? '#a5b4fc' : '#fff8ec'); ciel.groundColor.set(nuitK > .5 ? '#2b3a55' : monde.id === 'maroc' ? '#d6b37a' : '#8fb86a');
@@ -670,8 +671,8 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
   }
   /* les quêtes du Domaine avancent toutes seules quand l'état du jeu change */
   let qdPrevu = false;
-  J.surChangement(() => { if (qdPrevu) return; qdPrevu = true; setTimeout(() => { qdPrevu = false; QD.verifier(); }, 60); });
-  QD.verifier();
+  J.surChangement(() => { if (qdPrevu) return; qdPrevu = true; setTimeout(() => { qdPrevu = false; QD.verifier(); S.verifierEtat(); }, 60); });
+  QD.verifier(); S.verifierEtat();
 
   /* ── le mode « Décorer » (le décorateur lui-même est créé plus haut, avec le rayon du toucher) ── */
   function ouvrirDecorer() {

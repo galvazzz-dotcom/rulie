@@ -241,7 +241,7 @@ try {
   await coupe(2); await jusqua('coupe3'); await log('la Coupe des Dunes est gagnée');
   await coupe(3); await jusqua('coupe4'); await log('la Coupe de la Pluie est gagnée');
   await coupe(4); await jusqua('gontran2'); await log('la Coupe des Lianes est gagnée');
-  await courir(() => agir('pnj-gontran')); await jusqua('fin'); await log('la revanche de Gontran est gagnée');
+  await courir(() => agir('pnj-gontran')); await jusqua('parlerPlumeau6'); await log('la revanche de Gontran est gagnée (le chapitre 5 commence)');
   /* une deuxième leçon coûte 200 pièces ; on peut oublier une compétence */
   const L2 = await pg.evaluate(() => {
     const D = window.__jeu.DD, d = window.__jeu.etat().dindies.find(x => x.espece === 'glouglou'), p = window.__jeu.etat().pieces;
@@ -264,7 +264,7 @@ try {
   await pg.evaluate(() => document.querySelector('#profils .jouer').click());
   await pg.waitForFunction(() => window.__jeu, null, { timeout: 60000 }); await pg.waitForTimeout(1200);
   const apres = await pg.evaluate(() => ({ lieu: window.__jeu.monde.id, etape: window.__jeu.etat().quete.etape, badges: window.__jeu.DD.nbBadges(), records: Object.keys(window.__jeu.DD.courses().records).length }));
-  verifier(apres.lieu === 'dindodrome' && apres.etape === 'fin' && apres.badges === 4 && apres.records >= 3, `après rechargement : au Dindodrome, chapitre 4 fini, 4 badges, des records (${JSON.stringify(apres)})`);
+  verifier(apres.lieu === 'dindodrome' && apres.etape === 'parlerPlumeau6' && apres.badges === 4 && apres.records >= 3, `après rechargement : au Dindodrome, chapitre 4 fini, 4 badges, des records (${JSON.stringify(apres)})`);
 } catch (e) { console.log('❌', e.message); echecs++; await pg.screenshot({ path: `${OUT}/erreur.png` }); }
 verifier(!errs.length, `aucune erreur dans le navigateur${errs.length ? ' : ' + errs.join(' / ') : ''}`);
 console.log(echecs ? `\n❌ étape 5 : ${echecs} échec(s)` : '\n✅ étape 5 : le chapitre 4 est jouable de bout en bout');
