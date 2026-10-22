@@ -19,7 +19,7 @@ import { sol as solDomaine, ILE, forme as formeDomaine } from '../monde/decor.js
 import { construireRegion } from '../monde/region.js';
 import { creerChibi, PERSONNAGES } from '../personnages/chibi.js';
 import { creerDindie } from '../dindies/modele.js';
-import { variante } from '../dindies/adn.js';
+import { adnDe } from '../jeu/individus.js';
 import { PAR_ID } from '../donnees/especes.js';
 import { REGIONS } from '../donnees/regions.js';
 import * as J from '../jeu/etat.js';
@@ -36,6 +36,10 @@ import { ouvrirBureau, choisirCoureuse, ouvrirResultats, ouvrirTrophees } from '
 import { ouvrirEntrainement, miniJeuActif } from '../ui/entrainement.js';
 import { ouvrirCouvoir, ouvrirNurserie, grandiToast } from '../ui/elevage.js';
 import * as EL from '../jeu/elevage.js';
+import * as PR from '../jeu/production.js';
+import * as QD from '../jeu/quetesDomaine.js';
+import { ouvrirPotager, ouvrirMoulin, ouvrirAtelier, ouvrirMissions, proposerReparation } from '../ui/production.js';
+import { creerDecorateur } from './decorer.js';
 
 const VITESSE = 4.6;
 
@@ -90,18 +94,20 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     <div class="hudHaut"><div class="bourse"><span id="hPieces">0</span> 🪙 <span class="sep"></span><span id="hPlumes">0</span> 🪶</div>
       <button id="hQuete" class="quete"></button><div class="heure" id="hHeure"></div></div>
     <div class="hudBas"><button class="rondHud" id="hCarte" aria-label="Carte">🗺️</button><button class="rondHud" id="hDindies" aria-label="Mes dindies">🐾</button>
-      <button class="rondHud" id="hSac" aria-label="Sac">🎒</button><button class="rondHud" id="hLivre" aria-label="Grand Livre">📖</button><button class="rondHud" id="hJournal" aria-label="Journal">📜</button></div>
+      <button class="rondHud" id="hSac" aria-label="Sac">🎒</button><button class="rondHud" id="hLivre" aria-label="Grand Livre">📖</button><button class="rondHud" id="hJournal" aria-label="Journal">📜</button><button class="rondHud cache" id="hDeco" aria-label="Décorer">🎨</button></div>
     <button id="hAction" class="action cache"></button><div id="hFleche" class="flecheBord cache">➤</div></div>`);
   document.body.appendChild(hud);
   const majHud = () => {
     $('#hPieces').textContent = E().pieces; $('#hPlumes').textContent = E().plumesOr;
-    const q = S.queteDe(E().quete.etape);
-    $('#hQuete').innerHTML = `<small>${q ? q.titre : `Chapitre ${S.QUETES[S.QUETES.length - 1].chapitre} terminé !`}</small>${S.texteEtape()}`;
+    $('#hQuete').innerHTML = `<small>${S.titreQuete()}</small>${S.texteEtape()}`;
     $('#hLivre').classList.toggle('cache', !J.combien('grandLivre'));
+    const P0 = PR.prod();
+    $('#hDeco').classList.toggle('cache', !(monde === domaine && PR.productionOuverte() && (P0.deco.length || Object.values(P0.decorations).some(k => k > 0))));
   };
   $('#hCarte').onclick = () => { pop(); P.ouvrirCarte({ titre: monde.id === 'domaine' ? '🗺️ La carte du Domaine' : `🗺️ ${monde.nom}`, ...carteDe(monde), position: [moi.racine.position.x, moi.racine.position.z], cible: positionCible(), allerA: (x, z) => allerVers(x, z) }); };
   $('#hDindies').onclick = () => { pop(); P.ouvrirClapier({ surChange: syncDindies }); };
-  $('#hSac').onclick = () => { pop(); P.ouvrirSac(); };
+  $('#hSac').onclick = () => { pop(); P.ouvrirSac({ decorer: monde === domaine ? ouvrirDecorer : null }); };
+  $('#hDeco').onclick = () => { pop(); ouvrirDecorer(); };
   $('#hLivre').onclick = () => { pop(); P.ouvrirLivre(); };
   $('#hJournal').onclick = $('#hQuete').onclick = () => { pop(); P.ouvrirJournal(); };
   const carteDe = L => L.carte || { forme: L.ile.forme, a: L.ile.a, b: L.ile.b, lieux: L.lieux };
@@ -127,7 +133,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     for (const [uid, A] of affichees) if (voulu.get(uid) !== A.mode || A.cle !== cleDe(A.d)) { A.m.liberer(); affichees.delete(uid); }
     for (const [uid, mode] of voulu) {
       if (affichees.has(uid)) continue;
-      const d = J.parUid(uid), m = creerDindie(variante(PAR_ID[d.espece], { stade: d.stade, chroma: d.chroma }));
+      const d = J.parUid(uid), m = creerDindie(adnDe(d));
       scene.add(m.racine);
       const A = { d, m, mode, cle: cleDe(d), cible: null, attente: Math.random() * 2, prochaineAction: 3 + Math.random() * 6 };
       if (mode === 'enclos' || mode === 'nurserie') { const I = mode === 'enclos' ? domaine.enclosInfo[d.lieu.slice(7)] : domaine.elevage.nurserie.cour; A.I = I; const p = pointDansEnclos(I); m.racine.position.set(p[0], 0, p[1]); }
@@ -136,7 +142,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
       affichees.set(uid, A);
     }
   }
-  const cleDe = d => d.lieu + '|' + d.stade + '|' + d.chroma;
+  const cleDe = d => d.lieu + '|' + d.stade + '|' + d.chroma + '|' + (d.chapeau || '');
   const pointDansEnclos = I => { const [w, d] = I.b.interieur; return [I.x + (Math.random() - .5) * w, I.z + (Math.random() - .5) * d * .8 + .4]; };
   window.addEventListener('dindie-joie', ev => {
     const A = affichees.get(ev.detail); if (!A) return;
@@ -213,9 +219,14 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
       else if (id === 'couvoir' || id === 'nurserie') {
         const fait = await S.interagir(id);
         if (!fait) {
-          if (E().batiments[id]?.repare) { if (id === 'couvoir') ouvrirCouvoir({ surChange: majElevage, surEclosion: () => { syncDindies(); majElevage(); } }); else ouvrirNurserie({ surChange: () => { syncDindies(); majElevage(); } }); }
+          if (E().batiments[id]?.repare) { if (id === 'couvoir') ouvrirCouvoir({ surChange: quoi => { if (quoi === 'couvoir') domaine.majCouvoir(); majElevage(); }, surEclosion: () => { syncDindies(); majElevage(); } }); else ouvrirNurserie({ surChange: () => { syncDindies(); majElevage(); } }); }
           else toast(S.etapeAtteinte('parlerPlumeau3') ? `🚧 ${I.texte} est en ruine. Un kit de construction (chez Mimi) permettrait de le réparer !` : `🚧 ${I.texte} : en travaux. Il ouvrira dans un prochain chapitre !`, { duree: 3200 });
         }
+      }
+      else if (PR.PRODUCTION[id]) {
+        if (E().batiments[id]?.repare) ouvrirProduction(id);
+        else if (!PR.productionOuverte()) toast(`🚧 ${I.ruine} : en travaux. Il ouvrira dans un prochain chapitre !`, { duree: 3200 });
+        else if (await proposerReparation(id)) { await reparerProductionAnime(id); toast(`🔨 ${I.texte} : réparé !`, { classe: 'grand' }); QD.verifier(); ouvrirProduction(id); }
       }
       else if (id.startsWith('ruine-')) toast(`🚧 ${I.ruine} : en travaux. Il ouvrira dans un prochain chapitre !`, { duree: 3200 });
       else if (id.startsWith('objet-') || id.startsWith('deco-')) await S.interagir(id);
@@ -226,7 +237,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
       }
       else if (I.gadget) { const fait = await S.gadget(I.gadget); if (fait) { monde.gadgets[I.gadget]?.anim?.(); majLumiere(true); } }
       else if (id === 'clapier') { await S.interagir(id); if (E().batiments.clapier.repare) P.ouvrirClapier({ surChange: syncDindies }); else if (E().quete.etape !== 'reparerClapier') toast('🚧 Le Clapier est en ruine. Il faudrait des clous pour le réparer…'); else toast('Il faut une boîte de clous ! Mimi en vend.'); }
-      else if (I.enclos) { const fait = await S.interagir(id); if (!fait) P.ouvrirEnclos(I.enclos, { surChange: syncDindies }); }
+      else if (I.enclos) { const fait = await S.interagir(id); if (!fait) P.ouvrirEnclos(I.enclos, { surChange: (quoi, t) => { if (quoi === 'habitat' || quoi === 'enclos') { domaine.majEnclos(t); if (quoi === 'habitat') grandir(domaine.enclosInfo[t].b.g); } majPlumesScene(); syncDindies(); } }); }
     } finally { occupe = false; majHud(); }
   }
 
@@ -319,8 +330,10 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
 
   /* toucher l'écran : une dindie sauvage, une de nos dindies, un habitant, un bâtiment… ou le sol */
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), plan = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), pt = new THREE.Vector3();
+  const decorateur = creerDecorateur({ domaine, scene, camera, ray, moi: moi.racine, surChange: () => { majHud(); QD.verifier(); } });
   function toucher(x, y) {
     if (captureActive()) { captureActive().action(); return; }
+    if (decorateur.actif()) { if (!fenetreOuverte() && !enDialogue()) decorateur.toucher(x, y); return; }
     if (fenetreOuverte() || enDialogue() || occupe) return;
     audio();
     ndc.set(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1); ray.setFromCamera(ndc, camera);
@@ -349,7 +362,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
   const commandes = entrees(renderer.domElement, {
     surTap: toucher,
     surZoom: k => { zoom = Math.min(34, Math.max(10, zoom * k)); },
-    surAction: () => { if (captureActive()) { captureActive().action(); return; } if (enDialogue()) return; if (fermerDerniere()) return; const I = plusProche(); if (I) agir(I); }
+    surAction: () => { if (captureActive()) { captureActive().action(); return; } if (enDialogue() || decorateur.actif()) return; if (fermerDerniere()) return; const I = plusProche(); if (I) agir(I); }
   });
   $('#hAction').onclick = () => { const I = plusProche(); if (I) { pop(); agir(I); } };
 
@@ -483,6 +496,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
   /* ── changer de lieu : on range l'ancien (on libère une région), on installe le nouveau ── */
   function installerLieu(id, position = null) {
     chemin = null; auBout = null; anneau.visible = false; cadre = null;
+    decorateur.fermer();
     if (sauvages) { sauvages.liberer(); sauvages = null; }
     for (const A of affichees.values()) A.m.liberer(); affichees.clear();
     if (monde.racine.parent) scene.remove(monde.racine);
@@ -554,7 +568,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     }
     p.y = monde.sol(p.x, p.z);
     if (vitesse && E().compagnon) { promenade += VITESSE * dt * Math.min(1, vitesse); if (promenade > 40) { promenade = 0; const d = J.parUid(E().compagnon); if (d) { const niv = EL.donnerXp(d, 10); if (niv) P.niveauToast(d, niv); } } }
-    tempsElevage += dt; if (tempsElevage > 2) { tempsElevage = 0; verifierElevage(); }
+    tempsElevage += dt; if (tempsElevage > 2) { tempsElevage = 0; verifierElevage(); verifierProduction(); }
     moi.marcher(vitesse); moi.maj(dt, t);
     ombreRonde.position.set(p.x, p.y + .03, p.z);
     if (anneau.visible) { anneau.userData.t += dt; anneau.scale.setScalar(1 + Math.sin(anneau.userData.t * 6) * .15); }
@@ -628,6 +642,46 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
   J.surChangement(quoi => { if (quoi === 'elevage') majElevage(); });
   verifierElevage();
 
+  /* ── la production : les plantes du Potager, les tas de plumes, le drapeau du Bureau des missions ── */
+  const prevenusProd = new Set();
+  function majPlumesScene() {
+    const ouvert = PR.productionOuverte();
+    for (const t of Object.keys(domaine.enclosInfo)) if (domaine.enclosInfo[t].construit) domaine.majPlumes(t, ouvert && PR.plumesAPrendre(t) > 0);
+  }
+  function verifierProduction() {
+    const P0 = PR.prod(), M = PR.missions();
+    domaine.majPotager(P0.parcelles, PR.stadeParcelle);
+    domaine.majBureau(M.encours.length, PR.missionsFinies());
+    majPlumesScene();
+    for (const q of P0.parcelles) if (PR.mure(q) && !prevenusProd.has('p' + q.debut)) { prevenusProd.add('p' + q.debut); if (q.fin > Date.now() - 5000) toast(`${['🌽', '🌾', '🫘', '🍇'][['mais', 'ble', 'haricot', 'baie'].indexOf(q.g)]} Une récolte est prête au Potager !`, { cle: 'potagerPret' }); }
+    for (const m of M.encours) if (PR.missionFinie(m) && !prevenusProd.has(m.id)) { prevenusProd.add(m.id); toast('📮 Des dindies sont rentrées de mission ! Va les accueillir au Bureau.', { duree: 3400, cle: 'missionFinie' }); }
+  }
+  function ouvrirProduction(id) {
+    if (id === 'potager') ouvrirPotager({ surChange: quoi => { if (quoi === 'potager') domaine.majProduction('potager'); verifierProduction(); } });
+    else if (id === 'moulin') ouvrirMoulin({ surChange: () => domaine.tournerMoulin() });
+    else if (id === 'atelier') ouvrirAtelier({ surChange: majHud, decorer: ouvrirDecorer });
+    else if (id === 'missions') ouvrirMissions({ surChange: () => { syncDindies(); verifierProduction(); } });
+  }
+  async function reparerProductionAnime(id) {
+    const L0 = LIEUX[id];
+    for (let k = 0; k < 5; k++) { poussiere(L0.x + (Math.random() - .5) * 7, L0.z + (Math.random() - .5) * 5); bruitMarteau(); await attendre(.35); }
+    grandir(domaine.majProduction(id).g); tada(); verifierProduction();
+    await attendre(.6);
+  }
+  /* les quêtes du Domaine avancent toutes seules quand l'état du jeu change */
+  let qdPrevu = false;
+  J.surChangement(() => { if (qdPrevu) return; qdPrevu = true; setTimeout(() => { qdPrevu = false; QD.verifier(); }, 60); });
+  QD.verifier();
+
+  /* ── le mode « Décorer » (le décorateur lui-même est créé plus haut, avec le rayon du toucher) ── */
+  function ouvrirDecorer() {
+    if (monde !== domaine) { toast('Les décorations, c’est au Domaine !'); return; }
+    if (occupe || courseActive()) return;
+    chemin = null; anneau.visible = false; decorateur.ouvrir();
+  }
+  domaine.majDecos(PR.prod().deco);
+  verifierProduction();
+
   /* ── une course au Dindodrome : choisir sa coureuse, courir, les résultats ── */
   let enCourse = false;
   async function courir(id) {
@@ -666,7 +720,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     appliquerReglages, moi, allerVers, agir, affichees, etat: E, S, P, J, sauver, toucher, positionCible, partirVers, capturer, approcher,
     get monde() { return monde; }, get interactifs() { return monde.interactifs; }, get sauvages() { return sauvages; },
     get chemin() { return chemin; }, get occupe() { return occupe; }, get capture() { return captureActive(); }, domaine,
-    forcerMeteo, forcerHeure, majLumiere, EL, verifierElevage, courir, DD, get course() { return courseActive(); }, get miniJeu() { return miniJeuActif(); }, get camCourse() { return camCourse; }
+    forcerMeteo, forcerHeure, majLumiere, EL, verifierElevage, courir, DD, PR, QD, decorateur, ouvrirDecorer, verifierProduction, ouvrirProduction, syncDindies, get course() { return courseActive(); }, get miniJeu() { return miniJeuActif(); }, get camCourse() { return camCourse; }
   };
   return { sauver };
 }

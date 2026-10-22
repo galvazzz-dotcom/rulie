@@ -3,7 +3,7 @@
    porte ([x, z] local : où se placer pour entrer), maj?(dt, t) }.
    Les fenêtres ont leur propre matériau : elles s'allument la nuit. */
 import * as THREE from 'three';
-import { sphere, demiSphere, cylindre, cone, tore, boite, prisme, fusion } from '../moteur/formes.js';
+import { sphere, demiSphere, cylindre, cone, tore, boite, prisme, fusion, geo } from '../moteur/formes.js';
 import { toon, contourPour, TONS, texRonde, partager } from '../moteur/materiaux.js';
 import { assombrir, eclaircir, hasard } from '../moteur/couleurs.js';
 import { TYPES } from '../donnees/types.js';
@@ -175,7 +175,7 @@ const HABITATS = {
   sable: { sol: '#f3d38a', barriere: '#e9c27a' }, jungle: { sol: '#4ade80', barriere: '#a3e635' }, glace: { sol: '#f1f5f9', barriere: '#bae6fd' },
   nuit: { sol: '#5b21b6', barriere: '#7c3aed' }, ciel: { sol: '#e0f2fe', barriere: '#93c5fd' }
 };
-export function enclos(type, construit, w = 10, d = 7.5, cote = 'e') {
+export function enclos(type, construit, w = 10, d = 7.5, cote = 'e', niveau = 1) {
   const H = HABITATS[type], T0 = TYPES[type], p = [], f = [], r = hasard('enclos' + type);
   const sx = cote === 'e' ? 1 : -1;
   if (construit) {
@@ -210,7 +210,7 @@ export function enclos(type, construit, w = 10, d = 7.5, cote = 'e') {
   }
   const g = construire(p, f, .03);
   /* la pancarte de l'habitat, à l'entrée */
-  const pq = pancarte(construit ? `${T0.e} ${majuscule(T0.habitat)}` : `🚧 ${majuscule(T0.habitat)}`, 2.6, .6, construit ? {} : { fond: '#f5f5f4', encre: '#57534e', bord: '#a8a29e' });
+  const pq = pancarte(construit ? `${T0.e} ${majuscule(T0.habitat)}${niveau > 1 ? ' ' + '⭐'.repeat(niveau - 1) : ''}` : `🚧 ${majuscule(T0.habitat)}`, 2.6, .6, construit ? {} : { fond: '#f5f5f4', encre: '#57534e', bord: '#a8a29e' });
   pq.position.set(sx * (w / 2 + .1), 1.6, -1.9); pq.rotation.y = sx * Math.PI / 2; g.add(pq);
   const poteaux = construire([B('#8a5a3c', [sx * (w / 2 + .1), .8, -1.9], [.12, 1.6, .12])], [], .02); g.add(poteaux);
   const obst = construit ? [[0, -d / 2, w, .4], [0, d / 2, w, .4], [-sx * w / 2, 0, .4, d], [sx * w / 2, -(d / 4 + .6), .4, d / 2 - 1.2], [sx * w / 2, d / 4 + .6, .4, d / 2 - 1.2]] : [];
@@ -375,7 +375,7 @@ export function objetQuete(sorte) {
 export const libererBatiments = () => { aJeter.forEach(g => g.dispose()); aJeter.length = 0; };
 
 /* ── le Couvoir : une hutte ronde au toit de paille, 2 couveuses (des cloches de verre chauffées) et le nid ── */
-export function couvoir() {
+export function couvoir(n = 2) {
   const p = [], f = [];
   p.push(CY('#fde7c4', [0, 1.3, 0], [2.6, 2.6, 2.6], [0, 0, 0], 24), CY('#e7c9a0', [0, .12, 0], [2.75, .24, 2.75], [0, 0, 0], 24));
   p.push(CO('#d4a24c', [0, 3.6, 0], [3.3, 2.4, 3.3], [0, 0, 0], 24), CY('#b45309', [0, 2.62, 0], [3.25, .14, 3.25], [0, 0, 0], 24));
@@ -384,9 +384,10 @@ export function couvoir() {
   for (const a of [-1.1, 1.1]) { const x = Math.sin(a) * 2.6, z = Math.cos(a) * 2.6; p.push(TO('#b45309', [x, 1.6, z], [.42, .42, .42], [0, a, 0], .22)); f.push(CY('#bfe3ff', [x, 1.6, z], [.4, .06, .4], [Math.PI / 2, 0, -a], 18)); }
   const g = construire(p, f);
   const t = pancarte('🥚 Le Couvoir', 2.2, .5, { fond: '#fffbeb', encre: '#9a3412', bord: '#f59e0b' }); t.position.set(0, 2.55, 2.75); g.add(t);
-  /* les deux couveuses, de chaque côté de la porte */
-  const couveuses = [-2.4, 2.4].map(x => {
-    const c = new THREE.Group(); c.position.set(x, 0, 3.1); g.add(c);
+  /* les couveuses : deux de chaque côté de la porte, puis (améliorées) à gauche de la hutte */
+  const PLACES = [[-2.4, 3.1], [2.4, 3.1], [-4, .7], [-3.3, -2.5]].slice(0, n);
+  const couveuses = PLACES.map(([x, z]) => {
+    const c = new THREE.Group(); c.position.set(x, 0, z); g.add(c);
     c.add(construire([CY('#a0764a', [0, .35, 0], [.55, .7, .55], [0, 0, 0], 16), CY('#facc15', [0, .72, 0], [.6, .06, .6], [0, 0, 0], 16), CY('#fef3c7', [0, .76, 0], [.45, .04, .45], [0, 0, 0], 16),
       CY('#57534e', [.45, 1.3, -.3], [.03, 1.2, .03]), B('#57534e', [.25, 1.88, -.15], [.45, .04, .04], [0, -.5, 0]), CO('#dc2626', [0, 1.75, 0], [.2, .22, .2], [0, 0, 0], 12)], [], .02));
     const cloche = new THREE.Mesh(demiSphere(20, 10), new THREE.MeshToonMaterial({ gradientMap: TONS, color: '#e0f2fe', transparent: true, opacity: .32, depthWrite: false }));
@@ -412,7 +413,7 @@ export function couvoir() {
     C.pret = o && pret(o);
   });
   return {
-    g, obst: [[0, 0, 5.6, 5.6], [-2.4, 3.1, 1.3, 1.3], [2.4, 3.1, 1.3, 1.3], [3.9, .8, 1.6, 1.6]], porte: [0, 4.6], majOeufs,
+    g, obst: [[0, 0, 5.6, 5.6], ...PLACES.map(([x, z]) => [x, z, 1.3, 1.3]), [3.9, .8, 1.6, 1.6]], porte: [0, 4.6], majOeufs,
     maj: (dt, t) => couveuses.forEach((C, i) => {
       C.chaleur.material.opacity = C.oeuf ? (C.pret ? .55 + Math.sin(t * 6) * .3 : .45 + Math.sin(t * 2 + i) * .1) : .15;
       if (C.oeuf) C.oeuf.rotation.z = C.pret ? Math.sin(t * 14) * .12 * (Math.sin(t * 2) > 0 ? 1 : 0) : Math.sin(t * 1.5 + i) * .03;
@@ -443,4 +444,158 @@ export function nurserie() {
     obst: [[0, -1.6, 5, 3.8], [-W / 2, cz, .3, D], [W / 2, cz, .3, D], [-W / 4 - .45, cz + D / 2, W / 2 - .9, .3], [W / 4 + .45, cz + D / 2, W / 2 - .9, .3],
       [-W / 4 - .45, cz - D / 2, W / 2 - .9, .3], [W / 4 + .45, cz - D / 2, W / 2 - .9, .3], [-2, cz + 1, 1.8, 1.4], [2, cz - .5, .8, 2.2]]
   };
+}
+
+/* ══════════ LA PRODUCTION (étape 6) ══════════ */
+
+/* ── le Potager : des parcelles (4 à 12) dans une barrière basse, une cabane à outils, un épouvantail ──
+   majParcelles(parcelles, stade) : les plantes poussent (une forme par graine et par stade) */
+export const PLACES_PARCELLES = [[-3.3, 1.9], [-1.1, 1.9], [1.1, 1.9], [3.3, 1.9], [-3.3, -.3], [-1.1, -.3], [1.1, -.3], [3.3, -.3], [-3.3, -2.5], [-1.1, -2.5], [1.1, -2.5], [3.3, -2.5]];
+export function potager(n = 4) {
+  const p = [], f = [], W = 9.4, D = 7.6;
+  p.push(B('#8fcf6a', [0, .03, -.3], [W, .06, D]));
+  /* la barrière basse, ouverte devant (au sud) */
+  for (let k = 0; k <= 10; k++) { const x = -W / 2 + k * W / 10; if (Math.abs(x) > 1) p.push(B('#fff3dc', [x, .35, D / 2 - .3], [.12, .7, .12])); p.push(B('#fff3dc', [x, .35, -D / 2 - .3], [.12, .7, .12])); }
+  for (let k = 0; k <= 8; k++) { const z = -D / 2 - .3 + k * D / 8; p.push(B('#fff3dc', [-W / 2, .35, z], [.12, .7, .12]), B('#fff3dc', [W / 2, .35, z], [.12, .7, .12])); }
+  for (const s of [-1, 1]) p.push(B('#fde68a', [s * (W / 4 + .5), .5, D / 2 - .3], [W / 2 - 1, .08, .06]));
+  p.push(B('#fde68a', [0, .5, -D / 2 - .3], [W, .08, .06]), B('#fde68a', [-W / 2, .5, -.3], [.06, .08, D]), B('#fde68a', [W / 2, .5, -.3], [.06, .08, D]));
+  /* les parcelles ouvertes : de la bonne terre brune */
+  PLACES_PARCELLES.slice(0, n).forEach(([x, z]) => p.push(B('#7c4a22', [x, .1, z], [1.7, .14, 1.7]), B('#5b3416', [x, .18, z], [1.5, .04, .1]), B('#5b3416', [x, .18, z - .45], [1.5, .04, .1]), B('#5b3416', [x, .18, z + .45], [1.5, .04, .1])));
+  /* la cabane à outils (dehors, à gauche), l'arrosoir, l'épouvantail */
+  p.push(B('#a16207', [-5.9, .9, -2.4], [1.6, 1.8, 1.6]), T('#16a34a', [-5.9, 1.8, -2.4], [2, .9, 1.9], [0, Math.PI / 2, 0]), B('#78350f', [-5.9, .7, -1.58], [.6, 1.3, .05]));
+  p.push(CY('#38bdf8', [-5.2, .22, -1.2], [.22, .4, .22]), CY('#0ea5e9', [-4.95, .32, -1.2], [.04, .35, .04], [0, 0, -1]));
+  p.push(CY('#8a5a3c', [4.4, .8, -3.4], [.06, 1.6, .06]), B('#8a5a3c', [4.4, 1.3, -3.4], [1.2, .08, .08]), SP('#fde68a', [4.4, 1.75, -3.4], .26), B('#ef4444', [4.4, 1.15, -3.4], [.55, .55, .3]), CO('#a16207', [4.4, 2.05, -3.4], [.32, .28, .32]));
+  const g = construire(p, f, .03);
+  const t = pancarte('🥕 Le Potager', 2.4, .55, { fond: '#f0fdf4', encre: '#166534', bord: '#22c55e' }); t.position.set(-2.6, 1.05, D / 2 - .2); g.add(t);
+  g.add(construire([B('#8a5a3c', [-2.6, .5, D / 2 - .25], [.1, 1, .1])], [], .02));
+  /* les plantes */
+  const plantes = PLACES_PARCELLES.slice(0, n).map(([x, z]) => { const P = new THREE.Group(); P.position.set(x, .18, z); g.add(P); return { P, cle: '' }; });
+  const majParcelles = (parcelles, stade) => plantes.forEach((A, i) => {
+    const q = parcelles[i], st = stade(q), cle = q ? q.g + st : '';
+    if (cle === A.cle) return;
+    A.P.clear(); A.cle = cle;
+    if (!q) return;
+    const gp = plante(q.g, st);
+    const m = new THREE.Mesh(gp, toon()); m.castShadow = true; A.P.add(m, new THREE.Mesh(gp, contourPour(gp, .02)));
+  });
+  return {
+    g, majParcelles, porte: [0, D / 2 + .9],
+    obst: [[0, -D / 2 - .3, W, .3], [-W / 2, -.3, .3, D], [W / 2, -.3, .3, D], [-(W / 4 + .5), D / 2 - .3, W / 2 - 1, .3], [W / 4 + .5, D / 2 - .3, W / 2 - 1, .3], [-5.9, -2.4, 1.8, 1.8], [4.4, -3.4, .5, .5],
+      ...PLACES_PARCELLES.slice(0, n).map(([x, z]) => [x, z, 1.5, 1.5])]
+  };
+}
+/* une plante du Potager (stade 1 : une pousse, 2 : elle grandit, 3 : prête) — la même géométrie sert à toutes les parcelles */
+function plante(g, st) {
+  return geo(`plante-${g}-${st}`, () => {
+    const p = [], r = hasard('plante' + g + st), vert = '#22c55e', k = st === 1 ? .35 : st === 2 ? .7 : 1;
+    const touffes = st === 1 ? [[0, 0]] : [[-.4, -.4], [.4, -.4], [-.4, .4], [.4, .4]];
+    for (const [x, z] of touffes) {
+      if (g === 'mais') {
+        p.push(CY('#65a30d', [x, .55 * k, z], [.04, 1.1 * k, .04]));
+        for (const s of [-1, 1]) p.push(SP(vert, [x + s * .13 * k, .5 * k, z], [.18 * k, .03, .06], [0, 0, s * .5]));
+        if (st === 3) p.push(SP('#facc15', [x + .08, .7, z + .05], [.07, .2, .07], [0, 0, -.3]), SP('#86efac', [x + .1, .62, z + .05], [.06, .14, .06], [0, 0, -.5]));
+      } else if (g === 'ble') {
+        for (let i = 0; i < 5; i++) { const dx = (r() - .5) * .3, dz = (r() - .5) * .3; p.push(CY(st === 3 ? '#ca8a04' : '#84cc16', [x + dx, .35 * k, z + dz], [.015, .7 * k, .015])); if (st >= 2) p.push(SP(st === 3 ? '#facc15' : '#a3e635', [x + dx, .72 * k, z + dz], [.04, .11, .04])); }
+      } else if (g === 'haricot') {
+        p.push(SP(vert, [x, .25 * k, z], [.28 * k, .25 * k, .28 * k]));
+        if (st >= 2) p.push(CY('#a16207', [x, .5 * k, z], [.02, 1 * k, .02]));
+        if (st === 3) for (let i = 0; i < 3; i++) p.push(SP('#65a30d', [x + Math.cos(i * 2.1) * .22, .32 + i * .1, z + Math.sin(i * 2.1) * .22], [.04, .12, .04], [.3, 0, .4]));
+      } else {
+        p.push(SP('#15803d', [x, .3 * k, z], [.32 * k, .28 * k, .32 * k]));
+        if (st === 3) ['#ef4444', '#f97316', '#facc15', '#22c55e', '#3b82f6', '#a855f7'].forEach((c, i) => p.push(SP(c, [x + Math.cos(i * 1.05) * .26, .35 + (i % 2) * .12, z + Math.sin(i * 1.05) * .26], .07)));
+      }
+    }
+    if (st === 1) p.push(SP('#5b3416', [0, .02, 0], [.25, .06, .25]));
+    return fusion(p);
+  });
+}
+
+/* ── le Moulin à friandises : une tour de pierre, un toit pointu et ses ailes qui tournent ── */
+export function moulin() {
+  const p = [], f = [];
+  p.push(CY('#e7e5e4', [0, 2.4, 0], [1.55, 4.8, 2.05], [0, 0, 0], 16), CY('#d6d3d1', [0, .15, 0], [2.3, .3, 2.3], [0, 0, 0], 16));
+  for (let k = 0; k < 4; k++) p.push(TO('#a8a29e', [0, .9 + k * 1.1, 0], [1.98 - k * .12, 1.98 - k * .12, 1.2], [Math.PI / 2, 0, 0], .03));
+  p.push(CO('#b45309', [0, 5.6, 0], [1.9, 1.7, 1.9], [0, 0, 0], 16), SP('#facc15', [0, 6.55, 0], .14));
+  p.push(B('#78350f', [0, .85, 1.95], [.9, 1.7, .12]), DS('#78350f', [0, 1.7, 1.95], [.45, .3, .06], [Math.PI / 2, 0, 0]));
+  fenetre(p, f, 0, 3.2, 1.72, .55, .6, '#92400e');
+  /* les sacs de farine et une charrette de maïs */
+  for (const [x, z] of [[1.9, 1.5], [2.3, .9], [2.05, 1.2]]) p.push(SP('#f5f5f4', [x, .35, z], [.32, .38, .28]), SP('#d6d3d1', [x, .72, z], [.12, .08, .1]));
+  p.push(B('#a16207', [-2.3, .55, 1.1], [1.2, .4, .8]), CY('#57534e', [-2.3, .3, 1.55], [.28, .08, .28], [Math.PI / 2, 0, 0]), CY('#57534e', [-2.3, .3, .65], [.28, .08, .28], [Math.PI / 2, 0, 0]));
+  for (let k = 0; k < 4; k++) p.push(SP('#facc15', [-2.55 + (k % 2) * .45, .85, .95 + Math.floor(k / 2) * .3], [.08, .2, .08], [0, 0, 1.5]));
+  const g = construire(p, f);
+  const t = pancarte('🌬️ Le Moulin', 2.2, .5, { fond: '#fffbeb', encre: '#92400e', bord: '#f59e0b' }); t.position.set(0, 2.3, 2.02); g.add(t);
+  /* les ailes */
+  const ailes = new THREE.Group(); ailes.position.set(0, 4.3, 1.75); g.add(ailes);
+  const pa = [CY('#78350f', [0, 0, .1], [.18, .3, .18], [Math.PI / 2, 0, 0])];
+  for (let k = 0; k < 4; k++) { const an = k * Math.PI / 2; pa.push(B('#78350f', [Math.cos(an) * 1.5, Math.sin(an) * 1.5, .25], [3, .1, .06], [0, 0, an])); pa.push(B('#fef3c7', [Math.cos(an) * 1.75 - Math.sin(an) * .32, Math.sin(an) * 1.75 + Math.cos(an) * .32, .22], [2.2, .6, .03], [0, 0, an])); }
+  ailes.add(construire(pa, [], .025));
+  let vite = 0;
+  return {
+    g, obst: [[0, 0, 4.2, 4.2], [-2.3, 1.1, 1.4, 1.1]], porte: [0, 3.2],
+    tourner: () => { vite = 3; },
+    maj: (dt) => { vite = Math.max(0, vite - dt); ailes.rotation.z -= dt * (.5 + vite * 1.6); }
+  };
+}
+
+/* ── l'Atelier des plumes : un atelier rose, une grande plume sur le toit, un mannequin à chapeau ── */
+export function atelier() {
+  const p = [], f = [];
+  p.push(B('#d6d3d1', [0, .12, 0], [6.4, .24, 5]), B('#fbcfe8', [0, 1.55, 0], [6, 2.7, 4.6]));
+  p.push(T('#7c3aed', [0, 2.9, 0], [6.6, 1.8, 5.2], [0, 0, 0]), T('#6d28d9', [0, 2.82, 0], [6.8, .2, 5.4], [0, 0, 0]));
+  p.push(B('#7c2d12', [0, 1.05, 2.32], [1.2, 2.1, .12]), SP('#facc15', [.4, 1.05, 2.4], .07), B('#d6d3d1', [0, .15, 2.8], [1.8, .3, .8]));
+  fenetre(p, f, -1.9, 1.7, 2.32, 1.2, .9, '#a21caf'); fenetre(p, f, 1.9, 1.7, 2.32, 1.2, .9, '#a21caf');
+  for (const s of [-1, 1]) fenetre(p, f, s * 3.02, 1.6, 0, .8, .8, '#a21caf', 'x');
+  /* la grande plume sur le toit */
+  p.push(SP('#f472b6', [.6, 5, -.2], [.32, 1.2, .08], [0, 0, -.35]), SP('#fdf2f8', [.6, 5, -.2], [.12, 1.1, .09], [0, 0, -.35]), CY('#a16207', [.18, 3.85, -.2], [.035, .8, .035], [0, 0, -.35]));
+  /* les bobines, le mannequin à chapeau */
+  p.push(CY('#a16207', [-3.7, .4, 1.4], [.32, .8, .32]), CY('#ef4444', [-3.7, .4, 1.4], [.36, .5, .36]), CY('#a16207', [-3.7, .25, 2.1], [.25, .5, .25]), CY('#22c55e', [-3.7, .25, 2.1], [.28, .3, .28]));
+  p.push(CY('#57534e', [3.7, .6, 1.6], [.05, 1.2, .05]), SP('#f5f5f4', [3.7, 1.4, 1.6], [.32, .4, .3]), SP('#f5f5f4', [3.7, 1.95, 1.6], .22));
+  p.push(CY('#111827', [3.7, 2.15, 1.6], [.32, .03, .32]), CY('#111827', [3.7, 2.35, 1.6], [.18, .38, .18]), CY('#f472b6', [3.7, 2.21, 1.6], [.185, .06, .185]));
+  const g = construire(p, f);
+  const t = pancarte('🪶 L’Atelier des plumes', 3.4, .6, { fond: '#fdf4ff', encre: '#86198f', bord: '#d946ef' }); t.position.set(0, 2.5, 2.4); g.add(t);
+  return { g, obst: [[0, 0, 6.6, 5.2], [-3.7, 1.75, .9, 1.6], [3.7, 1.6, .7, .7]], porte: [0, 3.7] };
+}
+
+/* ── le Bureau des missions : un petit bureau de poste, le tableau des missions, un drapeau (levé quand une équipe est partie) ── */
+export function bureauMissions() {
+  const p = [], f = [];
+  p.push(B('#d6d3d1', [0, .12, 0], [5.6, .24, 4.2]), B('#fef3c7', [0, 1.45, 0], [5.2, 2.5, 3.8]));
+  p.push(T('#2563eb', [0, 2.7, 0], [5.8, 1.4, 4.4], [0, Math.PI / 2, 0]), T('#1d4ed8', [0, 2.62, 0], [6, .2, 4.6], [0, Math.PI / 2, 0]));
+  p.push(B('#1e3a8a', [-1.2, 1.05, 1.92], [1.1, 2.1, .12]), SP('#facc15', [-.85, 1.05, 2], .07));
+  fenetre(p, f, 1.2, 1.6, 1.92, 1.3, .9, '#2563eb');
+  /* le tableau des missions (des affiches), la boîte aux lettres, des colis */
+  p.push(B('#a16207', [3.4, 1.1, .9], [.12, 2.2, .12]), B('#a16207', [3.4, 1.1, -.9], [.12, 2.2, .12]), B('#b07a45', [3.45, 1.5, 0], [.1, 1.2, 2.1]));
+  [['#fef9c3', .5], ['#fce7f3', -.1], ['#dbeafe', -.65]].forEach(([c, z], i) => p.push(B(c, [3.52, 1.55 - (i % 2) * .2, z], [.03, .5, .42], [0, 0, (i - 1) * .08])));
+  p.push(B('#8a5a3c', [-3.2, .5, 1.6], [.1, 1, .1]), B('#2563eb', [-3.2, 1.15, 1.6], [.5, .4, .55]), DS('#2563eb', [-3.2, 1.35, 1.6], [.25, .16, .275]));
+  p.push(B('#c2884e', [2.4, .25, 2.4], [.6, .5, .5]), B('#d6a35a', [2.9, .2, 2.5], [.4, .4, .4]), B('#ef4444', [2.4, .25, 2.4], [.62, .06, .52]));
+  /* le mât du drapeau */
+  p.push(CY('#9ca3af', [-2.4, 2.3, -1.6], [.05, 4.6, .05]), SP('#facc15', [-2.4, 4.65, -1.6], .09));
+  const g = construire(p, f);
+  const t = pancarte('📮 Bureau des missions', 3.2, .58, { fond: '#eff6ff', encre: '#1e3a8a', bord: '#3b82f6' }); t.position.set(0, 2.45, 1.98); g.add(t);
+  const drapeau = new THREE.Mesh(new THREE.PlaneGeometry(1, .6, 6, 1), new THREE.MeshToonMaterial({ gradientMap: TONS, color: '#ef4444', side: THREE.DoubleSide }));
+  aJeter.push(drapeau.geometry); drapeau.position.set(-1.88, 4.2, -1.6); g.add(drapeau);
+  /* un « ! » qui flotte quand une équipe est revenue */
+  const alerte = pancarte('❗', .7, .7, { fond: '#fef08a', encre: '#b91c1c', bord: '#f59e0b', taille: 300 }); alerte.position.set(0, 4.1, 0); alerte.visible = false; g.add(alerte);
+  const pos = drapeau.geometry.attributes.position, x0 = Float32Array.from(pos.array);
+  let leve = false;
+  return {
+    g, obst: [[0, 0, 5.4, 4], [3.4, 0, .4, 2.2], [-3.2, 1.6, .6, .6], [2.6, 2.45, 1.2, .7], [-2.4, -1.6, .3, .3]], porte: [-1.2, 3.1],
+    setDrapeau: v => { leve = v; }, setAlerte: v => { alerte.visible = v; },
+    maj: (dt, t) => {
+      drapeau.position.y += ((leve ? 4.2 : 1.2) - drapeau.position.y) * Math.min(1, dt * 2);
+      for (let i = 0; i < pos.count; i++) { const x = x0[i * 3]; pos.setZ(i, Math.sin(t * 5 + x * 4) * .08 * (x + .5)); }
+      pos.needsUpdate = true;
+      if (alerte.visible) { alerte.position.y = 4.1 + Math.sin(t * 3) * .15; alerte.rotation.y = Math.sin(t * 1.5) * .4; }
+    }
+  };
+}
+
+/* ── un petit tas de plumes à ramasser dans un enclos ── */
+export function tasPlumes(type) {
+  const T0 = TYPES[type], p = [];
+  for (let k = 0; k < 5; k++) { const an = k * 1.26; p.push(SP(k % 2 ? T0.clair : T0.couleur, [Math.cos(an) * .22, .06 + k * .02, Math.sin(an) * .22], [.07, .025, .26], [0, an, .3])); }
+  const g = construire(p, [], .015);
+  const l = new THREE.Sprite(new THREE.SpriteMaterial({ map: texRonde(), color: '#fff3b0', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: .7 }));
+  l.scale.setScalar(1.3); l.position.y = .3; g.add(l);
+  return { g, maj: (dt, t) => { l.material.opacity = .45 + Math.sin(t * 3) * .25; } };
 }

@@ -99,6 +99,55 @@ function partiesChapeau(a, H, R) {
     p.push({ g: sphere(), c: '#111827', p: [H[0], haut + .02, H[2] - .02], s: [.24, .09, .12] }, { g: sphere(), c: '#111827', p: [H[0], haut + .07, H[2] - .02], s: [.12, .07, .1] });
     p.push({ g: sphere(10, 8), c: '#f8fafc', p: [H[0], haut + .05, H[2] + .1], s: [.03, .03, .01] }, { g: tore(1, .2), c: '#facc15', p: [H[0], haut + .0, H[2] - .02], r: [Math.PI / 2, 0, 0], s: [.2, .1, .1] });
   }
+  /* les chapeaux de l'Atelier des plumes (deux couleurs : couleurChapeau, couleurChapeau2), un peu plus grands que nature pour bien les voir */
+  const c1 = a.couleurChapeau || '#ef4444', c2 = a.couleurChapeau2 || '#fde68a', X = H[0], Z = H[2] - .02, n0 = p.length;
+  if (a.chapeau === 'fete') {
+    p.push({ g: cone(1, 1, 16), c: c1, p: [X, haut + .1, Z], s: [.1, .22, .1] }, { g: sphere(12, 10), c: c2, p: [X, haut + .215, Z], s: .036 });
+    p.push({ g: tore(1, .22), c: c2, p: [X, haut - .005, Z], r: [Math.PI / 2, 0, 0], s: [.1, .1, .08] });
+    [[0, .03, .08], [-.055, .09, 0], [.034, .14, .01]].forEach(([dx, dy, dz]) => p.push({ g: sphere(10, 8), c: c2, p: [X + dx, haut + dy, Z + dz], s: .02 }));
+  }
+  if (a.chapeau === 'noeud') {
+    for (const s of [-1, 1]) p.push({ g: sphere(), c: c1, p: [X + s * .085, haut + .03, Z], r: [0, 0, s * .45], s: [.09, .06, .04] });
+    p.push({ g: sphere(12, 10), c: c2, p: [X, haut + .02, Z + .01], s: [.04, .04, .035] });
+  }
+  if (a.chapeau === 'beret') p.push({ g: sphere(), c: c1, p: [X + .03, haut - .015, Z], r: [0, 0, -.2], s: [.21, .065, .2] }, { g: cylindre(1, 1, 1, 8), c: c2, p: [X + .045, haut + .055, Z], s: [.014, .05, .014] });
+  if (a.chapeau === 'bonnet') {
+    p.push({ g: demiSphere(), c: c1, p: [X, haut - .09, Z], s: [.218, .2, .218] }, { g: cylindre(1, 1, 1, 22), c: c2, p: [X, haut - .085, Z], s: [.226, .055, .226] });
+    p.push({ g: sphere(12, 10), c: c2, p: [X, haut + .13, Z], s: .056 });
+  }
+  if (a.chapeau === 'casquette') {
+    p.push({ g: demiSphere(), c: c1, p: [X, haut - .075, Z - .01], s: [.205, .16, .205] }, { g: sphere(), c: c2, p: [X, haut - .065, Z + .17], s: [.125, .018, .11] });
+    p.push({ g: sphere(10, 8), c: c2, p: [X, haut + .085, Z - .01], s: .022 });
+  }
+  if (a.chapeau === 'fleurs') {
+    p.push({ g: tore(1, .16), c: c1, p: [X, haut - .045, Z], r: [Math.PI / 2, 0, 0], s: [.175, .175, .13] });
+    for (let i = 0; i < 6; i++) {
+      const an = i / 6 * Math.PI * 2, fx = X + Math.sin(an) * .175, fz = Z + Math.cos(an) * .175, cf = i % 2 ? '#ffffff' : c2;
+      for (let k = 0; k < 4; k++) { const b = k / 4 * Math.PI * 2; p.push({ g: sphere(10, 8), c: cf, p: [fx + Math.cos(b) * .026, haut - .02, fz + Math.sin(b) * .026], s: [.024, .016, .024] }); }
+      p.push({ g: sphere(8, 6), c: '#facc15', p: [fx, haut - .01, fz], s: .016 });
+    }
+  }
+  if (a.chapeau === 'hautForme') {
+    p.push({ g: cylindre(1, 1, 1, 22), c: c1, p: [X, haut - .005, Z], s: [.2, .016, .2] }, { g: cylindre(1, 1, 1, 22), c: c1, p: [X, haut + .1, Z], s: [.12, .2, .12] });
+    p.push({ g: cylindre(1, 1, 1, 22), c: c2, p: [X, haut + .03, Z], s: [.124, .045, .124] });
+  }
+  if (a.chapeau === 'sombrero') {
+    p.push({ g: cylindre(1, 1, 1, 26), c: c1, p: [X, haut - .01, Z], s: [.34, .02, .34] }, { g: cylindre(.6, 1, 1, 20), c: c1, p: [X, haut + .07, Z], s: [.13, .15, .13] });
+    p.push({ g: cylindre(1, 1, 1, 20), c: c2, p: [X, haut + .015, Z], s: [.128, .03, .128] });
+    for (let i = 0; i < 8; i++) { const an = i / 8 * Math.PI * 2; p.push({ g: sphere(8, 6), c: c2, p: [X + Math.sin(an) * .33, haut - .03, Z + Math.cos(an) * .33], s: .025 }); }
+  }
+  if (a.chapeau === 'cowboy') {
+    p.push({ g: sphere(), c: c1, p: [X, haut, Z], s: [.31, .03, .26] }, { g: cylindre(.8, 1, 1, 18), c: c1, p: [X, haut + .07, Z], s: [.13, .13, .115] });
+    p.push({ g: sphere(), c: assombrir(c1, .15), p: [X, haut + .135, Z], s: [.1, .02, .09] }, { g: cylindre(1, 1, 1, 18), c: c2, p: [X, haut + .02, Z], s: [.133, .03, .118] });
+    for (const s of [-1, 1]) p.push({ g: tore(1, .25, Math.PI), c: c1, p: [X + s * .27, haut + .02, Z], r: [Math.PI / 2, s > 0 ? 0 : Math.PI, Math.PI / 2], s: [.05, .05, .05] });
+  }
+  if (a.chapeau === 'viking') {
+    p.push({ g: demiSphere(), c: c1, p: [X, haut - .085, Z], s: [.222, .2, .222] }, { g: cylindre(1, 1, 1, 22), c: assombrir(c1, .25), p: [X, haut - .075, Z], s: [.228, .045, .228] });
+    for (const s of [-1, 1]) p.push({ g: cone(1, 1, 12), c: c2, p: [X + s * .22, haut + .04, Z], r: [0, 0, -s * .75], s: [.045, .17, .045] });
+    p.push({ g: sphere(10, 8), c: assombrir(c1, .25), p: [X, haut + .11, Z], s: .03 });
+  }
+  const K = 1.3;
+  for (let i = n0; i < p.length; i++) { const q = p[i], s = typeof q.s === 'number' ? [q.s, q.s, q.s] : q.s; q.p = [X + (q.p[0] - X) * K, haut + (q.p[1] - haut) * K, Z + (q.p[2] - Z) * K]; q.s = s.map(v => v * K); }
   if (a.chapeau === 'champignon') {
     p.push({ g: demiSphere(), c: '#dc2626', p: [H[0], haut - .07, H[2] - .02], s: [.3, .2, .3] });
     [[0, .12, .19], [.17, .06, .14], [-.17, .06, .14], [.1, .16, .02], [-.1, .16, .02], [0, .1, -.2], [.2, .04, -.05], [-.2, .04, -.05]].forEach(([dx, dy, dz]) =>

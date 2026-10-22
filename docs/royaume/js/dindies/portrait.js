@@ -160,6 +160,28 @@ function chapeauSvg(a, tY, vol, C) {
   if (a.chapeau === 'turban') o.push(`<ellipse cx="100" cy="${tY - 24}" rx="25" ry="13" ${vol('#f8fafc')}/><ellipse cx="100" cy="${tY - 32}" rx="18" ry="10" ${vol('#fef3c7')}/><circle cx="100" cy="${tY - 22}" r="4" fill="${C('#dc2626')}"/><path d="M100 ${tY - 26} q4 -16 -2 -22" stroke="${C('#a855f7')}" stroke-width="4" fill="none" stroke-linecap="round"/>`);
   if (a.chapeau === 'toque') o.push(`<rect x="86" y="${tY - 44}" width="28" height="22" rx="3" ${vol('#ffffff')}/><ellipse cx="100" cy="${tY - 46}" rx="20" ry="11" ${vol('#ffffff')}/>`);
   if (a.chapeau === 'pirate') o.push(`<path d="M68 ${tY - 18} Q100 ${tY - 50} 132 ${tY - 18} Q100 ${tY - 26} 68 ${tY - 18}Z" ${vol('#111827')}/><circle cx="100" cy="${tY - 30}" r="4" fill="${C('#f8fafc')}"/>`);
+  /* les chapeaux de l'Atelier des plumes */
+  const c1 = a.couleurChapeau || '#ef4444', c2 = a.couleurChapeau2 || '#fde68a', y = tY;
+  if (a.chapeau === 'fete') o.push(`<path d="M86 ${y - 21} L100 ${y - 62} L114 ${y - 21} Z" ${vol(c1)}/><circle cx="95" cy="${y - 30}" r="3" fill="${C(c2)}"/><circle cx="104" cy="${y - 40}" r="2.6" fill="${C(c2)}"/><circle cx="98" cy="${y - 50}" r="2.2" fill="${C(c2)}"/><ellipse cx="100" cy="${y - 21}" rx="16" ry="4.5" ${vol(c2)}/><circle cx="100" cy="${y - 63}" r="6" ${vol(c2)}/>`);
+  if (a.chapeau === 'noeud') o.push(`<path d="M100 ${y - 28} Q80 ${y - 50} 72 ${y - 32} Q76 ${y - 14} 100 ${y - 28}Z" ${vol(c1)}/><path d="M100 ${y - 28} Q120 ${y - 50} 128 ${y - 32} Q124 ${y - 14} 100 ${y - 28}Z" ${vol(c1)}/><circle cx="100" cy="${y - 28}" r="6.5" ${vol(c2)}/>`);
+  if (a.chapeau === 'beret') o.push(`<ellipse cx="104" cy="${y - 25}" rx="31" ry="11" transform="rotate(-8 104 ${y - 25})" ${vol(c1)}/><rect x="106" y="${y - 42}" width="4.5" height="9" rx="2" fill="${C(c2)}"/>`);
+  if (a.chapeau === 'bonnet') o.push(`<path d="M73 ${y - 14} Q73 ${y - 52} 100 ${y - 52} Q127 ${y - 52} 127 ${y - 14}Z" ${vol(c1)}/><rect x="71" y="${y - 21}" width="58" height="11" rx="5" ${vol(c2)}/><circle cx="100" cy="${y - 54}" r="9" ${vol(c2)}/>`);
+  if (a.chapeau === 'casquette') o.push(`<path d="M76 ${y - 17} Q76 ${y - 48} 100 ${y - 48} Q124 ${y - 48} 124 ${y - 17}Z" ${vol(c1)}/><path d="M100 ${y - 19} Q132 ${y - 24} 144 ${y - 13} Q122 ${y - 8} 100 ${y - 15}Z" ${vol(c2)}/><circle cx="100" cy="${y - 48}" r="3.5" fill="${C(c2)}"/>`);
+  if (a.chapeau === 'fleurs') {
+    o.push(`<path d="M75 ${y - 15} Q100 ${y - 36} 125 ${y - 15}" stroke="${C(c1)}" stroke-width="6" fill="none" stroke-linecap="round"/>`);
+    [[78, -19], [88, -26], [100, -29], [112, -26], [122, -19]].forEach(([x, dy], i) => {
+      const cf = i % 2 ? '#ffffff' : c2;
+      for (let k = 0; k < 5; k++) { const b = k / 5 * Math.PI * 2; o.push(`<circle cx="${x + Math.cos(b) * 4}" cy="${y + dy + Math.sin(b) * 4}" r="3.4" fill="${C(cf)}"/>`); }
+      o.push(`<circle cx="${x}" cy="${y + dy}" r="2.4" fill="${C('#facc15')}"/>`);
+    });
+  }
+  if (a.chapeau === 'hautForme') o.push(`<ellipse cx="100" cy="${y - 20}" rx="27" ry="5.5" ${vol(c1)}/><rect x="84" y="${y - 64}" width="32" height="44" rx="3" ${vol(c1)}/><rect x="84" y="${y - 31}" width="32" height="7" fill="${C(c2)}"/><ellipse cx="100" cy="${y - 64}" rx="16" ry="3.5" fill="${C(assombrir(c1, .15))}"/>`);
+  if (a.chapeau === 'sombrero') {
+    o.push(`<ellipse cx="100" cy="${y - 19}" rx="46" ry="9" ${vol(c1)}/><path d="M84 ${y - 21} Q86 ${y - 54} 100 ${y - 54} Q114 ${y - 54} 116 ${y - 21}Z" ${vol(c1)}/><rect x="84.5" y="${y - 30}" width="31" height="6" fill="${C(c2)}"/>`);
+    for (const x of [60, 74, 126, 140]) o.push(`<circle cx="${x}" cy="${y - 13}" r="3.6" fill="${C(c2)}"/>`);
+  }
+  if (a.chapeau === 'cowboy') o.push(`<path d="M80 ${y - 20} Q77 ${y - 52} 92 ${y - 50} Q100 ${y - 44} 108 ${y - 50} Q123 ${y - 52} 120 ${y - 20}Z" ${vol(c1)}/><path d="M56 ${y - 30} Q66 ${y - 13} 100 ${y - 15} Q134 ${y - 13} 144 ${y - 30} Q134 ${y - 21} 100 ${y - 23} Q66 ${y - 21} 56 ${y - 30}Z" ${vol(c1)}/><rect x="80" y="${y - 30}" width="40" height="6" fill="${C(c2)}"/>`);
+  if (a.chapeau === 'viking') o.push(`<path d="M74 ${y - 27} Q55 ${y - 34} 54 ${y - 60} Q66 ${y - 42} 82 ${y - 38}Z" ${vol(c2)}/><path d="M126 ${y - 27} Q145 ${y - 34} 146 ${y - 60} Q134 ${y - 42} 118 ${y - 38}Z" ${vol(c2)}/><path d="M72 ${y - 12} Q72 ${y - 52} 100 ${y - 52} Q128 ${y - 52} 128 ${y - 12}Z" ${vol(c1)}/><rect x="70" y="${y - 20}" width="60" height="9" rx="3" ${vol(assombrir(c1, .25))}/><circle cx="100" cy="${y - 52}" r="4" fill="${C(assombrir(c1, .25))}"/>`);
   if (a.chapeau === 'champignon') {
     o.push(`<path d="M64 ${tY - 12} Q64 ${tY - 50} 100 ${tY - 50} Q136 ${tY - 50} 136 ${tY - 12} Q100 ${tY - 20} 64 ${tY - 12}Z" ${vol('#dc2626')}/>`);
     if (C('#fff') === '#fff') [[82, -30, 5], [100, -40, 5.5], [118, -30, 5], [74, -18, 3.5], [126, -18, 3.5], [100, -24, 3.5]].forEach(([x, dy, r]) => o.push(`<circle cx="${x}" cy="${tY + dy}" r="${r}" fill="#fff"/>`));

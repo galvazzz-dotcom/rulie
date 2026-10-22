@@ -3,17 +3,21 @@
 import { PAR_ID } from '../donnees/especes.js';
 import { vaDans } from './individus.js';
 
-export const VERSION = 4;
+export const VERSION = 5;
 export function nouvelEtat(nom, couleur) {
   return {
     version: VERSION, profil: { nom, couleur, cree: Date.now() },
     pieces: 0, plumesOr: 0, inventaire: {},
     dindies: [], compagnon: null,
-    enclos: {}, batiments: { clapier: { repare: false, rangees: 1 }, montgolfiere: { reparee: false }, couvoir: { repare: false }, nurserie: { repare: false }, dindodrome: { ouvert: false }, entrainement: { repare: false } },
+    enclos: {}, batiments: { clapier: { repare: false, rangees: 1 }, montgolfiere: { reparee: false }, couvoir: { repare: false, niveau: 1 }, nurserie: { repare: false, niveau: 1 }, dindodrome: { ouvert: false }, entrainement: { repare: false },
+      potager: { repare: false, niveau: 1 }, moulin: { repare: false }, atelier: { repare: false }, missions: { repare: false, niveau: 1 } },
     elevage: { couveuses: [null, null], croisements: 0, eclosions: 0, premierHybride: false, compteur: 0 },
     livre: { vus: {}, attrapes: {}, chromas: {} },
     courses: { badges: [], places: {}, faites: 0, victoires: 0, records: {}, entrainements: 0, lecons: 0 },
-    quete: { etape: 'arrivee', compteur: 0, finies: [], nourries: [] },
+    /* la production du Domaine (étape 6) : le Potager, les plumes, l'Atelier, la décoration, les missions */
+    production: { parcelles: [], plumes: {}, ramassage: {}, chapeaux: {}, decorations: {}, deco: [], missions: { offertes: [], encours: [], compteur: 0 },
+      stats: { plantees: 0, arrosees: 0, recoltes: 0, friandises: 0, plumes: 0, chapeaux: 0, decos: 0, posees: 0, envoyees: 0, rapportees: 0, ameliorations: 0, relachees: 0, gateaux: 0, habitats: 0 } },
+    quete: { etape: 'arrivee', compteur: 0, finies: [], nourries: [], domaine: { etape: null, finies: [] } },
     monde: { position: [0, 33.5], ramasses: {}, lieu: 'domaine', positions: {} },
     reglages: { son: true, musique: true, voix: false, aide: false, heure: 'vraie' },
     quotidien: { courrier: '', voeu: '', trouvailles: null, cadeaux: {} },
@@ -32,6 +36,7 @@ export function migrer(e) {
   else if (avant < 3 && e.quete.etape === 'fin') e.quete.etape = 'parlerPlumeau3';
   /* version 4 : la fin du chapitre 3 devient le début du chapitre 4 */
   else if (avant < 4 && e.quete.etape === 'fin') e.quete.etape = 'parlerPlumeau5';
+  /* version 5 : la production (rien à déplacer : les nouveaux bâtiments sont encore en ruine) */
   e.version = VERSION;
   return e;
 }
@@ -56,6 +61,7 @@ export const equipe = () => E.dindies.filter(d => d.lieu === 'equipe');
 export const dansEnclos = type => E.dindies.filter(d => d.lieu === 'enclos:' + type);
 export const dansClapier = () => E.dindies.filter(d => d.lieu === 'clapier');
 export const placesEnclos = type => [0, 2, 4, 6, 8, 10][E.enclos[type]?.niveau || 0];
+export const placesNurserie = () => 4 + 2 * (E.batiments.nurserie?.niveau || 1);
 export const placesClapier = () => E.batiments.clapier.repare ? 30 * (E.batiments.clapier.rangees || 1) : 0;
 export function voir(espece) { if (!E.livre.vus[espece]) { E.livre.vus[espece] = Date.now(); changer('livre'); } }
 export function ajouterDindie(d) {
@@ -68,9 +74,10 @@ export function ajouterDindie(d) {
 /* déplacer une dindie : renvoie un message d'erreur, ou null si c'est fait */
 export function deplacer(d, lieu) {
   if (d.lieu === lieu) return null;
+  if (d.lieu === 'mission') return 'Elle est partie en mission ! Elle reviendra au Bureau des missions.';
   const bebe = d.stade === 'poussin' || d.stade === 'jeune';
   if (bebe && (lieu === 'equipe' || lieu.startsWith('enclos:'))) return 'Elle est encore toute petite : elle grandit à la Nurserie (ou au Clapier).';
-  if (lieu === 'nurserie') { if (!E.batiments.nurserie?.repare) return 'La Nurserie est encore en ruine.'; if (!bebe) return 'La Nurserie, c’est pour les bébés !'; if (E.dindies.filter(x => x.lieu === 'nurserie').length >= 6) return 'La Nurserie est pleine (6 bébés).'; }
+  if (lieu === 'nurserie') { if (!E.batiments.nurserie?.repare) return 'La Nurserie est encore en ruine.'; if (!bebe) return 'La Nurserie, c’est pour les bébés !'; if (E.dindies.filter(x => x.lieu === 'nurserie').length >= placesNurserie()) return `La Nurserie est pleine (${placesNurserie()} bébés).`; }
   if (lieu === 'equipe' && equipe().length >= 6) return 'Ton équipe est pleine (6 dindies).';
   if (lieu === 'clapier') { if (!E.batiments.clapier.repare) return 'Le Clapier est encore en ruine.'; if (dansClapier().length >= placesClapier()) return 'Le Clapier est plein.'; }
   if (lieu.startsWith('enclos:')) {

@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { PAR_ID } from '../donnees/especes.js';
 import { COMPETENCES, SORTES, PISTES } from '../donnees/courses.js';
-import { variante } from '../dindies/adn.js';
+import { adnDe } from '../jeu/individus.js';
 import { creerDindie } from '../dindies/modele.js';
 import { portraitDindie } from '../dindies/portrait.js';
 import { creerCourse, COMPTE } from '../jeu/course.js';
@@ -70,7 +70,7 @@ export function lancerCourse(def, d, H) {
 
     /* ── les dindies sur la ligne de départ ── */
     const R3 = C.coureurs.map((R, k) => {
-      const m = creerDindie(variante(PAR_ID[R.d.espece], { stade: R.d.stade, chroma: R.d.chroma }));
+      const m = creerDindie(adnDe(R.d));
       L.racine.add(m.racine);
       /* une étiquette pour la nôtre et pour la star de la course (les autres : leur point sur la barre du haut) */
       const lab = etiquette(R.joueur ? '★ ' + R.nom : R.nom, R.joueur ? '#ea580c' : '#7c3aed');
@@ -277,4 +277,4 @@ export function lancerCourse(def, d, H) {
   });
 }
 /* le portrait d'une coureuse (pour les résultats) */
-export const portraitCoureuse = (R, id) => portraitDindie(variante(PAR_ID[R.d.espece], { stade: R.d.stade, chroma: R.d.chroma }), { id });
+export const portraitCoureuse = (R, id) => portraitDindie(adnDe(R.d), { id });

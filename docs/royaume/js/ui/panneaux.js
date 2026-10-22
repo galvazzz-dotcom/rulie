@@ -12,19 +12,23 @@ import { OBJETS, enBoutique, meilleurFilet } from '../jeu/objets.js';
 import { texteConditions, regleDe, REGIONS } from '../donnees/regions.js';
 import * as EL from '../jeu/elevage.js';
 import { ouvrirEveil, duree } from './elevage.js';
-import { CARACTERES, NOMS_RIGOLOS, nomDe, stats, xpPourNiveau, vaDans } from '../jeu/individus.js';
+import { CARACTERES, NOMS_RIGOLOS, nomDe, stats, xpPourNiveau, vaDans, adnDe } from '../jeu/individus.js';
 import * as S from '../jeu/scenario.js';
 import { QUETES, CHAPITRES } from '../jeu/scenario.js';
 import * as SAUVE from '../moteur/sauvegarde.js';
 import { ORDRE_ENCLOS } from '../monde/domaine.js';
+import * as PR from '../jeu/production.js';
+import * as QD from '../jeu/quetesDomaine.js';
+import { CHAPEAUX, DECORATIONS } from '../donnees/production.js';
+import { boutonsFiche, brancherFiche, boutonRelacher, blocAmeliorer, brancherAmeliorer, plumesHtml, proposerHabitat } from './production.js';
 
 const E = () => J.etat();
 const PASTILLE = { commune: '⚪', rare: '🔵', epique: '🟣', mythique: '🌈' };
 let n = 0;
-const portrait = (d, opts = {}) => portraitDindie(variante(PAR_ID[d.espece], { stade: d.stade, chroma: d.chroma }), { id: 'P' + (n++), ...opts });
+const portrait = (d, opts = {}) => portraitDindie(adnDe(d), { id: 'P' + (n++), ...opts });
 const portraitEsp = (id, opts = {}) => portraitDindie(variante(PAR_ID[id]), { id: 'Q' + (n++), ...opts });
 const etoiles = k => '⭐'.repeat(k) + '<i class="eteinte">' + '⭐'.repeat(5 - k) + '</i>';
-const lieuTexte = l => l === 'equipe' ? '🎒 Dans ton équipe' : l === 'clapier' ? '🐾 Au Clapier' : l === 'nurserie' ? '🍼 À la Nurserie' : l.startsWith('enclos:') ? `${TYPES[l.slice(7)].e} ${TYPES[l.slice(7)].habitat}` : l;
+const lieuTexte = l => l === 'equipe' ? '🎒 Dans ton équipe' : l === 'clapier' ? '🐾 Au Clapier' : l === 'nurserie' ? '🍼 À la Nurserie' : l === 'mission' ? '📮 En mission' : l.startsWith('enclos:') ? `${TYPES[l.slice(7)].e} ${TYPES[l.slice(7)].habitat}` : l;
 /* d'où vient cette dindie ? */
 const origineTexte = d => d.origine === 'premiere' ? '🎁 Ta toute première dindie' : d.origine === 'cadeau' ? '🎁 Un cadeau du Professeur'
   : d.origine.startsWith('sauvage:') ? `🧭 Attrapée : ${REGIONS[d.origine.slice(8)]?.nom || 'une île'}`
@@ -36,7 +40,7 @@ export function ouvrirBoutique() {
   const dessiner = () => {
     const ids = Object.keys(OBJETS).filter(id => enBoutique(id, E()));
     F.contenu.innerHTML = `<p class="bourse">Tu as <b>${E().pieces} 🪙</b></p><div class="rayons">` + ids.map(id => {
-      const O = OBJETS[id], q = id === 'friandise' || O.prefere ? 5 : 1;
+      const O = OBJETS[id], q = id === 'friandise' || O.prefere || O.graine ? 5 : 1;
       return `<div class="article"><span class="em">${O.e}</span><div><b>${O.nom}</b><small>${O.desc}</small><small class="possede">Tu en as : ${J.combien(id)}</small></div>
         <button class="btn acheter" data-id="${id}" data-q="${q}" ${E().pieces < O.prix * q ? 'disabled' : ''}>${q > 1 ? q + ' pour ' : ''}${O.prix * q} 🪙</button></div>`;
     }).join('') + '</div>';
@@ -145,12 +149,13 @@ export function ouvrirFiche(d, { surChange } = {}) {
         ${J.combien('biscuit') && d.niveau < 50 ? `<button class="btn" id="fBiscuit">🍘 Biscuit (${J.combien('biscuit')}) : + 150 XP</button>` : ''}
         <button class="btn" id="fNom">✏️ Renommer</button>
         ${d.lieu === 'equipe' ? `<button class="btn vert" id="fSuivre">${E().compagnon === d.uid ? '🛑 Ne plus suivre' : '🐾 Me suivre'}</button>` : ''}
+        ${boutonsFiche(d)}
       </div>
-      <p class="petitTitre">Déplacer vers…</p><div class="actionsFiche" id="fDest"></div>`;
-    const dest = (EL.estBebe(d) ? [...(E().batiments.nurserie?.repare ? [['nurserie', '🍼 Nurserie']] : []), ...(E().batiments.clapier.repare ? [['clapier', '🐾 Clapier']] : [])]
+      <p class="petitTitre">Déplacer vers…</p><div class="actionsFiche" id="fDest"></div>${boutonRelacher(d)}`;
+    const dest = d.lieu === 'mission' ? [] : (EL.estBebe(d) ? [...(E().batiments.nurserie?.repare ? [['nurserie', '🍼 Nurserie']] : []), ...(E().batiments.clapier.repare ? [['clapier', '🐾 Clapier']] : [])]
       : [['equipe', '🎒 Équipe'], ...(E().batiments.clapier.repare ? [['clapier', '🐾 Clapier']] : []),
       ...ORDRE_ENCLOS.map(([t]) => t).filter(t => E().enclos[t]?.construit && vaDans(d, t)).map(t => ['enclos:' + t, `${TYPES[t].e} ${TYPES[t].habitat}`])]).filter(([l]) => l !== d.lieu);
-    $('#fDest', F.el).innerHTML = dest.length ? dest.map(([l, t]) => `<button class="btn petit" data-l="${l}">${t}</button>`).join('') : '<small>Pas d’autre endroit pour l’instant.</small>';
+    $('#fDest', F.el).innerHTML = dest.length ? dest.map(([l, t]) => `<button class="btn petit" data-l="${l}">${t}</button>`).join('') : d.lieu === 'mission' ? '<small>📮 Elle est en mission : elle reviendra au Bureau des missions.</small>' : '<small>Pas d’autre endroit pour l’instant.</small>';
     $$('#fDest button', F.el).forEach(b => b.onclick = () => {
       const err = J.deplacer(d, b.dataset.l);
       if (err) { toast('⚠️ ' + err); return; }
@@ -177,6 +182,7 @@ export function ouvrirFiche(d, { surChange } = {}) {
     };
     $('#fNom', F.el).onclick = () => renommer(d, dessiner);
     const sv = $('#fSuivre', F.el); if (sv) sv.onclick = () => { pop(); J.choisirCompagnon(E().compagnon === d.uid ? null : d); surChange && surChange(); dessiner(); };
+    brancherFiche(F, d, { dessiner, surChange, niveauToast, fermer: () => F.fermer() });
   };
   dessiner();
   return F;
@@ -199,43 +205,66 @@ export function ouvrirClapier({ surChange } = {}) {
     h += E().batiments.clapier.repare ? `<h3>🐾 Clapier <small>${cl.length}/${J.placesClapier()}</small></h3><div class="rangee">${cl.map(carte).join('') || '<p class="petitTexte">Le Clapier est vide.</p>'}</div>`
       : '<h3>🐾 Clapier</h3><p class="petitTexte">🚧 Le Clapier est en ruine.</p>';
     const nu = E().dindies.filter(d => d.lieu === 'nurserie');
-    if (E().batiments.nurserie?.repare) h += `<h3>🍼 Nurserie <small>${nu.length}/${EL.PLACES_NURSERIE}</small></h3><div class="rangee">${nu.map(carte).join('') || '<p class="petitTexte">Pas de bébé.</p>'}</div>`;
+    if (E().batiments.nurserie?.repare) h += `<h3>🍼 Nurserie <small>${nu.length}/${EL.placesNurserie()}</small></h3><div class="rangee">${nu.map(carte).join('') || '<p class="petitTexte">Pas de bébé.</p>'}</div>`;
     for (const [t] of ORDRE_ENCLOS) if (E().enclos[t]?.construit) h += `<h3>${TYPES[t].e} ${TYPES[t].habitat} <small>${J.dansEnclos(t).length}/${J.placesEnclos(t)}</small></h3><div class="rangee">${J.dansEnclos(t).map(carte).join('') || '<p class="petitTexte">Vide.</p>'}</div>`;
+    const mi = E().dindies.filter(d => d.lieu === 'mission');
+    if (mi.length) h += `<h3>📮 En mission <small>${mi.length}</small></h3><div class="rangee">${mi.map(carte).join('')}</div>`;
+    if (E().batiments.clapier.repare) h += `<h3>⬆️ Le Clapier</h3>${blocAmeliorer('clapier')}`;
     F.contenu.innerHTML = h;
+    brancherAmeliorer(F.contenu, () => { dessiner(); surChange && surChange(); });
     $$('.carteDindie', F.contenu).forEach(b => b.onclick = () => { pop(); ouvrirFiche(J.parUid(b.dataset.uid), { surChange: () => { dessiner(); surChange && surChange(); } }); });
   };
   dessiner();
   return F;
 }
-/* un enclos : ses habitantes, et ranger une dindie de l'équipe ici */
+/* un enclos : ses habitantes, ranger une dindie ici, ramasser les plumes du jour, l'améliorer (ou le construire) */
 export function ouvrirEnclos(type, { surChange } = {}) {
-  const T = TYPES[type], construit = E().enclos[type]?.construit;
+  const T = TYPES[type];
   const F = fenetre(`${T.e} ${T.habitat}`, '', { classe: 'enclosF' });
   const dessiner = () => {
-    if (!construit) { F.contenu.innerHTML = `<p>🚧 Cet enclos est en ruine. On le reconstruira plus tard pour les dindies <b>${T.e} ${T.nom}</b>.</p>`; return; }
-    const ici = J.dansEnclos(type), candidates = E().dindies.filter(d => d.lieu !== 'enclos:' + type && vaDans(d, type));
+    if (!E().enclos[type]?.construit) {
+      F.contenu.innerHTML = `<p>🚧 Cet enclos est en ruine. Une fois construit, les dindies <b>${T.e} ${T.nom}</b> pourront y vivre.</p>
+        ${PR.productionOuverte() ? `<div class="ligneBtn"><button class="btn grand vert" id="eConstruire">🔨 Le construire</button></div>` : '<p class="petitTexte">On le reconstruira plus tard dans l’histoire.</p>'}`;
+      const c = $('#eConstruire', F.contenu); if (c) c.onclick = async () => { pop(); if (await proposerHabitat(type)) { tada(); toast(`🔨 ${T.habitat} est construit !`, { classe: 'grand' }); surChange && surChange('habitat', type); dessiner(); } };
+      return;
+    }
+    const ici = J.dansEnclos(type), candidates = E().dindies.filter(d => d.lieu !== 'enclos:' + type && d.lieu !== 'mission' && vaDans(d, type));
+    const pl = PR.plumesAPrendre(type), deja = PR.prod().ramassage[type] === jourJ();
     F.contenu.innerHTML = `<p class="petitTexte">L’habitat des dindies ${T.e} <b>${T.nom}</b>. Places : ${ici.length}/${J.placesEnclos(type)}.</p>
+      ${PR.productionOuverte() ? `<div class="plumesEnclos">${pl ? `<span>🪶 <b>${pl} plume${pl > 1 ? 's' : ''} ${T.e}</b> à ramasser !</span><button class="btn jaune" id="ePlumes">🪶 Ramasser</button>`
+        : deja ? '<span>✅ Plumes du jour ramassées. Reviens demain !</span>' : `<span>🪶 Installe des dindies adultes ici : chaque jour, elles laissent des plumes ${T.e}.</span>`}<small>Tu as ${PR.plumes(type)} plume${PR.plumes(type) > 1 ? 's' : ''} ${T.e}.</small></div>` : ''}
       <div class="rangee">${ici.map(d => `<button class="carteDindie" data-uid="${d.uid}"><div class="mini">${portrait(d)}</div><b>${echapper(nomDe(d))}</b><small>Niv. ${d.niveau}</small></button>`).join('') || '<p class="petitTexte">Personne n’y vit encore.</p>'}</div>
-      ${candidates.length ? `<p class="petitTitre">Installer ici :</p><div class="rangee">${candidates.map(d => `<button class="carteDindie installer" data-uid="${d.uid}"><div class="mini">${portrait(d)}</div><b>${echapper(nomDe(d))}</b><small>➕ Installer</small></button>`).join('')}</div>` : ''}`;
+      ${candidates.length ? `<p class="petitTitre">Installer ici :</p><div class="rangee">${candidates.map(d => `<button class="carteDindie installer" data-uid="${d.uid}"><div class="mini">${portrait(d)}</div><b>${echapper(nomDe(d))}</b><small>➕ Installer</small></button>`).join('')}</div>` : ''}
+      ${blocAmeliorer('enclos', type)}`;
     $$('.carteDindie:not(.installer)', F.contenu).forEach(b => b.onclick = () => { pop(); ouvrirFiche(J.parUid(b.dataset.uid), { surChange: () => { dessiner(); surChange && surChange(); } }); });
     $$('.installer', F.contenu).forEach(b => b.onclick = () => {
       const d = J.parUid(b.dataset.uid), err = J.deplacer(d, 'enclos:' + type);
       if (err) { toast('⚠️ ' + err); return; }
       tada(); toast(`🏡 ${nomDe(d)} s’installe dans ${T.habitat} !`); S.evenement('deplacement', d.uid); surChange && surChange(); dessiner();
     });
+    const bp = $('#ePlumes', F.contenu); if (bp) bp.onclick = () => {
+      const premiere = !PR.prod().stats.plumes, k = PR.ramasserPlumes(type); if (!k) return;
+      tada(); toast(`🪶 + ${k} plume${k > 1 ? 's' : ''} ${T.e} ${T.nom} !${premiere ? ` (dont ${PR.BONUS_PREMIERES_PLUMES} en cadeau : tes premières plumes !)` : ''}`, { classe: 'grand', cle: 'plumes', duree: 3400 }); surChange && surChange('plumes', type); dessiner();
+    };
+    brancherAmeliorer(F.contenu, () => { surChange && surChange('enclos', type); dessiner(); });
   };
   dessiner();
   return F;
 }
+const jourJ = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 
 /* ── le sac ── */
-export function ouvrirSac() {
+export function ouvrirSac({ decorer } = {}) {
   const inv = Object.entries(E().inventaire).filter(([id, q]) => q > 0 && OBJETS[id]);
   const imp = inv.filter(([id]) => OBJETS[id]?.important), autres = inv.filter(([id]) => !OBJETS[id]?.important);
   const filet = meilleurFilet(E().inventaire);
+  const chap = Object.entries(PR.prod().chapeaux).filter(([id, k]) => k > 0 && CHAPEAUX[id]), decos = Object.entries(PR.prod().decorations).filter(([id, k]) => k > 0 && DECORATIONS[id]);
   const ligne = ([id, q]) => `<div class="article"><span class="em">${OBJETS[id].e}</span><div><b>${OBJETS[id].nom}${q > 1 ? ' × ' + q : ''}${id === filet ? ' · <i class="pill">utilisé</i>' : ''}</b><small>${OBJETS[id].desc}</small></div></div>`;
-  fenetre('🎒 Mon sac', `<p class="bourse">🪙 <b>${E().pieces}</b> pièces · 🪶 <b>${E().plumesOr}</b> plume${E().plumesOr > 1 ? 's' : ''} d’or</p>
-    ${imp.length ? `<h3>⭐ Objets importants</h3>${imp.map(ligne).join('')}` : ''}<h3>🧺 Objets</h3>${autres.map(ligne).join('') || '<p class="petitTexte">Ton sac est vide.</p>'}`);
+  const F = fenetre('🎒 Mon sac', `<p class="bourse">🪙 <b>${E().pieces}</b> pièces · 🪶 <b>${E().plumesOr}</b> plume${E().plumesOr > 1 ? 's' : ''} d’or</p>
+    ${imp.length ? `<h3>⭐ Objets importants</h3>${imp.map(ligne).join('')}` : ''}<h3>🧺 Objets</h3>${autres.map(ligne).join('') || '<p class="petitTexte">Ton sac est vide.</p>'}
+    ${PR.productionOuverte() ? `<h3>🪶 Les plumes</h3>${plumesHtml()}${chap.length ? `<h3>🎩 Les chapeaux (pas encore portés)</h3><p class="petitTexte">${chap.map(([id, k]) => `${CHAPEAUX[id].e} ${CHAPEAUX[id].nom}${k > 1 ? ' × ' + k : ''}`).join(' · ')}</p>` : ''}
+      ${decos.length ? `<h3>🌷 Les décorations à poser</h3><p class="petitTexte">${decos.map(([id, k]) => `${DECORATIONS[id].e} ${DECORATIONS[id].nom}${k > 1 ? ' × ' + k : ''}`).join(' · ')}</p>${decorer ? '<div class="ligneBtn"><button class="btn jaune" id="sDecorer">🎨 Décorer le Domaine</button></div>' : ''}` : ''}` : ''}`);
+  const sd = $('#sDecorer', F.el); if (sd) sd.onclick = () => { pop(); F.fermer(); decorer(); };
 }
 
 /* ── le journal des quêtes ── */
@@ -253,6 +282,12 @@ export function ouvrirJournal() {
     }).join('');
     if (!QUETES.some(Q => Q.chapitre === +n)) h += '<div class="quete active"><b>🏁 Bientôt !</b><p>Ce chapitre arrive à la prochaine étape du jeu.</p></div>';
   }
+  if (QD.qd().etape || QD.qd().finies.length) h += `<p class="chapitre">🏡 Les quêtes du Domaine</p>` + QD.QUETES_DOMAINE.map(Q => {
+    const st = QD.etatQuete(Q), r = Q.recompense;
+    if (st === 'verrou') return `<div class="quete verrou">🔒 ???</div>`;
+    return `<div class="quete ${st}"><b>${st === 'finie' ? '✅' : '📜'} ${Q.titre}</b>${st === 'active' ? `<p>➡️ ${QD.texte(S.lieuActuelId())}</p>` : ''}
+      <small>Récompense : ${r.pieces} 🪙${r.plumesOr ? ' + ' + r.plumesOr + ' 🪶' : ''}${Object.keys(r.objets || {}).map(o => ' + ' + OBJETS[o].e).join('')}${r.plumes ? ' + des plumes' : ''}</small></div>`;
+  }).join('');
   fenetre('📜 Journal des quêtes', h);
 }
 

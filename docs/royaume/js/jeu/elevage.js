@@ -15,7 +15,11 @@ import { nouvelleDindie, gagnerXp, nomDe, CARACTERES } from './individus.js';
 import { OBJETS } from './objets.js';
 
 export const MINUTE = 60000;
-export const NB_COUVEUSES = 2, PLACES_NURSERIE = 6, NIVEAU_EVEIL = 20, REPOS_PARENT = 10;
+export const NIVEAU_EVEIL = 20, REPOS_PARENT = 10;
+/* le Couvoir et la Nurserie s'améliorent (étape 6) : 2 à 4 couveuses, 6 à 10 places */
+export const nbCouveuses = () => 1 + (J.etat().batiments.couvoir?.niveau || 1);
+export const placesNurserie = () => J.placesNurserie();
+const PLEIN = 'Toutes les couveuses sont occupées. Fais d’abord éclore un œuf !';
 const DUREES = { commune: 5, rare: 20, epique: 60, mythique: 240, tutoriel: .5 };
 const E = () => J.etat();
 const aide = () => !!E().reglages.aide;
@@ -26,7 +30,7 @@ const memePaire = (a, b) => (a[0] === b[0] && a[1] === b[1]) || (a[0] === b[1] &
 export function elevage() {
   const e = E();
   if (!e.elevage) e.elevage = { couveuses: [null, null], croisements: 0, eclosions: 0, premierHybride: false, compteur: 0 };
-  while (e.elevage.couveuses.length < NB_COUVEUSES) e.elevage.couveuses.push(null);
+  while (e.elevage.couveuses.length < nbCouveuses()) e.elevage.couveuses.push(null);
   return e.elevage;
 }
 export const estBebe = d => d.stade === 'poussin' || d.stade === 'jeune';
@@ -43,14 +47,15 @@ export function possibilites(p1, p2) {
   for (const a of e1.types) for (const b of e2.types) if (a !== b) { const h = hybrideDe(a, b); if (h && !hybrides.includes(h) && (h.rarete !== 'epique' || epiquePermise(p1, p2))) hybrides.push(h); }
   return { hybrides, recette: recetteDe(p1.espece, p2.espece), typesDifferents: e1.types.some(a => e2.types.some(b => a !== b)) };
 }
-export function resultatCroisement(p1, p2, premier = false) {
-  const e1 = PAR_ID[p1.espece], e2 = PAR_ID[p2.espece], P = possibilites(p1, p2);
-  if (P.recette && Math.random() < .25) return P.recette.id;
+/* gateau : le Gâteau d'amour du Moulin (recette secrète 50 %, hybrides deux fois plus probables) */
+export function resultatCroisement(p1, p2, premier = false, gateau = false) {
+  const e1 = PAR_ID[p1.espece], e2 = PAR_ID[p2.espece], P = possibilites(p1, p2), k = gateau ? 2 : 1;
+  if (P.recette && Math.random() < .25 * k) return P.recette.id;
   if (premier && P.hybrides.length) return (P.hybrides.find(h => h.rarete === 'rare') || P.hybrides[0]).id;
   const t1 = auHasard(e1.types), t2 = auHasard(e2.types);
   if (t1 !== t2) {
     const h = hybrideDe(t1, t2);
-    if (h) { const chance = h.rarete === 'epique' ? (epiquePermise(p1, p2) ? .15 : 0) : .3; if (Math.random() < chance) return h.id; }
+    if (h) { const chance = (h.rarete === 'epique' ? (epiquePermise(p1, p2) ? .15 : 0) : .3) * k; if (Math.random() < chance) return h.id; }
   }
   return Math.random() < .5 ? e1.id : e2.id;
 }
@@ -67,18 +72,20 @@ function nouvelOeuf(espece, extra) {
 }
 /* poser un œuf dans la première couveuse libre : renvoie l'œuf, ou un message d'erreur */
 function couver(oeuf) {
-  const i = couveuseLibre(); if (i < 0) return 'Les deux couveuses sont occupées. Fais d’abord éclore un œuf !';
+  const i = couveuseLibre(); if (i < 0) return PLEIN;
   oeuf.debut = maintenant(); oeuf.fin = oeuf.debut + dureeOeuf(oeuf.origine === 'tutoriel' ? 'tutoriel' : oeuf.rarete);
   elevage().couveuses[i] = oeuf; J.changer('elevage');
   return oeuf;
 }
-export function croiser(p1, p2) {
+export function croiser(p1, p2, { gateau = false } = {}) {
   if (!p1 || !p2 || p1 === p2) return 'Il faut deux dindies différentes.';
   if (!estAdulte(p1) || !estAdulte(p2)) return 'Seules les dindies adultes peuvent avoir un œuf.';
   for (const d of [p1, p2]) if (fatigue(d)) return `${nomDe(d)} se repose encore (${Math.ceil(fatigue(d) / MINUTE)} min).`;
-  if (couveuseLibre() < 0) return 'Les deux couveuses sont occupées. Fais d’abord éclore un œuf !';
+  if (couveuseLibre() < 0) return PLEIN;
+  if (gateau && !J.retirerObjet('gateauAmour')) return 'Tu n’as pas de Gâteau d’amour (il se fait au Moulin).';
   const L = elevage(), P = possibilites(p1, p2), premier = !L.premierHybride && P.hybrides.length > 0;
-  const espece = resultatCroisement(p1, p2, premier), esp = PAR_ID[espece];
+  const espece = resultatCroisement(p1, p2, premier, gateau), esp = PAR_ID[espece];
+  if (gateau) { const pr = E().production; if (pr) pr.stats.gateaux = (pr.stats.gateaux || 0) + 1; }
   if (['croisement', 'recette'].includes(esp.origine.sorte)) L.premierHybride = true;
   const oeuf = nouvelOeuf(espece, { origine: 'croisement', parents: [p1.espece, p2.espece], talents: talentsDe(p1, p2), caractere: caractereDe(p1, p2),
     couleurs: [TYPES[PAR_ID[p1.espece].types[0]].couleur, TYPES[PAR_ID[p2.espece].types[0]].couleur] });
@@ -89,7 +96,7 @@ export function croiser(p1, p2) {
 /* un œuf mystère : une espèce sauvage des îles déjà visitées (souvent commune, parfois rare, rarement épique) */
 export function couverOeufMystere() {
   if (!J.combien('oeufMystere')) return 'Tu n’as pas d’œuf mystère. On en trouve dans les îles !';
-  if (couveuseLibre() < 0) return 'Les deux couveuses sont occupées. Fais d’abord éclore un œuf !';
+  if (couveuseLibre() < 0) return PLEIN;
   const vues = Object.keys(E().monde.positions || {}).filter(id => REGIONS[id]?.especes);
   const regions = vues.length ? vues : ['pres'];
   const r = Math.random(), rarete = r < .7 ? 'commune' : r < .95 ? 'rare' : 'epique';
@@ -98,9 +105,18 @@ export function couverOeufMystere() {
   J.retirerObjet('oeufMystere');
   return couver(nouvelOeuf(espece, { origine: 'mystere', couleurs: ['#f472b6', '#60a5fa'] }));
 }
+/* un œuf épique (rapporté d'une mission) : une espèce épique des îles déjà visitées */
+export function couverOeufEpique() {
+  if (!J.combien('oeufEpique')) return 'Tu n’as pas d’œuf épique. Les longues missions en rapportent parfois !';
+  if (couveuseLibre() < 0) return PLEIN;
+  const vues = Object.keys(E().monde.positions || {}).filter(id => REGIONS[id]?.especes);
+  const pool = (vues.length ? vues : ['pres']).flatMap(id => Object.keys(REGIONS[id].especes)).filter(x => PAR_ID[x].rarete === 'epique');
+  J.retirerObjet('oeufEpique');
+  return couver(nouvelOeuf(auHasard(pool.length ? pool : ['coquelicot']), { origine: 'mystere', couleurs: ['#a855f7', '#f0abfc'] }));
+}
 export function couverOeufProfesseur() {
   if (!J.combien('oeufProfesseur')) return 'Tu n’as pas l’œuf du Professeur.';
-  if (couveuseLibre() < 0) return 'Les deux couveuses sont occupées.';
+  if (couveuseLibre() < 0) return PLEIN;
   J.retirerObjet('oeufProfesseur');
   return couver(nouvelOeuf(Math.random() < .5 ? 'paquerette' : 'glouglou', { origine: 'tutoriel', rarete: 'commune', couleurs: ['#facc15', '#fef3c7'] }));
 }
@@ -118,7 +134,7 @@ export function eclore(i) {
   d.parents = o.parents; d.naissance = maintenant(); d.croissance = { fin: maintenant() + 10 * MINUTE / (aide() ? 2 : 1) };
   J.ajouterDindie(d);
   if (o.chroma) { E().livre.chromas = E().livre.chromas || {}; E().livre.chromas[o.espece] = maintenant(); }
-  d.lieu = E().batiments.nurserie?.repare && J.etat().dindies.filter(x => x.lieu === 'nurserie').length < PLACES_NURSERIE ? 'nurserie' : E().batiments.clapier.repare ? 'clapier' : 'equipe';
+  d.lieu = E().batiments.nurserie?.repare && J.etat().dindies.filter(x => x.lieu === 'nurserie').length < placesNurserie() ? 'nurserie' : E().batiments.clapier.repare ? 'clapier' : 'equipe';
   if (E().compagnon === d.uid) E().compagnon = null;
   J.changer('dindies'); J.changer('elevage');
   return d;

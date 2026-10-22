@@ -495,3 +495,69 @@ body.enCourse #toasts{top:calc(max(10px,env(safe-area-inset-top)) + 110px)}
 #course.fini .cTitre,#course.fini .cCom{opacity:0;transition:opacity .4s}
 #course.fini .cCompte{top:24%}
 @media (max-height:480px){ #course.fini .cCompte{top:15%}#course.fini .cCompte b.arrivee{font-size:34px} }
+
+/* ══════════ la production (étape 6) ══════════ */
+.manque{color:#dc2626;font-weight:700}
+.centre{text-align:center}
+.plumesBarre{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:6px 0 10px}
+.plumesBarre span{background:#fff;border-radius:12px;padding:4px 9px;font-size:15px;box-shadow:0 2px 0 rgba(0,0,0,.08);white-space:nowrap}
+.plumesBarre span b{margin-left:3px}.plumesBarre span.zero{opacity:.45}
+.ameliorer{display:flex;align-items:center;gap:10px;background:#fef9c3;border:3px dashed #f59e0b;border-radius:16px;padding:8px 12px;margin:12px 0 4px}
+.ameliorer > div{flex:1;min-width:0}.ameliorer small{display:block;font-size:13px;color:#6b4f33}
+.ameliorer.max{justify-content:center;font-weight:700;color:#92400e;border-style:solid}
+/* le Potager */
+.recoltes{font-weight:700;align-self:center}
+.parcelles{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin:8px 0}
+.parcelle{display:flex;flex-direction:column;align-items:center;gap:4px;background:#a16207;color:#fff;border-radius:16px;padding:8px;border:4px solid #78350f;min-height:120px;justify-content:center;text-align:center}
+.parcelle > span{font-size:34px;line-height:1}.parcelle small{font-size:12.5px;font-weight:700}
+.parcelle .barreP{width:100%;flex:none;background:#78350f}
+.parcelle.vide{background:#c08a4e;border-style:dashed}
+.parcelle.mure{background:#16a34a;border-color:#15803d;animation:pouls2 .8s ease-in-out infinite alternate}
+.parcelle .arrose{color:#bae6fd}
+.choixGraine{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;background:#fff;border-radius:16px;padding:8px;margin:8px 0}
+.choixGraine .petitTitre{flex-basis:100%;text-align:center;margin:0}
+.choixGraine .btn small{font-size:12px;font-weight:600}
+/* le Moulin */
+.recette .ingr{margin-top:3px;font-weight:700;font-size:14px!important;color:#374151!important}
+/* l'Atelier */
+.formes{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:6px 0 10px}
+.formes button{width:46px;height:46px;border-radius:14px;background:#fff;font-size:24px;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.formes button.large{width:auto;padding:0 12px;font-size:15px;font-weight:700}
+.formes button.actif{background:#d946ef;color:#fff;box-shadow:0 3px 0 #86198f}
+.chapeaux{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.chapeau{display:flex;flex-direction:column;align-items:center;gap:4px;background:#fff;border-radius:18px;padding:10px;border:3px solid #f5d0fe;text-align:center}
+.chapeau .mini{width:96px;height:96px;border:0;background:#fdf4ff}
+.chapeau b{font-size:14px}.chapeau small{font-size:13px;color:#6b4f33}
+.chapeau.porte{border-color:#d946ef;background:#fdf4ff}
+.article.deco .em{font-size:30px}
+/* les missions */
+.mission{display:flex;align-items:center;gap:10px;background:#fff;border-radius:18px;padding:10px 12px;margin:8px 0;border:3px solid #bfdbfe}
+.mission .em{font-size:34px;flex:none}.mission > div{flex:1;min-width:0}.mission small{display:block;font-size:13px;color:#4b5563;margin-top:2px}
+.mission.enCours{border-color:#3b82f6;background:#eff6ff}.mission.finie{border-color:#22c55e;background:#f0fdf4;animation:pouls2 .8s ease-in-out infinite alternate}
+.equipeMission{display:flex;gap:6px;margin:4px 0}
+.equipeMission .mini{width:44px;height:44px;border-radius:12px;border:2px solid #bfdbfe;background:#fff}
+.chanceMission{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:8px 12px;margin:6px 0 10px;font-weight:700}
+.chanceMission b{white-space:nowrap}
+.choixEnt .carteDindie.choisie{outline:4px solid #7c3aed;outline-offset:2px}
+.resultatMission{text-align:center}.resultatMission .equipeMission{justify-content:center}
+.resultatMission .gains{font-weight:700;font-size:17px}
+/* les enclos, la fiche */
+.plumesEnclos{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;background:#fff;border-radius:16px;padding:8px 10px;margin:6px 0 10px;text-align:center}
+.plumesEnclos small{flex-basis:100%;color:#6b4f33}
+.btn.relacher{display:flex;margin:14px auto 0;background:#a3a3a3;box-shadow:0 4px 0 #737373;font-size:13px}
+/* le mode Décorer */
+#decorer{position:fixed;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(96vw,720px);z-index:20;background:#fff8e7;border:5px solid #d946ef;border-radius:24px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.3);display:flex;flex-direction:column;gap:8px;animation:monteDeco .25s}
+@keyframes monteDeco{from{transform:translate(-50%,30px);opacity:0}}
+.decoInfo b{display:block;font-family:'Lilita One',sans-serif;font-weight:400;font-size:18px;color:#86198f}.decoInfo small{font-size:13.5px;color:#6b4f33}
+.decoStock{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.decoChoix{flex:none;flex-direction:column;width:96px;padding:8px 6px;background:#fff;color:#374151;box-shadow:0 3px 0 rgba(0,0,0,.12);border:3px solid #f5d0fe}
+.decoChoix span{font-size:30px}.decoChoix small{font-size:11.5px;line-height:1.15;white-space:normal}
+.decoBtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+body.enDeco .hudBas, body.enDeco #hAction{display:none}
+/* un dialogue ouvert depuis une fenêtre (rendre à la nature, construire un habitat…) passe devant elle */
+.voile ~ .dialogue{z-index:35}
+.chanceMission{flex-wrap:wrap}.chanceMission > span{flex-basis:100%}
+@media (max-width:560px){
+  .mission{flex-wrap:wrap}.mission > div{flex-basis:calc(100% - 50px)}.mission .btn{margin-left:auto}
+  .article.deco{flex-wrap:wrap}.article.deco > div{flex-basis:calc(100% - 50px)}.article.deco .btn{margin-left:auto}
+}

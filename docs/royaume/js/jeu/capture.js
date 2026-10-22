@@ -58,7 +58,7 @@ export function lancerCapture(s, H) {
       $('.capJauge em', U).textContent = Math.round(confiance * 100) + ' %';
       $('.capEssais', U).innerHTML = '🥅'.repeat(essais) + '<i class="eteinte">' + '🥅'.repeat(3 - essais) + '</i>';
     };
-    const friandises = () => Object.keys(OBJETS).filter(id => (id === 'friandise' || OBJETS[id].prefere) && J.combien(id) > 0);
+    const friandises = () => Object.keys(OBJETS).filter(id => (id === 'friandise' || id === 'superFriandise' || OBJETS[id].prefere) && J.combien(id) > 0);
     function boutons() {
       if (phase === 'visee') { $('.capBas', U).innerHTML = '<button class="btn grand vert" id="cLancer">🥅 MAINTENANT !</button>'; $('#cLancer', U).onclick = lancer; return; }
       const fr = friandises();
@@ -78,7 +78,7 @@ export function lancerCapture(s, H) {
       if (occupe || fini) return;
       if (id !== 'doux' && !J.retirerObjet(id)) return;
       occupe = true; U.classList.add('attente');
-      const k = id === 'doux' ? .12 : id === pref ? .68 : OBJETS[id].prefere ? .24 : .34;
+      const k = id === 'doux' ? .12 : id === pref ? .68 : id === 'superFriandise' ? .6 : OBJETS[id].prefere ? .24 : .34;
       await H.lancerObjet(id === 'doux' ? null : OBJETS[id].e, s);
       s.m.jouer(id === 'doux' ? 'glouglou' : 'picore');
       H.coeurs(s, id === pref ? 14 : 8);

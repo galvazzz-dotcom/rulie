@@ -7,7 +7,6 @@
 import { PAR_ID } from '../donnees/especes.js';
 import { RARETES } from '../donnees/types.js';
 import { COMPETENCES, ENSEIGNEES, competenceInnee, competencesDe, placesCompetences } from '../donnees/courses.js';
-import { variante } from '../dindies/adn.js';
 import { portraitDindie } from '../dindies/portrait.js';
 import { fenetre, toast, $, $$, el, echapper, barre } from '../moteur/ui.js';
 import { pop, tada, glouglou, audio, sonActif } from '../moteur/sons.js';
@@ -15,7 +14,7 @@ import { dire } from '../moteur/voix.js';
 import * as J from '../jeu/etat.js';
 import * as DD from '../jeu/dindodrome.js';
 import * as EL from '../jeu/elevage.js';
-import { nomDe, stats } from '../jeu/individus.js';
+import { nomDe, stats, adnDe } from '../jeu/individus.js';
 import * as S from '../jeu/scenario.js';
 import { niveauToast } from './panneaux.js';
 import { pauseRendu } from '../moteur/rendu.js';
@@ -23,7 +22,7 @@ import { coureusesPossibles } from './dindodrome.js';
 
 const E = () => J.etat();
 let n = 0;
-const portrait = d => portraitDindie(variante(PAR_ID[d.espece], { stade: d.stade, chroma: d.chroma }), { id: 'EN' + (n++) });
+const portrait = d => portraitDindie(adnDe(d), { id: 'EN' + (n++) });
 export const JEUX = [
   { stat: 0, id: 'sprint', e: '⚡', nom: 'Le sprint des petits pas', but: 'Tape à gauche, puis à droite, puis à gauche… le plus vite possible !' },
   { stat: 1, id: 'souffle', e: '💪', nom: 'Le souffle régulier', but: 'Tape quand la bulle touche l’anneau. Respire avec ta dindie !' },

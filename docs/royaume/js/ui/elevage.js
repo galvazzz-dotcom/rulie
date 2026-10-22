@@ -1,9 +1,8 @@
 /* ══════════ LES FENÊTRES DE L'ÉLEVAGE ══════════
-   Le Couvoir (le nid pour croiser deux adultes, les 2 couveuses et leurs minuteurs), l'éclosion animée,
+   Le Couvoir (le nid pour croiser deux adultes, les couveuses (2 à 4) et leurs minuteurs), l'éclosion animée,
    la Nurserie (les bébés qui grandissent), et l'éveil au Labo. */
 import { PAR_ID } from '../donnees/especes.js';
 import { TYPES, RARETES } from '../donnees/types.js';
-import { variante } from '../dindies/adn.js';
 import { portraitDindie } from '../dindies/portrait.js';
 import { fenetre, toast, $, $$, el, echapper, barre } from '../moteur/ui.js';
 import { pop, tada, glouglou } from '../moteur/sons.js';
@@ -11,12 +10,13 @@ import { dire } from '../moteur/voix.js';
 import * as J from '../jeu/etat.js';
 import * as L from '../jeu/elevage.js';
 import { OBJETS } from '../jeu/objets.js';
-import { nomDe, NOMS_RIGOLOS, xpPourNiveau } from '../jeu/individus.js';
+import { nomDe, NOMS_RIGOLOS, xpPourNiveau, adnDe } from '../jeu/individus.js';
 import * as S from '../jeu/scenario.js';
+import { blocAmeliorer, brancherAmeliorer } from './production.js';
 
 const E = () => J.etat();
 let n = 0;
-const portrait = d => portraitDindie(variante(PAR_ID[d.espece], { stade: d.stade, chroma: d.chroma }), { id: 'E' + (n++) });
+const portrait = d => portraitDindie(adnDe(d), { id: 'E' + (n++) });
 /* « 4 min 05 s », « 1 h 12 » */
 export function duree(ms) {
   const s = Math.ceil(ms / 1000);
@@ -39,7 +39,7 @@ const carteMini = (d, extra = '') => `<button class="carteDindie" data-uid="${d.
 /* ── le Couvoir ── */
 export function ouvrirCouvoir({ surChange, surEclosion } = {}) {
   const nid = [null, null];
-  let minuteur = null;
+  let minuteur = null, gateau = false;
   const F = fenetre('🥚 Le Couvoir', '', { classe: 'couvoirF', large: true, surFermer: () => clearInterval(minuteur) });
   const dessiner = () => {
     const C = L.elevage().couveuses, P = nid[0] && nid[1] ? L.possibilites(nid[0], nid[1]) : null;
@@ -50,7 +50,8 @@ export function ouvrirCouvoir({ surChange, surEclosion } = {}) {
       : '<p class="infoCouple pale">Ces deux dindies ont le même type : leur bébé leur ressemblera. Choisis deux types différents pour un hybride !</p>';
     F.contenu.innerHTML = `<h3>💕 Le nid</h3><div class="nid">${nid.map((d, i) => d ? `<div class="placeNid">${carteMini(d)}<button class="btn petit" data-retire="${i}">✖</button></div>`
         : `<button class="placeNid vide" data-choisir="${i}"><span>➕</span><small>Parent ${i + 1}</small></button>`).join('<span class="coeurNid">💕</span>')}</div>
-      ${infoCouple}<div class="ligneBtn"><button class="btn grand vert" id="cCroiser" ${P ? '' : 'disabled'}>💕 Croiser</button></div>
+      ${infoCouple}${J.combien('gateauAmour') ? `<label class="mais"><input type="checkbox" id="cGateau" ${gateau ? 'checked' : ''}> 🎂 Avec un Gâteau d’amour (tu en as ${J.combien('gateauAmour')}) : un hybride ou une recette secrète, bien plus souvent !</label>` : ''}
+      <div class="ligneBtn"><button class="btn grand vert" id="cCroiser" ${P ? '' : 'disabled'}>💕 Croiser</button></div>
       <h3>🔥 Les couveuses</h3><div class="couveuses">${C.map((o, i) => o ? `<div class="couveuse ${L.pret(o) ? 'prete' : ''}">
         <div class="oeufBox">${oeufSvg(o.couleurs, L.pret(o) ? 2 : 0)}</div>
         <b>${o.origine === 'croisement' ? (o.parents?.length ? 'Œuf de ' + o.parents.map(p => PAR_ID[p]?.nom.split(' ').pop() || '?').join(' × ') : 'Un œuf de croisement') : o.origine === 'tutoriel' ? 'L’œuf du Professeur' : 'Un œuf mystère'}</b>
@@ -59,12 +60,17 @@ export function ouvrirCouvoir({ surChange, surEclosion } = {}) {
              ${J.combien('sablier') ? `<button class="btn petit" data-sablier="${i}">⏳ Sablier (${J.combien('sablier')}) : − 30 min</button>` : ''}`}</div>`
         : `<div class="couveuse vide"><div class="oeufBox vide">🪺</div><small>Libre</small></div>`).join('')}</div>
       ${J.combien('oeufProfesseur') ? '<div class="ligneBtn"><button class="btn jaune" id="cProf">🥚 Mettre l’œuf du Professeur en couveuse</button></div>' : ''}
+      ${J.combien('oeufEpique') ? `<div class="ligneBtn"><button class="btn jaune" id="cEpique">🟣 Mettre un œuf épique en couveuse (tu en as ${J.combien('oeufEpique')})</button></div>` : ''}
       ${J.combien('oeufMystere') ? `<div class="ligneBtn"><button class="btn" id="cMystere">🥚 Mettre un œuf mystère en couveuse (tu en as ${J.combien('oeufMystere')})</button></div>` : ''}
-      <p class="petitTexte">⏱️ Les œufs couvent même quand le jeu est fermé : commune 5 min, rare 20 min, épique 1 h${E().reglages.aide ? ' (deux fois moins en mode aide)' : ''}.</p>`;
+      <p class="petitTexte">⏱️ Les œufs couvent même quand le jeu est fermé : commune 5 min, rare 20 min, épique 1 h${E().reglages.aide ? ' (deux fois moins en mode aide)' : ''}.</p>
+      ${blocAmeliorer('couvoir')}`;
+    brancherAmeliorer(F.el, () => { L.elevage(); surChange && surChange('couvoir'); dessiner(); });
+    const gt = $('#cGateau', F.el); if (gt) gt.onchange = () => { gateau = gt.checked; };
     $$('[data-choisir]', F.el).forEach(b => b.onclick = () => { pop(); choisirParent(nid.filter(Boolean), d => { nid[+b.dataset.choisir] = d; dessiner(); }); });
     $$('[data-retire]', F.el).forEach(b => b.onclick = () => { pop(); nid[+b.dataset.retire] = null; dessiner(); });
     const c = $('#cCroiser', F.el); if (c) c.onclick = () => {
-      const r = L.croiser(nid[0], nid[1]);
+      const r = L.croiser(nid[0], nid[1], { gateau: gateau && J.combien('gateauAmour') > 0 });
+      if (typeof r !== 'string') gateau = false;
       if (typeof r === 'string') { toast('⚠️ ' + r, { duree: 3200 }); return; }
       tada(); glouglou(1.1); toast('💕 Un œuf apparaît dans le nid ! Il part au chaud dans une couveuse.', { duree: 3200 });
       window.dispatchEvent(new CustomEvent('dindie-joie', { detail: nid[0].uid })); window.dispatchEvent(new CustomEvent('dindie-joie', { detail: nid[1].uid }));
@@ -79,6 +85,7 @@ export function ouvrirCouvoir({ surChange, surEclosion } = {}) {
     });
     $$('[data-sablier]', F.el).forEach(b => b.onclick = () => { if (L.sablier(+b.dataset.sablier)) { pop(); toast('⏳ Hop ! 30 minutes de gagnées.'); } dessiner(); });
     const pr = $('#cProf', F.el); if (pr) pr.onclick = () => { const r = L.couverOeufProfesseur(); if (typeof r === 'string') toast('⚠️ ' + r); else { pop(); S.evenement('oeufPose', r); } dessiner(); };
+    const ep = $('#cEpique', F.el); if (ep) ep.onclick = () => { const r = L.couverOeufEpique(); if (typeof r === 'string') toast('⚠️ ' + r); else { tada(); toast('🟣 L’œuf épique brille dans sa couveuse… Il éclora dans 1 heure !', { duree: 3200 }); S.evenement('oeufPose', r); } dessiner(); };
     const m = $('#cMystere', F.el); if (m) m.onclick = () => { const r = L.couverOeufMystere(); if (typeof r === 'string') toast('⚠️ ' + r); else { pop(); toast('🥚 L’œuf mystère est au chaud…'); S.evenement('oeufPose', r); } dessiner(); };
   };
   dessiner();
@@ -91,8 +98,8 @@ export function ouvrirCouvoir({ surChange, surEclosion } = {}) {
   return F;
 }
 function choisirParent(deja, surChoix) {
-  const A = E().dindies.filter(d => L.estAdulte(d) && !deja.includes(d));
-  const F = fenetre('💕 Choisis un parent', A.length ? `<p class="petitTexte">Seules les dindies adultes peuvent avoir un œuf. Une dindie qui vient d’avoir un œuf se repose ${L.REPOS_PARENT} minutes.</p>
+  const A = E().dindies.filter(d => L.estAdulte(d) && !deja.includes(d) && d.lieu !== 'mission');
+  const F = fenetre('💕 Choisis un parent', A.length ? `<p class="petitTexte">Seules les dindies adultes (et pas en mission) peuvent avoir un œuf. Une dindie qui vient d’avoir un œuf se repose ${L.REPOS_PARENT} minutes.</p>
     <div class="rangee">${A.map(d => carteMini(d, L.fatigue(d) ? ' · 💤' : '')).join('')}</div>` : '<p>Aucune dindie adulte disponible…</p>');
   $$('.carteDindie', F.el).forEach(b => b.onclick = () => {
     const d = J.parUid(b.dataset.uid);
@@ -140,7 +147,9 @@ export function ouvrirNurserie({ surChange } = {}) {
         <small>${d.stade === 'poussin' ? '🐣 Poussin' : '🐥 Jeune'} · ${PAR_ID[d.espece].nom}${d.lieu === 'nurserie' ? '' : ' · 🐾 au Clapier'}</small>
         <div class="minuteur">${barre(1 - L.tempsCroissance(d) / ((d.stade === 'poussin' ? 10 : 30) * L.MINUTE / (E().reglages.aide ? 2 : 1)), '#f472b6')}<span data-croit="${d.uid}">${d.stade === 'poussin' ? '🐥' : '🦃'} dans ${duree(L.tempsCroissance(d))}</span></div></div>
         <button class="btn jaune" data-nourrir="${d.uid}" ${L.friandisePour(d) ? '' : 'disabled'}>🍪 Nourrir</button></div>`).join('')
-        : '<p class="vide">🍼 Pas de bébé pour l’instant. Les poussins arrivent ici en sortant de l’œuf !</p>'}`;
+        : '<p class="vide">🍼 Pas de bébé pour l’instant. Les poussins arrivent ici en sortant de l’œuf !</p>'}
+      <p class="petitTexte">Places : ${E().dindies.filter(d => d.lieu === 'nurserie').length}/${L.placesNurserie()}</p>${blocAmeliorer('nurserie')}`;
+    brancherAmeliorer(F.el, () => { surChange && surChange(); dessiner(); });
     $$('[data-nourrir]', F.el).forEach(b => b.onclick = () => {
       const d = J.parUid(b.dataset.nourrir), r = L.nourrir(d);
       if (!r) { toast('Il te faut une friandise !'); return; }
@@ -166,7 +175,7 @@ export function grandiToast(d) {
 export function ouvrirEveil({ surChange } = {}) {
   const F = fenetre('🌟 L’éveil', '', { classe: 'eveilF', large: true });
   const dessiner = () => {
-    const A = E().dindies.filter(d => L.estAdulte(d)).sort((a, b) => b.niveau - a.niveau);
+    const A = E().dindies.filter(d => L.estAdulte(d) && d.lieu !== 'mission').sort((a, b) => b.niveau - a.niveau);
     F.contenu.innerHTML = `<p class="petitTexte">Une dindie de <b>niveau ${L.NIVEAU_EVEIL}</b> peut s’éveiller avec une <b>pierre d’éveil</b> 💎 (tu en as ${J.combien('pierreEveil')}).
       Elle gagne + 1 à chaque stat de base et une toute nouvelle apparence !</p>
       <div class="rangee">${A.map(d => { const non = L.peutEveiller(d); return `<button class="carteDindie ${non ? 'pale' : 'prete'}" data-uid="${d.uid}"><div class="mini">${portrait(d)}</div><b>${echapper(nomDe(d))}</b>

@@ -2,6 +2,8 @@
    Chaque dindie a son espèce, son surnom, son niveau, ses talents (0 à 5 étoiles
    par stat), son caractère, son bonheur, et l'endroit où elle vit. */
 import { PAR_ID } from '../donnees/especes.js';
+import { variante } from '../dindies/adn.js';
+import { CHAPEAUX } from '../donnees/production.js';
 
 export const CARACTERES = {
   fonceuse: { nom: 'Fonceuse', plus: 0, moins: 1, desc: 'Elle fonce ! Plus rapide, moins endurante.' },
@@ -28,6 +30,15 @@ export function nouvelleDindie(espece, { niveau = 1, talents = null, caractere =
 }
 export const espece = d => PAR_ID[d.espece];
 export const nomDe = d => d.surnom || PAR_ID[d.espece].nom;
+/* l'apparence d'une dindie (pour le modèle 3D et le portrait) : son espèce, son stade… et son chapeau de l'Atelier */
+export function adnDe(d) {
+  const a = variante(PAR_ID[d.espece], { stade: d.stade, chroma: d.chroma }), C = d.chapeau && CHAPEAUX[d.chapeau];
+  if (C && (d.stade === 'adulte' || d.stade === 'eveille')) {
+    a.chapeau = C.forme; a.couleurChapeau = C.c1; a.couleurChapeau2 = C.c2;
+    if (!['cornes', 'antennes'].includes(a.crete)) a.crete = 'aucune';
+  }
+  return a;
+}
 
 /* les stats affichées (de 5 à 100), selon le plan : 5 + (6 × base + 4 × talent + entraînement) × niveau / 50,
    puis ± 10 % selon le caractère ; l'éveil donne + 1 à chaque base */

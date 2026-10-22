@@ -4,7 +4,6 @@
 import { PAR_ID } from '../donnees/especes.js';
 import { TYPES, RARETES } from '../donnees/types.js';
 import { CHAMPIONNATS, SORTES, PISTES, COMPETENCES, competencesDe, gainsCourse } from '../donnees/courses.js';
-import { variante } from '../dindies/adn.js';
 import { portraitDindie } from '../dindies/portrait.js';
 import { PERSONNAGES, portraitChibi } from '../personnages/chibi.js';
 import { fenetre, toast, $, $$, echapper } from '../moteur/ui.js';
@@ -12,12 +11,12 @@ import { pop, tada } from '../moteur/sons.js';
 import * as J from '../jeu/etat.js';
 import * as DD from '../jeu/dindodrome.js';
 import { qualites } from '../jeu/course.js';
-import { nomDe, stats } from '../jeu/individus.js';
+import { nomDe, stats, adnDe } from '../jeu/individus.js';
 import * as S from '../jeu/scenario.js';
 
 const E = () => J.etat();
 let n = 0;
-const portrait = d => portraitDindie(variante(PAR_ID[d.espece], { stade: d.stade, chroma: d.chroma }), { id: 'DD' + (n++) });
+const portrait = d => portraitDindie(adnDe(d), { id: 'DD' + (n++) });
 const MEDAILLE = p => p === 1 ? '🥇' : p === 2 ? '🥈' : p === 3 ? '🥉' : p ? `${p}e` : '–';
 const ORD = p => p === 1 ? '1re' : p + 'e';
 export const coureusesPossibles = () => J.equipe().filter(d => d.stade === 'adulte' || d.stade === 'eveille');

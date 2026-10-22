@@ -17,6 +17,7 @@ import { jour } from './trouvailles.js';
 import { CACHETTES } from '../monde/domaine.js';
 import * as DD from './dindodrome.js';
 import { CHAMPIONNATS } from '../donnees/courses.js';
+import * as QD from './quetesDomaine.js';
 
 export const STARTERS = ['paquerette', 'crachin', 'braise'];
 export const CHAPITRES = { 1: 'Le Domaine en ruine', 2: 'L’expédition', 3: 'Le premier œuf', 4: 'Le Dindodrome ouvre', 5: 'Jungle et Banquise' };
@@ -54,6 +55,13 @@ export const QUETES = [
 ];
 const ORDRE = [...QUETES.flatMap(q => q.etapes), 'fin'];
 export const queteDe = etape => QUETES.find(q => q.etapes.includes(etape));
+/* le titre du bandeau : la quête de l'histoire, ou (quand l'histoire attend la suite) une quête du Domaine */
+export function titreQuete() {
+  const q = queteDe(E().quete.etape);
+  if (q) return q.titre;
+  if (QD.active()) return '🏡 ' + QD.queteActuelle().titre;
+  return `Chapitre ${QUETES[QUETES.length - 1].chapitre} terminé !`;
+}
 export const chapitreActuel = () => { const Q = queteDe(E().quete.etape); return Q ? Q.chapitre : 4; };
 /* l'histoire en est-elle arrivée à cette étape (ou plus loin) ? */
 export const etapeAtteinte = s => ORDRE.indexOf(E().quete.etape) >= ORDRE.indexOf(s);
@@ -86,11 +94,13 @@ const LIEU = { gaston: 'pres', capture1: 'pres', pres3: 'pres', parlerGaston2: '
   entrainement3: 'domaine', coupe1: 'dindodrome', gontran1: 'dindodrome', lecon: 'domaine', coupe2: 'dindodrome', coupe3: 'dindodrome', coupe4: 'dindodrome', gontran2: 'dindodrome' };
 export const lieuEtape = () => { const s = E().quete.etape; return ORDRE.indexOf(s) < ORDRE.indexOf('decollage') ? 'domaine' : LIEU[s] || null; };
 let lieuActuel = () => 'domaine';
+export const lieuActuelId = () => lieuActuel();
 const nomLieu = id => id === 'domaine' ? 'au Domaine' : id === 'dindodrome' ? 'au Dindodrome' : REGIONS[id] ? `${REGIONS[id].nom.replace(/^(Le |La |Les )/, m => ({ 'Le ': 'au ', 'La ': 'en ', 'Les ': 'aux ' })[m])}` : '';
 
 /* ── le texte de l'étape (le bandeau en haut) et ce que montre la flèche ── */
 export function texteEtape() {
   const e = E(), s = e.quete.etape, ici = lieuActuel(), la = lieuEtape();
+  if (s === 'fin' && QD.active()) return QD.texte(ici);
   const t = ({
     arrivee: 'Va voir le Professeur Plumeau, devant le Labo 🔬',
     choix: 'Choisis ta première dindie !',
@@ -172,6 +182,7 @@ export function texteEtape() {
 const coupeTexte = n => { const C = CHAMPIONNATS[n - 1], k = C.courses.filter(c => (DD.meilleurePlace(c.id) || 9) <= 3).length; return k < 3 ? `${k}/3 podiums` : 'la finale !'; };
 export function cibleEtape() {
   const e = E(), s = e.quete.etape, ici = lieuActuel(), la = lieuEtape();
+  if (s === 'fin' && QD.active()) return QD.cible(ici);
   if (la === 'dindodrome' && ici === 'domaine') return 'dindodrome';
   if (la === 'domaine' && ici === 'dindodrome') return 'sortie';
   if (la && la !== 'zephyr' && la !== ici) return 'pnj-zephyr';
@@ -260,6 +271,8 @@ function cadeauDuJour(id, objet) {
 /* ── parler à un habitant ── */
 export async function parler(id) {
   const e = E(), s = e.quete.etape;
+  /* les quêtes du Domaine (si l'histoire n'attend rien de cet habitant) */
+  if (QD.active() && (s === 'fin' || cibleEtape() !== 'pnj-' + id) && await QD.parler(id)) return;
   if (id === 'plumeau') {
     if (s === 'arrivee') {
       await dialogue([

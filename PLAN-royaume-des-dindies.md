@@ -346,6 +346,17 @@ En mode aide, les compétences se déclenchent toutes seules.
 - **Le Bureau des missions :** on envoie 1 à 3 dindies pendant 15 min à 8 h. La réussite dépend des stats et des types demandés. Elles rapportent pièces, objets, œufs mystère, et parfois un œuf épique.
 - **Rendre à la nature :** on peut relâcher une dindie avec un petit au revoir, contre des plumes. Il n’y a pas de vente.
 
+**Ce qui est en place (étape 6) :**
+- **Les réparations :** le Potager (300 🪙), le Moulin (400 🪙), l’Atelier des plumes (500 🪙), le Bureau des missions (400 🪙) ; un nouvel habitat coûte 400 🪙. Tout s’ouvre quand le chapitre 4 est fini.
+- **Le Potager :** 4 parcelles (jusqu’à 12 en l’améliorant). Les graines se vendent par 5 chez Mimi (maïs 5 🪙, blé 8 🪙, haricot 10 🪙, baie 25 🪙). On peut **arroser** une fois : la plante pousse un quart plus vite et donne une récolte de plus. Une récolte donne 2 à 3 épis, gerbes ou haricots (1 à 2 baies), et parfois une graine en plus. Tout pousse en temps réel, même jeu fermé.
+- **Le Moulin :** galette de maïs (2 🌽), petit pain (2 🌾), croquant sauteur (2 🫘) : + 1 point d’entraînement dans une stat (15 au plus) ; tarte aux baies (1 🍇 + 1 🌾) : + 300 XP ; super-friandise (🌽 🌾 🫘) : la confiance monte presque comme avec la friandise préférée ; Gâteau d’amour (2 🍇, 1 🌾, 1 🌽) : au nid, la recette secrète passe à 50 % et les hybrides deux fois plus souvent.
+- **Les plumes :** chaque adulte d’un enclos en laisse une fois par jour (1 commune, 2 rare, 3 épique, 5 mythique, + 1 si son bonheur dépasse 80) ; la toute première fois, 6 plumes en cadeau. On les voit en petit tas dans l’enclos.
+- **L’Atelier :** 30 chapeaux (10 formes : fête, nœud, béret, bonnet, casquette, couronne de fleurs, haut-de-forme, sombrero, cowboy, viking ; 3 coloris chacun, payés en plumes d’un type) et 50 décorations (massifs, fanions et statues des 8 types, arbres, bancs, lampadaire, lampions, fontaine, puits, kiosque, arche, balançoire, nichoir, épouvantail, petit moulin, ballons, citrouilles, bonhomme de neige, rocher, mare, parasol, haies, barrières, dalles). Une dindie adulte porte un chapeau (on le voit en 3D et sur son portrait).
+- **La décoration :** le mode 🎨 Décorer pose jusqu’à 60 décorations librement (pas dans un bâtiment, un enclos, l’eau, ni devant une porte) ; on les tourne, les déplace ou les range. Celles qui « bloquent » bouchent la carte, et la libèrent quand on les range.
+- **Le Bureau des missions :** 4 missions proposées (12 modèles, de 15 min à 8 h), 1 à 3 adultes par mission. La chance de réussite = la stat demandée (+ 12 avec le bon type), comparée à ce que demande la mission (10 % à 97 %). Réussie : des pièces (40 à 550), des plumes, une surprise (friandises, graines, sablier, biscuit, œuf mystère, et parfois un **œuf épique** au-delà de 4 h). Ratée : 30 % des pièces, la moitié de l’expérience. Les dindies parties ne peuvent pas être déplacées, et rentrent chez elles.
+- **Les améliorations :** enclos (2 → 10 places, niveaux 1 à 5), Clapier (1 → 10 rangées), Couvoir (2 → 4 couveuses), Nurserie (6 → 10 places), Potager (4 → 12 parcelles), Bureau (1 → 3 missions à la fois). Les plus grandes demandent des plumes d’or.
+- **Rendre à la nature :** jamais la toute première dindie ; une commune laisse 3 plumes, une rare 6, une épique 12, une mythique 20 (+ 10 si elle est chromatique) ; son chapeau revient au stock, et elle reste dans le Grand Livre.
+
 ## 10. Les quêtes et la durée de vie
 
 **L’histoire en 8 chapitres** (environ 60 quêtes) :
@@ -359,7 +370,7 @@ En mode aide, les compétences se déclenchent toutes seules.
 8. *La Légende* : la Ligue des Légendes, la plume arc-en-ciel, le Dindromakus, la fin et le générique.
 
 **Les autres activités :**
-- environ 40 quêtes des habitants ;
+- environ 40 quêtes des habitants (les 7 premières, les « quêtes du Domaine », arrivent avec l’étape 6 : le Potager, le Moulin, l’Atelier des plumes, la décoration, le Bureau des missions, une amélioration, le Gâteau d’amour) ;
 - 8 grandes quêtes de région, une par mythique ;
 - 3 défis par jour et 3 par semaine ;
 - **100 succès** ;
@@ -403,7 +414,8 @@ docs/royaume/
                           sons, voix, sauvegarde, temps (jour/nuit, météo, lune)
   js/dindies/             adn, modele (3D), portrait (SVG), elevage, stats
   js/donnees/             types, especes, regions (les 8 îles, qui y vit et quand),
-                          batiments, objets, competences, courses, quetes, pnj
+                          courses, production (graines, recettes, 30 chapeaux, 50 décorations,
+                          missions, améliorations)
   js/personnages/         chibi (modèle commun), roullieee, pnj
   js/monde/               carte (grille + A*), decor (île, eau, végétation, nuit),
                           batiments, domaine, ile (le sol des régions), nature, fabrique,
@@ -412,17 +424,21 @@ docs/royaume/
                           sauvages (les apparitions), capture, trouvailles (coffres, œufs…),
                           elevage (œufs, croisements, minuteurs, croissance, expérience, éveil),
                           collection (les espèces débloquées de chaque profil),
-                          course (la simulation d'une course), dindodrome (courses, gains, badges, leçons)
+                          course (la simulation d'une course), dindodrome (courses, gains, badges, leçons),
+                          production (Potager, Moulin, plumes, Atelier, décoration, missions, améliorations,
+                          rendre à la nature), quetesDomaine (les 7 quêtes du Domaine)
   js/ui/                  panneaux (Boutique, Labo, Livre, Musée, Fiche, Clapier…),
                           monde (la carte du monde, le voyage en montgolfière),
                           elevage (le Couvoir, la Nurserie, l’éclosion, l’éveil),
                           dindodrome (Bureau des courses, résultats, trophées),
-                          entrainement (le terrain de Coach Ginette et ses 3 mini-jeux)
+                          entrainement (le terrain de Coach Ginette et ses 3 mini-jeux),
+                          production (Potager, Moulin, Atelier, Bureau des missions, améliorations, chapeau)
   musique/                les musiques libres (MP3) et leurs crédits
   js/scenes/              titre, jeu (le Domaine et tous les lieux), defile (étape 1),
-                          course (la course en 3D : caméra, interface, podium)
+                          course (la course en 3D : caméra, interface, podium), decorer (le mode Décorer)
   js/monde/dindodrome.js  le Dindodrome (piste, tribunes, public, tableau, podium)
-royaume-outils/           les tests Playwright (test-etape1 à 5, et tous-les-tests.mjs qui les lance
+  js/monde/decorations.js les 50 décorations en 3D (et leur « fantôme » pour les poser)
+royaume-outils/           les tests Playwright (test-etape1 à 6, et tous-les-tests.mjs qui les lance
                           tous avec un résumé), le simulateur d'équilibrage des courses
                           (simulateur-courses.mjs), le générateur du tableau des espèces
 ```
@@ -433,7 +449,7 @@ royaume-outils/           les tests Playwright (test-etape1 à 5, et tous-les-te
   - des parties jouées automatiquement par Playwright (comme pour la ferme), sur téléphone, téléphone couché, tablette et ordinateur ;
   - une vérification qu’il n’y a aucune erreur et que la mémoire reste stable ;
   - un **simulateur** qui joue des milliers de croisements et de courses pour régler la progression ;
-  - **une seule commande** pour tout lancer : `node royaume-outils/tous-les-tests.mjs` (options : `--etapes=1,2,3,4,5`, `--formats=tel,paysage,tablette,ordi` ou `tous`, `--adresse=` pour tester le site en ligne, `--three=` pour un three.js local sans Internet). Elle sert `docs/` sur un petit serveur local, lance les tests l’un après l’autre et affiche un résumé (environ une heure pour tout).
+  - **une seule commande** pour tout lancer : `node royaume-outils/tous-les-tests.mjs` (options : `--etapes=1,2,3,4,5,6`, `--formats=tel,paysage,tablette,ordi` ou `tous`, `--adresse=` pour tester le site en ligne, `--three=` pour un three.js local sans Internet). Elle sert `docs/` sur un petit serveur local, lance les tests l’un après l’autre et affiche un résumé (environ une heure pour tout).
 
 ## 14. Les étapes jusqu’à la version 1.0
 
@@ -484,10 +500,11 @@ Chaque étape se termine par : les tests passent, des captures sur les 4 formats
 - [x] En plus : le chapitre 4 (8 quêtes), Monsieur Chrono le présentateur, le public et le podium, la Salle des trophées et les records, les courses libres, deux musiques de course libres (orgue de foire), et le simulateur d’équilibrage dans les tests.
 - **Fini quand :** on peut élever un champion et gagner 4 badges.
 
-### Étape 6 — La production
-- [ ] Le Potager, le Moulin, l’Atelier des plumes (chapeaux).
-- [ ] La décoration du Domaine et les améliorations des bâtiments.
-- [ ] Le Bureau des missions.
+### Étape 6 — La production ✅
+- [x] Le Potager, le Moulin, l’Atelier des plumes (chapeaux).
+- [x] La décoration du Domaine et les améliorations des bâtiments.
+- [x] Le Bureau des missions.
+- [x] En plus : 7 « quêtes du Domaine » (des habitants) qui font découvrir tout cela après le chapitre 4, le mode 🎨 Décorer (poser, tourner, déplacer, ranger), les 10 formes de chapeaux en 3D et en portrait, le Gâteau d’amour au Couvoir, l’œuf épique, la super-friandise pour attraper, construire les 6 autres habitats, et « rendre à la nature ».
 - **Fini quand :** le Domaine produit et se décore, et les missions rapportent.
 
 ### Étape 7 — Le monde entier
@@ -530,3 +547,4 @@ Chaque étape se termine par : les tests passent, des captures sur les 4 formats
 | 2026-10-22 | 3 | L’expédition est jouable : le chapitre 2 en 10 quêtes. La carte du monde (8 îles, 3 ouvertes) et le voyage en montgolfière ; 3 îles en 3D construites à la demande et libérées au départ (mémoire stable) : les Prés (ferme de Gaston, moulin, mare, champ de coquelicots, jardin oublié), le Maroc imaginaire (dunes, ksar, souk et ses lanternes, oasis), la Belgique (canaux et ponts, Grand-Place, beffroi, maisons à pignons, Atomium). La météo par île et par heure (pluie, nuages, soleil). Les dindies sauvages (zones, heure, météo, équipement, mirages), la capture (friandises préférées, jauge de confiance, cercle et zone verte, 3 essais), la carte d’une dindie attrapée et la prime du Grand Livre. Les guides Gaston, Leïla et Monsieur Waffel ; les gadgets (le coq, le cadran magique, la bouteille à nuages) ; les coffres, œufs mystère et pierres d’éveil du jour ; filets solide et doré, chapeau de soleil, parapluie. De vraies musiques libres (0 A.D., OpenRCT2) à la place de la mélodie synthétisée. Les épiques ne dépendent plus des champions mais d’une petite quête de leur île. Les anciennes sauvegardes passent au chapitre 2. Tests : `royaume-outils/test-etape3.mjs` (les 12 espèces attrapées, gadgets, voyages, mémoire, sauvegarde) ; `test-etape1.mjs` et `test-etape2.mjs` toujours verts. |
 | 2026-10-22 | 4 | L’élevage est jouable : le chapitre 3 en 5 quêtes. Le Couvoir (une hutte ronde, le nid et 2 couveuses sous cloche, les œufs visibles en 3D) et la Nurserie (une maison pastel, sa cour clôturée, son bac à sable et son toboggan, où jouent les bébés le jour) se réparent avec un kit de construction de Mimi. Les croisements (hybrides 30 % / 15 %, recettes 25 %, le premier hybride garanti), les minuteurs en temps réel même jeu fermé, le sablier, l’éclosion animée avec le prénom du bébé, les 3 stades (poussin, jeune, adulte) et les repas qui font grandir plus vite. L’expérience (friandises, biscuits de champion, captures, promenades) et les niveaux ; l’éveil au Labo au niveau 20 avec une pierre d’éveil ; les chromatiques (1 sur 64). Les œufs mystère trouvés dans les îles éclosent enfin. Le Défilé (écran titre et page du Défilé) ne montre plus que les dindies débloquées du profil. Les sauvegardes de l’étape 3 passent au chapitre 3. Tests : `royaume-outils/test-etape4.mjs` (chapitre 3 joué de bout en bout, 300 croisements, minuteurs, rechargement) ; `test-etape1.mjs` (avec le Défilé limité), `test-etape2.mjs` et `test-etape3.mjs` toujours verts. |
 | 2026-10-22 | 5 | Le Dindodrome est ouvert : le chapitre 4 en 8 quêtes. Un nouveau lieu au bout de la route de l’est (on y entre par le portail, avec un fondu en damier) : une piste en anneau de 200 m à 6 couloirs, la grande tribune et son public qui s’agite, le portique de l’arrivée, le tableau d’affichage, le podium, le Bureau des courses de Monsieur Chrono (le présentateur) et la Salle des trophées. Les courses en 3D : 6 dindies, la caméra derrière la nôtre, le compte à rebours, le commentateur, les haies (l’anneau vert du bouton 🦘 pour un saut parfait), 20 compétences avec leur recharge, « 🔥 Fonce ! », ⏩, puis le podium et les résultats (gains, expérience, records). La simulation (vitesse, endurance et fatigue, sauts, terrain, zones de sable et de boue, compétences) est réglée avec un simulateur. Les 4 premiers championnats (Prés, Dunes, Pluie, Lianes : 3 courses sur le podium puis la finale), leurs badges, deux défis de Gontran, les courses libres. Le terrain d’entraînement de Coach Ginette au Domaine (3 mini-jeux, un par stat, et les leçons de compétences). Deux nouveaux personnages (Monsieur Chrono, Tarzanette) et trois musiques libres de plus (orgue de foire et ragtime, domaine public). La 3D se met en pause pendant les mini-jeux. Les sauvegardes de l’étape 4 passent au chapitre 4. Tests : `royaume-outils/test-etape5.mjs` (l’équilibre sur des centaines de courses simulées, puis les règles une par une — chute si l’on saute trop tôt, saut parfait, mode aide, « Fonce ! », les 20 compétences, leçon payante, finale perdue —, puis le chapitre 4 joué de bout en bout : 19 courses, les 3 mini-jeux, une leçon, la mémoire du Dindodrome, le rechargement), vert sur les 4 formats ; `test-etape1.mjs` à `test-etape4.mjs` toujours verts. Toute la série se lance avec `royaume-outils/tous-les-tests.mjs`. |
+| 2026-10-22 | 6 | La production : le Domaine produit, se décore, et les missions rapportent. Quand le chapitre 4 est fini, 7 « quêtes du Domaine » (Mimi, le Professeur, le Capitaine) font découvrir : le **Potager** réparé (4 à 12 parcelles, maïs, blé, haricot sauteur et baie arc-en-ciel qui poussent en temps réel, l’arrosage, les plantes visibles en 3D), le **Moulin** et ses ailes qui tournent (6 recettes : galette, petit pain et croquant pour l’entraînement, tarte aux baies, super-friandise pour attraper, Gâteau d’amour pour les hybrides), les **plumes du jour** en petit tas dans les enclos, l’**Atelier des plumes** (30 chapeaux en 10 formes, portés en 3D et sur les portraits ; 50 décorations), le mode **🎨 Décorer** (poser, tourner, déplacer, ranger ; la carte se bouche et se libère), le **Bureau des missions** (12 modèles de 15 min à 8 h, 1 à 3 dindies, la chance selon les stats et le type, pièces, plumes, surprises, œuf épique ; le drapeau se lève, un « ! » quand elles rentrent), les **améliorations** (enclos, Clapier, Couvoir jusqu’à 4 couveuses, Nurserie, Potager, Bureau), les 6 autres habitats à construire, et **rendre à la nature**. Sauvegarde en version 5. Tests : `royaume-outils/test-etape6.mjs` (les règles une par une, les 7 quêtes jouées avec les fenêtres, la mémoire, la sauvegarde) sur les 4 formats ; la série complète (`tous-les-tests.mjs`, étapes 1 à 6) reste verte. |
