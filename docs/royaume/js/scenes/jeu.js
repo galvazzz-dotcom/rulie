@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 import { scene, camera, renderer, chaqueImage, soleil, ciel, couleursCiel, centrerImage, distancesBrume, redimensionner } from '../moteur/rendu.js';
 import { entrees } from '../moteur/entrees.js';
-import { lumiere, heure, texteHeure, regler as reglerHeure, finForcage, forcerHeure } from '../moteur/temps.js';
+import { lumiere, heure, texteHeure, regler as reglerHeure, finForcage, forcerHeure, forcerPleineLune } from '../moteur/temps.js';
 import { meteo, METEOS, forcerMeteo } from '../moteur/meteo.js';
 import { $, el, toast, fenetreOuverte, enDialogue, fermerDerniere } from '../moteur/ui.js';
 import { pop, tada, glouglou, sonActif, musique, musiqueNuit, ambianceMusique, audio, pluieSon } from '../moteur/sons.js';
@@ -19,6 +19,8 @@ import { sol as solDomaine, ILE, forme as formeDomaine } from '../monde/decor.js
 import { construireRegion } from '../monde/region.js';
 import { creerChibi, PERSONNAGES } from '../personnages/chibi.js';
 import { creerDindie } from '../dindies/modele.js';
+import { variante } from '../dindies/adn.js';
+import { ouvrirGenerique } from '../ui/generique.js';
 import { adnDe } from '../jeu/individus.js';
 import { PAR_ID } from '../donnees/especes.js';
 import { REGIONS } from '../donnees/regions.js';
@@ -40,6 +42,12 @@ import * as PR from '../jeu/production.js';
 import * as QD from '../jeu/quetesDomaine.js';
 import { ouvrirPotager, ouvrirMoulin, ouvrirAtelier, ouvrirMissions, proposerReparation } from '../ui/production.js';
 import { creerDecorateur } from './decorer.js';
+import { ouvrirScene, concoursActif } from '../ui/concours.js';
+import * as CO from '../jeu/concours.js';
+import * as DF from '../jeu/defis.js';
+import * as SU from '../jeu/succes.js';
+import * as EV from '../jeu/evenements.js';
+import { ouvrirPanneau } from '../ui/quotidien.js';
 
 const VITESSE = 4.6;
 
@@ -201,7 +209,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
       else if (id === 'labo') await S.parler('plumeau');
       else if (id === 'boutique') await S.parler('mimi');
       else if (id === 'musee') P.ouvrirMusee();
-      else if (id === 'quetes') P.ouvrirJournal();
+      else if (id === 'quetes') ouvrirPanneau({ journal: P.ouvrirJournal, surChange: majHud });
       else if (id === 'lettres') P.courrier();
       else if (id === 'fontaine') P.voeu(() => { particules(new THREE.Vector3(0, 2.4, 0), { n: 30, couleur: '#fde68a', taille: .4, vitesse: 3, monte: 3 }); pop(); });
       else if (id === 'montgolfiere' || id === 'ballon') await S.parler('zephyr');
@@ -225,8 +233,8 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
       }
       else if (PR.PRODUCTION[id]) {
         if (E().batiments[id]?.repare) ouvrirProduction(id);
-        else if (!PR.productionOuverte()) toast(`🚧 ${I.ruine} : en travaux. Il ouvrira dans un prochain chapitre !`, { duree: 3200 });
-        else if (await proposerReparation(id)) { await reparerProductionAnime(id); toast(`🔨 ${I.texte} : réparé !`, { classe: 'grand' }); QD.verifier(); ouvrirProduction(id); }
+        else if (!PR.productionOuverte() || (id === 'scene' && !PR.sceneOuverte())) toast(`🚧 ${I.ruine} : en travaux. ${id === 'scene' ? 'Elle rouvrira' : 'Il ouvrira'} dans un prochain chapitre !`, { duree: 3200 });
+        else if (await proposerReparation(id)) { await reparerProductionAnime(id); toast(`🔨 ${I.texte} : réparé${id === 'scene' ? 'e' : ''} !`, { classe: 'grand' }); QD.verifier(); ouvrirProduction(id); }
       }
       else if (id.startsWith('ruine-')) toast(`🚧 ${I.ruine} : en travaux. Il ouvrira dans un prochain chapitre !`, { duree: 3200 });
       else if (id.startsWith('objet-') || id.startsWith('deco-')) await S.interagir(id);
@@ -479,6 +487,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
       domaine.interactifs.push({ id: 'pnj-gontran', e: '💬', texte: 'Gontran', x: 9.5, z: 35.7, cible: gontran.racine, pnj: 'gontran', rayon: 2.2 });
     },
     finChapitre(n) { P.finChapitre(n); },
+    finHistoire: () => finHistoire(),
     /* le portail du Dindodrome s'ouvre (avec des confettis la première fois) */
     async ouvrirPortail(anim) {
       domaine.majPortail();
@@ -491,6 +500,39 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     courir: id => courir(id),
     ajouterPnj: (...a) => monde.ajouterPnj && monde.ajouterPnj(...a)
   });
+  /* ── la fin de l'histoire : le Dindromakus descend du ciel sur la place, sous la pleine lune, puis le générique ── */
+  async function finHistoire() {
+    while (fenetreOuverte() || enDialogue() || occupe) await attendre(.5);
+    if (monde !== domaine) await partirVers('domaine');
+    occupe = true; chemin = null; anneau.visible = false;
+    document.body.classList.add('enCinematique');   /* (sans le bandeau des quêtes ni les boutons) */
+    forcerHeure(23, 6 * 60000); forcerPleineLune(6 * 60000); majLumiere(true);
+    const p0 = domaine.grille.plusProcheLibre(0, 12.5); moi.racine.position.set(p0[0], domaine.sol(p0[0], p0[1]), p0[1]); moi.racine.rotation.y = Math.PI;
+    const m = creerDindie(variante(PAR_ID.ruuulius, { stade: 'adulte' })); m.racine.scale.setScalar(1.7); m.racine.position.set(0, 14, 7.8); domaine.racine.add(m.racine);
+    camCourse = true; camera.position.set(0, 3.6, 22); camera.lookAt(0, 4, 7.8);
+    const ARC = ['#ef4444', '#f97316', '#facc15', '#22c55e', '#3b82f6', '#a855f7', '#f472b6'];
+    let t0 = null;
+    const anim = chaqueImage((dt, t) => {
+      m.maj(dt, t);
+      if (t0 === null) t0 = t;
+      const k = Math.min(1, (t - t0) / 4.5), e = 1 - Math.pow(1 - k, 3);
+      m.racine.position.y = 14 * (1 - e) + (k < 1 ? Math.sin(t * 3) * .3 : 0);
+      m.racine.rotation.y = (1 - e) * Math.PI * 2;
+      camera.lookAt(0, 1.6 + m.racine.position.y * .7, 7.8);
+      if (Math.random() < dt * (k < 1 ? 14 : 4)) particules(new THREE.Vector3((Math.random() - .5) * 3, m.racine.position.y + 1.5 + Math.random() * 2, 7.8 + (Math.random() - .5) * 2), { n: 6, couleur: ARC[Math.floor(Math.random() * 7)], taille: .4, vitesse: 2, monte: 1, duree: 1.2 });
+    });
+    await attendre(4.7);
+    m.jouer('roue'); tada(); glouglou(.55); setTimeout(() => glouglou(.5), 650); setTimeout(() => glouglou(.62), 1300);
+    toast('🌈 <b>RUUUULIIIIIIEEEEEEE !!!</b>', { duree: 4200, classe: 'grand' });
+    for (let k = 0; k < 6; k++) { particules(new THREE.Vector3((Math.random() - .5) * 14, 8 + Math.random() * 4, 7.8 + (Math.random() - .5) * 8), { n: 50, couleur: ARC[k], taille: .5, vitesse: 6, monte: 1, duree: 2.2 }); await attendre(.35); }
+    await attendre(1.5);
+    await S.dialoguesFin();
+    await ouvrirGenerique();
+    anim(); m.liberer(); document.body.classList.remove('enCinematique');
+    camCourse = false; cible.copy(moi.racine.position); placerCamera(1);
+    ambianceMusique(monde.ambiance, nuitK > .5);
+    occupe = false; majHud(); sauver();
+  }
   const bruitMarteau = () => { try { const A = audio(), o = A.createOscillator(), g = A.createGain(); o.type = 'square'; o.frequency.value = 180; g.gain.setValueAtTime(.08, A.currentTime); g.gain.exponentialRampToValueAtTime(.001, A.currentTime + .12); o.connect(g); g.connect(A.destination); o.start(); o.stop(A.currentTime + .13); } catch { /* pas de son */ } };
   function grandir(g) { const t0 = performance.now(); const f = () => { const k = Math.min(1, (performance.now() - t0) / 700); g.scale.set(1, .01 + .99 * (1 - Math.pow(1 - k, 3)) * (1 + Math.sin(k * Math.PI) * .12), 1); if (k < 1) requestAnimationFrame(f); }; f(); }
 
@@ -662,6 +704,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     else if (id === 'moulin') ouvrirMoulin({ surChange: () => domaine.tournerMoulin() });
     else if (id === 'atelier') ouvrirAtelier({ surChange: majHud, decorer: ouvrirDecorer });
     else if (id === 'missions') ouvrirMissions({ surChange: () => { syncDindies(); verifierProduction(); } });
+    else if (id === 'scene') ouvrirScene({ surChange: () => { majHud(); QD.verifier(); } });
   }
   async function reparerProductionAnime(id) {
     const L0 = LIEUX[id];
@@ -671,8 +714,18 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
   }
   /* les quêtes du Domaine avancent toutes seules quand l'état du jeu change */
   let qdPrevu = false;
-  J.surChangement(() => { if (qdPrevu) return; qdPrevu = true; setTimeout(() => { qdPrevu = false; QD.verifier(); S.verifierEtat(); }, 60); });
+  J.surChangement(() => { if (qdPrevu) return; qdPrevu = true; setTimeout(() => { qdPrevu = false; QD.verifier(); S.verifierEtat(); verifierSucces(); }, 60); });
   QD.verifier(); S.verifierEtat();
+  /* les succès (étape 8) : au chargement, ceux déjà mérités arrivent d'un coup (un seul message) */
+  let premiersSucces = true;
+  function verifierSucces() {
+    const N = SU.verifier(), plumes = N.reduce((a, x) => a + x.plumes, 0);
+    if (N.length > 2 || (premiersSucces && N.length > 1)) toast(`🏆 <b>${N.length} succès</b> débloqués ! + ${plumes} 🪶 d’or <small>(au Panneau des quêtes)</small>`, { duree: 4200, classe: 'grand', cle: 'succes' });
+    else N.forEach((x, i) => setTimeout(() => { tada(); toast(`🏆 Succès : <b>${x.e} ${x.nom}</b> ! + ${x.plumes} 🪶 d’or`, { duree: 3600, classe: 'grand' }); }, 900 + i * 1400));
+    premiersSucces = false;
+    $('#hJournal').classList.toggle('alerte', DF.aReclamer() > 0);
+  }
+  setTimeout(verifierSucces, 2500);
 
   /* ── le mode « Décorer » (le décorateur lui-même est créé plus haut, avec le rayon du toucher) ── */
   function ouvrirDecorer() {
@@ -682,6 +735,14 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
   }
   domaine.majDecos(PR.prod().deco);
   verifierProduction();
+  /* les fêtes de l'année (étape 8) : le Domaine se décore, et on prévient une fois par fête */
+  domaine.majFete(EV.feteDu());
+  const FT = EV.fete();
+  if (FT) {
+    const e = E(), d = new Date(), cle = FT.id + ':' + (FT.id === 'noel' && d.getMonth() === 0 ? d.getFullYear() - 1 : d.getFullYear());
+    e.fetes = e.fetes || { vues: {} };
+    if (!e.fetes.vues[cle]) { e.fetes.vues[cle] = Date.now(); setTimeout(() => toast(`${FT.e} <b>C’est ${FT.nom} au Royaume !</b> ${FT.texte}`, { duree: 6000, classe: 'grand' }), 3200); }
+  }
 
   /* ── une course au Dindodrome : choisir sa coureuse, courir, les résultats ── */
   let enCourse = false;
@@ -689,19 +750,22 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     if (enCourse || courseActive()) return null;
     const def = DD.defCourse(id); if (!def) return null;
     if (monde.id !== 'dindodrome') { toast('Les courses, c’est au Dindodrome !'); return null; }
-    const d = await choisirCoureuse(def);
-    if (!d) return null;
+    const choix = await choisirCoureuse(def);
+    if (!choix) return null;
+    /* au relais : une équipe de 3 (la première part) */
+    const equipe = Array.isArray(choix) ? choix : null, d = equipe ? equipe[0] : choix;
     enCourse = true; const avant = occupe; occupe = true; chemin = null; anneau.visible = false;
     let res = null;
     try {
       ambianceMusique('course', false);
       const { C, nettoyer } = await lancerCourse(def, d, {
-        lieu: monde, chaqueImage, nuit: nuitK > .5, nomJoueuse: 'Roullieee', particules,
+        lieu: monde, chaqueImage, nuit: nuitK > .5, nomJoueuse: 'Roullieee', particules, equipe,
         cadrer: on => { camCourse = on; if (!on) { cible.copy(moi.racine.position); placerCamera(1); } },
         cacher: on => { moi.racine.visible = !on; ombreRonde.visible = !on; marque.visible = etoileSol.visible = false; for (const A of affichees.values()) A.m.racine.visible = !on; }
       });
       res = DD.enregistrer(def, C, d);
-      const niv = EL.donnerXp(d, res.gains.xp);
+      /* au relais, l'expérience est partagée entre les 3 */
+      const niv = equipe ? equipe.map(x => EL.donnerXp(x, Math.round(res.gains.xp / 2))).find(Boolean) || null : EL.donnerXp(d, res.gains.xp);
       sauver();
       await ouvrirResultats(def, C, res, niv);
       nettoyer();
@@ -710,7 +774,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
       cible.copy(moi.racine.position); placerCamera(1);
       ambianceMusique(monde.ambiance, nuitK > .5);
       const rival = C.coureurs.find(x => x.id === 'star');
-      S.evenement('course', { id: def.id, place: res.place, placeRival: rival ? rival.place : 9, badge: res.badge });
+      S.evenement('course', { id: def.id, place: res.place, placeRival: rival ? rival.place : 9, badge: res.badge, def, res });
       S.preparer();
     } finally { enCourse = false; occupe = avant; majHud(); }
     return res;
@@ -721,7 +785,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     appliquerReglages, moi, allerVers, agir, affichees, etat: E, S, P, J, sauver, toucher, positionCible, partirVers, capturer, approcher,
     get monde() { return monde; }, get interactifs() { return monde.interactifs; }, get sauvages() { return sauvages; },
     get chemin() { return chemin; }, get occupe() { return occupe; }, get capture() { return captureActive(); }, domaine,
-    forcerMeteo, forcerHeure, majLumiere, EL, verifierElevage, courir, DD, PR, QD, decorateur, ouvrirDecorer, verifierProduction, ouvrirProduction, syncDindies, get course() { return courseActive(); }, get miniJeu() { return miniJeuActif(); }, get camCourse() { return camCourse; }
+    forcerMeteo, forcerHeure, majLumiere, EL, verifierElevage, courir, DD, PR, QD, decorateur, ouvrirDecorer, verifierProduction, ouvrirProduction, syncDindies, get course() { return courseActive(); }, get miniJeu() { return miniJeuActif(); }, get camCourse() { return camCourse; }, CO, get concours() { return concoursActif(); }, finHistoire, DF, SU, EV, ouvrirPanneau, verifierSucces
   };
   return { sauver };
 }

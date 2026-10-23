@@ -2,7 +2,8 @@
    Dans chaque île, le guide raconte une vieille légende. Il faut retrouver 3 fragments cachés dans l'île,
    puis le guide confie l'objet légendaire. Au nid du Couvoir, avec les deux bons parents (deux épiques),
    l'objet et parfois une condition (le matin, la nuit, la pluie sur la Belgique), un œuf mythique apparaît.
-   Le Dindromakus (la Forêt de la Lune, « La légende ») arrive avec le chapitre 8. */
+   Le Dindromakus (la Forêt de la Lune, « La légende ») est la quête du chapitre 8 : la plume arc-en-ciel remplace l'objet
+   légendaire, et elle fait venir elle-même la nuit de pleine lune. */
 import * as J from './etat.js';
 import { OBJETS } from './objets.js';
 import { PAR_ID, ESPECES } from '../donnees/especes.js';
@@ -51,14 +52,16 @@ export const nbFinies = () => ORDRE_GRANDES.filter(id => etatGrande(id) === 'fin
 
 /* ── la condition d'un croisement mythique ── */
 const CONDITIONS = { florissima: () => estMatin(), belgarum: () => meteo('belgique') === 'pluie', borealis: () => estNuit(), phenix: () => estMatin() };
-export const TEXTES_CONDITION = { florissima: 'le matin', belgarum: 'quand il pleut sur la Belgique', borealis: 'la nuit', phenix: 'au lever du soleil (le matin)' };
+export const TEXTES_CONDITION = { florissima: 'le matin', belgarum: 'quand il pleut sur la Belgique', borealis: 'la nuit', phenix: 'au lever du soleil (le matin)', ruuulius: 'une nuit de pleine lune (la plume la fait venir)' };
 const memePaire = (a, b) => (a[0] === b[0] && a[1] === b[1]) || (a[0] === b[1] && a[1] === b[0]);
 /* deux parents → la légende possible (ou null) : { M (l'espèce), G (la grande quête), aObjet, condition, ok } */
+/* la légende des légendes (chapitre 8) : pas de fragments, la plume arc-en-ciel */
+export const LEGENDE = { titre: 'La légende', guide: 'hibou', region: 'foret', objet: 'plumeArcEnCiel', mythique: 'ruuulius' };
 export function mythiquePour(p1, p2) {
   const M = ESPECES.find(e => e.origine.sorte === 'mythique' && memePaire(e.origine.especes, [p1.espece, p2.espece]));
   if (!M) return null;
-  const G = Object.values(GRANDES).find(g => g.mythique === M.id);
-  if (!G) return null;   /* le Dindromakus : au chapitre 8 */
+  const G = M.id === 'ruuulius' ? LEGENDE : Object.values(GRANDES).find(g => g.mythique === M.id);
+  if (!G) return null;
   const aObjet = J.combien(G.objet) > 0, cond = !CONDITIONS[M.id] || CONDITIONS[M.id]();
   return { M, G, aObjet, condition: TEXTES_CONDITION[M.id] || null, conditionOk: cond, ok: aObjet && cond };
 }

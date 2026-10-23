@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { sphere, cylindre, cone, boite, fusion } from '../moteur/formes.js';
 import { toon, contour, contourPour, TONS, texRonde, partager } from '../moteur/materiaux.js';
 import { hasard } from '../moteur/couleurs.js';
+import { pleineLune } from '../moteur/temps.js';
 
 /* ── la forme de l'île : un « super-ovale » un peu irrégulier ──
    f(x, z) < 1 : sur l'île ; entre 0,93 et 1 : la plage */
@@ -186,6 +187,9 @@ export function construireNuit(scene) {
   const etoiles = new THREE.Points(g, m); scene.add(etoiles);
   const lune = new THREE.Mesh(new THREE.SphereGeometry(6, 24, 16), new THREE.MeshBasicMaterial({ color: '#fef9c3', fog: false, transparent: true, opacity: 0 }));
   lune.position.set(-60, 70, -100); scene.add(lune);
+  /* le halo de la pleine lune */
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: texRonde(), color: '#fde68a', transparent: true, opacity: 0, fog: false, depthWrite: false, blending: THREE.AdditiveBlending }));
+  halo.scale.set(44, 44, 1); lune.add(halo);
   const nl = 60, pl = new Float32Array(nl * 3), base = [];
   for (let i = 0; i < nl; i++) { const x = (r() - .5) * 90, z = (r() - .5) * 76; base.push([x, .6 + r() * 1.6, z, r() * 6]); }
   const gl = new THREE.BufferGeometry(); gl.setAttribute('position', new THREE.BufferAttribute(pl, 3));
@@ -194,6 +198,7 @@ export function construireNuit(scene) {
   return {
     maj(t, nuit, camPos) {
       m.opacity = nuit; lune.material.opacity = nuit; ml.opacity = nuit;
+      const pleine = pleineLune(); lune.scale.setScalar(pleine ? 1.55 : 1); halo.material.opacity = pleine ? nuit * .55 : 0;
       etoiles.position.copy(camPos); lune.position.set(camPos.x - 60, 70, camPos.z - 100);
       if (nuit > 0) { base.forEach(([x, y, z, ph], i) => pl.set([x + Math.sin(t * .5 + ph) * 1.2, y + Math.sin(t * 1.3 + ph) * .3, z + Math.cos(t * .4 + ph) * 1.2], i * 3)); gl.attributes.position.needsUpdate = true; }
     }

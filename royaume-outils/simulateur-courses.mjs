@@ -1,6 +1,7 @@
 /* Le simulateur d'équilibrage des courses du Dindodrome (sans navigateur).
    Usage : node --experimental-default-type=module royaume-outils/simulateur-courses.mjs [nombre de courses] [experte] [chapitres]
-   chapitres : « 4 » (par défaut : les championnats 1 à 4) ou « 5-7 » (les championnats 5 à 8).
+   chapitres : « 4 » (par défaut : les championnats 1 à 4), « 5-7 » (les championnats 5 à 8), « 8 » (la Ligue des Légendes,
+   les relais) ou « maitres » (les 8 Coupes des Maîtres, avec des dindies au maximum).
    Pour quelques profils de joueuse typiques de ces chapitres, il fait courir chaque course des championnats
    (la joueuse ne fait rien de spécial, ou, avec « experte », elle saute toujours au bon moment)
    et affiche le pourcentage de victoires et de podiums, le temps moyen, et si la star de la course est devant. */
@@ -25,15 +26,24 @@ const PROFILS_4 = {
   'Atomium niv. 24 entraîné': () => { const d = nouvelleDindie('atomium', { niveau: 24, talents: [2, 2, 2], caractere: 'calme', stade: 'eveille' }); d.entrainement = [12, 10, 10]; d.competences = ['turbo']; return d; },
   'Belgicus niv. 22 entraîné': () => { const d = nouvelleDindie('belgicus', { niveau: 22, talents: [3, 3, 3], caractere: 'calme' }); d.entrainement = [10, 10, 10]; d.competences = ['turbo']; return d; }
 };
+const PROFILS_8 = {
+  'Comète niv. 42 entraînée (12)': entraine('comete', 42, [3, 3, 3], [12, 12, 12]),
+  'Orage niv. 42 entraîné (15)': entraine('orage', 42, [4, 4, 4], [15, 15, 15]),
+  'Panthère niv. 45 entraînée (15)': entraine('panthere', 45, [4, 4, 4], [15, 15, 15]),
+  'Jaguar niv. 50 au maximum': entraine('jaguar', 50, [5, 5, 5], [15, 15, 15])
+};
+const COURSES_8 = ['ligue1', 'ligue2', 'ligue3', 'ligue4', 'ligueGontran', 'relais1', 'relais2'];
+const PROFILS_M = Object.fromEntries(['dingue', 'atomium', 'jaguar', 'magma', 'panthere', 'orage', 'celestia'].map(e => [`${e} niv. 50 au maximum`, entraine(e, 50, [5, 5, 5], [15, 15, 15])]));
+const COURSES_M = ['maitre1', 'maitre2', 'maitre3', 'maitre4', 'maitre5', 'maitre6', 'maitre7', 'maitre8'];
 const COURSES_4 = ['essai', 'c1a', 'c1b', 'c1c', 'c1f', 'gontran1', 'c2a', 'c2b', 'c2c', 'c2f', 'c3a', 'c3b', 'c3c', 'c3f', 'c4a', 'c4b', 'c4c', 'c4f', 'gontran2'];
-const N = +process.argv[2] || 200, experte = process.argv.includes('experte'), ch57 = process.argv.includes('5-7');
-const PROFILS = ch57 ? PROFILS_57 : PROFILS_4, COURSES = ch57 ? COURSES_57 : COURSES_4;
+const N = +process.argv[2] || 200, experte = process.argv.includes('experte'), A = process.argv;
+const [PROFILS, COURSES] = A.includes('5-7') ? [PROFILS_57, COURSES_57] : A.includes('8') ? [PROFILS_8, COURSES_8] : A.includes('maitres') ? [PROFILS_M, COURSES_M] : [PROFILS_4, COURSES_4];
 for (const [nom, f] of Object.entries(PROFILS)) {
   console.log(`\n== ${nom} (⚡/💪/🦘 ${stats(f()).join('/')})${experte ? ' · joueuse experte' : ''}`);
   for (const id of COURSES) {
     const def = defCourse(id); let p1 = 0, pod = 0, tps = 0, star = 0;
     for (let k = 0; k < N; k++) {
-      const o = optionsCourse(def, f()); o.rng = hasard(id + k + nom);
+      const o = optionsCourse(def, f(), { equipe: def.relais ? [f(), f(), f()] : null }); o.rng = hasard(id + k + nom);
       const C = simuler(o, { joueuseIA: true, experte });
       const R = C.coureurs.find(x => x.id === 'moi'), S = C.coureurs.find(x => x.id === 'star');
       if (R.place === 1) p1++; if (R.place <= 3) pod++; tps += R.temps; if (S && S.place < R.place) star++;

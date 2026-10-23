@@ -410,6 +410,15 @@ body.enCourse #toasts{top:calc(max(10px,env(safe-area-inset-top)) + 110px)}
 .ligneCourse > div{flex:1;min-width:0}.ligneCourse b{font-size:15px}.ligneCourse small{display:block;font-size:12px;color:#6b4f33}
 .lcE{font-size:24px;width:32px;text-align:center}.lcMed{font-size:22px;min-width:30px;text-align:center}
 .libres{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.lcP{width:38px;height:38px;border-radius:50%;overflow:hidden;flex:none;display:block}.lcP svg{width:100%;height:100%}
+.champ.ligue{background:linear-gradient(#faf5ff,#fff)}.champ.maitres{background:linear-gradient(#fefce8,#fff)}
+.chronos{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px}
+.chrono{display:flex;flex-direction:column;align-items:center;background:#fff;border:3px solid #fcd34d;border-radius:14px;padding:6px 4px;font-family:inherit;cursor:pointer}
+.chrono span{font-size:22px}.chrono b{font-size:13px}.chrono small{font-size:11.5px;color:#6b4f33}
+.coureuse.choisie{outline:4px solid #22c55e;position:relative}.coureuse[data-ordre]:not([data-ordre=""])::after{content:attr(data-ordre);position:absolute;top:-8px;right:-8px;background:#22c55e;color:#fff;font-weight:700;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center}
+.soloRes{text-align:center}.soloRes p{margin:4px 0}.classementF.cache{display:none}
+.grandTrophee{display:flex;flex-direction:column;align-items:center;font-size:44px;background:radial-gradient(#fdf4ff,#f5d0fe);border:4px solid #a855f7;border-radius:20px;padding:8px;margin:8px 0}.grandTrophee b{font-size:15px;color:#6b21a8}
+.badgeCase.ok.or{background:radial-gradient(#fef9c3,#eab308)}
 .libres .btn{flex-direction:column}.libres .btn small{font-size:11px;opacity:.85}
 /* choisir sa coureuse */
 .coureuses{display:flex;flex-direction:column;gap:8px}
@@ -564,3 +573,78 @@ body.enDeco .hudBas, body.enDeco #hAction{display:none}
   .mission{flex-wrap:wrap}.mission > div{flex-basis:calc(100% - 50px)}.mission .btn{margin-left:auto}
   .article.deco{flex-wrap:wrap}.article.deco > div{flex-basis:calc(100% - 50px)}.article.deco .btn{margin-left:auto}
 }
+/* ── le générique de fin (étape 8) ── */
+#generique{position:fixed;inset:0;z-index:60;overflow:hidden;background:radial-gradient(circle at 70% 15%,#4c1d95,#0b1026 70%);color:#fff;text-align:center}
+#generique.part{opacity:0;transition:opacity .4s}
+#generique .genCiel{position:absolute;inset:0;background-image:radial-gradient(2px 2px at 20% 30%,#fff,transparent),radial-gradient(2px 2px at 70% 60%,#fde68a,transparent),radial-gradient(1.5px 1.5px at 40% 80%,#fff,transparent),radial-gradient(1.5px 1.5px at 85% 20%,#c4b5fd,transparent),radial-gradient(2px 2px at 10% 70%,#f9a8d4,transparent);background-size:240px 240px;opacity:.8}
+#generique .genDefile{position:absolute;left:0;right:0;top:100%;padding:0 18px 40px;animation:genMonte 75s linear forwards}
+#generique .genDefile.fige{top:0;overflow-y:auto;height:100%;padding-top:20px;padding-bottom:130px;box-sizing:border-box}
+@keyframes genMonte{from{transform:translateY(0)}to{transform:translateY(-100%)}}
+#generique .genBloc{max-width:640px;margin:0 auto 70px}
+#generique h1{font-family:'Lilita One',sans-serif;font-size:32px;margin:8px 0;text-shadow:0 3px 0 #7c3aed}
+#generique h2{font-family:'Lilita One',sans-serif;font-size:24px;color:#fde68a;margin:0 0 12px}
+#generique p{font-size:16px;line-height:1.4}#generique small{color:#c7d2fe}
+.genLegende{width:min(62vw,240px);margin:0 auto;border-radius:50%;overflow:hidden;border:5px solid #fde68a;box-shadow:0 0 40px #f0abfc}
+.genPersos{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:12px}
+.genPerso{display:flex;flex-direction:column;align-items:center}.genPerso b{font-size:13px}.genPerso small{font-size:11.5px}
+.genPortrait{width:74px;height:74px;border-radius:50%;overflow:hidden;border:3px solid #fff}
+.genDindies{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px}
+.genDindie{border-radius:14px;overflow:hidden;background:rgba(255,255,255,.12)}
+#generique .genPasser{position:absolute;right:12px;top:max(12px,env(safe-area-inset-top));z-index:2}
+#generique .genFin{position:absolute;left:50%;bottom:max(24px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:2}
+.genMerci .grosEmoji{font-size:48px}
+/* ── la Scène des défilés (étape 8) ── */
+.rangs{display:flex;justify-content:center;gap:6px;margin:8px 0}
+.rang{display:flex;flex-direction:column;align-items:center;width:62px;padding:6px 2px;border-radius:14px;background:#f5f5f4;border:3px solid #e7e5e4;color:#78716c}
+.rang span{font-size:24px}.rang small{font-size:11px;font-weight:700}
+.rang.gagne{background:#fef9c3;border-color:#facc15;color:#854d0e}.rang.actuel{background:#fdf2f8;border-color:#f472b6;color:#9d174d;animation:pouls 2s ease-in-out infinite}
+.noteDefile{display:flex;flex-wrap:wrap;gap:4px 8px;justify-content:center;background:#fff;border:3px dashed #f9a8d4;border-radius:16px;padding:8px;font-size:13px}
+.noteDefile > b{flex-basis:100%;text-align:center;font-size:15px}.noteDefile span{background:#fdf2f8;border-radius:10px;padding:2px 8px}.noteDefile span.pose{background:#ede9fe}
+.chansons{display:flex;flex-direction:column;gap:8px}
+.chanson{display:grid;grid-template-columns:auto 1fr;gap:4px 8px;align-items:center;background:#fff;border:3px solid #e9d5ff;border-radius:16px;padding:8px}
+.chanson .em{font-size:26px}.chanson .diffs{grid-column:1 / -1;display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.chanson .diffs .btn{flex-direction:column}.chanson .diffs small{font-size:11px}.eteinte{filter:grayscale(1);opacity:.35;font-style:normal}
+.jury{text-align:center}.juryDindie{width:130px;margin:0 auto;border-radius:20px;overflow:hidden}
+.juges{display:flex;justify-content:center;gap:14px;margin:8px 0}.juge{display:flex;flex-direction:column;align-items:center}.juge b{font-family:'Lilita One',sans-serif;font-size:26px;color:#db2777}.juge small{font-size:11px;color:#78716c}
+.jugeP{width:56px;height:56px;border-radius:50%;overflow:hidden;border:3px solid #f9a8d4}
+.totalJury b{font-family:'Lilita One',sans-serif;font-size:34px;color:#7c3aed}.totalJury small{display:block;font-size:12px;color:#78716c}
+.mj-concours .mjCarte{border-color:#db2777}
+.posesPiste{position:absolute;left:0;right:0;top:20px;height:64px;background:linear-gradient(90deg,#fce7f3,#fdf4ff);border-radius:16px}
+.posesCible{position:absolute;left:calc(12% - 30px);top:2px;width:60px;height:60px;border-radius:50%;border:5px solid #db2777;box-sizing:border-box;background:rgba(255,255,255,.6)}
+.poseIcone{position:absolute;left:-26px;top:8px;font-size:40px;line-height:48px;width:52px;text-align:center;transition:opacity .15s}
+.poseIcone.faite:not(.ratee){filter:drop-shadow(0 0 8px #facc15)}.poseIcone.ratee{filter:grayscale(1)}
+.posesDindie{position:absolute;bottom:8px;left:50%;width:110px;margin-left:-55px;border-radius:20px;overflow:hidden}
+.posesDindie.roue{animation:pRoue .6s ease}.posesDindie.tourne{animation:pTourne .6s ease}.posesDindie.salut{animation:pSalut .6s ease}
+@keyframes pRoue{50%{transform:scale(1.25)}}@keyframes pTourne{to{transform:rotateY(360deg)}}@keyframes pSalut{50%{transform:translateY(14px) rotate(-8deg)}}
+.mj-concours .mjZone{min-height:250px;background:linear-gradient(#fff1f2,#fdf2f8)}
+.mjBas .pose span,.mjBas .touche span{font-size:30px}
+.mj-concours .mjBas{gap:8px}.mj-concours .mjBas .btn{flex:1 1 0;min-width:0;padding-left:4px;padding-right:4px}
+.couloirs{position:absolute;inset:6px;display:flex;gap:6px}.couloir{position:relative;flex:1;background:rgba(255,255,255,.6);border-radius:14px;overflow:hidden}
+.ligneNotes{position:absolute;left:0;right:0;top:86%;height:6px;margin-top:10px;background:#db2777;border-radius:3px;pointer-events:none}
+.noteG{position:absolute;left:50%;top:-14px;margin-left:-16px;width:32px;height:32px;line-height:30px;text-align:center;border-radius:50%;color:#fff;font-size:18px;background:#a855f7;box-shadow:0 3px 0 #6b21a8}
+.noteG.t1{background:#ec4899;box-shadow:0 3px 0 #9d174d}.noteG.t2{background:#f59e0b;box-shadow:0 3px 0 #b45309}
+.noteG.parfaite{background:#facc15;box-shadow:0 0 14px #facc15}.noteG.bonne{background:#86efac}.noteG.ratee{background:#d6d3d1;box-shadow:none}
+.mjBas .touche.frappe{animation:frappe .2s ease}@keyframes frappe{50%{transform:scale(.92)}}
+
+/* ── étape 8 : le Panneau des quêtes (défis, succès), les fêtes ── */
+.pastille{display:inline-block;min-width:20px;height:20px;line-height:20px;padding:0 5px;border-radius:10px;background:#ef4444;color:#fff;font-size:12px;font-style:normal;font-weight:800;vertical-align:middle}
+.rondHud{position:relative}.rondHud.alerte::after{content:'';position:absolute;top:4px;right:4px;width:13px;height:13px;border-radius:50%;background:#ef4444;border:2px solid #fff}
+.journalHaut{margin:0 0 6px;gap:8px;flex-wrap:wrap}
+.feteBandeau{display:flex;align-items:center;gap:12px;background:linear-gradient(90deg,#fff7ed,#f5f3ff);border:3px solid #fdba74;border-radius:18px;padding:8px 12px;margin:4px 0 10px}
+.feteBandeau span{font-size:38px}.feteBandeau b{display:block;color:#7c2d12}.feteBandeau small{font-size:13px;color:#6b4f33}
+.panneauF h3{margin:12px 0 4px;color:#9a3412}.panneauF h3 small{font-weight:400;color:#a16207;font-size:13px}
+.defi{display:flex;align-items:center;gap:10px;background:#fff;border:3px solid #f1d9a8;border-radius:16px;padding:8px 10px;margin:6px 0}
+.defi .em{font-size:30px;flex:none}.defi > div{flex:1;min-width:0}.defi b{display:block;font-size:15px;margin-bottom:4px}.defi small{color:#6b4f33}
+.defi.pret{border-color:#4ade80;background:#f0fdf4}.defi.fait{opacity:.7}.defi .coche{font-size:24px}
+.bonusDefi.fait{color:#15803d}
+.totalSucces{text-align:center;font-size:18px;margin:4px 0}
+.cats{flex-wrap:wrap}.cats button small{opacity:.75}
+.succesGrille{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:8px}
+.succes{position:relative;background:#f5f5f4;border:3px solid #e7e5e4;border-radius:16px;padding:8px 8px 22px;text-align:center;color:#78716c}
+.succes .em{display:block;font-size:28px}.succes b{display:block;font-size:13px;margin:2px 0}.succes small{display:block;font-size:12px;line-height:1.25}
+.succes i{position:absolute;bottom:4px;left:0;right:0;font-style:normal;font-size:12px;font-weight:700}
+.succes.obtenu{background:#fffbeb;border-color:#fcd34d;color:#5b3a1a}
+.formes button.fete{background:#ffedd5;border-color:#fb923c}
+.feteTexte{background:#fff7ed;border-radius:12px;padding:6px 10px}
+.titreFete{display:inline-block;margin:4px 0 0;padding:4px 14px;border-radius:14px;background:rgba(255,247,237,.92);color:#9a3412;font-weight:800;font-size:15px}
+body.enCinematique #hQuete,body.enCinematique .hudBas,body.enCinematique #hAction,body.enCinematique #hFleche{display:none}

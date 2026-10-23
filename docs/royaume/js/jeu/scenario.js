@@ -1,4 +1,4 @@
-/* ══════════ L'HISTOIRE : LES CHAPITRES 1 À 7 ══════════
+/* ══════════ L'HISTOIRE : LES CHAPITRES 1 À 8 ══════════
    Une suite d'étapes (une seule à la fois, pour que ce soit clair) regroupées en quêtes.
    La scène appelle : parler(pnj), interagir(id), gadget(id), evenement(type, valeur) ;
    et lit : texteEtape(), cibleEtape() (pour la flèche qui guide), lieuEtape(). */
@@ -11,14 +11,15 @@ import { nouvelleDindie, nomDe } from './individus.js';
 import { OBJETS } from './objets.js';
 import { dialogue, toast } from '../moteur/ui.js';
 import { tada, pop } from '../moteur/sons.js';
-import { forcerHeure, estMatin, estNuit } from '../moteur/temps.js';
+import { forcerHeure, estMatin, estNuit, pleineLune, forcerPleineLune, joursAvantPleineLune } from '../moteur/temps.js';
 import { forcerMeteo, meteo } from '../moteur/meteo.js';
 import { jour } from './trouvailles.js';
 import { CACHETTES } from '../monde/domaine.js';
 import * as DD from './dindodrome.js';
-import { CHAMPIONNATS } from '../donnees/courses.js';
+import { CHAMPIONNATS, LIGUE } from '../donnees/courses.js';
 import * as QD from './quetesDomaine.js';
 import * as GQ from './grandesQuetes.js';
+import { compter } from './defis.js';
 
 export const STARTERS = ['paquerette', 'crachin', 'braise'];
 export const CHAPITRES = { 1: 'Le Domaine en ruine', 2: 'L’expédition', 3: 'Le premier œuf', 4: 'Le Dindodrome ouvre', 5: 'Jungle et Banquise', 6: 'Volcan et Forêt de la Lune', 7: 'Le Royaume des Nuages', 8: 'La Légende' };
@@ -73,7 +74,12 @@ export const QUETES = [
   { id: 'q48', chapitre: 7, titre: 'La page des Nuages', etapes: ['nuages3'], recompense: { pieces: 450 } },
   { id: 'q49', chapitre: 7, titre: 'Les plumes d’éclair', etapes: ['parlerAzur2', 'plumesEclair', 'orage'], recompense: { pieces: 650, plumesOr: 3 } },
   { id: 'q50', chapitre: 7, titre: 'La Coupe des Nuages', etapes: ['coupe8'], recompense: { pieces: 800, plumesOr: 3 } },
-  { id: 'q51', chapitre: 7, titre: 'Les légendes mythiques', etapes: ['parlerPlumeau9', 'grandeQuete', 'mythique'], recompense: { pieces: 1000, plumesOr: 5 } }
+  { id: 'q51', chapitre: 7, titre: 'Les légendes mythiques', etapes: ['parlerPlumeau9', 'grandeQuete', 'mythique'], recompense: { pieces: 1000, plumesOr: 5 } },
+  { id: 'q52', chapitre: 8, titre: 'La dernière page', etapes: ['parlerPlumeau10', 'parlerGinette2'], recompense: { pieces: 400, objets: { biscuit: 5 } } },
+  { id: 'q53', chapitre: 8, titre: 'La Ligue des Légendes', etapes: ['ligue1', 'ligue2', 'ligue3', 'ligue4'], recompense: { pieces: 2000, plumesOr: 5 } },
+  { id: 'q54', chapitre: 8, titre: 'Le grand défi de Gontran', etapes: ['ligueGontran'], recompense: { pieces: 3000, plumesOr: 5 } },
+  { id: 'q55', chapitre: 8, titre: 'La plume arc-en-ciel', etapes: ['parlerHibou3', 'pleineLune'], recompense: { pieces: 800, objets: { sablier: 6 } } },
+  { id: 'q56', chapitre: 8, titre: 'Le Dindromakus', etapes: ['celestia', 'dindromakus'], recompense: { pieces: 5000, plumesOr: 10 } }
 ];
 const ORDRE = [...QUETES.flatMap(q => q.etapes), 'fin'];
 export const queteDe = etape => QUETES.find(q => q.etapes.includes(etape));
@@ -198,7 +204,10 @@ const LIEU = { gaston: 'pres', capture1: 'pres', pres3: 'pres', parlerGaston2: '
   entrainement3: 'domaine', coupe1: 'dindodrome', gontran1: 'dindodrome', lecon: 'domaine', coupe2: 'dindodrome', coupe3: 'dindodrome', coupe4: 'dindodrome', gontran2: 'dindodrome',
   parlerPlumeau6: 'domaine', parlerPlumeau7: 'domaine', parlerPlumeau8: 'domaine', parlerPlumeau9: 'domaine', serre: 'domaine',
   coupe5: 'dindodrome', coupe6: 'dindodrome', coupe7: 'dindodrome', coupe8: 'dindodrome',
-  ...Object.fromEntries(EQUIPEMENTS.map(x => [x, 'domaine'])), ...Object.fromEntries(Object.keys(VOLS).map(x => [x, 'zephyr'])), ...ILE_ETAPE };
+  ...Object.fromEntries(EQUIPEMENTS.map(x => [x, 'domaine'])), ...Object.fromEntries(Object.keys(VOLS).map(x => [x, 'zephyr'])), ...ILE_ETAPE,
+  parlerPlumeau10: 'domaine', parlerGinette2: 'domaine', ...Object.fromEntries(LIGUE.map(x => [x.id, 'dindodrome'])), parlerHibou3: 'foret', pleineLune: 'foret', dindromakus: 'domaine' };
+/* la Ligue : l'étape → la course, et qui la propose */
+const LIGUE_ETAPE = Object.fromEntries(LIGUE.map(L => [L.id, L]));
 export const lieuEtape = () => { const s = E().quete.etape; return ORDRE.indexOf(s) < ORDRE.indexOf('decollage') ? 'domaine' : LIEU[s] || null; };
 /* VOLS contient aussi 'decollage', qui reste au Domaine */
 LIEU.decollage = 'domaine';
@@ -325,7 +334,20 @@ export function texteEtape() {
     mythique: oeufLegendaire() ? 'Ton œuf légendaire couve au Couvoir… Fais-le éclore ! 🥚🌈'
       : objetLegendaire() ? 'Au nid du Couvoir, mets les deux bons parents avec ton objet légendaire : une dindie mythique va naître ! 🌈'
       : '🌈 ' + GQ.texteGrandes(),
-    fin: 'Chapitre 8 bientôt : la légende du Dindromakus ! 🌈'
+    parlerPlumeau10: 'Le Professeur Plumeau a lu la dernière page du vieux livre… Va le voir 🔬',
+    parlerGinette2: 'Coach Ginette a une grande nouvelle : la Ligue des Légendes ! Va la voir, devant le portail du Dindodrome 🏁',
+    ligue1: 'La Ligue des Légendes 👑 : bats la Baronne Plumeline (haies). Elle t’attend au Dindodrome !',
+    ligue2: 'La Ligue des Légendes 👑 : bats le Grand Dindini (piste de Nuit 🌙) !',
+    ligue3: 'La Ligue des Légendes 👑 : bats Mamie Glouglou (marathon : 1 000 m !)',
+    ligue4: 'La Ligue des Légendes 👑 : bats le Capitaine Rapido (sprint ⚡) !',
+    ligueGontran: 'La grande finale de la Ligue : Gontran t’attend au Dindodrome ! 😤👑',
+    parlerHibou3: 'La plume brille un peu… Le Comte Hibou, dans la Forêt de la Lune, connaît sa légende 🌙',
+    pleineLune: pleineLune() ? 'C’est la pleine lune ! Pose la plume sur la pierre de lune, au milieu du cercle de la colline aux étoiles 🌕'
+      : `Il faut la pleine lune (dans ${joursAvantPleineLune()} jours)… ou le grand télescope du Comte Hibou 🔭, puis la pierre de lune de la colline 🌕`,
+    celestia: E().livre.attrapes.celestia ? 'Célestia Dindissima est là ! 🌈' : 'Il faut une Célestia Dindissima : la grande quête « Le palais des nuages » (Aurélie Azur, au Royaume des Nuages), puis le Couvoir ☁️🌈',
+    dindromakus: oeufLegendaire() ? 'L’œuf du Dindromakus couve au Couvoir… Fais-le éclore ! 🥚🌈'
+      : 'Au nid du Couvoir : une Dindétoile, Célestia Dindissima et la plume arc-en-ciel. La légende des légendes t’attend ! 🌈',
+    fin: '🌈 L’histoire est finie… mais le Royaume continue : les Coupes des Maîtres, la Scène des défilés, les défis du jour, les succès ! ✨'
   })[s] || '';
   if (la === 'dindodrome' && ici === 'domaine') return t + ' <i>(au Dindodrome : par le portail de l’est 🏁)</i>';
   if (la && la !== 'domaine' && la !== 'dindodrome' && ici === 'dindodrome') return t + ' <i>(rentre d’abord au Domaine 🏡, puis en montgolfière 🎈)</i>';
@@ -339,6 +361,7 @@ export function texteEtape() {
 /* les courses déjà réussies d'un championnat : « 2/3 podiums » ou « la finale ! » */
 const page = (r, de) => `Attrape 3 espèces ${de} : ${BESOIN[r].map(x => PAR_ID[x].nom).join(', ')} (${compte(r)}/3)`;
 const PRIX_SERRE = 400;
+const SORTES_TXT = { haies: 'Une course de haies, 600 m.', piste: 'La piste de Nuit, 500 m, avec ses champignons et sa brume.', marathon: 'Un marathon : 1 000 m, 5 tours !', sprint: 'Un sprint : 400 m, à fond !' };
 const coupeTexte = n => { const C = CHAMPIONNATS[n - 1], k = C.courses.filter(c => (DD.meilleurePlace(c.id) || 9) <= 3).length; return k < 3 ? `${k}/3 podiums` : 'la finale !'; };
 export function cibleEtape() {
   const e = E(), s = e.quete.etape, ici = lieuActuel(), la = lieuEtape();
@@ -359,6 +382,10 @@ export function cibleEtape() {
   if (I && s === I.epique) return ['sauvage:' + s, I.ok() ? 'zone:' + I.zone : 'gadget-' + I.gadget];
   if (I && (s === I.guide || s === I.parler2)) return 'pnj-' + I.guide;
   if (s === 'grandeQuete') return GQ.cible(ici);
+  if (LIGUE_ETAPE[s]) return 'pnj-' + LIGUE_ETAPE[s].plume;
+  if (s === 'pleineLune') return pleineLune() ? 'gadget-autel' : 'gadget-telescope';
+  if (s === 'celestia') { const c = GQ.etatGrande('palais') === 'fini' || objetLegendaire() || oeufLegendaire() ? null : GQ.cible(ici); return c || (ici === 'domaine' ? 'couvoir' : ici === 'dindodrome' ? 'sortie' : 'ballon'); }
+  if (s === 'dindromakus') return ici === 'domaine' ? 'couvoir' : ici === 'dindodrome' ? 'sortie' : 'ballon';
   if (s === 'mythique') return (oeufLegendaire() || objetLegendaire()) ? (ici === 'domaine' ? 'couvoir' : ici === 'dindodrome' ? 'sortie' : 'ballon') : GQ.cible(ici);
   if (s === 'plumesRouges') return [1, 2, 3].filter(i => !e.monde.ramasses['plumeRouge' + i]).map(i => 'objet-plumeRouge' + i);
   if (s === 'lanternes') return [1, 2, 3].filter(i => !e.monde.ramasses['lanterne' + i]).map(i => 'gadget-lanterne' + i);
@@ -378,7 +405,7 @@ export function cibleEtape() {
     reparerEntrainement: 'entrainement', entrainement3: 'entrainement', lecon: 'entrainement', coupe1: 'bureau', coupe2: 'bureau', coupe3: 'bureau', coupe4: 'bureau',
     gontran1: 'pnj-gontran', gontran2: 'pnj-gontran',
     parlerPlumeau6: 'pnj-plumeau', parlerPlumeau7: 'pnj-plumeau', parlerPlumeau8: 'pnj-plumeau', parlerPlumeau9: 'pnj-plumeau', serre: 'enclos-jungle',
-    coupe5: 'bureau', coupe6: 'bureau', coupe7: 'bureau', coupe8: 'bureau',
+    coupe5: 'bureau', coupe6: 'bureau', coupe7: 'bureau', coupe8: 'bureau', parlerPlumeau10: 'pnj-plumeau', parlerGinette2: 'pnj-ginette', parlerHibou3: 'pnj-hibou',
     ...Object.fromEntries(EQUIPEMENTS.map(x => [x, 'pnj-mimi'])), ...Object.fromEntries(Object.keys(VOLS).map(x => [x, 'pnj-zephyr']))
   })[s] || null;
 }
@@ -400,6 +427,7 @@ function avancer() {
     const N = queteDe(suivante);
     if (N && N.chapitre !== Q.chapitre) setTimeout(() => monde && monde.finChapitre && monde.finChapitre(Q.chapitre), 900);
     else if (N) setTimeout(() => toast(`📜 Nouvelle quête : <b>${N.titre}</b>`, { duree: 3200 }), 1400);
+    else if (suivante === 'fin' && Q.chapitre === 8) setTimeout(() => monde && monde.finHistoire && monde.finHistoire(), 1200);
     else if (suivante === 'fin') setTimeout(() => monde && monde.finChapitre && monde.finChapitre(Q.chapitre), 900);
   }
   e.quete.etape = suivante; e.quete.compteur = 0;
@@ -421,6 +449,8 @@ function preparerEtape() {
       inuk: [-19, 39, .6], lava: [-12, 40.5, .3], hibou: [12, 40.5, -.3], azur: [19, 39, -.6] };
     for (const C of CHAMPIONNATS) if (etapeAtteinte('coupe' + C.n)) monde.ajouterPnj(C.champion, ...PLACES[C.champion]);
     if (etapeAtteinte('gontran1')) monde.ajouterPnj('gontran', 6.5, 27.5, -.4);
+    /* les Quatre Plumes de la Ligue des Légendes, devant le portail */
+    if (etapeAtteinte('ligue1')) for (const [id, x, z, r] of [['plumeline', -5, 37, .4], ['dindini', -1.9, 38, .15], ['mamie', 1.9, 38, -.15], ['rapido', 5, 37, -.4]]) monde.ajouterPnj(id, x, z, r);
   }
   if (ici === 'domaine' && e.batiments.dindodrome?.ouvert && monde.ouvrirPortail) monde.ouvrirPortail(false);
   if (ici === 'pres' && s === 'plumesRouges') for (const i of [1, 2, 3]) if (!e.monde.ramasses['plumeRouge' + i]) monde.poserObjet('plumeRouge' + i, 'plume');
@@ -431,7 +461,7 @@ function preparerEtape() {
   if (monde.poserObjet && ici !== 'domaine' && ici !== 'dindodrome') GQ.preparer(ici, monde);
   /* déjà fait avant d'y arriver (des captures en avance) : on passe à la suite */
   if (s === 'grandir' && e.dindies.some(d => d.stade === 'jeune' && d.lieu === 'nurserie')) setTimeout(() => { if (E().quete.etape === s) avancer(); }, 600);
-  if ((/^coupe[1-8]$/.test(s) && DD.badge(+s.slice(5))) || (s === 'entrainement3' && (e.quete.jeux || []).length >= 3) || (s === 'lecon' && DD.courses().lecons > 0)) setTimeout(() => { if (E().quete.etape === s) avancer(); }, 600);
+  if ((LIGUE_ETAPE[s] && DD.ligueGagnee(s)) || (/^coupe[1-8]$/.test(s) && DD.badge(+s.slice(5))) || (s === 'entrainement3' && (e.quete.jeux || []).length >= 3) || (s === 'lecon' && DD.courses().lecons > 0)) setTimeout(() => { if (E().quete.etape === s) avancer(); }, 600);
   if ((s === 'capture1' && attrapeesDans('pres').size) || (ilePage(s) && !manquantes(ilePage(s)).length)) setTimeout(() => { if (E().quete.etape === s) avancer(); }, 600);
   if ((EQUIPEMENTS.includes(s) && J.combien(s)) || (ILES[ILE_ETAPE[s]]?.epique === s && E().livre.attrapes[s] && attrapeesDans(ILE_ETAPE[s]).has(s))) setTimeout(() => { if (E().quete.etape === s) avancer(); }, 600);
   setTimeout(verifierEtat, 400);
@@ -449,7 +479,7 @@ export async function parler(id) {
   const e = E(), s = e.quete.etape;
   /* les quêtes du Domaine (si l'histoire n'attend rien de cet habitant) */
   if (QD.active() && (s === 'fin' || cibleEtape() !== 'pnj-' + id) && await QD.parler(id)) return;
-  if (lieuActuel() === 'dindodrome' && ['chrono', 'gontran', ...CHAMPIONNATS.map(C => C.champion)].includes(id)) return parlerDindodrome(id);
+  if (lieuActuel() === 'dindodrome' && ['chrono', 'gontran', ...CHAMPIONNATS.map(C => C.champion), ...LIGUE.map(L => L.plume)].includes(id)) return parlerDindodrome(id);
   /* la légende d'une île (chapitre 7), si l'histoire n'attend rien de ce guide */
   if (cibleEtape() !== 'pnj-' + id && await GQ.parler(id, lieuActuel(), monde)) return;
   if (ILE_DE_GUIDE[id]) return parlerGuide(id);
@@ -560,6 +590,23 @@ export async function parler(id) {
         L('plumeau', 'Ah… Le Dindromakus est la légende des légendes. Fais d’abord naître une mythique. Ensuite… on verra !')]);
       avancer();
       return;
+    }
+    if (s === 'parlerPlumeau10') {
+      await dialogue([L('plumeau', 'Roullieee… Une dindie mythique ! Je n’en croyais pas mes yeux. Tu es devenue une vraie légende !'),
+        L('plumeau', 'J’ai lu la dernière page du vieux livre. Elle parle du <b>Dindromakus RUUULIUSSS Maximus</b>… et d’une <b>plume arc-en-ciel</b>.'),
+        L('moi', 'La plume ! Le soir où j’ai vu le Dindromakus, il en a laissé tomber une. Je l’ai gardée… mais elle s’est éteinte.'),
+        L('plumeau', 'Fais voir ! Toute grise… Le livre dit : « La plume se rallume pour <b>la plus grande championne du Royaume</b>, sous la pleine lune. »'),
+        L('plumeau', 'La plus grande championne… c’est celle qui gagne la <b>Ligue des Légendes</b> ! Va voir Coach Ginette : elle en sait plus que moi.')]);
+      J.ajouterObjet('plumeEteinte');
+      toast('🪶 Tu as la <b>plume éteinte</b> du Dindromakus (dans ton sac).', { duree: 3400 });
+      avancer();
+      return;
+    }
+    if (s === 'pleineLune' && J.combien('plumeEteinte')) { await dialogue([L('plumeau', 'Le Comte Hibou connaît les secrets de la lune. Écoute-le bien : la plume a besoin de la <b>pleine lune</b>, sur la colline aux étoiles !')]); return monde.ouvrirLabo(); }
+    if (s === 'celestia' || s === 'dindromakus') {
+      await dialogue([L('plumeau', s === 'celestia' && !E().livre.attrapes.celestia ? 'Le livre dit que le Dindromakus naît d’une <b>Dindétoile</b> et de <b>Célestia Dindissima</b>. Célestia, c’est la légende du palais des nuages : demande à Aurélie Azur !'
+        : 'Une Dindétoile, Célestia Dindissima et la plume arc-en-ciel, au nid du Couvoir… La plume fera venir la nuit de pleine lune. Je n’ose pas y croire !')]);
+      return monde.ouvrirLabo();
     }
     if (s === 'grandeQuete' || s === 'mythique') {
       await dialogue([L('plumeau', s === 'mythique' && (objetLegendaire() || oeufLegendaire()) ? 'Un objet légendaire ! Au nid du Couvoir, mets les deux parents de la légende : le Grand Livre te dit lesquels (page des mythiques). Parfois, il faut aussi le bon moment !'
@@ -742,6 +789,15 @@ export async function parler(id) {
       await dialogue([L('ginette', 'Entre, et va voir Monsieur Chrono, le présentateur. Il t’inscrira à ta première course !')]);
       return;
     }
+    if (s === 'parlerGinette2') {
+      await dialogue([L('ginette', 'Une, deux ! Roullieee ! Tu as les 8 badges… alors la <b>Ligue des Légendes</b> t’ouvre ses portes !'),
+        L('ginette', 'Quatre grands champions t’attendent au Dindodrome : <b>les Quatre Plumes</b>. La Baronne Plumeline, le Grand Dindini, Mamie Glouglou et le Capitaine Rapido !'),
+        L('ginette', 'Il faut les battre tous les quatre, l’un après l’autre. Et ensuite… quelqu’un t’attend pour la grande finale. Tu devines qui ?'),
+        L('moi', 'Gontran !'),
+        L('ginette', 'Exactement ! Entraîne bien tes dindies : ce sont les courses les plus dures du Royaume. Une, deux !')]);
+      avancer();
+      return;
+    }
     if (s === 'kitEntrainement' || s === 'reparerEntrainement') {
       await dialogue([L('ginette', 'Pour progresser, rien ne vaut l’entraînement ! Mais mon vieux <b>terrain d’entraînement</b> est en ruine…'),
         L('ginette', s === 'kitEntrainement' ? 'Mimi vend des <b>kits de construction</b> 🧰. Rapporte-m’en un, et on le répare ensemble !' : 'Tu as le kit ? Touche le terrain, juste à côté, pour le réparer !')]);
@@ -776,6 +832,14 @@ async function parlerGuide(id) {
   if (s === I.parler2) { await dialogue(I.legende.map(Lg)); avancer(); return; }
   if (s === I.etapeObjets) { await dialogue([L(id, I.objets(ramasses(I.objet)))]); return; }
   if (s === I.epique) { await dialogue(I.indice.map(Lg)); return; }
+  if (id === 'hibou' && s === 'parlerHibou3') {
+    await dialogue([L('hibou', 'Hou hou… Chère exploratrice, cette plume ! Je la reconnais : c’est une plume du <b>Dindromakus</b>. Elle brille encore un tout petit peu.'),
+      L('hibou', 'Mes vieilles cartes du ciel le disent : une plume du Dindromakus se rallume <b>sous la pleine lune</b>, posée sur la <b>pierre de lune</b>, au milieu du cercle de la colline aux étoiles.'),
+      L('hibou', pleineLune() ? 'Et justement… regardez le ciel : c’est la pleine lune, ce soir ! Allez vite sur la colline !' : `La prochaine pleine lune est dans <b>${joursAvantPleineLune()} jours</b>… Mais mon <b>grand télescope</b>, devant l’observatoire, sait l’attirer pour un moment. Hou hou !`)]);
+    avancer();
+    return;
+  }
+  if (id === 'hibou' && s === 'pleineLune') { await dialogue([L('hibou', pleineLune() ? 'La pleine lune brille ! Vite, la pierre de lune, sur la colline aux étoiles !' : 'Tournez mon grand télescope vers le ciel : la pleine lune viendra, pour un moment. Puis la pierre de lune !')]); return; }
   if (etapeAtteinte(I.apres)) cadeauDuJour(id, I.cadeau);
   await dialogue([L(id, I.bavard[Math.floor(Math.random() * I.bavard.length)])]);
 }
@@ -811,8 +875,34 @@ async function parlerDindodrome(id) {
       await monde.courir(s);
       return;
     }
+    if (s === 'ligueGontran') {
+      const choix = await dialogue([L('gontran', 'Roullieee… Tu as battu les Quatre Plumes. Toutes les quatre ! Bon. Alors c’est moi, ton dernier adversaire.'),
+        L('gontran', 'Depuis notre toute première course, Flamby s’entraîne tous les jours. Il est devenu le Dindofeu le plus rapide du Royaume.'),
+        L('gontran', 'La <b>grande finale de la Ligue</b> : 800 m, avec des haies. Que la meilleure gagne. (Ce sera moi. Gloup gloup !)', [['oui', '🏁 C’est parti !'], ['non', '⏳ Plus tard']])]);
+      if (choix === 'oui') await monde.courir('ligueGontran');
+      return;
+    }
+    if (etapeAtteinte('parlerHibou3')) { await dialogue([L('gontran', ['Grande championne… Ça te va bien, Roullieee. Mais je reviendrai ! Les Coupes des Maîtres, ça te dit ? Gloup gloup !', 'Flamby et moi, on court tous les matins. Un jour, on te battra. Peut-être. Gloup gloup !'][Math.floor(Math.random() * 2)])]); return; }
     if (etapeAtteinte('parlerPlumeau6')) { await dialogue([L('gontran', 'Tu es vraiment forte, Roullieee. Mais la prochaine fois… tu verras ! Gloup gloup !')]); return; }
     await dialogue([L('gontran', 'Flamby et moi, on s’entraîne. La prochaine fois, c’est nous qui gagnons !')]);
+    return;
+  }
+  /* les Quatre Plumes */
+  const Lp = LIGUE.find(x => x.plume === id);
+  if (Lp) {
+    const TP = {
+      plumeline: ['Enchantée, très chère. Je suis la <b>Baronne Plumeline</b>. Ma Duchesse, une Dindopanthère, saute les haies avec une élégance… inégalable.', 'Quelle grâce ! Vous méritez votre place dans la Ligue, très chère.'],
+      dindini: ['Abracadabra ! Je suis <b>le Grand Dindini</b> ! Sur la piste de Nuit, ma Dindogalaxie disparaît… et réapparaît devant tout le monde !', 'Incroyable ! Même la magie n’a rien pu faire contre toi. Abracadabra… bravo !'],
+      mamie: ['Bonjour, ma petite ! <b>Mamie Glouglou</b>, pour te servir. Mon Pépère est un Dindodragon : il ne se fatigue jamais. Mille mètres, ça ne lui fait pas peur !', 'Bravo, ma chérie ! Tiens, un biscuit. Tu l’as bien mérité.'],
+      rapido: ['<b>Capitaine Rapido</b>, le plus rapide du Royaume ! Ma Fusée, une Dindocomète, fait le sprint en un clin d’œil. Prête ?', 'Wouah ! Tu as battu Fusée ! Tu es plus rapide que l’éclair !']
+    }[id];
+    if (s === Lp.id) {
+      const choix = await dialogue([L(id, TP[0]), L(id, `${SORTES_TXT[Lp.sorte]} Il faut <b>gagner</b> pour continuer la Ligue. On y va ?`, [['oui', '🏁 C’est parti !'], ['non', '⏳ Plus tard']])]);
+      if (choix === 'oui') await monde.courir(Lp.id);
+      return;
+    }
+    await dialogue([L(id, DD.ligueGagnee(Lp.id) ? TP[1] : TP[0])]);
+    if (!DD.ligueGagnee(Lp.id) && etapeAtteinte(Lp.id)) await dialogue([L(id, 'Bats d’abord les autres membres de la Ligue, dans l’ordre. Je t’attends !')]);
     return;
   }
   /* les champions */
@@ -926,6 +1016,23 @@ export async function gadget(id) {
     forcerMeteo('belgique', 'pluie', DIX_MINUTES); toast('☁️ Tu débouches la bouteille… <b>Plic, ploc : il pleut sur la Belgique</b>, pour 10 minutes !', { duree: 3600, classe: 'grand' });
     return true;
   }
+  if (id === 'telescope') {
+    if (!etapeAtteinte('parlerHibou3')) { toast('🔭 Le grand télescope du Comte Hibou. On y voit des milliers d’étoiles !'); return false; }
+    if (pleineLune() && estNuit()) { toast('🌕 C’est déjà la pleine lune ! Elle brille au-dessus de la colline aux étoiles.'); return false; }
+    forcerHeure(23, DIX_MINUTES); forcerPleineLune(DIX_MINUTES);
+    toast('🔭 Tu tournes le grand télescope vers le ciel… <b>La nuit tombe, et la pleine lune se lève</b>, pour 10 minutes !', { duree: 4000, classe: 'grand' });
+    J.changer('quete');
+    return true;
+  }
+  if (id === 'autel') {
+    if (s !== 'pleineLune' || !J.combien('plumeEteinte')) { toast('🌕 La pierre de lune : elle est douce et toute froide.'); return false; }
+    if (!pleineLune() || !estNuit()) { toast('🌕 La pierre de lune attend la pleine lune… (le grand télescope du Comte Hibou peut la faire venir !)', { duree: 3600 }); return false; }
+    J.retirerObjet('plumeEteinte'); J.ajouterObjet('plumeArcEnCiel'); tada();
+    await dialogue([L('moi', 'Je pose la plume sur la pierre de lune… Oh ! Elle brille ! Rouge, orange, jaune, vert, bleu, violet… Elle est toute arc-en-ciel !'),
+      L('hibou', '(le Comte Hibou arrive, essoufflé) Hou hou ! La plume arc-en-ciel ! Avec une <b>Dindétoile</b> et <b>Célestia Dindissima</b>, au nid du Couvoir, elle fera venir une nuit de pleine lune… et le Dindromakus !')]);
+    avancer();
+    return true;
+  }
   if (id === 'baton' || id === 'tambour') {
     const r = id === 'baton' ? 'jungle' : 'nuages';
     if (meteo(r) === 'pluie') { toast('🌧️ Il pleut déjà ! Écoute les gouttes…'); return false; }
@@ -958,6 +1065,10 @@ export async function gadget(id) {
 /* ── les évènements : achats, dindie installée, nourrie, Musée ouvert, arrivée dans une île, capture… ── */
 export function evenement(type, valeur) {
   const e = E(), s = e.quete.etape;
+  /* les compteurs des défis du jour */
+  if (type === 'capture') compter('captures');
+  if (type === 'nourrir') compter('nourries');
+  if (type === 'arrivee' && REGIONS[valeur]) compter('voyages');
   if (type === 'achat') {
     if ((s === 'clous' && valeur === 'clous') || (s === 'kit' && valeur === 'kitPlanches') || (s === 'friandises' && valeur === 'friandise') || (s === 'chapeau' && valeur === 'chapeauSoleil') || (s === 'parapluie' && valeur === 'parapluie') || (EQUIPEMENTS.includes(s) && valeur === s)) avancer();
     else if (valeur === 'toile' && (s === 'toile' || s === 'corde')) { if (J.combien('corde')) { if (s === 'corde') avancer(); avancer(); } }
@@ -976,6 +1087,7 @@ export function evenement(type, valeur) {
   if (type === 'achat' && valeur === 'kitConstruction' && (s === 'kitCouvoir' || s === 'kitNurserie' || s === 'kitEntrainement')) avancer();
   if (type === 'oeufPose' && s === 'oeufTuto' && valeur.origine === 'tutoriel') avancer();
   if (type === 'eclosion' && s === 'mythique' && PAR_ID[valeur.dindie.espece].rarete === 'mythique') avancer();
+  if (type === 'eclosion' && s === 'dindromakus' && valeur.dindie.espece === 'ruuulius') avancer();
   if (type === 'eclosion') {
     if (s === 'eclosion' && valeur.oeuf.origine === 'tutoriel') { avancer(); setTimeout(() => dialogue([L('moi', 'Un poussin ! Il lui faudrait un endroit douillet pour grandir… La Nurserie, à côté du Couvoir, est en ruine. Encore un kit !')]), 1200); }
     if (s === 'oeufCroise' && valeur.oeuf.origine === 'croisement' && ['croisement', 'recette'].includes(PAR_ID[valeur.oeuf.espece].origine.sorte)) avancer();
@@ -1013,6 +1125,15 @@ export function evenementCourse(type, v) {
           L('moi', s === 'gontran2' ? 'Merci, Gontran ! Flamby a très bien couru, lui aussi.' : 'Bien couru, Gontran ! À la prochaine !')]), 500);
       } else setTimeout(() => dialogue([L('gontran', 'Ha ha ! Flamby est le plus rapide ! Reviens quand tu veux… si tu oses ! Gloup gloup !')]), 500);
     }
+    if (LIGUE_ETAPE[s] && v.id === s && DD.ligueGagnee(s)) {
+      const Lp = LIGUE_ETAPE[s];
+      avancer();
+      if (s === 'ligueGontran') setTimeout(() => dialogue([L('gontran', 'Tu as… gagné. Bravo, Roullieee. Tu es la meilleure. Vraiment. Et… merci. Grâce à toi, Flamby et moi, on est devenus bien plus forts.'),
+        L('chrono', 'Mesdames et messieurs… <b>Roullieee est la grande championne de la Ligue des Légendes</b> ! 👑'),
+        L('moi', 'Oh ! Dans mon sac… la plume ! Elle brille un tout petit peu !'),
+        L('chrono', 'Une plume du Dindromakus ?! Le Comte Hibou, l’astronome de la Forêt de la Lune, connaît sa légende. Va le voir !')]), 600);
+      else setTimeout(() => dialogue([L(Lp.plume, `Bravo, Roullieee ! Tu as battu ${DD.LIGUE_NOMS[Lp.plume]} !`), L('chrono', s === 'ligue4' ? 'Les Quatre Plumes sont battues ! Il ne reste plus que… la grande finale. Gontran t’attend !' : 'La Ligue continue ! La prochaine Plume t’attend devant le portail.')]), 600);
+    }
     const m = /^coupe([1-8])$/.exec(s);
     if (m && DD.badge(+m[1])) {
       const C = CHAMPIONNATS[+m[1] - 1];
@@ -1032,6 +1153,16 @@ export function evenementCourse(type, v) {
   if (type === 'lecon' && s === 'lecon') avancer();
 }
 export const etapeActuelle = () => E().quete.etape;
+/* ── la fin de l'histoire : tout le monde est là pour le Dindromakus ── */
+export async function dialoguesFin() {
+  await dialogue([L('moi', 'Il est là… Le Dindromakus RUUULIUSSS Maximus ! Comme la nuit où tout a commencé !'),
+    L('plumeau', 'Le plus grand mystère du Royaume… né au Domaine des Dindies ! Roullieee, tu as réussi l’impossible.'),
+    L('gontran', 'Wouah… Bon, d’accord : tu es la plus grande éleveuse de dindies du Royaume. Je le dis. Une fois. Gloup gloup !'),
+    L('mimi', 'Le Domaine n’a jamais été aussi beau ! Et toutes ces dindies… quelle famille !'),
+    L('zephyr', 'Ahoy ! Huit îles, mille aventures… Ma montgolfière n’a jamais autant volé !'),
+    L('ginette', 'Une, deux ! La meilleure élève que j’aie jamais eue !'),
+    L('plumeau', 'Le Grand Livre est presque plein… Et le Royaume a encore plein de surprises pour toi. Merci, Roullieee !')]);
+}
 /* au Domaine, sous l'histoire : la quête du Domaine en cours (une petite ligne dans le bandeau) */
 export const texteDomaine = () => E().quete.etape !== 'fin' && QD.active() && lieuActuel() === 'domaine' ? `<span class="qd">🏡 ${QD.texte('domaine')}</span>` : '';
 /* les étapes qui dépendent de l'état du jeu (appelé quand quelque chose change) */
@@ -1044,4 +1175,6 @@ export function verifierEtat() {
   }
   if (s === 'grandeQuete' && GQ.nbFinies() > 0) avancer();
   if (s === 'mythique' && mythiqueNee()) avancer();
+  if (s === 'celestia' && e.livre.attrapes.celestia) avancer();
+  if (s === 'dindromakus' && e.livre.attrapes.ruuulius) avancer();
 }

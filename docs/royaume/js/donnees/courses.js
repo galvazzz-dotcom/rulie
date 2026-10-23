@@ -50,7 +50,12 @@ export const SORTES = {
   haies: { nom: 'Haies', e: '🦘', distance: 600, desc: '3 tours et des haies à sauter. Le saut compte beaucoup.' },
   marathon: { nom: 'Marathon', e: '💪', distance: 1000, desc: '5 tours : il faut tenir ! L’endurance compte le plus.' },
   piste: { nom: 'Piste', e: '🏟️', distance: 500, desc: '2 tours et demi sur une piste spéciale.' },
-  libre: { nom: 'Course libre', e: '🎽', distance: 400, desc: 'Pour s’entraîner contre des dindies de ton niveau.' }
+  libre: { nom: 'Course libre', e: '🎽', distance: 400, desc: 'Pour s’entraîner contre des dindies de ton niveau.' },
+  /* étape 8 : la Ligue des Légendes, et l'après-histoire */
+  finale: { nom: 'La grande finale', e: '👑', distance: 800, desc: '4 tours avec des haies : la course des légendes !' },
+  relais: { nom: 'Relais', e: '🔁', distance: 1200, desc: '3 dindies, 400 m chacune : la dernière franchit la ligne !' },
+  chrono: { nom: 'Contre la montre', e: '⏱️', distance: 500, desc: 'Seule sur la piste : bats ton record !' },
+  sansFin: { nom: 'La course sans fin', e: '♾️', distance: 99999, desc: 'Cours le plus loin possible : à la 3e chute, ou à bout de forces, c’est fini !' }
 };
 
 /* ── les pistes : la couleur du sol, les obstacles sur l'anneau, les zones qui ralentissent ── */
@@ -69,8 +74,8 @@ export const PISTES = {
 /* les mètres de course où se trouvent les haies et les zones (la course part de « depart » sur l'anneau) */
 export function obstaclesCourse(pisteId, sorte, distance) {
   const P = PISTES[pisteId], depart = ((-distance % TOUR) + TOUR) % TOUR;
-  const boucle = sorte === 'haies' ? P.haiesCourse || P.haies : sorte === 'essai' ? [50, 150] : sorte === 'piste' ? P.haies : [];
-  const zonesB = sorte === 'piste' ? P.zones || [] : [];
+  const boucle = ['haies', 'finale', 'sansFin'].includes(sorte) ? P.haiesCourse || P.haies : sorte === 'essai' ? [50, 150] : ['piste', 'chrono'].includes(sorte) ? P.haies : sorte === 'relais' ? [100] : [];
+  const zonesB = ['piste', 'chrono', 'sansFin'].includes(sorte) ? P.zones || [] : [];
   const haies = [], zones = [];
   for (let tour = -1; tour <= distance / TOUR + 1; tour++) {
     for (const u of boucle) { const s = u - depart + tour * TOUR; if (s > 25 && s < distance - 12) haies.push(s); }
@@ -133,6 +138,28 @@ export const SPECIALES = {
   gontran2: { id: 'gontran2', sorte: 'haies', piste: 'neutre', nom: 'La revanche de Gontran', niveaux: [19, 22], especes: ['trefle', 'mirageus', 'belgicus', 'liane', 'oasis'],
     rival: { espece: 'dindofeu', nom: 'Flamby', dresseur: 'Gontran', niveau: 21, talents: [3, 2, 3], caractere: 'fonceuse', competences: ['sprint'] } }
 };
+/* ── la Ligue des Légendes (chapitre 8) : les Quatre Plumes, puis Gontran ── */
+export const LIGUE = [
+  { id: 'ligue1', plume: 'plumeline', sorte: 'haies', piste: 'neutre', nom: 'La Ligue · Baronne Plumeline', niveaux: [37, 40], force: 7, especes: ['panthere', 'galaxie', 'amanite', 'pirate', 'yeti'],
+    rival: { espece: 'panthere', nom: 'Duchesse', dresseur: 'Baronne Plumeline', niveau: 41, talents: [3, 3, 3], caractere: 'calme', stade: 'eveille', competences: ['esquive', 'turbo'], entrainement: [8, 8, 8] } },
+  { id: 'ligue2', plume: 'dindini', sorte: 'piste', piste: 'nuit', nom: 'La Ligue · le Grand Dindini', niveaux: [38, 41], force: 7, especes: ['galaxie', 'momie', 'dracula', 'yeti', 'amanite'],
+    rival: { espece: 'galaxie', nom: 'Abracadabra', dresseur: 'le Grand Dindini', niveau: 42, talents: [3, 3, 3], caractere: 'calme', stade: 'eveille', competences: ['turbo', 'cri'], entrainement: [8, 8, 8] } },
+  { id: 'ligue3', plume: 'mamie', sorte: 'marathon', piste: 'neutre', nom: 'La Ligue · Mamie Glouglou', niveaux: [41, 44], force: 7, especes: ['mammouth', 'dragon', 'yeti', 'pirate', 'fritesfluo'],
+    rival: { espece: 'dragon', nom: 'Pépère', dresseur: 'Mamie Glouglou', niveau: 49, talents: [5, 5, 4], caractere: 'tetue', stade: 'eveille', competences: ['souffle', 'turbo'], entrainement: [15, 15, 12] } },
+  { id: 'ligue4', plume: 'rapido', sorte: 'sprint', piste: 'neutre', nom: 'La Ligue · Capitaine Rapido', niveaux: [40, 43], force: 7, especes: ['comete', 'dracula', 'galaxie', 'dragon', 'panthere'],
+    rival: { espece: 'comete', nom: 'Fusée', dresseur: 'Capitaine Rapido', niveau: 45, talents: [3, 3, 3], caractere: 'calme', stade: 'eveille', competences: ['turbo', 'sprint'], entrainement: [10, 8, 8] } },
+  { id: 'ligueGontran', plume: 'gontran', sorte: 'finale', piste: 'neutre', nom: 'La grande finale de la Ligue', niveaux: [39, 43], force: 8, especes: ['dracula', 'comete', 'dragon', 'galaxie', 'mammouth'],
+    rival: { espece: 'dindofeu', nom: 'Flamby', dresseur: 'Gontran', niveau: 45, talents: [4, 4, 4], caractere: 'calme', stade: 'eveille', competences: ['sprint', 'turbo'], entrainement: [10, 10, 10] } }
+];
+/* ── après l'histoire : les Coupes des Maîtres (le champion de chaque championnat, niveau 50, talents forts) ── */
+export const MAITRES = CHAMPIONNATS.map(C => ({ id: 'maitre' + C.n, n: C.n, champion: C.champion, type: C.type, sorte: 'piste', piste: C.finale.piste, nom: `La Coupe des Maîtres · ${C.nom.replace(/^La Coupe (des |de la |de )/, '')}`,
+  niveaux: [45, 49], force: 9, especes: C.especes, rival: { ...C.finale.star, niveau: 50, talents: [5, 5, 5], caractere: 'calme', stade: 'eveille', entrainement: [12, 12, 12], competences: [...new Set([...(C.finale.star.competences || []), 'turbo'])].filter(c => c !== 'canon') } }));
+/* le relais : deux courses, et le contre la montre : une course par piste ; la course sans fin */
+export const RELAIS = [
+  { id: 'relais1', sorte: 'relais', piste: 'neutre', nom: 'Le relais du Dindodrome', niveaux: [30, 36], force: 7, especes: ['trefle', 'mirageus', 'belgicus', 'liane', 'aurore', 'dindofeu', 'luciole', 'dindarc'] },
+  { id: 'relais2', sorte: 'relais', piste: 'neutre', nom: 'Le relais des légendes', niveaux: [42, 47], force: 9, especes: ['coquelicot', 'dingue', 'atomium', 'jaguar', 'cristal', 'magma', 'etoile', 'orage'] }
+];
+export const PISTES_CHRONO = Object.keys(PISTES);
 /* les gains d'une course, selon la place (1 à 6) et le championnat (1 à 4 ; 0 pour une course libre) */
 export const gainsCourse = (place, n) => ({
   pieces: Math.round([100, 70, 50, 35, 25, 20][place - 1] * (n ? 1 + .3 * (n - 1) : .6)),

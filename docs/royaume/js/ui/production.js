@@ -4,7 +4,7 @@
    (son chapeau, les friandises du Moulin, rendre à la nature). */
 import { PAR_ID } from '../donnees/especes.js';
 import { TYPES, RARETES, ORDRE_TYPES } from '../donnees/types.js';
-import { GRAINES, ORDRE_GRAINES, RECETTES, CHAPEAUX, FORMES_CHAPEAUX, DECORATIONS, PRIX_REPARATION, PRIX_HABITAT } from '../donnees/production.js';
+import { GRAINES, ORDRE_GRAINES, RECETTES, CHAPEAUX, FORMES_CHAPEAUX, DECORATIONS, PRIX_REPARATION, PRIX_HABITAT, NB_CHAPEAUX, NB_DECORATIONS } from '../donnees/production.js';
 import { portraitDindie } from '../dindies/portrait.js';
 import { PERSONNAGES, portraitChibi } from '../personnages/chibi.js';
 import { fenetre, toast, $, $$, echapper, barre, dialogue } from '../moteur/ui.js';
@@ -15,6 +15,7 @@ import { OBJETS } from '../jeu/objets.js';
 import { nomDe, adnDe, stats } from '../jeu/individus.js';
 import { estAdulte } from '../jeu/elevage.js';
 import { duree } from './elevage.js';
+import * as EV from '../jeu/evenements.js';
 
 const E = () => J.etat();
 let n = 0;
@@ -30,7 +31,7 @@ export const plumesHtml = () => `<div class="plumesBarre">${ORDRE_TYPES.map(t =>
 /* ── réparer un bâtiment de la production (on demande d'abord) ── */
 export async function proposerReparation(id) {
   const prix = PRIX_REPARATION[id], nom = PR.PRODUCTION[id];
-  const c = await dialogue([{ qui: moi(), texte: `${nom.charAt(0).toUpperCase() + nom.slice(1)} est en ruine… Avec ${prix} 🪙 de planches et de peinture, on pourrait le réparer !`, choix: [['oui', `🔨 Réparer (${prix} 🪙)`], ['non', '⏳ Plus tard']] }]);
+  const c = await dialogue([{ qui: moi(), texte: `${nom.charAt(0).toUpperCase() + nom.slice(1)} est en ruine… Avec ${prix} 🪙 de planches et de peinture, on pourrait ${id === 'scene' ? 'la' : 'le'} réparer !`, choix: [['oui', `🔨 Réparer (${prix} 🪙)`], ['non', '⏳ Plus tard']] }]);
   if (c !== 'oui') return false;
   const err = PR.reparer(id);
   if (err) { toast('⚠️ ' + err, { duree: 3200 }); return false; }
@@ -141,7 +142,12 @@ export function ouvrirMoulin({ surChange } = {}) {
 const GROUPES_DECO = [['jardin', '🌷 Jardin', ['massif', 'arbre', 'haie', 'rocher', 'mare', 'dalles']], ['fete', '🎈 Fête', ['fanions', 'lampions', 'ballons', 'citrouilles', 'bonhomme', 'kiosque']],
   ['statues', '🗿 Statues', ['statue']], ['mobilier', '🪑 Mobilier', ['banc', 'lampadaire', 'fontaine', 'puits', 'arche', 'balancoire', 'nichoir', 'epouvantail', 'moulinet', 'parasol', 'barriere']]];
 export function ouvrirAtelier({ surChange, decorer } = {}) {
-  let onglet = 'chapeaux', forme = FORMES_CHAPEAUX[0].forme, groupe = 'jardin';
+  /* pendant une fête : un onglet de plus, avec ses chapeaux et ses décorations (on l'ouvre d'office une fois les premiers faits) */
+  const FT = EV.fete(), S0 = PR.prod().stats;
+  let onglet = 'chapeaux', forme = FT && S0.chapeaux ? 'fete:' + FT.id : FORMES_CHAPEAUX[0].forme, groupe = FT && S0.decos ? 'fete:' + FT.id : 'jardin';
+  const groupes = FT ? [...GROUPES_DECO, ['fete:' + FT.id, `${FT.e} ${FT.nom.charAt(0).toUpperCase() + FT.nom.slice(1)}`, null]] : GROUPES_DECO;
+  const chapeauxDe = f => Object.values(CHAPEAUX).filter(C => f.startsWith('fete:') ? C.evenement === f.slice(5) : !C.evenement && C.forme === f);
+  const decosDe = g => { const G = groupes.find(x => x[0] === g); return Object.values(DECORATIONS).filter(D => G[2] ? !D.evenement && G[2].includes(D.famille) : D.evenement === g.slice(5)); };
   const F = fenetre('🪶 L’Atelier des plumes', '', { classe: 'atelierF', large: true });
   /* le mannequin : la compagne, ou une dindie adulte, ou un Glouglou */
   const modele = () => J.parUid(E().compagnon) || E().dindies.find(estAdulte) || { espece: 'glouglou', stade: 'adulte', chroma: false };
@@ -150,17 +156,18 @@ export function ouvrirAtelier({ surChange, decorer } = {}) {
       <div class="onglets"><button data-o="chapeaux" class="${onglet === 'chapeaux' ? 'actif' : ''}">🎩 Chapeaux</button><button data-o="decos" class="${onglet === 'decos' ? 'actif' : ''}">🌷 Décorations</button></div>`;
     if (onglet === 'chapeaux') {
       const m = modele();
-      h += `<div class="formes">${FORMES_CHAPEAUX.map(Fo => `<button data-f="${Fo.forme}" class="${Fo.forme === forme ? 'actif' : ''}" title="${Fo.nom}">${Fo.e}</button>`).join('')}</div>
-        <div class="chapeaux">${Object.values(CHAPEAUX).filter(C => C.forme === forme).map(C => `<div class="chapeau"><div class="mini">${portraitDindie({ ...adnDe(m), chapeau: C.forme, couleurChapeau: C.c1, couleurChapeau2: C.c2, crete: 'aucune' }, { id: 'AT' + (n++) })}</div>
+      h += `<div class="formes">${FT ? `<button data-f="fete:${FT.id}" class="fete ${forme === 'fete:' + FT.id ? 'actif' : ''}" title="${FT.nom}">${FT.e}</button>` : ''}${FORMES_CHAPEAUX.map(Fo => `<button data-f="${Fo.forme}" class="${Fo.forme === forme ? 'actif' : ''}" title="${Fo.nom}">${Fo.e}</button>`).join('')}</div>
+        ${FT && forme.startsWith('fete:') ? `<p class="petitTexte feteTexte">${FT.e} C’est <b>${FT.nom}</b> ! Ces chapeaux ne se fabriquent que pendant la fête (tu les gardes après).</p>` : ''}
+        <div class="chapeaux">${chapeauxDe(forme).map(C => `<div class="chapeau"><div class="mini">${portraitDindie({ ...adnDe(m), chapeau: C.forme, couleurChapeau: C.c1, couleurChapeau2: C.c2, crete: 'aucune' }, { id: 'AT' + (n++) })}</div>
           <b>${C.nom}</b><small>${prixTexte(C.cout)}</small>${PR.nbChapeau(C.id) ? `<small class="possede">Tu en as : ${PR.nbChapeau(C.id)}</small>` : ''}
           <button class="btn petit vert" data-chapeau="${C.id}" ${PR.coutOk(C.cout) ? '' : 'disabled'}>🧵 Fabriquer</button></div>`).join('')}</div>
-        <p class="petitTexte">Pour coiffer une dindie : touche-la, puis 🎩. (${Object.keys(CHAPEAUX).length} chapeaux à fabriquer !)</p>`;
+        <p class="petitTexte">Pour coiffer une dindie : touche-la, puis 🎩. (${NB_CHAPEAUX} chapeaux à fabriquer, et des chapeaux de fête !)</p>`;
     } else {
-      const fams = GROUPES_DECO.find(g => g[0] === groupe)[2];
-      h += `<div class="formes">${GROUPES_DECO.map(([k, t]) => `<button data-g="${k}" class="large ${k === groupe ? 'actif' : ''}">${t}</button>`).join('')}</div>
-        ${Object.values(DECORATIONS).filter(D => fams.includes(D.famille)).map(D => `<div class="article deco"><span class="em">${D.e}</span><div><b>${D.nom}</b><small>${prixTexte(D.cout)}</small>${PR.nbDeco(D.id) ? `<small class="possede">Tu en as : ${PR.nbDeco(D.id)} (${PR.prod().decorations[D.id] || 0} à poser)</small>` : ''}</div>
+      h += `<div class="formes">${groupes.map(([k, t]) => `<button data-g="${k}" class="large ${k.startsWith('fete:') ? 'fete ' : ''}${k === groupe ? 'actif' : ''}">${t}</button>`).join('')}</div>
+        ${groupe.startsWith('fete:') ? `<p class="petitTexte feteTexte">${FT.e} Des décorations de fête, seulement pendant ${FT.nom} !</p>` : ''}
+        ${decosDe(groupe).map(D => `<div class="article deco"><span class="em">${D.e}</span><div><b>${D.nom}</b><small>${prixTexte(D.cout)}</small>${PR.nbDeco(D.id) ? `<small class="possede">Tu en as : ${PR.nbDeco(D.id)} (${PR.prod().decorations[D.id] || 0} à poser)</small>` : ''}</div>
           <button class="btn petit vert" data-deco="${D.id}" ${PR.coutOk(D.cout) ? '' : 'disabled'}>🔨 Fabriquer</button></div>`).join('')}
-        <p class="petitTexte">${Object.keys(DECORATIONS).length} décorations à fabriquer. Pour les poser : le bouton 🎨 en bas de l’écran !</p>
+        <p class="petitTexte">${NB_DECORATIONS} décorations à fabriquer (et des décorations de fête, selon la saison). Pour les poser : le bouton 🎨 en bas de l’écran !</p>
         ${decorer && Object.values(PR.prod().decorations).some(k => k > 0) ? '<div class="ligneBtn"><button class="btn grand jaune" id="aDecorer">🎨 Décorer le Domaine</button></div>' : ''}`;
     }
     F.contenu.innerHTML = h;

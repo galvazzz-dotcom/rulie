@@ -56,3 +56,15 @@ export const estNuit = (h = heure()) => lumiere(h).nuit > .5;
 /* les moments qui comptent pour les dindies sauvages */
 export const estMatin = (h = heure()) => h >= 6 && h < 12;
 export const estJour = (h = heure()) => !estNuit(h);
+
+/* ── la lune : sa phase suit la vraie (0 = nouvelle lune, 0,5 = pleine lune), ou une pleine lune « forcée »
+   un moment (le grand télescope du Comte Hibou, la plume arc-en-ciel) ── */
+const MOIS_LUNAIRE = 29.530588853, NOUVELLE_LUNE = Date.UTC(2000, 0, 6, 18, 14);
+export const phaseLune = (d = new Date()) => (((d.getTime() - NOUVELLE_LUNE) / 864e5 / MOIS_LUNAIRE) % 1 + 1) % 1;
+let luneForcee = 0;
+export const forcerPleineLune = ms => { luneForcee = Date.now() + ms; };
+export const pleineLuneForcee = () => Date.now() < luneForcee;
+/* pleine lune : à un jour et demi près (ou forcée) */
+export const pleineLune = (d = new Date()) => pleineLuneForcee() || Math.abs(phaseLune(d) - .5) < 1.5 / MOIS_LUNAIRE;
+/* dans combien de jours, la prochaine pleine lune ? */
+export const joursAvantPleineLune = (d = new Date()) => Math.round(((.5 - phaseLune(d) + 1) % 1) * MOIS_LUNAIRE);

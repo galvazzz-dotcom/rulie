@@ -12,6 +12,7 @@ import { estJour, estNuit, estMatin } from '../moteur/temps.js';
 import { meteo } from '../moteur/meteo.js';
 import { glouglou } from '../moteur/sons.js';
 import * as J from './etat.js';
+import { typeFete } from './evenements.js';
 
 const MAX = 6;
 let compteur = 0;
@@ -29,14 +30,15 @@ export function creerSauvages(lieu, { etapeAtteinte, particules, quandVue }) {
   let prochain = 0, premiers = 4;
 
   function candidates() {
-    const e = J.etat(), out = [];
+    const e = J.etat(), out = [], tf = typeFete();
     for (const [esp, r] of Object.entries(R.especes)) {
       if (!conditionsOk(lieu.id, esp, etapeAtteinte)) continue;
       const epique = PAR_ID[esp].rarete === 'epique';
       if (epique && liste.some(s => s.espece === esp)) continue;
       const fantome = !!(r.equipement && !e.inventaire[r.equipement]);
       if (fantome && liste.some(s => s.fantome)) continue;
-      out.push({ esp, r, poids: (r.poids || 1) * (fantome ? .6 : 1) * (epique ? 1.6 : 1), fantome });
+      /* pendant une fête, les dindies de son type sortent deux fois plus */
+      out.push({ esp, r, poids: (r.poids || 1) * (fantome ? .6 : 1) * (epique ? 1.6 : 1) * (tf && PAR_ID[esp].types.includes(tf) ? 2 : 1), fantome });
     }
     return out;
   }

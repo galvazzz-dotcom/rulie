@@ -219,7 +219,8 @@ try {
       T.finForcage(); vider();
       R.mythiques.push(r);
     }
-    R.dindromakus = GQ.mythiquePour(mk('etoile'), mk('celestia')) === null;
+    /* le Dindromakus (étape 8) : le bon couple, mais il faut la plume arc-en-ciel du chapitre 8 */
+    const md = GQ.mythiquePour(mk('etoile'), mk('celestia')); R.dindromakus = !!md && md.M.id === 'ruuulius' && !md.ok;
     /* les championnats 5 à 8 */
     R.champ = CHAMPIONNATS.slice(4).map(C => ({ n: C.n, courses: C.courses.length, finale: !!C.finale, badge: !!C.badge, star: C.finale.star.espece }));
     e.courses.badges = [1, 2, 3, 4]; e.quete.etape = 'coupe5';
@@ -233,7 +234,7 @@ try {
   verifier(!R.manquePlaces.length && !R.horsIle.length, `les objets des légendes et les fragments ont leurs 3 places dans chaque île${R.manquePlaces.length || R.horsIle.length ? ' : ' + [...R.manquePlaces, ...R.horsIle].join(' ') : ''}`);
   verifier(R.jumelles && !R.equipAvant.length && R.equipApres.length === 5 && R.friandisesApres.length === 5, `Mimi vend chaque équipement au bon moment (au chapitre 5 : jumelles seulement ; puis les 5, et les 5 friandises préférées)`);
   for (const r of R.mythiques) verifier(r.sansObjet && r.mauvaisMoment && r.ok && r.oeuf && r.objetUtilise && r.sansObjetJamais, `mythique ${r.id} : sans l’objet ou au mauvais moment, rien ; sinon un œuf mythique (4 h), et l’objet est utilisé ${JSON.stringify(r)}`);
-  verifier(R.dindromakus, 'le Dindromakus ne peut pas encore naître (chapitre 8)');
+  verifier(R.dindromakus, 'le Dindromakus ne peut pas encore naître (il faut la plume arc-en-ciel du chapitre 8)');
   verifier(R.champ.length === 4 && R.champ.every(c => c.courses === 3 && c.finale && c.badge) && R.ouvert5, `les championnats 5 à 8 : 3 courses, une finale, un badge, et ils s’ouvrent un par un (${R.champ.map(c => c.n + ':' + c.star).join(' ')})`);
 
   /* ══════════ 2. les chapitres 5 à 7 ══════════ */
@@ -263,7 +264,7 @@ try {
   await pg.reload(); await pg.waitForTimeout(1200);
   await pg.evaluate(() => document.querySelector('#profils .jouer').click());
   await pg.waitForFunction(() => window.__jeu && window.__jeu.monde, null, { timeout: 60000 }); await pg.waitForTimeout(1000); await dialogues(); await fermer();
-  if (!LEGENDES) verifier(await etape() === 'parlerPlumeau6' && await pg.evaluate(() => window.__jeu.etat().version) === 6, 'une sauvegarde de l’étape 6 (chapitre 4 fini) reprend au début du chapitre 5 (version 6)');
+  if (!LEGENDES) verifier(await etape() === 'parlerPlumeau6' && await pg.evaluate(() => window.__jeu.etat().version) >= 6, 'une sauvegarde de l’étape 6 (chapitre 4 fini) reprend au début du chapitre 5 (version 6 ou plus)');
   const coureuse = await pg.evaluate(() => Object.fromEntries(window.__jeu.etat().dindies.filter(d => d.lieu === 'equipe').map(d => [d.espece, d.uid])));
   const m0 = await memoire();
 
@@ -344,7 +345,7 @@ try {
   await pg.evaluate(() => { const i = window.__jeu.EL.elevage().couveuses.findIndex(o => o && o.rarete === 'mythique'); document.querySelector(`[data-eclore="${i}"]`).click(); });
   await attendre('#eOk', 20000); await pg.waitForTimeout(500); await pg.screenshot({ path: `${OUT}/eclosion-mythique.png` });
   await clic('#eOk'); await pg.waitForTimeout(800);
-  await jusqua('fin'); await log('Dindoréa Florissima est née !');
+  await jusqua('parlerPlumeau10'); await log('Dindoréa Florissima est née ! (le chapitre 8 commence)');
   await pg.waitForTimeout(1200); await pg.screenshot({ path: `${OUT}/fin-chapitre7.png` }); await fermer();
   verifier(await pg.evaluate(() => window.__jeu.etat().quete.finies.length === 51 && !!window.__jeu.etat().livre.attrapes.florissima), 'le chapitre 7 est fini : 51 quêtes, et une mythique dans le Grand Livre');
   console.log(`chapitres 5 à 7 joués en ${((Date.now() - t0) / 1000).toFixed(0)} s`);
@@ -370,7 +371,7 @@ try {
   await pg.evaluate(() => document.querySelector('#profils .jouer').click());
   await pg.waitForFunction(() => window.__jeu && window.__jeu.monde, null, { timeout: 90000 }); await pg.waitForTimeout(1500);
   const apres = await pg.evaluate(() => ({ lieu: window.__jeu.monde.id, etape: window.__jeu.etat().quete.etape, livre: Object.keys(window.__jeu.etat().livre.attrapes).length, badges: window.__jeu.etat().courses.badges.length }));
-  verifier(apres.lieu === 'banquise' && apres.etape === 'fin' && apres.badges === 8, `après rechargement : on reprend sur la Banquise, 8 badges (${JSON.stringify(apres)})`);
+  verifier(apres.lieu === 'banquise' && apres.etape === 'parlerPlumeau10' && apres.badges === 8, `après rechargement : on reprend sur la Banquise, 8 badges (${JSON.stringify(apres)})`);
 } catch (e) { console.log('❌', e.message); echecs++; await pg.screenshot({ path: `${OUT}/erreur.png` }); }
 verifier(!errs.length, `aucune erreur dans le navigateur${errs.length ? ' : ' + errs.join(' / ') : ''}`);
 console.log(echecs ? `\n❌ étape 7 : ${echecs} échec(s)` : '\n✅ étape 7 : les chapitres 5 à 7 sont jouables de bout en bout');

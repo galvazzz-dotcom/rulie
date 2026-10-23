@@ -4,6 +4,8 @@
    - le terrain : + 8 % sur la piste de son type, − 8 % sur celle du type opposé (pas de malus en mode aide) ; les zones de sable ou de boue (− 15 %) ;
    - les compétences, avec leur recharge.
    La joueuse peut : sauter au bon moment (sinon le saut se fait tout seul, selon le 🦘), lancer ses compétences, foncer (plus vite, plus fatigant).
+   Après l'histoire (étape 8) : le relais (3 dindies par équipe, chacune court un tiers de la distance), le contre la montre
+   (seule sur la piste) et la course sans fin (sans arrivée : on s'arrête à la 3e chute, ou quand il ne reste plus de forces).
    creerCourse(options) → { t, phase, coureurs, maj(dt), sauter(), competence(i), foncer(v), evenements, classement() } */
 import { PAR_ID } from '../donnees/especes.js';
 import { TYPES } from '../donnees/types.js';
@@ -25,12 +27,13 @@ export function qualites(d, pisteType, aide) {
   return { vMax: 9 + .2 * sv, Emax: 55 + 1.8 * se, sj, terrain, chezElle: !!pisteType && types.includes(pisteType), stats: [sv, se, sj] };
 }
 
-/* options : { piste, distance, haies, zones, coureurs: [{ id, nom, dresseur, d, joueur }], aide, nuit, rng } */
-export function creerCourse({ piste = 'neutre', distance, haies = [], zones = [], coureurs, aide = false, nuit = false, rng = Math.random }) {
+/* options : { piste, distance, haies, zones, coureurs: [{ id, nom, dresseur, d, joueur, equipe? }], aide, nuit, rng, relais, sansFin } */
+export const CHUTES_SANS_FIN = 3;
+export function creerCourse({ piste = 'neutre', distance, haies = [], zones = [], coureurs, aide = false, nuit = false, rng = Math.random, relais = false, sansFin = false }) {
   const P = PISTES[piste], ouverte = !P.type || ['prairie', 'sable', 'ciel'].includes(P.type);
   const evenements = [];
   const emettre = (type, R, extra = {}) => evenements.push({ type, r: R ? R.i : -1, ...extra });
-  const C = { t: -COMPTE, phase: 'compte', distance, haies, zones, piste, evenements, coureurs: [], fini: false, tFin: null, ordreArrivee: [] };
+  const C = { t: -COMPTE, phase: 'compte', distance, haies, zones, piste, evenements, coureurs: [], fini: false, tFin: null, ordreArrivee: [], relais, sansFin, jambe: relais ? distance / 3 : 0 };
 
   C.coureurs = coureurs.map((c, i) => {
     const Q = qualites(c.d, P.type, aide && c.joueur);
@@ -41,9 +44,17 @@ export function creerCourse({ piste = 'neutre', distance, haies = [], zones = []
       pos: 0, v: 0, E: Q.Emax, allure: 1, fonce: false, reaction: c.joueur ? .18 : .08 + rng() * .22, parti: false,
       fini: false, temps: null, place: null, prochaine: 0, saut: null, chute: 0, effets: [], charges: { parfait: 0, esquive: 0 },
       competences: comp, recharges: comp.map(() => 0), utilisees: comp.map(() => false), tIA: rng() * .25,
-      perso: .9 + rng() * .2      /* chaque adversaire lance ses compétences à sa façon */
+      perso: .9 + rng() * .2,     /* chaque adversaire lance ses compétences à sa façon */
+      equipe: relais ? (c.equipe || [c.d, c.d, c.d]) : null, jambe: 0, chutes: 0
     };
   });
+  /* le relais : la dindie suivante de l'équipe prend le relais (fraîche, avec ses compétences) */
+  function passerRelais(R) {
+    R.jambe++; R.d = R.equipe[R.jambe];
+    const Q = qualites(R.d, P.type, aide && R.joueur), comp = competencesDe(R.d);
+    Object.assign(R, Q, { vMax: Q.vMax * (.975 + rng() * .05), E: Q.Emax, competences: comp, recharges: comp.map(() => 0), utilisees: comp.map(() => false), saut: null, chute: 0, effets: [], charges: { parfait: 0, esquive: 0 } });
+    emettre('relais', R, { jambe: R.jambe });
+  }
   const joueur = () => C.coureurs.find(R => R.joueur);
 
   /* ── les effets (boosts, ralentissements, immunités) ── */
@@ -131,7 +142,7 @@ export function creerCourse({ piste = 'neutre', distance, haies = [], zones = []
     if ((q === 'chute' || q === 'tot') && (actif(R, 'solide') || actif(R, 'parfait'))) q = 'bon';
     if ((q === 'chute' || q === 'tot') && R.charges.esquive) { R.charges.esquive = 0; q = 'bon'; emettre('esquive', R); }
     if (q === 'parfait') ajouter(R, 'boost', 1, 1.12);
-    if (q === 'chute' || q === 'tot') { R.chute = .95; R.saut = null; }
+    if (q === 'chute' || q === 'tot') { R.chute = .95; R.saut = null; R.chutes++; }
     emettre('haie', R, { q, h: haies[R.prochaine], n: R.prochaine });
     R.prochaine++;
   }
@@ -166,12 +177,13 @@ export function creerCourse({ piste = 'neutre', distance, haies = [], zones = []
         if (R.tIA <= 0) { R.tIA = .25; R.competences.forEach((id, k) => { if (peutLancer(R, k) && envieDe(R, id) && rng() < .55 * R.perso + (R.joueur ? .3 : 0)) lancer(R, k); }); }
       }
       /* l'allure : on règle son effort pour tenir jusqu'au bout (et on fonce à la fin s'il reste des forces) */
-      const reste = Math.max(1, distance - R.pos);
+      const finJambe = relais ? Math.min(distance, (R.jambe + 1) * C.jambe) : distance, reste = Math.max(1, finJambe - R.pos);
       if (R.fini) R.allure = .45;
+      else if (sansFin) R.allure = R.fonce ? 1.13 : 1;
       else {
         const permis = (R.E - R.Emax * .08) / (reste / (R.vMax * .95));
         let a = clamp(Math.pow(Math.max(0, permis) / K_FATIGUE, .25), .8, 1.04);
-        if (reste < distance * .15 && R.E > R.Emax * .22) a = 1.07;
+        if (reste < (relais ? C.jambe : distance) * .15 && R.E > R.Emax * .22) a = 1.07;
         if (R.fonce) a = 1.13;
         R.allure = a;
       }
@@ -200,6 +212,13 @@ export function creerCourse({ piste = 'neutre', distance, haies = [], zones = []
       if (!R.fini) for (const X of C.coureurs) if (X !== R && !X.fini && avant <= X.pos && R.pos > X.pos) {
         if (actif(R, 'etincelle')) ajouter(R, 'boost', 1.5, 1.1);
         if (R.joueur || X.joueur) emettre('double', R, { qui: X.i });
+      }
+      /* le relais : on passe le témoin */
+      if (relais && !R.fini && R.jambe < 2 && R.pos >= (R.jambe + 1) * C.jambe) passerRelais(R);
+      /* la course sans fin : elle s'arrête à la 3e chute, ou à bout de forces */
+      if (sansFin && !R.fini && (R.chutes >= CHUTES_SANS_FIN || R.E <= .5)) {
+        R.fini = true; R.temps = C.t; C.ordreArrivee.push(R); R.place = C.ordreArrivee.length;
+        emettre('arrivee', R, { place: R.place, raison: R.chutes >= CHUTES_SANS_FIN ? 'chutes' : 'forces' });
       }
       /* l'arrivée */
       if (!R.fini && R.pos >= distance) {

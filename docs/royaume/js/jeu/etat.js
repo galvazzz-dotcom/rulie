@@ -3,14 +3,14 @@
 import { PAR_ID } from '../donnees/especes.js';
 import { vaDans } from './individus.js';
 
-export const VERSION = 6;
+export const VERSION = 7;
 export function nouvelEtat(nom, couleur) {
   return {
     version: VERSION, profil: { nom, couleur, cree: Date.now() },
     pieces: 0, plumesOr: 0, inventaire: {},
     dindies: [], compagnon: null,
     enclos: {}, batiments: { clapier: { repare: false, rangees: 1 }, montgolfiere: { reparee: false }, couvoir: { repare: false, niveau: 1 }, nurserie: { repare: false, niveau: 1 }, dindodrome: { ouvert: false }, entrainement: { repare: false },
-      potager: { repare: false, niveau: 1 }, moulin: { repare: false }, atelier: { repare: false }, missions: { repare: false, niveau: 1 } },
+      potager: { repare: false, niveau: 1 }, moulin: { repare: false }, atelier: { repare: false }, missions: { repare: false, niveau: 1 }, scene: { repare: false } },
     elevage: { couveuses: [null, null], croisements: 0, eclosions: 0, premierHybride: false, compteur: 0 },
     livre: { vus: {}, attrapes: {}, chromas: {} },
     courses: { badges: [], places: {}, faites: 0, victoires: 0, records: {}, entrainements: 0, lecons: 0 },
@@ -39,6 +39,8 @@ export function migrer(e) {
   /* version 5 : la production (rien à déplacer : les nouveaux bâtiments sont encore en ruine) */
   /* version 6 : la fin du chapitre 4 devient le début du chapitre 5 */
   else if (avant < 6 && e.quete.etape === 'fin') e.quete.etape = 'parlerPlumeau6';
+  /* version 7 : la fin du chapitre 7 devient le début du chapitre 8 */
+  else if (avant < 7 && e.quete.etape === 'fin') e.quete.etape = 'parlerPlumeau10';
   e.version = VERSION;
   return e;
 }
@@ -69,6 +71,7 @@ export function voir(espece) { if (!E.livre.vus[espece]) { E.livre.vus[espece] =
 export function ajouterDindie(d) {
   E.dindies.push(d); voir(d.espece);
   if (!E.livre.attrapes[d.espece]) E.livre.attrapes[d.espece] = Date.now();
+  if (d.chroma) { E.livre.chromas = E.livre.chromas || {}; if (!E.livre.chromas[d.espece]) E.livre.chromas[d.espece] = Date.now(); }
   if (equipe().length > 6) d.lieu = E.batiments.clapier.repare ? 'clapier' : 'equipe';
   changer('dindies');
   return d;

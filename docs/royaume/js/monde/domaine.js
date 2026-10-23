@@ -29,7 +29,8 @@ export const LIEUX = {
   elevage: { nom: 'Le Couvoir et la Nurserie', e: '🥚', x: 0, z: -27 },
   dindodrome: { nom: 'Le Dindodrome', e: '🏁', x: 44, z: 0 },
   entrainement: { nom: 'Le terrain d’entraînement', e: '🏋️', x: 33, z: 15 },
-  port: { nom: 'Le port', e: '⛵', x: 0, z: 37 }
+  port: { nom: 'Le port', e: '⛵', x: 0, z: 37 },
+  scene: { nom: 'La Scène des défilés', e: '🎭', x: 22, z: 29 }
 };
 export const ORDRE_ENCLOS = [['prairie', -40.5, -12, 'e'], ['pluie', -40.5, -3.5, 'e'], ['feu', -40.5, 5, 'e'], ['sable', -40.5, 13.5, 'e'],
   ['jungle', -26.5, -12, 'o'], ['glace', -26.5, -3.5, 'o'], ['nuit', -26.5, 5, 'o'], ['ciel', -26.5, 13.5, 'o']];
@@ -136,7 +137,8 @@ export function construireDomaine(scene, etat) {
     potager: { nom: 'Le Potager', texte: 'Le Potager', e: '🥕', fab: () => BAT.potager(2 + 2 * (etat.batiments.potager?.niveau || 1)), ruine: () => BAT.ruine('Le Potager', 6, 5), zone: [-.8, 14.5, 10] },
     moulin: { nom: 'Le Moulin à friandises', texte: 'Le Moulin', e: '🌬️', fab: BAT.moulin, ruine: () => BAT.ruine('Le Moulin', 5, 5, true), zone: [0, 7.5, 7] },
     atelier: { nom: 'L’Atelier des plumes', texte: 'L’Atelier', e: '🪶', fab: BAT.atelier, ruine: () => BAT.ruine('L’Atelier des plumes', 6, 5), zone: [.5, 9.5, 7.5] },
-    missions: { nom: 'Le Bureau des missions', texte: 'Les missions', e: '📮', fab: BAT.bureauMissions, ruine: () => BAT.ruine('Le Bureau des missions', 6, 4.5), zone: [.8, 8.5, 7] }
+    missions: { nom: 'Le Bureau des missions', texte: 'Les missions', e: '📮', fab: BAT.bureauMissions, ruine: () => BAT.ruine('Le Bureau des missions', 6, 4.5), zone: [.8, 8.5, 7] },
+    scene: { nom: 'La Scène des défilés', texte: 'La Scène', e: '🎭', fab: BAT.sceneDefiles, ruine: () => BAT.ruine('La Scène des défilés', 8, 5), zone: [.4, 9.6, 8] }
   };
   const majProduction = id => {
     const P = PROD[id], L0 = LIEUX[id], A = production[id], repare = !!etat.batiments[id]?.repare;
@@ -178,6 +180,13 @@ export function construireDomaine(scene, etat) {
   lePort.setGonfle(!!etat.batiments.montgolfiere?.reparee);
   ajouterInteractif({ id: 'montgolfiere', e: '🎈', texte: 'La montgolfière', x: lePort.porteMonde[0], z: lePort.porteMonde[1], cible: lePort.g });
   majProduction('missions');
+  /* la Scène des défilés (étape 8) : une décoration posée là avant qu'elle existe retourne dans le stock */
+  if (etat.production?.deco) etat.production.deco = etat.production.deco.filter(D => {
+    const dedans = Math.abs(D.x - LIEUX.scene.x) < 5.6 && Math.abs(D.z - LIEUX.scene.z) < 5.2;
+    if (dedans) etat.production.decorations[D.id] = (etat.production.decorations[D.id] || 0) + 1;
+    return !dedans;
+  });
+  majProduction('scene');
 
   /* ── les habitants ── */
   const pnj = {};
@@ -262,6 +271,24 @@ export function construireDomaine(scene, etat) {
     return true;
   }
 
+  /* ── les fêtes de l'année (étape 8) : des décorations de fête autour de la place ── */
+  const DECOS_FETE = { halloween: ['citrouilles', 'fantomes', 'lampions-halloween'], noel: ['arbre-sapin', 'cadeaux', 'lampions-noel', 'bonhomme', 'cadeaux', 'lampions-noel'],
+    paques: ['oeufs', 'massif-rose', 'parasol-paques', 'oeufs', 'massif-jaune', 'arbre-cerisier'], ete: ['chateauSable', 'parasol-ete', 'ballons'] };
+  let fete = null;
+  function majFete(id) {
+    if (fete && fete.id === id) return;
+    if (fete) { for (const A of fete.items) scene.remove(A.R.g); for (const c of fete.cases) grille.libre[c] = 1; fete = null; }
+    if (!id || !DECOS_FETE[id]) return;
+    fete = { id, items: [], cases: [] };
+    [22, 158, -22, -112, 67, 112].forEach((a, i) => {
+      const x = Math.cos(a * Math.PI / 180) * 7.6, z = Math.sin(a * Math.PI / 180) * 7.6, deco = DECOS_FETE[id][i % DECOS_FETE[id].length], r = DECORATIONS[deco].rayon;
+      if (interactifs.some(I => Number.isFinite(I.x) && Math.hypot(I.x - x, I.z - z) < 1.4 + r)) return;
+      for (let k = 0; k < 9; k++) { const b = k / 8 * Math.PI * 2, d = k ? r : 0; if (!grille.libreEn(x + Math.cos(b) * d, z + Math.sin(b) * d)) return; }
+      const R = fabDeco(deco); R.g.position.set(x, 0, z); R.g.rotation.y = Math.atan2(-x, -z); scene.add(R.g);
+      fete.items.push({ R }); fete.cases.push(...boucherDeco(x, z, r * .8));
+    });
+  }
+
   /* ── les objets de quête posés dans le monde ── */
   const objets = new Map();
   function poserObjet(id, sorte, x, z) {
@@ -278,7 +305,7 @@ export function construireDomaine(scene, etat) {
   return {
     grille, interactifs, pnj, enclosInfo, lieux: LIEUX, fontaine, lampes: lum,
     majEnclos, majClapier, majCouvoir, majNurserie, elevage, majPortail, majEntrainement,
-    majProduction, production, majPlumes, decos, majDecos, ajouterDeco, retirerDeco, peutPoserDeco,
+    majProduction, production, majPlumes, decos, majDecos, ajouterDeco, retirerDeco, peutPoserDeco, majFete,
     majPotager: (parcelles, stade) => production.potager?.repare && production.potager.b.majParcelles(parcelles, stade),
     majBureau: (enCours, finies) => { const b = production.missions?.repare && production.missions.b; if (b) { b.setDrapeau(enCours > 0); b.setAlerte(finies > 0); } },
     tournerMoulin: () => production.moulin?.repare && production.moulin.b.tourner(),
@@ -295,6 +322,7 @@ export function construireDomaine(scene, etat) {
       for (const O of objets.values()) O.o.maj(dt, t);
       for (const P of Object.values(pnj)) P.c.maj(dt, t);
       for (const A of decos.values()) A.R.maj && A.R.maj(dt, t);
+      if (fete) for (const A of fete.items) A.R.maj && A.R.maj(dt, t);
       for (const I of Object.values(enclosInfo)) if (I.tas && I.tas.g.visible) I.tas.maj(dt, t);
     }
   };

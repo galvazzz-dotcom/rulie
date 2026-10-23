@@ -59,7 +59,9 @@ async function courir(declencher, { regarder = false } = {}) {
   await pg.waitForFunction(() => window.__jeu.course, null, { timeout: 15000 });
   if (regarder) {
     await pg.waitForTimeout(1500); await pg.screenshot({ path: `${OUT}/depart.png` });
-    await pg.waitForFunction(() => window.__jeu.course.C.t > .3, null, { timeout: 60000, polling: 100 });
+    /* (le compte à rebours en accéléré : sur une machine lente, 3 s de jeu peuvent prendre plus d'une minute) */
+    await pg.evaluate(() => { window.__jeu.course.vitesseTest = 3; });
+    await pg.waitForFunction(() => window.__jeu.course.C.t > .3, null, { timeout: 120000, polling: 100 });
     await pg.evaluate(() => { window.__jeu.course.vitesseTest = 3; });
     /* on saute au bon moment (l'anneau est vert) */
     const auto = setInterval(() => pg.evaluate(() => { const A = window.__jeu.course; if (!A) return; const R = A.C.joueur(), h = A.C.haies[R.prochaine]; if (h !== undefined && (h - R.pos) / R.v < .32 && (h - R.pos) / R.v > .16) A.sauter(); }).catch(() => {}), 30);

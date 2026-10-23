@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { PAR_ID } from '../donnees/especes.js';
 import { COMPETENCES, SORTES, PISTES } from '../donnees/courses.js';
-import { adnDe } from '../jeu/individus.js';
+import { adnDe, nomDe } from '../jeu/individus.js';
 import { creerDindie } from '../dindies/modele.js';
 import { portraitDindie } from '../dindies/portrait.js';
 import { creerCourse, COMPTE } from '../jeu/course.js';
@@ -60,8 +60,9 @@ function etiquette(texte, couleur) {
 /* H : { lieu, chaqueImage, cadrer(on), cacher(on), particules(pos, opts), nuit, nomJoueuse } */
 export function lancerCourse(def, d, H) {
   return new Promise(resoudre => {
-    const opts = optionsCourse(def, d, { nom: H.nomJoueuse || 'Roullieee' });
+    const opts = optionsCourse(def, d, { nom: H.nomJoueuse || 'Roullieee', equipe: H.equipe });
     const C = creerCourse({ ...opts, nuit: !!H.nuit });
+    const N = C.coureurs.length, longueur = def.sansFin ? null : def.distance;
     const L = H.lieu, P = L.piste, obst = { haies: opts.haies, zones: opts.zones, depart: opts.depart };
     P.preparer(def.piste, obst);
     H.cadrer(true); H.cacher(true);
@@ -92,15 +93,16 @@ export function lancerCourse(def, d, H) {
     R3.forEach(X => placer(X, 0, 0));
 
     /* ── l'interface ── */
-    const comps = C.joueur().competences;
-    const U = el(`<div id="course">
-      <div class="cHaut"><div class="cPlace"><b>–</b><small>/ 6</small></div>
-        <div class="cProgres"><div class="cBarre">${R3.map(X => `<i class="${X.R.joueur ? 'moi' : X.R.id === 'star' ? 'star' : ''}" data-i="${X.R.i}"></i>`).join('')}</div><small class="cDist">0 / ${def.distance} m</small></div>
+    let comps = C.joueur().competences;
+    const boutonsComps = () => comps.map((id, k) => `<button class="cComp" data-k="${k}" title="${COMPETENCES[id].desc}"><span>${COMPETENCES[id].e}</span><small>${COMPETENCES[id].nom}</small><i></i></button>`).join('');
+    const U = el(`<div id="course" class="${def.solo ? 'solo' : ''} ${def.sansFin ? 'sansFin' : ''}">
+      <div class="cHaut"><div class="cPlace">${def.sansFin ? '<b class="cVies">❤️❤️❤️</b>' : def.solo ? '<b class="cTemps">0.0 s</b>' : `<b>–</b><small>/ ${N}</small>`}</div>
+        <div class="cProgres"><div class="cBarre">${R3.map(X => `<i class="${X.R.joueur ? 'moi' : X.R.id === 'star' ? 'star' : ''}" data-i="${X.R.i}"></i>`).join('')}</div><small class="cDist">0${longueur ? ' / ' + longueur : ''} m</small></div>
         <button class="cVite" id="cVite" aria-label="Accélérer">⏩</button></div>
       <div class="cTitre">${S.e} ${echapper(def.nom)}<small>${PI.e} ${PI.nom}</small></div>
       <div class="cCom"></div><div class="cMsg"></div><div class="cCompte"></div>
       <div class="cEnergie" title="Endurance"><span>💪</span><div class="barreP"><b></b></div></div>
-      <div class="cBas"><div class="cComps">${comps.map((id, k) => `<button class="cComp" data-k="${k}" title="${COMPETENCES[id].desc}"><span>${COMPETENCES[id].e}</span><small>${COMPETENCES[id].nom}</small><i></i></button>`).join('')}</div>
+      <div class="cBas"><div class="cComps">${boutonsComps()}</div>
         <button class="cFonce" id="cFonce"><span>🔥</span><small>Fonce !</small></button>
         <button class="cSaut" id="cSaut"><i class="anneau"></i><span>🦘</span><small>Saute !</small></button></div></div>`);
     document.body.appendChild(U); document.body.classList.add('enCourse');
@@ -116,7 +118,8 @@ export function lancerCourse(def, d, H) {
     };
     const lancerComp = k => { if (C.competence(+k)) { pop(); } };
     $('#cSaut', U).addEventListener('pointerdown', e => { e.preventDefault(); sauter(); });
-    $$('.cComp', U).forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); lancerComp(b.dataset.k); }));
+    const brancherComps = () => $$('.cComp', U).forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); lancerComp(b.dataset.k); }));
+    brancherComps();
     const fonce = $('#cFonce', U);
     fonce.addEventListener('pointerdown', e => { e.preventDefault(); C.foncer(true); fonce.classList.add('appuye'); });
     for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) fonce.addEventListener(ev, () => { C.foncer(false); fonce.classList.remove('appuye'); });
@@ -159,7 +162,7 @@ export function lancerCourse(def, d, H) {
         const inx = -Q.dz, inz = Q.dx;   /* vers l'intérieur de l'anneau */
         camV.set(p.x - Q.dx * 7.2 + inx * 1.6, 3.4, p.z - Q.dz * 7.2 + inz * 1.6); viseV.set(p.x + Q.dx * 6, .9, p.z + Q.dz * 6);
       }
-      const k = Math.min(1, dt * (C.phase === 'compte' ? 2 : 3.2));
+      const k = Math.min(1, dt * (C.phase === 'compte' ? 2 : 3.2) * vitesse * (active?.vitesseTest || 1));   /* en accéléré (⏩), la caméra suit aussi vite */
       cam.lerp(camV, k); vise.lerp(viseV, k);
       camera.position.copy(cam); camera.lookAt(vise);
     }
@@ -179,6 +182,17 @@ export function lancerCourse(def, d, H) {
           else if (R.joueur) msg('👍 Hop !');
         }
         if (ev.type === 'esquive' && R.joueur) msg('🤸 Esquive !', 'or');
+        if (ev.type === 'relais') {
+          const vieux = X.m, nouveau = creerDindie(adnDe(R.d));
+          L.racine.add(nouveau.racine); nouveau.racine.position.copy(vieux.racine.position); nouveau.racine.rotation.copy(vieux.racine.rotation);
+          vieux.racine.remove(X.lab); nouveau.racine.add(X.lab); X.lab.position.y = nouveau.hauteur() / nouveau.adn.taille + .5;
+          vieux.liberer(); X.m = nouveau;
+          H.particules(new THREE.Vector3(nouveau.racine.position.x, .8, nouveau.racine.position.z), { n: 16, couleur: R.joueur ? '#fb923c' : '#c4b5fd', taille: .4, vitesse: 2.5, monte: 1.6, duree: .8 });
+          if (R.joueur) {
+            comps = R.competences; $('.cComps', U).innerHTML = boutonsComps(); brancherComps();
+            msg(`🔁 Relais ! À toi, ${echapper(nomDe(R.d))} !`, 'or'); commenter(`Relais ! ${nomDe(R.d)} prend le départ !`); whoosh();
+          }
+        }
         if (ev.type === 'competence') {
           const Cp = COMPETENCES[ev.id];
           if (R.joueur) { msg(`${Cp.e} ${Cp.nom} !`, 'violet'); whoosh(); }
@@ -187,10 +201,12 @@ export function lancerCourse(def, d, H) {
         }
         if (ev.type === 'double' && R.joueur) commenter(`${C.joueur().nom} double ${C.coureurs[ev.qui].nom} !`);
         if (ev.type === 'arrivee') {
-          if (R.place === 1) { foule.hourra(); commenter(`${R.nom} gagne la course !`); }
+          if (R.place === 1 && !def.solo) { foule.hourra(); commenter(`${R.nom} gagne la course !`); }
+          if (R.joueur && def.solo) { foule.hourra(); commenter(def.sansFin ? `${Math.round(R.pos)} mètres ! ${ev.raison === 'chutes' ? 'Trois chutes…' : 'Plus de forces…'} Bravo !` : `${R.temps.toFixed(2)} secondes !`); }
           if (R.joueur) {
             finiJoueuse = C.t; tada(); glouglou(1.1);
-            $('.cCompte', U).innerHTML = `<b class="arrivee p${Math.min(4, R.place)}">${R.place <= 3 ? ['🥇', '🥈', '🥉'][R.place - 1] : '🏁'} ${ORD(R.place)} place !</b>`;
+            $('.cCompte', U).innerHTML = def.sansFin ? `<b class="arrivee p1">♾️ ${Math.round(R.pos)} m !</b>` : def.solo ? `<b class="arrivee p1">⏱️ ${R.temps.toFixed(2)} s</b>`
+              : `<b class="arrivee p${Math.min(4, R.place)}">${R.place <= 3 ? ['🥇', '🥈', '🥉'][R.place - 1] : '🏁'} ${ORD(R.place)} place !</b>`;
             H.particules(new THREE.Vector3(X.m.racine.position.x, 1.5, X.m.racine.position.z), { n: 60, couleur: R.place === 1 ? '#facc15' : '#f472b6', taille: .45, vitesse: 5, monte: 4, duree: 2 });
           }
         }
@@ -200,9 +216,11 @@ export function lancerCourse(def, d, H) {
     /* ── l'interface, à chaque image ── */
     function majUI() {
       const R = C.joueur(), cl = C.classement(), place = cl.indexOf(R) + 1;
-      $('.cPlace b', U).textContent = C.phase === 'compte' ? '–' : ORD(R.place || place);
-      $('.cDist', U).textContent = `${Math.min(def.distance, Math.round(R.pos))} / ${def.distance} m`;
-      $$('.cBarre i', U).forEach(b => { const X = C.coureurs[+b.dataset.i]; b.style.left = (Math.min(1, X.pos / def.distance) * 100) + '%'; });
+      if (def.sansFin) $('.cPlace b', U).textContent = '❤️'.repeat(Math.max(0, 3 - R.chutes)) + '🤍'.repeat(Math.min(3, R.chutes));
+      else if (def.solo) $('.cPlace b', U).textContent = `${Math.max(0, R.fini ? R.temps : C.t).toFixed(1)} s`;
+      else $('.cPlace b', U).textContent = C.phase === 'compte' ? '–' : ORD(R.place || place);
+      $('.cDist', U).textContent = longueur ? `${Math.min(longueur, Math.round(R.pos))} / ${longueur} m${C.relais ? ` · relais ${R.jambe + 1}/3` : ''}` : `${Math.round(R.pos)} m`;
+      $$('.cBarre i', U).forEach(b => { const X = C.coureurs[+b.dataset.i]; b.style.left = (Math.min(1, longueur ? X.pos / longueur : (X.pos % 200) / 200) * 100) + '%'; });
       $('.cEnergie b', U).style.width = Math.round(R.E / R.Emax * 100) + '%';
       $('.cEnergie b', U).style.background = R.E / R.Emax < .3 ? '#ef4444' : R.fonce ? '#f97316' : '#22c55e';
       $$('.cComp', U).forEach(b => { const k = +b.dataset.k, ok = C.peutLancer(k), rec = R.recharges[k] - C.t, Cp = COMPETENCES[comps[k]]; b.disabled = !ok; b.classList.toggle('prete', ok); b.querySelector('i').style.height = !ok && rec > 0 && Cp.recharge && !R.fini ? Math.min(100, rec / Cp.recharge * 100) + '%' : '0%'; });
@@ -211,7 +229,7 @@ export function lancerCourse(def, d, H) {
       if (tau < 1.4 && !R.saut && R.chute <= 0) { an.style.opacity = 1; an.style.transform = `scale(${1 + Math.max(0, (tau - .26) / 1.14) * 1.25})`; an.classList.toggle('bon', tau >= .12 && tau <= .42); }
       else an.style.opacity = 0;
       if (place !== dernierPlace && C.phase === 'course' && !R.fini) { if (place === 1 && dernierPlace > 1) commenter(`${R.nom} passe en tête !`); dernierPlace = place; }
-      if (!tourAnnonce && def.distance > 300 && R.pos > def.distance - 200 && !R.fini) { tourAnnonce = true; commenter('Dernier tour ! 🔔'); bip(1200, .1, .06, 'sine'); setTimeout(() => bip(1200, .1, .06, 'sine'), 160); }
+      if (!tourAnnonce && longueur && def.distance > 300 && R.pos > def.distance - 200 && !R.fini) { tourAnnonce = true; commenter('Dernier tour ! 🔔'); bip(1200, .1, .06, 'sine'); setTimeout(() => bip(1200, .1, .06, 'sine'), 160); }
       if (!mi && R.pos > def.distance / 2) { mi = true; const T = cl[0]; if (T !== R) commenter(`${T.nom} mène la course !`); }
     }
 

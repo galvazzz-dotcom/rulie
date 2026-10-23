@@ -1,7 +1,8 @@
 /* ══════════ RÉGION 7 : LA FORÊT DE LA LUNE ══════════
    Une forêt bleue où il fait toujours un peu nuit : des arbres aux feuilles violettes, des champignons géants qui brillent,
    l'étang de lune (une lune s'y reflète), la colline aux étoiles et son cercle de pierres, l'observatoire du Comte Hibou.
-   La boîte à musique fait tomber la nuit. */
+   La boîte à musique fait tomber la nuit. Au chapitre 8 : le grand télescope fait venir la pleine lune,
+   et la pierre de lune, au milieu du cercle, rallume la plume arc-en-ciel. */
 import * as THREE from 'three';
 import { B, T, CY, CO, SP, TO, construire, pancarte, panneau, fenetre } from '../fabrique.js';
 import { semer, autour, dessinerFeuillus, dessinerPins, dessinerBuissons, dessinerRochers, dessinerFleurs, dessinerHerbes, dessinerChampignons } from '../nature.js';
@@ -9,6 +10,7 @@ import { instances } from '../ile.js';
 import { sphere } from '../../moteur/formes.js';
 import { toon, texRonde } from '../../moteur/materiaux.js';
 import { distSegment } from '../decor.js';
+import { pleineLune } from '../../moteur/temps.js';
 
 const lisse = x => { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); };
 const CHEMINS = [[0, 28, 0, 8, 2.4], [0, 28, -7, 25, 2.2], [0, 8, 16, 2, 2.2], [0, 8, -14, 0, 2], [0, 8, 0, -12, 2.2], [0, -12, -10, -22, 2], [16, 2, 26, -10, 1.8]];
@@ -80,8 +82,10 @@ export default {
     { nom: 'La colline aux étoiles', e: '⭐', x: COLLINE[0], z: COLLINE[1] }, { nom: 'Les champignons géants', e: '🍄', x: 22, z: 16 }],
   construire(ctx) {
     const { placer, grille, ajouterInteractif, reserver, sol, ile, racine, majs } = ctx;
-    placer(observatoire(), 17, -2); reserver(17, -1, 4.5);
-    placer(cercle(), COLLINE[0], COLLINE[1] - 1); reserver(COLLINE[0], COLLINE[1], 6);
+    const obs = placer(observatoire(), 17, -2); reserver(17, -1, 4.5);
+    ajouterInteractif({ id: 'gadget-telescope', e: '🔭', texte: 'Le grand télescope', x: obs.porteMonde[0] + 2.2, z: obs.porteMonde[1], cible: obs.g, gadget: 'telescope' });
+    const cer = placer(cercle(), COLLINE[0], COLLINE[1] - 1); reserver(COLLINE[0], COLLINE[1], 6);
+    ajouterInteractif({ id: 'gadget-autel', e: '🌕', texte: 'La pierre de lune', x: COLLINE[0], z: COLLINE[1] + 1.2, cible: cer.g, gadget: 'autel', rayon: 2.4 });
     /* l'étang de lune : une lune qui s'y reflète */
     sol.planEau(ETANG[0], ETANG[1], (ETANG[2] - .6) * 2, (ETANG[2] - .6) * 2, -.36, ['#a5b4fc', '#312e81'], 0, true);
     grille.boucherCercle(ETANG[0], ETANG[1], ETANG[2] - .4); reserver(ETANG[0], ETANG[1], ETANG[2] + .6);
@@ -90,6 +94,8 @@ export default {
     /* une grande lune dans le ciel, au-dessus de la forêt */
     const lune = new THREE.Mesh(sphere(24, 16), new THREE.MeshBasicMaterial({ color: '#fef9c3' })); lune.scale.setScalar(4); lune.position.set(-30, 30, -60); racine.add(lune);
     const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: texRonde(), color: '#fde68a', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: .5 })); halo.scale.setScalar(22); halo.position.copy(lune.position); racine.add(halo);
+    /* la pleine lune : plus grosse, plus brillante */
+    majs.push((dt, t) => { const p = pleineLune(); lune.scale.setScalar(p ? 5.4 : 4); halo.scale.setScalar(p ? 34 + Math.sin(t * 2) * 2 : 22); halo.material.opacity = p ? .75 : .5; });
     placer(panneau('🌙 La Forêt de la Lune'), -2.6, 11.5);
     const bm = placer(boiteMusique(), -3.5, -12);
     ajouterInteractif({ id: 'gadget-boite', e: '🎵', texte: 'La boîte à musique', x: bm.porteMonde[0], z: bm.porteMonde[1], cible: bm.g, gadget: 'boite' });

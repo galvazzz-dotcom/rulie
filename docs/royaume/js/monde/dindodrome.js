@@ -326,8 +326,11 @@ export function construireDindodrome() {
         haies.set(u, { g: o, choc: 0 });
       }
       /* les zones de sable ou de boue */
+      const zonesVues = new Set();
       for (const [a, b] of obst.zones) {
-        const u0 = ((obst.depart + a) % TOUR + TOUR) % TOUR;
+        const u0 = ((obst.depart + a) % TOUR + TOUR) % TOUR, cle = Math.round(u0 * 10);
+        /* une zone par endroit de l'anneau (on la retrouve à chaque tour, même dans la course sans fin) */
+        if (zonesVues.has(cle)) continue; zonesVues.add(cle);
         const z = new THREE.Mesh(ruban(-LARGEUR / 2 + .1, LARGEUR / 2 - .1, .055, u0, u0 + (b - a), .4), toon({ sable: '#f3d38e', verglas: '#e0f7ff', cendre: '#3f3f46', brume: '#6366f1', nuage: '#ffffff' }[P.zone] || '#5b4630'));
         z.receiveShadow = true; g.add(z);
         if (P.zone === 'boue') for (let k = 0; k < 6; k++) { const Q = pointPiste(u0 + (b - a) * (k + .5) / 6, (r() - .5) * 6); const f = new THREE.Mesh(new THREE.CircleGeometry(.5 + r() * .5, 14), new THREE.MeshBasicMaterial({ color: '#8fb3c9', transparent: true, opacity: .55, depthWrite: false })); f.rotation.x = -Math.PI / 2; f.position.set(Q.x, .07, Q.z); g.add(f); }

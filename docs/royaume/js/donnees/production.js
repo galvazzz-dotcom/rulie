@@ -49,6 +49,18 @@ FORMES_CHAPEAUX.forEach((F, i) => {
   });
 });
 
+/* ── les chapeaux de fête (étape 8) : on ne peut les fabriquer que pendant leur fête (Halloween, Noël, Pâques, l'été) ── */
+export const FORMES_FETE = { sorciere: 'Chapeau de sorcière', renne: 'Bois de renne', lapin: 'Oreilles de lapin', paille: 'Chapeau de paille' };
+[['sorciere-halloween', 'sorciere', 'halloween', 'nuit', 'Chapeau de sorcière 🎃', '🧙', '#4c1d95', '#f97316'],
+  ['hautForme-halloween', 'hautForme', 'halloween', 'nuit', 'Haut-de-forme citrouille 🎃', '🎩', '#1f2937', '#f97316'],
+  ['bonnet-noel', 'bonnet', 'noel', 'glace', 'Bonnet de Noël 🎄', '🎅', '#dc2626', '#ffffff'],
+  ['renne-noel', 'renne', 'noel', 'glace', 'Bois de renne 🎄', '🦌', '#92400e', '#16a34a'],
+  ['lapin-paques', 'lapin', 'paques', 'prairie', 'Oreilles de lapin 🥚', '🐰', '#fdf2f8', '#f9a8d4'],
+  ['fleurs-paques', 'fleurs', 'paques', 'prairie', 'Couronne de printemps 🥚', '🌷', '#86efac', '#fbcfe8'],
+  ['paille-ete', 'paille', 'ete', 'sable', 'Chapeau de paille ☀️', '👒', '#fde68a', '#38bdf8'],
+  ['casquette-ete', 'casquette', 'ete', 'sable', 'Casquette de plage ☀️', '🧢', '#38bdf8', '#fde047']]
+  .forEach(([id, forme, evenement, type, nom, e, c1, c2], i) => { CHAPEAUX[id] = { id, forme, type, nom, e, c1, c2, evenement, cout: { plumes: { [type]: 6 + (i % 2) * 2 }, pieces: 60 + (i % 2) * 20 } }; });
+
 /* ── l'Atelier : les 50 décorations (familles × variantes) ; rayon = la place qu'elles prennent, bloque = on ne passe pas à travers ── */
 export const DECORATIONS = {};
 const deco = (id, nom, e, famille, cout, { rayon = .6, bloque = true, ...params } = {}) => { DECORATIONS[id] = { id, nom, e, famille, cout, rayon, bloque, ...params }; };
@@ -82,8 +94,18 @@ deco('barriere-blanche', 'Barrière blanche', '🚧', 'barriere', { plumes: { pl
 deco('barriere-bois', 'Barrière en bois', '🪵', 'barriere', { plumes: { prairie: 2 }, pieces: 15 }, { couleur: '#a16207', rayon: .5 });
 deco('dalles-pierre', 'Dalles de pierre', '⬜', 'dalles', { plumes: { glace: 1, prairie: 1 }, pieces: 10 }, { couleur: '#d6d3d1', rayon: .7, bloque: false });
 deco('dalles-briques', 'Dalles de briques', '🟧', 'dalles', { plumes: { feu: 1, sable: 1 }, pieces: 10 }, { couleur: '#c2410c', rayon: .7, bloque: false });
-export const NB_DECORATIONS = Object.keys(DECORATIONS).length;
-export const NB_CHAPEAUX = Object.keys(CHAPEAUX).length;
+/* les décorations de fête (étape 8) : seulement pendant leur fête */
+deco('fantomes', 'Petits fantômes', '👻', 'fantomes', { plumes: { nuit: 4 }, pieces: 60 }, { rayon: .7, evenement: 'halloween' });
+deco('lampions-halloween', 'Lampions d’Halloween', '🏮', 'lampions', { plumes: { nuit: 3, feu: 2 }, pieces: 60 }, { couleurs: ['#f97316', '#7c3aed', '#22c55e', '#f97316'], rayon: .5, evenement: 'halloween' });
+deco('cadeaux', 'Pile de cadeaux', '🎁', 'cadeaux', { plumes: { glace: 4 }, pieces: 60 }, { rayon: .7, evenement: 'noel' });
+deco('lampions-noel', 'Guirlande de Noël', '🎄', 'lampions', { plumes: { glace: 3, feu: 2 }, pieces: 60 }, { couleurs: ['#dc2626', '#16a34a', '#facc15', '#ffffff'], rayon: .5, evenement: 'noel' });
+deco('oeufs', 'Panier d’œufs peints', '🧺', 'oeufs', { plumes: { prairie: 4 }, pieces: 60 }, { rayon: .6, evenement: 'paques' });
+deco('parasol-paques', 'Parasol de printemps', '🌷', 'parasol', { plumes: { prairie: 3, pluie: 2 }, pieces: 70 }, { couleurs: ['#f9a8d4', '#fef9c3'], rayon: 1, evenement: 'paques' });
+deco('chateauSable', 'Château de sable', '🏰', 'chateauSable', { plumes: { sable: 5 }, pieces: 70 }, { rayon: .9, evenement: 'ete' });
+deco('parasol-ete', 'Parasol de plage', '⛱️', 'parasol', { plumes: { sable: 3, pluie: 2 }, pieces: 70 }, { couleurs: ['#38bdf8', '#fde047'], rayon: 1, evenement: 'ete' });
+/* (les chapeaux et décorations de fête ne comptent pas dans les 30 chapeaux et les 50 décorations de l'Atelier) */
+export const NB_DECORATIONS = Object.values(DECORATIONS).filter(D => !D.evenement).length;
+export const NB_CHAPEAUX = Object.values(CHAPEAUX).filter(C => !C.evenement).length;
 
 /* ── le Bureau des missions ── */
 export const DUREES_MISSIONS = [15, 30, 60, 120, 240, 480];
@@ -111,5 +133,5 @@ export const AMELIORATIONS = {
   potager: { nom: 'le Potager', max: 5, effet: n => `${2 + 2 * n} parcelles`, cout: n => [null, null, { pieces: 300 }, { pieces: 600 }, { pieces: 1000, plumesOr: 1 }, { pieces: 1500, plumesOr: 2 }][n] },
   missions: { nom: 'le Bureau des missions', max: 3, effet: n => `${n} mission${n > 1 ? 's' : ''} à la fois`, cout: n => [null, null, { pieces: 600 }, { pieces: 1200, plumesOr: 2 }][n] }
 };
-export const PRIX_REPARATION = { potager: 300, moulin: 400, atelier: 500, missions: 400 };
+export const PRIX_REPARATION = { potager: 300, moulin: 400, atelier: 500, missions: 400, scene: 600 };
 export const PRIX_HABITAT = 400;

@@ -25,6 +25,8 @@ export function trouvaillesDuJour(region, cachettes) {
 export function ramasser(o, region) {
   const M = memoire(); if (M.pris[o.id]) return null;
   M.pris[o.id] = true;
+  /* pour les défis et les succès */
+  const st = J.etat().stats, c = st.compteurs = st.compteurs || {}; c.trouvailles = (c.trouvailles || 0) + 1;
   if (o.sorte === 'oeuf') { J.ajouterObjet('oeufMystere'); return `🥚 Un <b>œuf mystère</b> ! Il est tout chaud… Il éclora au Couvoir.`; }
   if (o.sorte === 'pierre') { J.ajouterObjet('pierreEveil'); return `💎 Une <b>pierre d’éveil</b> ! Elle brille doucement…`; }
   const r = hasard(o.id + jour()), pieces = 25 + Math.floor(r() * 9) * 5;

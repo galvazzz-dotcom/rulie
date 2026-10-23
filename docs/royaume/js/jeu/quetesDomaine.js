@@ -5,6 +5,7 @@
    l'étape passe toute seule). Le bandeau et la flèche la montrent quand l'histoire n'a rien d'autre à faire. */
 import * as J from './etat.js';
 import * as PR from './production.js';
+import * as CO from './concours.js';
 import { OBJETS } from './objets.js';
 import { TYPES, ORDRE_TYPES } from '../donnees/types.js';
 import { PERSONNAGES, portraitChibi } from '../personnages/chibi.js';
@@ -18,7 +19,9 @@ export const QUETES_DOMAINE = [
   { id: 'h4', titre: 'Un Domaine tout beau', etapes: ['deco', 'poser'], recompense: { pieces: 200, plumesOr: 1 } },
   { id: 'h5', titre: 'Le Bureau des missions', etapes: ['parlerZephyr', 'reparerMissions', 'envoyer', 'rapporter'], recompense: { pieces: 250, objets: { oeufMystere: 1 } } },
   { id: 'h6', titre: 'Toujours plus grand', etapes: ['ameliorer'], recompense: { pieces: 300, plumesOr: 1 } },
-  { id: 'h7', titre: 'Le Gâteau d’amour', etapes: ['gateau', 'gateauNid'], recompense: { pieces: 400, plumesOr: 2 } }
+  { id: 'h7', titre: 'Le Gâteau d’amour', etapes: ['gateau', 'gateauNid'], recompense: { pieces: 400, plumesOr: 2 } },
+  /* étape 8 : au chapitre 8, la Scène des défilés */
+  { id: 'h8', titre: 'La Scène des défilés', etapes: ['parlerMimiScene', 'reparerScene', 'defile', 'glouglouScene'], recompense: { pieces: 500, objets: { rubanBleu: 2 }, plumesOr: 2 }, ouverte: () => PR.sceneOuverte() }
 ];
 const ORDRE_H = [...QUETES_DOMAINE.flatMap(q => q.etapes), 'fin'];
 const E = () => J.etat();
@@ -36,7 +39,8 @@ const FAIT = {
   parlerPlumeau: () => qd().vus.plumeau, plumes: () => stat('plumes') > 0, reparerAtelier: () => !!E().batiments.atelier?.repare, chapeau: () => stat('chapeaux') > 0, coiffer: () => E().dindies.some(d => d.chapeau),
   deco: () => stat('decos') > 0, poser: () => stat('posees') > 0,
   parlerZephyr: () => qd().vus.zephyr, reparerMissions: () => !!E().batiments.missions?.repare, envoyer: () => stat('envoyees') > 0, rapporter: () => stat('rapportees') > 0,
-  ameliorer: () => stat('ameliorations') > 0, gateau: () => J.combien('gateauAmour') > 0 || stat('gateaux') > 0, gateauNid: () => stat('gateaux') > 0
+  ameliorer: () => stat('ameliorations') > 0, gateau: () => J.combien('gateauAmour') > 0 || stat('gateaux') > 0, gateauNid: () => stat('gateaux') > 0,
+  parlerMimiScene: () => qd().vus.scene, reparerScene: () => !!E().batiments.scene?.repare, defile: () => CO.concours().defile.faits > 0, glouglouScene: () => CO.concours().glouglou.faits > 0
 };
 
 /* ── le bandeau et la flèche ── */
@@ -62,7 +66,11 @@ export function texte(ici = 'domaine') {
     rapporter: 'Quand elles rentrent, accueille tes dindies au Bureau des missions 📮',
     ameliorer: 'Améliore un bâtiment : un enclos, le Clapier, le Couvoir, la Nurserie, le Potager ou le Bureau ⬆️',
     gateau: 'Fabrique un Gâteau d’amour au Moulin (2 baies, 1 blé, 1 maïs) 🎂',
-    gateauNid: 'Au Couvoir, croise deux dindies avec le Gâteau d’amour 💕'
+    gateauNid: 'Au Couvoir, croise deux dindies avec le Gâteau d’amour 💕',
+    parlerMimiScene: 'Mimi a une idée pour la vieille Scène des défilés ! Va lui parler 🛒',
+    reparerScene: 'Répare la Scène des défilés, au sud-est du Domaine (600 🪙) 🎭',
+    defile: 'Fais défiler une dindie sur la Scène des défilés 💃',
+    glouglouScene: 'Chante une chanson avec ta dindie, sur la Scène (le concours de glouglou) 🎶'
   })[s] || '';
   if (ici === 'dindodrome') return t + ' <i>(au Domaine : par le portail 🏡)</i>';
   if (ici !== 'domaine') return t + ' <i>(au Domaine : en montgolfière 🎈)</i>';
@@ -74,7 +82,8 @@ export function cible(ici = 'domaine') {
   if (ici !== 'domaine') return 'pnj-zephyr';
   if (s === 'plumes') { const L = enclosConstruits().filter(t => PR.plumesAPrendre(t)); return (L.length ? L : enclosConstruits()).map(t => 'enclos-' + t); }
   return ({ parlerMimi: 'pnj-mimi', reparerPotager: 'potager', planter: 'potager', recolter: 'potager', reparerMoulin: 'moulin', fabriquer: 'moulin', gateau: 'moulin',
-    parlerPlumeau: 'pnj-plumeau', reparerAtelier: 'atelier', chapeau: 'atelier', deco: 'atelier', parlerZephyr: 'pnj-zephyr', reparerMissions: 'missions', envoyer: 'missions', rapporter: 'missions', gateauNid: 'couvoir' })[s] || null;
+    parlerPlumeau: 'pnj-plumeau', reparerAtelier: 'atelier', chapeau: 'atelier', deco: 'atelier', parlerZephyr: 'pnj-zephyr', reparerMissions: 'missions', envoyer: 'missions', rapporter: 'missions', gateauNid: 'couvoir',
+    parlerMimiScene: 'pnj-mimi', reparerScene: 'scene', defile: 'scene', glouglouScene: 'scene' })[s] || null;
 }
 
 /* ── avancer ── */
@@ -96,11 +105,14 @@ export function verifier() {
   enCours = true;
   try {
     if (!D.etape && !D.finies.length && PR.productionOuverte()) { D.etape = ORDRE_H[0]; bouge = true; setTimeout(() => toast(`📜 Nouvelle quête du Domaine : <b>${QUETES_DOMAINE[0].titre}</b>`, { duree: 3400 }), 1600); }
+    /* toutes les quêtes ouvertes sont finies ? une nouvelle quête peut s'ouvrir plus tard (la Scène, au chapitre 8) */
+    if (D.etape === 'fin') { const N = QUETES_DOMAINE.find(Q => !D.finies.includes(Q.id) && (!Q.ouverte || Q.ouverte())); if (N) { D.etape = N.etapes[0]; bouge = true; setTimeout(() => toast(`📜 Nouvelle quête du Domaine : <b>${N.titre}</b>`, { duree: 3400 }), 1600); } }
     while (active() && FAIT[D.etape]()) {
       const Q = queteDomaineDe(D.etape), i = ORDRE_H.indexOf(D.etape);
       if (Q.etapes[Q.etapes.length - 1] === D.etape) recompenser(Q);
       D.etape = ORDRE_H[i + 1]; bouge = true;
       const N = queteDomaineDe(D.etape);
+      if (N && N !== Q && N.ouverte && !N.ouverte()) { D.etape = 'fin'; break; }
       if (N && N !== Q) setTimeout(() => toast(`📜 Nouvelle quête du Domaine : <b>${N.titre}</b>`, { duree: 3200 }), 2600);
     }
   } finally { enCours = false; }
@@ -125,6 +137,13 @@ export async function parler(id) {
       L('plumeau', 'Ramasse-les <b>une fois par jour</b> : touche l’enclos. Plus une dindie est rare ou heureuse, plus elle en laisse.'),
       L('plumeau', 'Avec ces plumes, l’<b>Atelier des plumes</b> fabrique des chapeaux et des décorations ! Il est en ruine, à l’est du Labo…')]);
     qd().vus.plumeau = true; verifier();
+    return true;
+  }
+  if (id === 'mimi' && s === 'parlerMimiScene') {
+    await dialogue([L('mimi', 'Roullieee ! Tu te souviens de la vieille <b>Scène des défilés</b>, au sud-est du Domaine ? Autrefois, on y faisait des concours magnifiques !'),
+      L('mimi', 'Deux concours : le <b>défilé</b> (la plus belle dindie, et les plus belles poses !) et le <b>glouglou</b> (on chante avec le cri de sa dindie).'),
+      L('mimi', 'La Baronne Plumeline veut bien présider le jury… Si tu répares la Scène, bien sûr ! Et j’ai des <b>rubans bleus</b> 🎀 pour les défilés.')]);
+    qd().vus.scene = true; verifier();
     return true;
   }
   if (id === 'zephyr' && s === 'parlerZephyr') {

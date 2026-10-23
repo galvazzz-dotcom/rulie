@@ -13,6 +13,7 @@ import { OBJETS } from '../jeu/objets.js';
 import { nomDe, NOMS_RIGOLOS, xpPourNiveau, adnDe } from '../jeu/individus.js';
 import * as S from '../jeu/scenario.js';
 import * as GQ from '../jeu/grandesQuetes.js';
+import { forcerHeure, forcerPleineLune } from '../moteur/temps.js';
 import { blocAmeliorer, brancherAmeliorer } from './production.js';
 
 const E = () => J.etat();
@@ -78,7 +79,8 @@ export function ouvrirCouvoir({ surChange, surEclosion } = {}) {
       if (typeof r !== 'string') gateau = false;
       if (typeof r === 'string') { toast('⚠️ ' + r, { duree: 3200 }); return; }
       tada(); glouglou(1.1);
-      if (r.rarete === 'mythique') toast(`🌈 ${O ? O.e + ' ' + O.nom + ' brille' : 'Tout brille'}… Un <b>œuf légendaire</b> apparaît dans le nid ! Il couvera 4 heures.`, { duree: 4600, classe: 'grand' });
+      if (r.espece === 'ruuulius') { forcerHeure(23, 3 * 60000); forcerPleineLune(3 * 60000); toast('🌈 La plume arc-en-ciel s’illumine… <b>La nuit tombe, et la pleine lune se lève !</b> Un œuf aux mille couleurs apparaît dans le nid. Il couvera 4 heures.', { duree: 5200, classe: 'grand' }); }
+      else if (r.rarete === 'mythique') toast(`🌈 ${O ? O.e + ' ' + O.nom + ' brille' : 'Tout brille'}… Un <b>œuf légendaire</b> apparaît dans le nid ! Il couvera 4 heures.`, { duree: 4600, classe: 'grand' });
       else toast('💕 Un œuf apparaît dans le nid ! Il part au chaud dans une couveuse.', { duree: 3200 });
       window.dispatchEvent(new CustomEvent('dindie-joie', { detail: nid[0].uid })); window.dispatchEvent(new CustomEvent('dindie-joie', { detail: nid[1].uid }));
       nid[0] = nid[1] = null; S.evenement('croisement', r); surChange && surChange(); dessiner();

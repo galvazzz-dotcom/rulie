@@ -37,6 +37,15 @@ export const PERSONNAGES = {
     chapeau: 'hautForme', ruban: '#a78bfa', moustache: '#e5e7eb', lunettes: '#facc15', taille: 1.05, couleur: '#6366f1' },
   azur: { nom: 'Aurélie Azur', peau: '#f6c9a0', cheveux: '#fbbf24', coiffure: 'queue', haut: '#f8fafc', gilet: '#38bdf8', bas: '#1d4ed8', longBas: true, chaussures: '#f8fafc',
     chapeau: 'aviateur', echarpe: '#f472b6', couleur: '#38bdf8' },
+  /* les Quatre Plumes, de la Ligue des Légendes (chapitre 8) */
+  plumeline: { nom: 'Baronne Plumeline', peau: '#f3d2b9', cheveux: '#4c1d95', coiffure: 'chignon', haut: '#fdf4ff', bas: '#a21caf', jupe: true, chaussures: '#4a044e',
+    chapeau: 'capeline', capeline: '#f0abfc', plume: '#a855f7', ruban: '#facc15', taille: 1.03, couleur: '#c026d3' },
+  dindini: { nom: 'Le Grand Dindini', peau: '#e8b48f', cheveux: '#111827', coiffure: 'court', haut: '#f8fafc', gilet: '#312e81', bas: '#111827', longBas: true, chaussures: '#111827',
+    chapeau: 'magicien', magicien: '#4338ca', moustache: '#111827', echarpe: '#dc2626', taille: 1.07, couleur: '#4338ca' },
+  mamie: { nom: 'Mamie Glouglou', peau: '#f2c6a0', cheveux: '#e7e5e4', coiffure: 'chignon', haut: '#fde68a', bas: '#9a3412', jupe: true, tablier: '#fb7185', chaussures: '#57534e',
+    lunettes: '#78350f', ruban: '#84cc16', echarpe: '#c2410c', taille: .95, couleur: '#f97316' },
+  rapido: { nom: 'Capitaine Rapido', peau: '#c68a5e', cheveux: '#1c1917', coiffure: 'court', haut: '#f8fafc', gilet: '#dc2626', bas: '#111827', longBas: true, chaussures: '#f8fafc',
+    chapeau: 'casque', casque: '#dc2626', echarpe: '#facc15', taille: 1.04, couleur: '#dc2626' },
   gontran: { nom: 'Gontran Gloupi', peau: '#f5cba7', cheveux: '#facc15', coiffure: 'herisse', haut: '#f8fafc', gilet: '#0ea5e9', bas: '#334155', longBas: true, chaussures: '#ef4444',
     malin: true, couleur: '#0284c7' }
 };
@@ -133,6 +142,15 @@ export function creerChibi(p) {
     { g: sphere(12, 8), c: p.fourrure || '#f5f5f4', p: [0, .66, -.04], s: .07 });
   if (p.chapeau === 'hautForme') pt.push({ g: cylindre(1, 1, 1, 26), c: '#111827', p: [0, .5, -.02], r: [-.1, 0, 0], s: [.36, .024, .35] },
     { g: cylindre(1, 1, 1, 22), c: '#111827', p: [0, .68, -.04], r: [-.1, 0, 0], s: [.21, .34, .2] }, { g: cylindre(1, 1, 1, 22), c: p.ruban || '#a78bfa', p: [0, .56, -.03], r: [-.1, 0, 0], s: [.215, .06, .205] });
+  if (p.chapeau === 'capeline') pt.push({ g: cylindre(1, 1, 1, 28), c: p.capeline, p: [0, .5, -.02], r: [-.14, 0, .06], s: [.58, .022, .56] },
+    { g: demiSphere(), c: p.capeline, p: [0, .5, -.03], r: [-.14, 0, .06], s: [.24, .16, .23] }, { g: cylindre(1, 1, 1, 22), c: p.ruban || '#facc15', p: [0, .53, -.025], r: [-.14, 0, .06], s: [.245, .045, .235] },
+    { g: sphere(14, 10), c: p.plume, p: [.18, .72, -.12], r: [.2, 0, -.6], s: [.05, .24, .03] }, { g: sphere(14, 10), c: eclaircir(p.plume, .3), p: [.24, .66, -.08], r: [.3, 0, -.9], s: [.04, .18, .025] });
+  if (p.chapeau === 'magicien') pt.push({ g: cylindre(1, 1, 1, 26), c: p.magicien, p: [0, .5, -.02], r: [-.1, 0, 0], s: [.4, .024, .38] },
+    { g: cone(1, 1, 16), c: p.magicien, p: [0, .78, -.06], r: [-.18, 0, .08], s: [.24, .56, .24] },
+    { g: sphere(8, 6), c: '#facc15', p: [-.08, .7, .1], s: .035 }, { g: sphere(8, 6), c: '#facc15', p: [.09, .86, .04], s: .03 }, { g: sphere(8, 6), c: '#fde68a', p: [.02, 1.02, -.04], s: .045 });
+  if (p.chapeau === 'casque') pt.push({ g: demiSphere(), c: p.casque, p: [0, .33, -.02], s: [.345, .33, .335] },
+    { g: tore(1, .18), c: '#f8fafc', p: [0, .45, -.02], r: [Math.PI / 2, 0, 0], s: [.3, .3, .3] },
+    { g: sphere(16, 10), c: '#1e293b', p: [0, .45, .22], r: [-.3, 0, 0], s: [.22, .07, .08] }, { g: sphere(10, 8), c: '#facc15', p: [0, .68, -.02], s: [.05, .05, .2] });
   poser(tete, pt);
   const yeuxG = new THREE.Group(); yeuxG.position.set(0, .27, 0); tete.add(yeuxG);
   const pY = [];
@@ -221,5 +239,8 @@ export function portraitChibi(p, id = 'c' + Math.random().toString(36).slice(2, 
   if (p.chapeau === 'melon') o.push(`<ellipse cx="60" cy="34" rx="36" ry="7" ${vol('#1f2937')}/><path d="M40 34 Q40 8 60 8 Q80 8 80 34Z" ${vol('#1f2937')}/><path d="M40 28 H80 V33 H40Z" fill="${p.ruban || '#facc15'}"/>`);
   if (p.chapeau === 'chapka') o.push(`<path d="M30 60 Q28 16 60 14 Q92 16 90 60 Q84 36 60 34 Q36 36 30 60Z" ${vol(p.chapka || '#0284c7')}/><rect x="27" y="30" width="66" height="12" rx="6" ${vol(p.fourrure || '#f5f5f4')}/><ellipse cx="29" cy="58" rx="8" ry="14" ${vol(p.fourrure || '#f5f5f4')}/><ellipse cx="91" cy="58" rx="8" ry="14" ${vol(p.fourrure || '#f5f5f4')}/><circle cx="60" cy="13" r="7" ${vol(p.fourrure || '#f5f5f4')}/>`);
   if (p.chapeau === 'hautForme') o.push(`<ellipse cx="60" cy="34" rx="38" ry="7" ${vol('#111827')}/><rect x="42" y="0" width="36" height="34" rx="3" ${vol('#111827')}/><rect x="42" y="25" width="36" height="7" fill="${p.ruban || '#a78bfa'}"/>`);
+  if (p.chapeau === 'capeline') o.push(`<ellipse cx="60" cy="34" rx="56" ry="10" ${vol(p.capeline)} transform="rotate(-5 60 34)"/><path d="M40 34 Q40 16 60 16 Q80 16 80 34Z" ${vol(p.capeline)}/><path d="M40 28 H80 V34 H40Z" fill="${p.ruban || '#facc15'}"/><path d="M76 24 Q96 -4 104 6 Q92 14 80 28Z" ${vol(p.plume)}/><path d="M80 26 Q100 8 108 18 Q94 24 82 30Z" ${vol(eclaircir(p.plume, .3))}/>`);
+  if (p.chapeau === 'magicien') o.push(`<ellipse cx="60" cy="36" rx="40" ry="8" ${vol(p.magicien)}/><path d="M38 36 L66 -6 L84 36Z" ${vol(p.magicien)}/><circle cx="56" cy="22" r="3.5" fill="#facc15"/><circle cx="68" cy="12" r="3" fill="#facc15"/><circle cx="64" cy="-2" r="4" fill="#fde68a"/>`);
+  if (p.chapeau === 'casque') o.push(`<path d="M26 62 Q24 14 60 12 Q96 14 94 62 Q86 40 60 38 Q34 40 26 62Z" ${vol(p.casque)}/><path d="M30 44 Q60 30 90 44" stroke="#f8fafc" stroke-width="5" fill="none"/><path d="M36 48 Q60 40 84 48 L82 56 Q60 50 38 56Z" fill="#1e293b" stroke="#0f172a" stroke-width="2"/><path d="M58 12 L62 12 L62 38 L58 38Z" fill="#facc15"/>`);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">${o.join('')}</svg>`;
 }

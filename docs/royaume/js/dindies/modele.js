@@ -6,7 +6,7 @@
          d.maj(dt, t) à chaque image ; d.jouer('roue' | 'glouglou' | 'saut') ;
          d.marcher(vitesse) (0 = s'arrêter) ; d.liberer() pour la retirer. */
 import * as THREE from 'three';
-import { sphere, demiSphere, cylindre, cone, tore, etoile5, geo, fusion } from '../moteur/formes.js';
+import { sphere, demiSphere, cylindre, cone, tore, boite, etoile5, geo, fusion } from '../moteur/formes.js';
 import { toon, toonTexture, contour, contourPour, texRonde, texEtoile } from '../moteur/materiaux.js';
 import { assombrir, eclaircir, ARC, hasard } from '../moteur/couleurs.js';
 import { formeQueue } from './adn.js';
@@ -145,6 +145,26 @@ function partiesChapeau(a, H, R) {
     p.push({ g: demiSphere(), c: c1, p: [X, haut - .085, Z], s: [.222, .2, .222] }, { g: cylindre(1, 1, 1, 22), c: assombrir(c1, .25), p: [X, haut - .075, Z], s: [.228, .045, .228] });
     for (const s of [-1, 1]) p.push({ g: cone(1, 1, 12), c: c2, p: [X + s * .22, haut + .04, Z], r: [0, 0, -s * .75], s: [.045, .17, .045] });
     p.push({ g: sphere(10, 8), c: assombrir(c1, .25), p: [X, haut + .11, Z], s: .03 });
+  }
+  /* les chapeaux de fête (étape 8) */
+  if (a.chapeau === 'sorciere') {
+    p.push({ g: cylindre(1, 1, 1, 24), c: c1, p: [X, haut - .005, Z], s: [.3, .018, .3] }, { g: cone(1, 1, 16), c: c1, p: [X - .01, haut + .15, Z - .02], r: [-.2, 0, .14], s: [.14, .3, .14] });
+    p.push({ g: cylindre(1, 1, 1, 20), c: c2, p: [X, haut + .03, Z], s: [.13, .04, .13] }, { g: boite(1, 1, 1), c: '#facc15', p: [X, haut + .03, Z + .13], s: [.05, .04, .012] });
+  }
+  if (a.chapeau === 'renne') {
+    p.push({ g: tore(1, .12, Math.PI), c: c2, p: [X, haut - .1, Z], s: [.2, .2, .2] });
+    for (const s of [-1, 1]) {
+      p.push({ g: cylindre(1, 1, 1, 8), c: c1, p: [X + s * .14, haut + .1, Z], r: [0, 0, -s * .25], s: [.022, .2, .022] }, { g: cylindre(1, 1, 1, 8), c: c1, p: [X + s * .2, haut + .13, Z], r: [0, 0, -s * 1.1], s: [.018, .1, .018] });
+      p.push({ g: cylindre(1, 1, 1, 8), c: c1, p: [X + s * .19, haut + .2, Z], r: [0, 0, -s * .8], s: [.016, .08, .016] }, { g: sphere(8, 6), c: c1, p: [X + s * .165, haut + .2, Z], s: .021 });
+    }
+  }
+  if (a.chapeau === 'lapin') {
+    p.push({ g: tore(1, .14, Math.PI), c: c1, p: [X, haut - .1, Z], s: [.2, .2, .2] });
+    for (const s of [-1, 1]) p.push({ g: sphere(), c: c1, p: [X + s * .08, haut + .17, Z], r: [0, 0, -s * .15], s: [.055, .19, .04] }, { g: sphere(), c: c2, p: [X + s * .08, haut + .17, Z + .022], r: [0, 0, -s * .15], s: [.032, .14, .025] });
+  }
+  if (a.chapeau === 'paille') {
+    p.push({ g: cylindre(1, 1, 1, 26), c: c1, p: [X, haut - .005, Z], s: [.3, .018, .3] }, { g: cylindre(.85, 1, 1, 20), c: c1, p: [X, haut + .06, Z], s: [.13, .12, .13] });
+    p.push({ g: cylindre(1, 1, 1, 20), c: c2, p: [X, haut + .025, Z], s: [.133, .035, .133] }, { g: sphere(10, 8), c: c2, p: [X + .12, haut + .03, Z + .06], s: [.035, .025, .02] });
   }
   const K = 1.3;
   for (let i = n0; i < p.length; i++) { const q = p[i], s = typeof q.s === 'number' ? [q.s, q.s, q.s] : q.s; q.p = [X + (q.p[0] - X) * K, haut + (q.p[1] - haut) * K, Z + (q.p[2] - Z) * K]; q.s = s.map(v => v * K); }

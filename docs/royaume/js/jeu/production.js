@@ -12,6 +12,7 @@ import { jour } from './trouvailles.js';
 import { nomDe, stats } from './individus.js';
 import { estAdulte, donnerXp } from './elevage.js';
 import { MAX_ENTRAINEMENT } from './dindodrome.js';
+import * as EV from './evenements.js';
 
 export const MINUTE = 60000;
 export const MAX_DECO = 60, NB_OFFRES = 4;
@@ -23,6 +24,8 @@ const entre = ([a, b]) => a + Math.floor(Math.random() * (b - a + 1));
 
 /* la production s'ouvre quand le chapitre 4 est fini (la dernière quête du Dindodrome) */
 export const productionOuverte = () => E().quete.finies.includes('q30');
+/* la Scène des défilés : au chapitre 8 (le chapitre 7 fini) */
+export const sceneOuverte = () => E().quete.finies.includes('q51');
 export function prod() {
   const P = E().production;
   for (const k of ['plumes', 'ramassage', 'chapeaux', 'decorations']) P[k] = P[k] || {};
@@ -127,6 +130,7 @@ export function fabriquerChapeau(id) {
   const C = CHAPEAUX[id];
   if (!E().batiments.atelier?.repare) return 'L’Atelier des plumes est encore en ruine.';
   if (!C) return 'Ce chapeau n’existe pas.';
+  if (!EV.disponible(C)) return `Ce chapeau de fête revient pour ${EV.FETES[C.evenement].nom} !`;
   if (!payer(C.cout)) return manque(C.cout);
   const P = prod(); P.chapeaux[id] = (P.chapeaux[id] || 0) + 1; compter('chapeaux');
   return null;
@@ -135,6 +139,7 @@ export function fabriquerDeco(id) {
   const D = DECORATIONS[id];
   if (!E().batiments.atelier?.repare) return 'L’Atelier des plumes est encore en ruine.';
   if (!D) return 'Cette décoration n’existe pas.';
+  if (!EV.disponible(D)) return `Cette décoration de fête revient pour ${EV.FETES[D.evenement].nom} !`;
   if (!payer(D.cout)) return manque(D.cout);
   const P = prod(); P.decorations[id] = (P.decorations[id] || 0) + 1; compter('decos');
   return null;
@@ -258,9 +263,10 @@ export function rapporter(id) {
 }
 
 /* ── réparer les bâtiments de la production, construire un habitat, améliorer ── */
-export const PRODUCTION = { potager: 'le Potager', moulin: 'le Moulin à friandises', atelier: 'l’Atelier des plumes', missions: 'le Bureau des missions' };
+export const PRODUCTION = { potager: 'le Potager', moulin: 'le Moulin à friandises', atelier: 'l’Atelier des plumes', missions: 'le Bureau des missions', scene: 'la Scène des défilés' };
 export function reparer(id) {
   if (!productionOuverte()) return 'Il ouvrira plus tard dans l’histoire !';
+  if (id === 'scene' && !sceneOuverte()) return 'La Scène des défilés rouvrira au chapitre 8 !';
   const B = E().batiments[id]; if (!B) return 'Ce bâtiment n’existe pas.';
   if (B.repare) return null;
   if (!J.depenser(PRIX_REPARATION[id])) return `Il te faut ${PRIX_REPARATION[id]} 🪙 pour réparer ${PRODUCTION[id]}.`;

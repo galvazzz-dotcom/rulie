@@ -97,8 +97,10 @@ try {
     R.aPrendre = PR.plumesAPrendre('prairie');
     R.ramasse = PR.ramasserPlumes('prairie'); R.encore = PR.ramasserPlumes('prairie'); R.plumes = PR.plumes('prairie');
     R.sansEnclos = PR.plumesAPrendre('nuit');
-    /* l'Atelier : 30 chapeaux (10 formes), 50 décorations */
-    R.nb = [Object.keys(DON.CHAPEAUX).length, new Set(Object.values(DON.CHAPEAUX).map(x => x.forme)).size, Object.keys(DON.DECORATIONS).length];
+    /* l'Atelier : 30 chapeaux (10 formes), 50 décorations (sans ceux des fêtes de l'étape 8) */
+    const H0 = Object.values(DON.CHAPEAUX).filter(x => !x.evenement);
+    R.nb = [H0.length, new Set(H0.map(x => x.forme)).size, Object.values(DON.DECORATIONS).filter(x => !x.evenement).length];
+    R.nbTout = [new Set(Object.values(DON.CHAPEAUX).map(x => x.forme)).size, Object.keys(DON.DECORATIONS).length];
     R.atelierFerme = typeof PR.fabriquerChapeau('fete-prairie') === 'string';
     PR.reparer('atelier'); const pl0 = PR.plumes('prairie');
     R.chapeau = PR.fabriquerChapeau('fete-prairie') === null && PR.plumes('prairie') === pl0 - DON.CHAPEAUX['fete-prairie'].cout.plumes.prairie;
@@ -178,7 +180,7 @@ try {
   verifier(R.nb[0] === 30 && R.nb[1] === 10 && R.nb[2] === 50, `l’Atelier : ${R.nb[0]} chapeaux (${R.nb[1]} formes) et ${R.nb[2]} décorations`);
   verifier(R.atelierFerme && R.chapeau && R.chapeauTrop, 'un chapeau se paie en plumes de son type (et en pièces) ; sans les plumes, rien');
   verifier(R.coiffeBebe && R.porte && R.enleve, 'coiffer une dindie adulte (le chapeau quitte le stock, et se voit), l’enlever (il y retourne) ; pas les bébés');
-  verifier(R.formesOk === 10 && R.decosOk === 50, `les 10 formes de chapeaux se dessinent en 3D et en portrait (${R.formesOk}/10) ; les 50 décorations en 3D (${R.decosOk}/50)`);
+  verifier(R.formesOk === R.nbTout[0] && R.decosOk === R.nbTout[1], `les ${R.nbTout[0]} formes de chapeaux (avec celles des fêtes) se dessinent en 3D et en portrait (${R.formesOk}) ; les ${R.nbTout[1]} décorations en 3D (${R.decosOk})`);
   verifier(R.interdits.every(x => !x) && R.place, 'on ne pose pas une décoration dans un bâtiment, dans l’eau, devant une porte, ni dans un enclos');
   verifier(R.bouche && R.libere && R.max, 'une décoration posée bouche la carte ; rangée, elle libère la place et revient dans le stock ; 60 au plus');
   verifier(R.missionFerme && R.offres === 4 && R.chances[1] > R.chances[0], `le Bureau des missions : 4 missions proposées ; plus de dindies (et les bons types) = plus de chances (${R.chances.map(x => Math.round(x * 100) + ' %').join(' → ')})`);

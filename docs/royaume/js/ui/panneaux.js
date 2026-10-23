@@ -23,6 +23,9 @@ import * as GQ from '../jeu/grandesQuetes.js';
 import { PERSONNAGES } from '../personnages/chibi.js';
 import { CHAPEAUX, DECORATIONS } from '../donnees/production.js';
 import { boutonsFiche, brancherFiche, boutonRelacher, blocAmeliorer, brancherAmeliorer, plumesHtml, proposerHabitat } from './production.js';
+import * as DF from '../jeu/defis.js';
+import * as SU from '../jeu/succes.js';
+import { ouvrirPanneau } from './quotidien.js';
 
 const E = () => J.etat();
 const PASTILLE = { commune: '⚪', rare: '🔵', epique: '🟣', mythique: '🌈' };
@@ -307,7 +310,11 @@ export function ouvrirJournal() {
     return `<div class="quete ${st}"><b>${st === 'finie' ? '✅' : '📜'} ${Q.titre}</b>${st === 'active' ? `<p>➡️ ${QD.texte(S.lieuActuelId())}</p>` : ''}
       <small>Récompense : ${r.pieces} 🪙${r.plumesOr ? ' + ' + r.plumesOr + ' 🪶' : ''}${Object.keys(r.objets || {}).map(o => ' + ' + OBJETS[o].e).join('')}${r.plumes ? ' + des plumes' : ''}</small></div>`;
   }).join('');
-  fenetre('📜 Journal des quêtes', h);
+  /* en haut : les défis du jour et les succès (étape 8) */
+  const nb = DF.aReclamer();
+  h = `<div class="ligneBtn journalHaut"><button class="btn petit jaune" data-pan="defis">📅 Les défis${nb ? ` <i class="pastille">${nb}</i>` : ''}</button><button class="btn petit jaune" data-pan="succes">🏆 ${SU.nbObtenus()} / ${SU.SUCCES.length} succès</button></div>` + h;
+  const F = fenetre('📜 Journal des quêtes', h);
+  $$('[data-pan]', F.el).forEach(b => b.onclick = () => { pop(); F.fermer(); ouvrirPanneau({ onglet: b.dataset.pan, journal: ouvrirJournal }); });
 }
 
 /* ── la carte du lieu où l'on est (on peut toucher un endroit pour y aller) ── */
@@ -346,11 +353,13 @@ export function ouvrirMaison({ appliquerReglages, changerProfil, idProfil }) {
     <h3>👤 Profil</h3>
     <p class="petitTexte">Tu joues avec le profil <b>${echapper(E().profil.nom)}</b>.</p>
     <button class="btn" id="mProfil">👥 Changer de profil</button>
-    <h3>🎵 Crédits</h3><button class="btn petit" id="mCredits">🎶 Les musiques du jeu</button>`);
+    <h3>🎵 Crédits</h3><div class="ligneBtn"><button class="btn petit" id="mCredits">🎶 Les musiques du jeu</button><button class="btn petit" id="mPrologue">🌙 Revoir le prologue</button>${S.etapeAtteinte('fin') ? '<button class="btn petit jaune" id="mGenerique">🌈 Revoir le générique</button>' : ''}</div>`);
   $('#mHeure', F.el).value = r.heure;
   const maj = () => { r.son = $('#mSon', F.el).checked; r.musique = $('#mMus', F.el).checked; r.voix = $('#mVoix', F.el).checked; r.aide = $('#mAide', F.el).checked; r.heure = $('#mHeure', F.el).value; appliquerReglages(); J.changer('reglages'); };
   ['#mSon', '#mMus', '#mVoix', '#mAide', '#mHeure'].forEach(s => $(s, F.el).onchange = maj);
   $('#mCredits', F.el).onclick = () => { pop(); credits(); };
+  $('#mPrologue', F.el).onclick = () => { pop(); F.fermer(); import('../scenes/titre.js').then(m => m.prologue()); };
+  const gen = $('#mGenerique', F.el); if (gen) gen.onclick = () => { pop(); F.fermer(); import('./generique.js').then(m => m.ouvrirGenerique()); };
   $('#mCode', F.el).onclick = () => {
     const z = $('#mZone', F.el), c = SAUVE.exporterCode(E());
     z.classList.remove('cache'); z.value = c; z.select();
@@ -450,7 +459,7 @@ export function finChapitre(n) {
     6: ['🎉 Fin du chapitre 6 !', '🔥🌙🏆', 'Le Volcan, la Forêt de la Lune, le Dindomagma, la Dindétoile… et deux badges de plus !',
       '<b>Le chapitre 7 commence : le Royaume des Nuages !</b> Va voir le Professeur Plumeau : il a vu une île au-dessus des nuages.'],
     7: ['🎉 Fin du chapitre 7 !', '☁️🌈🦃', 'Huit îles, huit badges… et ta première dindie mythique ! Tu es devenue une légende du Royaume.',
-      '<b>La suite :</b> le chapitre 8, <b>la Légende</b> : le Dindromakus RUUULIUSSS Maximus… arrive bientôt !']
+      '<b>Le chapitre 8 commence : la Légende !</b> Va voir le Professeur Plumeau : il a lu la dernière page du vieux livre…']
   }[n];
   if (!T) return;
   const F = fenetre(T[0], `<div class="finChap"><p class="grosEmoji">${T[1]}</p><p>${T[2]}</p><p>${T[3]}</p>

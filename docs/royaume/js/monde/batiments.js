@@ -234,6 +234,24 @@ export function ruine(texte, w = 6, d = 5, moulin = false) {
   return { g, obst: [[0, 0, w + .4, d + .4], [-w / 2 + .3, d / 2 + .3, 2.2, .8]], porte: [1.2, d / 2 + 1.6] };
 }
 
+/* ── la Scène des défilés (étape 8) : une estrade, des rideaux rouges, des lampions, un tapis rouge ── */
+export function sceneDefiles() {
+  const p = [], f = [];
+  p.push(B('#a16207', [0, .35, -.2], [8, .7, 4.6]), B('#ca8a04', [0, .72, -.2], [8.1, .06, 4.7]), B('#92400e', [0, .15, 2.4], [3, .3, .8]));
+  p.push(B('#7c2d12', [0, 2.7, -2.4], [8.4, 4.6, .3]));
+  for (const s of [-1, 1]) for (let k = 0; k < 3; k++) p.push(CY(k % 2 ? '#b91c1c' : '#dc2626', [s * (3.75 - k * .45), 2.65, -2.05 + k * .1], [.32, 3.9, .28], [0, 0, 0], 10));
+  p.push(B('#b91c1c', [0, 4.75, -1.95], [8.7, .8, .55]), B('#facc15', [0, 4.33, -1.65], [8.7, .1, .1]), B('#facc15', [0, 5.17, -1.65], [8.7, .1, .1]));
+  for (let k = 0; k < 9; k++) p.push(SP('#facc15', [-4 + k, 5.45, -2.05], .16));
+  /* les projecteurs et le tapis rouge */
+  for (const s of [-1, 1]) p.push(CY('#57534e', [s * 4.5, 1.8, 2.2], [.08, 3.6, .08]), CO('#1f2937', [s * 4.5, 3.75, 2.05], [.32, .5, .32], [-.9, 0, 0]), SP('#fef9c3', [s * 4.5, 3.62, 1.82], .18));
+  p.push(B('#dc2626', [0, .03, 3.9], [1.6, .04, 2.6]), B('#facc15', [-.82, .04, 3.9], [.06, .04, 2.6]), B('#facc15', [.82, .04, 3.9], [.06, .04, 2.6]));
+  /* les lampions au bord de l'estrade (ils s'allument la nuit) */
+  for (let k = 0; k < 8; k++) f.push(B(['#fde68a', '#f9a8d4', '#a5f3fc', '#bbf7d0'][k % 4], [-3.5 + k, .82, 2.12], [.24, .18, .1]));
+  const g = construire(p, f);
+  const t = pancarte('🎭 La Scène des défilés', 3.6, .62, { fond: '#fff1f2', encre: '#9f1239', bord: '#e11d48' }); t.position.set(0, 4.75, -1.62); g.add(t);
+  return { g, obst: [[0, -.4, 8.6, 5.2], [-4.5, 2.2, .4, .4], [4.5, 2.2, .4, .4]], porte: [0, 4.4] };
+}
+
 /* ── le portail du Dindodrome (fermé jusqu'au chapitre 4) ── */
 export function portailDindodrome(ouvert = false) {
   const p = [];

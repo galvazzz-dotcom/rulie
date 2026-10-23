@@ -11,6 +11,7 @@ import { portraitChibi, PERSONNAGES } from '../personnages/chibi.js';
 
 import { especesDe, especesDeTous, dansLOrdre } from '../jeu/collection.js';
 import { hasard } from '../moteur/couleurs.js';
+import { fete } from '../jeu/evenements.js';
 
 const COULEURS = ['#ea580c', '#2563eb', '#16a34a', '#db2777', '#7c3aed', '#0891b2'];
 /* les dindies qui flottent autour du titre : seulement celles qu'on a déjà attrapées
@@ -26,11 +27,12 @@ function defilantes() {
 export function ecranTitre({ surJouer }) {
   /* les dindies qui flottent autour du titre (en haut et en bas, pour ne pas cacher la boîte) */
   const POS = [[4, 4], [80, 82], [58, 5], [6, 78], [30, 2], [56, 80], [80, 3], [30, 84]];
+  const FT = fete();
   const T = el(`<div id="titre"><div class="titreFond">${defilantes().map((id, i) => `<div class="flotte" style="--i:${i};left:${POS[i][0]}%;top:${POS[i][1]}%">${portraitDindie(variante(PAR_ID[id]), { id: 'T' + i, fond: false })}</div>`).join('')}</div>
-    <div class="titreBoite"><h1><small>Le</small> Royaume <small>des</small> Dindies</h1><p class="sous">Attrape-les, élève-les, fais-les courir !</p>
+    <div class="titreBoite"><h1><small>Le</small> Royaume <small>des</small> Dindies</h1><p class="sous">Attrape-les, élève-les, fais-les courir !</p>${FT ? `<p class="titreFete">${FT.e} C’est ${FT.nom} au Royaume ! ${FT.e}</p>` : ''}
     <div id="profils"></div>
     <p class="liensTitre"><a href="../index.html">🏠 Le site</a></p>
-    <p class="enDev">🚧 Jeu en développement : chapitres 1 à 7 jouables, les 8 îles et les mythiques</p></div></div>`);
+    <p class="enDev">🚧 Jeu en développement : les 8 chapitres jouables, de la première dindie au Dindromakus</p></div></div>`);
   document.body.appendChild(T);
   /* la musique démarre au premier toucher (les navigateurs l'exigent) */
   T.addEventListener('pointerdown', () => { audio(); ambianceMusique('titre'); musique(true); }, { once: true });

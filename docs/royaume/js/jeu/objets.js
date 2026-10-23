@@ -76,6 +76,9 @@ export const OBJETS = {
   eclatAurore: { nom: 'Éclat d’aurore', e: '💠', desc: 'Au nid du Couvoir, la nuit, avec un Dindocristal et un Dindoyéti… une légende peut naître !', important: true, legendaire: 'borealis' },
   braiseEternelle: { nom: 'Braise éternelle', e: '🔥', desc: 'Au nid du Couvoir, au lever du soleil (le matin), avec un Dindomagma et un Dindocomète… une légende peut naître !', important: true, legendaire: 'phenix' },
   harpe: { nom: 'Harpe des nuages', e: '🎼', desc: 'Au nid du Couvoir, avec un Dindorage et une Dindogalaxie… une légende peut naître !', important: true, legendaire: 'celestia' },
+  /* le chapitre 8 : la plume du Dindromakus (éteinte depuis le prologue), puis rallumée à la pleine lune */
+  plumeEteinte: { nom: 'Plume éteinte', e: '🪶', desc: 'La plume que le Dindromakus a laissée tomber, la nuit de pleine lune. Elle est toute grise… On dit qu’elle se rallume pour une grande championne, sous la pleine lune.', important: true },
+  plumeArcEnCiel: { nom: 'Plume arc-en-ciel', e: '🌈', desc: 'Elle brille de toutes les couleurs ! Au nid du Couvoir, avec une Dindétoile et Célestia Dindissima, elle fait venir une nuit de pleine lune… et la légende des légendes.', important: true, legendaire: 'ruuulius' },
   grandLivre: { nom: 'Le Grand Livre', e: '📖', desc: 'Les 72 pages des dindies du Royaume. Touche 📖 pour l’ouvrir.', important: true },
   filet: { nom: 'Filet d’exploratrice', e: '🥅', desc: 'Pour attraper les dindies sauvages : gagne leur confiance, puis lance-le au bon moment !', filet: 1, important: true },
   billet: { nom: 'Billet de montgolfière', e: '🎫', desc: 'Le Capitaine Zéphyr t’emmène où tu veux, autant de fois que tu veux !', important: true }

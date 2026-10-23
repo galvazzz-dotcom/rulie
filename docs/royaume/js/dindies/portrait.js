@@ -182,6 +182,17 @@ function chapeauSvg(a, tY, vol, C) {
   }
   if (a.chapeau === 'cowboy') o.push(`<path d="M80 ${y - 20} Q77 ${y - 52} 92 ${y - 50} Q100 ${y - 44} 108 ${y - 50} Q123 ${y - 52} 120 ${y - 20}Z" ${vol(c1)}/><path d="M56 ${y - 30} Q66 ${y - 13} 100 ${y - 15} Q134 ${y - 13} 144 ${y - 30} Q134 ${y - 21} 100 ${y - 23} Q66 ${y - 21} 56 ${y - 30}Z" ${vol(c1)}/><rect x="80" y="${y - 30}" width="40" height="6" fill="${C(c2)}"/>`);
   if (a.chapeau === 'viking') o.push(`<path d="M74 ${y - 27} Q55 ${y - 34} 54 ${y - 60} Q66 ${y - 42} 82 ${y - 38}Z" ${vol(c2)}/><path d="M126 ${y - 27} Q145 ${y - 34} 146 ${y - 60} Q134 ${y - 42} 118 ${y - 38}Z" ${vol(c2)}/><path d="M72 ${y - 12} Q72 ${y - 52} 100 ${y - 52} Q128 ${y - 52} 128 ${y - 12}Z" ${vol(c1)}/><rect x="70" y="${y - 20}" width="60" height="9" rx="3" ${vol(assombrir(c1, .25))}/><circle cx="100" cy="${y - 52}" r="4" fill="${C(assombrir(c1, .25))}"/>`);
+  /* les chapeaux de fête (étape 8) */
+  if (a.chapeau === 'sorciere') o.push(`<ellipse cx="100" cy="${y - 19}" rx="40" ry="8" ${vol(c1)}/><path d="M80 ${y - 21} Q90 ${y - 50} 96 ${y - 62} Q104 ${y - 76} 122 ${y - 72} Q108 ${y - 66} 110 ${y - 50} L120 ${y - 21}Z" ${vol(c1)}/><path d="M81 ${y - 30} L119 ${y - 30} L120 ${y - 22} L80 ${y - 22}Z" fill="${C(c2)}"/><rect x="95" y="${y - 31}" width="10" height="9" rx="1.5" fill="none" stroke="${C('#facc15')}" stroke-width="2"/>`);
+  if (a.chapeau === 'renne') {
+    o.push(`<path d="M72 ${y - 16} Q100 ${y - 40} 128 ${y - 16}" stroke="${C(c2)}" stroke-width="6" fill="none" stroke-linecap="round"/>`);
+    for (const s of [-1, 1]) o.push(`<path d="M${100 + s * 18} ${y - 28} L${100 + s * 24} ${y - 64} M${100 + s * 21} ${y - 46} L${100 + s * 36} ${y - 54} M${100 + s * 23} ${y - 58} L${100 + s * 34} ${y - 70} M${100 + s * 22} ${y - 40} L${100 + s * 10} ${y - 52}" stroke="${C(c1)}" stroke-width="5.5" fill="none" stroke-linecap="round"/>`);
+  }
+  if (a.chapeau === 'lapin') {
+    o.push(`<path d="M74 ${y - 16} Q100 ${y - 36} 126 ${y - 16}" stroke="${C(c1)}" stroke-width="6" fill="none" stroke-linecap="round"/>`);
+    for (const s of [-1, 1]) o.push(`<ellipse cx="${100 + s * 13}" cy="${y - 56}" rx="9" ry="26" transform="rotate(${s * 12} ${100 + s * 13} ${y - 56})" ${vol(c1)}/><ellipse cx="${100 + s * 13}" cy="${y - 55}" rx="4.5" ry="18" transform="rotate(${s * 12} ${100 + s * 13} ${y - 55})" fill="${C(c2)}"/>`);
+  }
+  if (a.chapeau === 'paille') o.push(`<ellipse cx="100" cy="${y - 19}" rx="44" ry="9" ${vol(c1)}/><path d="M82 ${y - 21} Q82 ${y - 46} 100 ${y - 46} Q118 ${y - 46} 118 ${y - 21}Z" ${vol(c1)}/><rect x="82" y="${y - 30}" width="36" height="7" fill="${C(c2)}"/><path d="M118 ${y - 26} q12 4 14 14" stroke="${C(c2)}" stroke-width="4" fill="none" stroke-linecap="round"/>`);
   if (a.chapeau === 'champignon') {
     o.push(`<path d="M64 ${tY - 12} Q64 ${tY - 50} 100 ${tY - 50} Q136 ${tY - 50} 136 ${tY - 12} Q100 ${tY - 20} 64 ${tY - 12}Z" ${vol('#dc2626')}/>`);
     if (C('#fff') === '#fff') [[82, -30, 5], [100, -40, 5.5], [118, -30, 5], [74, -18, 3.5], [126, -18, 3.5], [100, -24, 3.5]].forEach(([x, dy, r]) => o.push(`<circle cx="${x}" cy="${tY + dy}" r="${r}" fill="#fff"/>`));
