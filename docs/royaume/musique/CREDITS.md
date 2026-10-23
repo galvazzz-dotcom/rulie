@@ -13,6 +13,19 @@ Source : https://github.com/OpenRCT2/OpenMusic (le projet déclare ces styles «
 | `orgue-el-capitan.mp3` | El Capitan (orgue de foire) | John Philip Sousa (1896), version du projet OpenRCT2 OpenMusic (« Fairground organ style 2 », Karst van Galen Last et Herman Riddering) |
 | `orgue-doppeladler.mp3` | Unter dem Doppeladler (orgue de foire) | Josef Franz Wagner (1893), même version |
 | `ragtime-something-doing.mp3` | Something Doing Rag | Scott Joplin et Scott Hayden (1903), version du projet OpenRCT2 OpenMusic (« Ragtime style 2 ») |
+| `orgue-slavonic-dance.mp3` | Slavonic Dance (orgue de foire) | air traditionnel, version du projet OpenRCT2 OpenMusic (enregistrée sur l’orgue de Herman Riddering) |
+
+## CC BY-SA 4.0 — OpenRCT2 OpenMusic
+
+Source : https://github.com/OpenRCT2/OpenMusic (dossier `alternative/`). Licence : Creative Commons Attribution - Partage dans les mêmes conditions 4.0 — https://creativecommons.org/licenses/by-sa/4.0/deed.fr
+
+Les fichiers MP3 ci-dessous (versions converties) sont eux aussi sous licence CC BY-SA 4.0.
+
+| Fichier | Morceau | Auteurs |
+|---|---|---|
+| `rct-snowbound.mp3` | Snowbound (OpenRCT2 Edit) | Silver Aura, Jalmaan, Greyfade |
+| `rct-ancient-lands.mp3` | The Ancient Lands | Flyxxpy |
+| `rct-mystic-winds.mp3` | Mystic Winds | Skyshard |
 
 ## CC BY-SA 3.0 — 0 A.D. (Wildfire Games)
 
@@ -31,6 +44,11 @@ Les fichiers MP3 ci-dessous (versions converties) sont eux aussi sous licence CC
 | `0ad-peaks-of-atlas.mp3` | Peaks of Atlas |
 | `0ad-mirage.mp3` | Mirage |
 | `0ad-waters-edge.mp3` | Water's Edge |
+| `0ad-eastern-dreams.mp3` | Eastern Dreams |
+| `0ad-sands-of-time.mp3` | Sands of Time |
+| `0ad-harvest-moon.mp3` | Harvest Moon |
+| `0ad-elysian-fields.mp3` | Elysian Fields |
+| `0ad-sunrise.mp3` | Sunrise |
 
 ## Où on les entend
 
@@ -41,5 +59,11 @@ Les fichiers MP3 ci-dessous (versions converties) sont eux aussi sous licence CC
 | Les Prés | Solstice Festival, Harvest Festival | Mountain Idyll, Albian Nocturne |
 | Le Maroc imaginaire | Peaks of Atlas | Mirage, Peaks of Atlas |
 | La Belgique | Das Alpenhorn, Water's Edge | Water's Edge |
-| Le Dindodrome | Unter dem Doppeladler, Something Doing Rag | Unter dem Doppeladler, Albian Nocturne |
+| La Jungle | The Ancient Lands, Eastern Dreams | Eastern Dreams, Water's Edge |
+| La Banquise | Snowbound, Mountain Idyll | Albian Nocturne, Snowbound |
+| Le Volcan | Sands of Time, The Ancient Lands | Sands of Time, Mirage |
+| La Forêt de la Lune | Mystic Winds, Sunrise | Harvest Moon, Mystic Winds, Albian Nocturne |
+| Le Royaume des Nuages | Elysian Fields, Solstice Festival | Elysian Fields, Mountain Idyll |
+| Le Dindodrome | Unter dem Doppeladler, Something Doing Rag, Slavonic Dance | Unter dem Doppeladler, Albian Nocturne |
 | Pendant une course | El Capitan | El Capitan |
+| Les finales, la Ligue, les relais et les Coupes des Maîtres | Slavonic Dance | Slavonic Dance |

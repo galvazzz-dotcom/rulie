@@ -9,7 +9,9 @@ import { RARETES } from '../donnees/types.js';
 import { COMPETENCES, ENSEIGNEES, competenceInnee, competencesDe, placesCompetences } from '../donnees/courses.js';
 import { portraitDindie } from '../dindies/portrait.js';
 import { fenetre, toast, $, $$, el, echapper, barre } from '../moteur/ui.js';
-import { pop, tada, glouglou, audio, sonActif } from '../moteur/sons.js';
+import { pop, tada, audio, sonActif } from '../moteur/sons.js';
+import { crier } from '../jeu/cris.js';
+import { astuce } from './astuces.js';
 import { dire } from '../moteur/voix.js';
 import * as J from '../jeu/etat.js';
 import * as DD from '../jeu/dindodrome.js';
@@ -64,7 +66,7 @@ export function ouvrirEntrainement({ surChange } = {}) {
       const stat = +b.dataset.jeu, score = await jouerMiniJeu(JEUX[stat], choisie);
       if (score === null) { if (mais) J.ajouterObjet('graineMais'); dessiner(); return; }
       const pts = score + (mais ? 1 : 0), gagne = DD.entrainer(choisie, stat, pts), niv = EL.donnerXp(choisie, 20 + 30 * pts);
-      tada(); glouglou(1.15);
+      tada(); crier(choisie, { hauteur: 1.05 });
       toast(`${JEUX[stat].e} + ${gagne} point${gagne > 1 ? 's' : ''} d’entraînement pour ${echapper(nomDe(choisie))} (${choisie.entrainement[stat]}/${DD.MAX_ENTRAINEMENT}) · + ${20 + 30 * pts} XP`, { duree: 3400, classe: 'grand', cle: 'entr' });
       if (niv) niveauToast(choisie, niv);
       S.evenement('entrainement', { stat, d: choisie });
@@ -80,7 +82,7 @@ export function ouvrirEntrainement({ surChange } = {}) {
     $$('[data-oublie]', F.el).forEach(b => b.onclick = () => { if (!confirm(`Oublier ${COMPETENCES[b.dataset.oublie].nom} ? (Tu pourras la réapprendre plus tard.)`)) return; DD.oublier(choisie, b.dataset.oublie); pop(); dessiner(); });
   };
   const brancherOnglets = () => $$('.onglets button', F.el).forEach(b => b.onclick = () => { pop(); onglet = b.dataset.o; dessiner(); });
-  dessiner();
+  dessiner(); astuce('entrainement', F);
   return F;
 }
 

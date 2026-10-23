@@ -31,8 +31,8 @@ export function ecranTitre({ surJouer }) {
   const T = el(`<div id="titre"><div class="titreFond">${defilantes().map((id, i) => `<div class="flotte" style="--i:${i};left:${POS[i][0]}%;top:${POS[i][1]}%">${portraitDindie(variante(PAR_ID[id]), { id: 'T' + i, fond: false })}</div>`).join('')}</div>
     <div class="titreBoite"><h1><small>Le</small> Royaume <small>des</small> Dindies</h1><p class="sous">Attrape-les, élève-les, fais-les courir !</p>${FT ? `<p class="titreFete">${FT.e} C’est ${FT.nom} au Royaume ! ${FT.e}</p>` : ''}
     <div id="profils"></div>
-    <p class="liensTitre"><a href="../index.html">🏠 Le site</a></p>
-    <p class="enDev">🚧 Jeu en développement : les 8 chapitres jouables, de la première dindie au Dindromakus</p></div></div>`);
+    <p class="liensTitre"><a href="../index.html">🏠 Le site</a> · <a href="grand-livre.html">📖 Le Grand Livre</a></p>
+    <p class="enDev">✨ Version 1.0 BETA : les 8 chapitres, de la première dindie au Dindromakus</p></div></div>`);
   document.body.appendChild(T);
   /* la musique démarre au premier toucher (les navigateurs l'exigent) */
   T.addEventListener('pointerdown', () => { audio(); ambianceMusique('titre'); musique(true); }, { once: true });

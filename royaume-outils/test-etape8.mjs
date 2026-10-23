@@ -2,7 +2,7 @@
    Usage : node royaume-outils/test-etape8.mjs [adresse] [largeur,hauteur,mobile] [dossier des captures]
    - adresse par défaut : http://localhost:8765/royaume/index.html
    - format par défaut : 390,844,1 (téléphone) ; CHROMIUM=/chemin/vers/chromium si besoin.
-   1. Les règles : la Ligue des Légendes (une dindie très entraînée gagne souvent, une moyenne rarement), les 8 Coupes des Maîtres
+   1. Les règles : la Ligue des Légendes (une épique moyenne bien entraînée a sa chance vers le niveau 44, une peu entraînée rarement), les 8 Coupes des Maîtres
       (chacune gagnable par une dindie au maximum du bon type), le relais (3 dindies, 2 passages), le contre la montre (seule,
       les médailles), la course sans fin (3 chutes ou à bout de forces), la note du défilé, les rangs, la partition du glouglou
       et ses étoiles, les défis (tirés selon la date, réclamés une fois, le bonus), les 100 succès, les fêtes selon la date
@@ -15,6 +15,7 @@
       l'Atelier pendant une fête, le générique depuis la Maison, et aucune erreur. */
 import { chromium } from 'playwright';
 import { mkdirSync } from 'fs';
+import { enPartie, reprendre, laisser } from './partie.mjs';
 const URL = process.argv[2] || 'http://localhost:8765/royaume/index.html';
 const [w, h, mob] = (process.argv[3] || '390,844,1').split(',').map(Number), OUT = process.argv[4] || 'captures-etape8';
 mkdirSync(OUT, { recursive: true });
@@ -99,7 +100,8 @@ try {
     const P = (esp, niv, t, ent) => () => { const d = nouvelleDindie(esp, { niveau: niv, talents: [t, t, t], caractere: 'calme', stade: 'eveille' }); d.entrainement = [ent, ent, ent]; d.competences = ['turbo']; return d; };
     const gagne = (id, f, n = 30) => { const def = DD.defCourse(id); let k = 0; for (let i = 0; i < n; i++) { const o = DD.optionsCourse(def, f(), { equipe: def.relais ? [f(), f(), f()] : null }); o.rng = hasard(id + i); if (simuler(o, { joueuseIA: true }).coureurs.find(x => x.id === 'moi').place === 1) k++; } return k / n; };
     /* la Ligue des Légendes */
-    R.ligue = LIGUE.map(L => ({ id: L.id, forte: gagne(L.id, P('panthere', 45, 4, 15)), moyenne: gagne(L.id, P('comete', 42, 3, 12)), gagner: !!DD.defCourse(L.id).gagner, canon: DD.adversaires(DD.defCourse(L.id)).some(x => (x.d.competences || []).includes('canon')) }));
+    R.ligue = LIGUE.map(L => ({ id: L.id, forte: gagne(L.id, P('panthere', 45, 4, 15)), faible: gagne(L.id, P('comete', 36, 3, 8)),
+      typique: Math.max(...['coquelicot', 'dingue', 'atomium', 'jaguar', 'cristal', 'magma', 'etoile', 'orage'].map(x => gagne(L.id, P(x, 44, 3, 15), 20))), gagner: !!DD.defCourse(L.id).gagner, canon: DD.adversaires(DD.defCourse(L.id)).some(x => (x.d.competences || []).includes('canon')) }));
     /* les Coupes des Maîtres : chacune gagnable par une dindie au maximum (du bon type) */
     R.maitres = MAITRES.map(M => { const id = 'maitre' + M.n, def = DD.defCourse(id); return { id, star: !!def && DD.adversaires(def).some(x => x.star && x.d.niveau === 50), meilleure: Math.max(...['jaguar', 'magma', 'panthere', 'orage', 'celestia', 'dingue'].map(x => gagne(id, P(x, 50, 5, 15), 16))), moyenne: gagne(id, P('orage', 42, 4, 15), 16) }; });
     /* le relais : 3 dindies, 2 passages de relais */
@@ -165,7 +167,7 @@ try {
     e.livre.attrapes = {}; delete e.defis; delete e.concours; e.succes = {}; e.stats.compteurs = {};
     return R;
   });
-  for (const L of R.ligue) verifier(L.forte >= .7 && L.moyenne <= .3 && L.gagner && !L.canon, `Ligue ${L.id} : une dindie très entraînée gagne souvent (${Math.round(L.forte * 100)} %), une moyenne rarement (${Math.round(L.moyenne * 100)} %), il faut la 1re place, pas de canon`);
+  for (const L of R.ligue) verifier(L.forte >= .7 && L.typique >= .5 && L.faible <= .3 && L.gagner && !L.canon, `Ligue ${L.id} : une épique moyenne bien entraînée, de la bonne espèce, a une chance sur deux au niveau 44 (${Math.round(L.typique * 100)} %), une très entraînée gagne souvent (${Math.round(L.forte * 100)} %), une peu entraînée rarement (${Math.round(L.faible * 100)} %) ; il faut la 1re place, pas de canon`);
   verifier(R.maitres.length === 8 && R.maitres.every(M => M.star && M.meilleure >= .5 && M.moyenne <= .4), `les 8 Coupes des Maîtres : une star niveau 50, chacune gagnable par une dindie au maximum du bon type, très dure sinon (Orage niv. 42) (${R.maitres.map(M => M.id.slice(6) + ':' + Math.round(M.meilleure * 100) + '/' + Math.round(M.moyenne * 100)).join(' ')})`);
   verifier(R.relais.n === 2 && R.relais.passages === 2 && R.relais.jambe === 2 && R.relais.d && R.relais.place === 1, `le relais : 3 dindies, 2 passages, la 3e finit la course (${JSON.stringify(R.relais)})`);
   verifier(R.chrono.pistes >= 8 && R.chrono.seule && R.chrono.ordre && R.chrono.medaille === 'or' && R.chrono.lente === null, `le contre la montre : seule sur la piste, les médailles or < argent < bronze (${JSON.stringify(R.chrono)})`);
@@ -182,7 +184,14 @@ try {
   verifier(R.migration, 'une sauvegarde version 6 (chapitre 7 fini) passe à la version 7 et reprend au chapitre 8');
 
   /* ══════════ 2. le chapitre 8 ══════════ */
-  await pg.evaluate(async () => {
+  /* (la partie complète : on reprend la vraie partie du test d'avant, avec un coup de pouce) */
+  if (enPartie()) await reprendre(pg, () => {
+    /* (les championnes des Coupes des Maîtres, au niveau 50) */
+    const e = window.__jeu.etat(); window.__auMoins({ pieces: 9000 });
+    for (const d of e.dindies) if (d.lieu === 'equipe') d.lieu = 'clapier';
+    for (const [x, lieu] of [['panthere', 'equipe'], ['jaguar', 'equipe'], ['orage', 'equipe'], ['etoile', 'clapier'], ['celestia', 'clapier']]) { const u = window.__pouce(x, { niveau: 50, stade: 'eveille', talents: [5, 5, 5], entrainement: [15, 15, 15], caractere: 'calme', lieu }); e.dindies.find(d => d.uid === u).bonheur = 90; }
+  });
+  else await pg.evaluate(async () => {
     const W = window.__jeu, e = W.etat(), { nouvelleDindie } = await import('./js/jeu/individus.js');
     e.version = 6; e.quete.etape = 'fin'; e.quete.finies = Array.from({ length: 51 }, (_, i) => 'q' + (i + 1)); e.pieces = 9000; e.plumesOr = 0;
     Object.assign(e.inventaire, { grandLivre: 1, filet: 1, billet: 1, jumelles: 1, moufles: 1, bottesLave: 1, lanterne: 1, ailes: 1 });
@@ -323,5 +332,6 @@ try {
 } catch (e) { console.log('❌', e.message); echecs++; await pg.screenshot({ path: `${OUT}/erreur.png` }); }
 verifier(!errs.length, `aucune erreur dans le navigateur${errs.length ? ' : ' + errs.join(' / ') : ''}`);
 console.log(echecs ? `\n❌ étape 8 : ${echecs} échec(s)` : '\n✅ étape 8 : le chapitre 8, la fin et l’après-histoire sont jouables');
+if (!echecs) await laisser(pg);
 await b.close();
 process.exit(echecs ? 1 : 0);

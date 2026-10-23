@@ -8,7 +8,9 @@ import { GRAINES, ORDRE_GRAINES, RECETTES, CHAPEAUX, FORMES_CHAPEAUX, DECORATION
 import { portraitDindie } from '../dindies/portrait.js';
 import { PERSONNAGES, portraitChibi } from '../personnages/chibi.js';
 import { fenetre, toast, $, $$, echapper, barre, dialogue } from '../moteur/ui.js';
-import { pop, tada, glouglou } from '../moteur/sons.js';
+import { pop, tada, bruit } from '../moteur/sons.js';
+import { crier } from '../jeu/cris.js';
+import { astuce } from './astuces.js';
 import * as J from '../jeu/etat.js';
 import * as PR from '../jeu/production.js';
 import { OBJETS } from '../jeu/objets.js';
@@ -93,10 +95,10 @@ export function ouvrirPotager({ surChange } = {}) {
       const libre = PR.prod().parcelles.findIndex(x => !x); choix = libre >= 0 && J.combien(GRAINES[b.dataset.graine].graine) ? libre : null;
       surChange && surChange(); dessiner();
     });
-    $$('[data-arroser]', F.contenu).forEach(b => b.onclick = () => { if (PR.arroser(+b.dataset.arroser)) { pop(); toast('💧 Glouglou… la plante a bien bu !', { cle: 'potager' }); surChange && surChange(); dessiner(); } });
+    $$('[data-arroser]', F.contenu).forEach(b => b.onclick = () => { if (PR.arroser(+b.dataset.arroser)) { bruit('eau'); toast('💧 Glouglou… la plante a bien bu !', { cle: 'potager' }); surChange && surChange(); dessiner(); } });
     $$('[data-recolter]', F.contenu).forEach(b => b.onclick = () => recolter([+b.dataset.recolter]));
     $('#pTout', F.contenu).onclick = () => recolter(PR.prod().parcelles.map((q, i) => PR.mure(q) ? i : -1).filter(i => i >= 0));
-    $('#pArroser', F.contenu).onclick = () => { let k = 0; PR.prod().parcelles.forEach((q, i) => { if (PR.arroser(i)) k++; }); if (k) { pop(); toast(`💧 ${k} plante${k > 1 ? 's' : ''} arrosée${k > 1 ? 's' : ''} !`, { cle: 'potager' }); surChange && surChange(); } else toast('Rien à arroser pour l’instant.'); dessiner(); };
+    $('#pArroser', F.contenu).onclick = () => { let k = 0; PR.prod().parcelles.forEach((q, i) => { if (PR.arroser(i)) k++; }); if (k) { bruit('eau'); toast(`💧 ${k} plante${k > 1 ? 's' : ''} arrosée${k > 1 ? 's' : ''} !`, { cle: 'potager' }); surChange && surChange(); } else toast('Rien à arroser pour l’instant.'); dessiner(); };
     brancherAmeliorer(F.contenu, () => { surChange && surChange('potager'); dessiner(); });
   };
   const recolter = liste => {
@@ -106,7 +108,7 @@ export function ouvrirPotager({ surChange } = {}) {
     tada(); toast(`🧺 Récolte : ${Object.entries(tot).map(([o, k]) => `${OBJETS[o].e} × ${k}`).join(', ')}${graine ? ` (+ ${graine} graine${graine > 1 ? 's' : ''} 🌱)` : ''}`, { duree: 3000, classe: 'grand', cle: 'recolte' });
     surChange && surChange(); dessiner();
   };
-  dessiner();
+  dessiner(); astuce('production', F);
   /* les minuteurs : on redessine quand une plante est prête */
   minuteur = setInterval(() => {
     let pret = false;
@@ -217,7 +219,7 @@ export function ouvrirMissions({ surChange } = {}) {
     $$('[data-rapporter]', F.contenu).forEach(b => b.onclick = () => { const R = PR.rapporter(b.dataset.rapporter); if (R) { resultatMission(R); surChange && surChange(); dessiner(); } });
     brancherAmeliorer(F.contenu, () => { surChange && surChange(); dessiner(); });
   };
-  dessiner();
+  dessiner(); astuce('missions', F);
   minuteur = setInterval(() => {
     let fini = false;
     for (const m of PR.missions().encours) { const s = $(`[data-reste="${m.id}"]`, F.el); if (s) { if (PR.missionFinie(m)) fini = true; else s.textContent = '⏳ ' + duree(PR.restantMission(m)); } }
@@ -245,7 +247,7 @@ function choisirEquipe(idOffre, apres) {
     });
     $('#mPartir', F.contenu).onclick = () => {
       const err = PR.envoyer(idOffre, choisies); if (err) { toast('⚠️ ' + err); return; }
-      tada(); glouglou(1.1); toast(`🚀 ${choisies.length > 1 ? 'Elles sont parties' : 'Elle est partie'} : ${Mo.titre} !`, { duree: 3000, classe: 'grand' });
+      tada(); crier(J.parUid(choisies[0])); toast(`🚀 ${choisies.length > 1 ? 'Elles sont parties' : 'Elle est partie'} : ${Mo.titre} !`, { duree: 3000, classe: 'grand' });
       F.fermer(); apres && apres();
     };
   };
@@ -276,7 +278,7 @@ export function brancherFiche(F, d, { dessiner, surChange, niveauToast, fermer }
   $$('[data-moulin]', F.el).forEach(b => b.onclick = () => {
     const id = b.dataset.moulin, R = PR.donnerFriandiseMoulin(d, id);
     if (typeof R === 'string') { toast('⚠️ ' + R); return; }
-    glouglou(1.1); tada();
+    crier(d); tada();
     toast(`${OBJETS[id].e} Miam ! ${R.stat !== undefined ? `+ 1 point d’entraînement ${STATS[R.stat]}` : `+ ${OBJETS[id].moulin.xp} XP`} pour ${nomDe(d)} !`, { cle: 'moulin' });
     window.dispatchEvent(new CustomEvent('dindie-joie', { detail: d.uid }));
     if (R.niv && niveauToast) niveauToast(d, R.niv);
@@ -289,7 +291,7 @@ export function brancherFiche(F, d, { dessiner, surChange, niveauToast, fermer }
       choix: [['non', '💗 Non, elle reste !'], ['oui', '🍃 Oui, au revoir…']] }]);
     if (ch !== 'oui') return;
     const R = PR.relacher(d); if (typeof R === 'string') { toast('⚠️ ' + R); return; }
-    glouglou(.9); toast(`🍃 Au revoir, ${echapper(nomDe(d))} ! Elle s’éloigne en faisant « glouglou »… + ${R.n} 🪶${TYPES[R.type].e}`, { duree: 4200, classe: 'grand' });
+    crier(d, { hauteur: .95 }); toast(`🍃 Au revoir, ${echapper(nomDe(d))} ! Elle s’éloigne en faisant « glouglou »… + ${R.n} 🪶${TYPES[R.type].e}`, { duree: 4200, classe: 'grand' });
     fermer(); surChange && surChange();
   };
 }
@@ -305,7 +307,7 @@ function choisirChapeau(d, apres) {
     const en = $('#cEnlever', F.contenu); if (en) en.onclick = () => { PR.coiffer(d, null); pop(); toast(`${nomDe(d)} enlève son chapeau.`); apres && apres(); dessiner(); };
     $$('[data-mettre]', F.contenu).forEach(b => b.onclick = () => {
       const err = PR.coiffer(d, b.dataset.mettre); if (err) { toast('⚠️ ' + err); return; }
-      tada(); glouglou(1.2); toast(`🎩 ${nomDe(d)} adore son ${CHAPEAUX[b.dataset.mettre].nom.replace(/ \S+$/, '').toLowerCase()} !`, { cle: 'chapeau' });
+      tada(); crier(d, { hauteur: 1.06 }); toast(`🎩 ${nomDe(d)} adore son ${CHAPEAUX[b.dataset.mettre].nom.replace(/ \S+$/, '').toLowerCase()} !`, { cle: 'chapeau' });
       window.dispatchEvent(new CustomEvent('dindie-joie', { detail: d.uid }));
       apres && apres(); F.fermer();
     });

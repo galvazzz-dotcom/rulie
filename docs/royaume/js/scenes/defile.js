@@ -8,6 +8,7 @@ import { sphere, cylindre, cone, tore, boite, fusion } from '../moteur/formes.js
 import { toon, contour, contourPour } from '../moteur/materiaux.js';
 import { hasard } from '../moteur/couleurs.js';
 import { glouglou, pop, tada, audio } from '../moteur/sons.js';
+import { crier as crierDindie } from '../jeu/cris.js';
 import { ESPECES } from '../donnees/especes.js';
 import { TYPES, RARETES, ORDRE_TYPES } from '../donnees/types.js';
 import { variante } from '../dindies/adn.js';
@@ -167,8 +168,7 @@ function presenter(d) {
 function crier() {
   if (!courante) return;
   courante.jouer('glouglou');
-  const a = courante.adn, h = a.stade === 'poussin' ? 1.6 : a.stade === 'jeune' ? 1.3 : (1.08 / Math.sqrt(a.taille)) * (.9 + hasard(a.id)() * .25);
-  glouglou(h);
+  crierDindie(courante.adn);
   const c = $('#cri'); c.textContent = courante.espece.cri; c.classList.remove('cache'); c.style.animation = 'none'; void c.offsetWidth; c.style.animation = '';
   criJusqua = temps + 2.2;
 }

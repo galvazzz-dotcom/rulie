@@ -1,0 +1,81 @@
+/* Le Grand Livre des Dindies (la page publique, étape 9) : le style du jeu (crème, orange, polices rondes) */
+:root{--encre:#3b2a1a;--creme:#fff8e7;--or:#f59e0b;--orFonce:#c2410c;--carte:#fff;--ligne:#fde68a;--doux:#7c4a1d;--fond1:#5ec4f5;--fond2:#d9f3ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--fond2)}
+body{margin:0;min-height:100vh;font-family:'Fredoka',system-ui,sans-serif;color:var(--encre);background:linear-gradient(var(--fond1),var(--fond2) 420px,#fef3c7 1400px);background-attachment:scroll}
+a{color:var(--orFonce)}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+.cache{display:none!important}
+button:focus-visible,a:focus-visible,input:focus-visible,.dindie:focus-visible{outline:4px solid #2563eb;outline-offset:2px}
+
+/* l'en-tête */
+.entete{max-width:1100px;margin:0 auto;padding:max(14px,env(safe-area-inset-top)) 16px 6px;text-align:center}
+.liens{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+.lien{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:14px;background:#fff;color:var(--encre);font-weight:700;text-decoration:none;box-shadow:0 4px 0 rgba(0,0,0,.15)}
+.lien.jouer{background:#22c55e;color:#fff;box-shadow:0 4px 0 #15803d}
+.lien:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.15)}
+h1{margin:4px 0 6px;font-family:'Lilita One',sans-serif;font-weight:400;font-size:clamp(28px,7vw,52px);color:#fff;text-shadow:0 3px 0 var(--orFonce),0 6px 14px rgba(0,0,0,.18);line-height:1.05}
+.sousTitre{margin:0 auto 6px;max-width:640px;font-size:clamp(15px,3.8vw,18px);font-weight:600;color:#0c4a6e}
+.resume{margin:6px auto 0;display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.resume span{background:rgba(255,255,255,.85);border-radius:99px;padding:3px 10px;font-weight:700;font-size:13px}
+
+/* les filtres */
+main{max-width:1100px;margin:0 auto;padding:8px 16px 30px}
+.filtres{background:var(--creme);border:5px solid var(--or);border-radius:24px;padding:10px 12px;box-shadow:0 8px 22px rgba(0,0,0,.15);display:flex;flex-direction:column;gap:6px}
+.ligne{display:flex;align-items:center;gap:8px;min-width:0}
+.etiquette{flex:none;width:54px;font-family:'Lilita One',sans-serif;color:#9a3412;font-size:15px}
+.puces{display:flex;gap:6px;overflow-x:auto;padding:3px 2px 6px;min-width:0;scrollbar-width:thin}
+.puce{flex:none;padding:6px 11px;border-radius:99px;background:#fff;border:3px solid var(--ligne);font-weight:700;font-size:14px;white-space:nowrap}
+.puce.actif{background:var(--or);border-color:var(--orFonce);color:#fff}
+.ligne.bas{flex-wrap:wrap;gap:8px 14px}
+.recherche{display:flex;align-items:center;gap:6px;flex:1 1 200px;min-width:0;background:#fff;border:3px solid var(--ligne);border-radius:14px;padding:4px 10px}
+.recherche input{flex:1;min-width:0;border:0;outline:0;font:inherit;font-size:16px;background:none;color:var(--encre)}
+.bascule{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;cursor:pointer}
+.bascule input{width:20px;height:20px;accent-color:var(--or)}
+.compte{margin:12px 4px 8px;font-weight:700;color:var(--doux)}
+
+/* la grille des dindies */
+.grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+@media (max-width:420px){.grille{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
+.dindie{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;background:var(--carte);border:4px solid var(--rar,#9ca3af);border-radius:20px;padding:8px 8px 10px;box-shadow:0 5px 0 rgba(0,0,0,.12);min-width:0}
+.dindie:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.12)}
+.dindie .haut{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:20px;margin-bottom:2px}
+.dindie .num{font-size:12px;font-weight:700;color:#94a3b8}
+.dindie .types{font-size:15px}
+.dindie .portrait{width:100%;aspect-ratio:1;max-width:150px}
+.dindie .portrait svg{width:100%;height:100%;display:block}
+.dindie b{display:block;font-size:15px;line-height:1.15;margin-top:2px;overflow-wrap:anywhere}
+.dindie .rar{margin-top:4px;font-size:11.5px;font-weight:700;color:#fff;background:var(--rar);border-radius:99px;padding:1px 8px}
+.dindie.secret b{color:#64748b}
+.vide{grid-column:1/-1;text-align:center;font-weight:700;color:var(--doux);padding:30px 0}
+
+/* la fiche */
+.voile{position:fixed;inset:0;z-index:20;background:rgba(20,40,60,.5);display:flex;align-items:center;justify-content:center;padding:14px}
+.fiche{position:relative;width:min(94vw,640px);max-height:90vh;overflow:auto;background:var(--creme);border:6px solid var(--rar,var(--or));border-radius:28px;padding:16px 16px 18px;box-shadow:0 12px 34px rgba(0,0,0,.35)}
+.fermer{position:sticky;float:right;top:0;margin:-6px -6px 0 0;width:44px;height:44px;border-radius:50%;background:#ef4444;color:#fff;font-size:20px;box-shadow:0 4px 0 #991b1b;border:3px solid #fff;z-index:2}
+.ficheHaut{display:flex;gap:14px;align-items:center}
+.ficheHaut .grand{flex:none;width:min(42vw,200px);aspect-ratio:1;border-radius:22px;background:#fff;border:4px solid var(--rar)}
+.ficheHaut .grand svg{width:100%;height:100%;display:block}
+.ficheHaut h2{margin:0;font-family:'Lilita One',sans-serif;font-weight:400;font-size:clamp(22px,5.5vw,30px);color:#9a3412;line-height:1.05}
+.pills{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
+.pill{font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:99px;background:#f1f5f9;white-space:nowrap}
+.pill.rar{background:var(--rar);color:#fff}
+.criFiche{margin:8px 0 0;font-weight:700;font-style:italic;color:var(--doux);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ecouter{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:99px;background:#3b82f6;color:#fff;font-weight:700;font-style:normal;box-shadow:0 3px 0 #1e40af}
+.ecouter:active{transform:translateY(2px);box-shadow:0 1px 0 #1e40af}
+.desc{margin:12px 0 8px;font-size:16px;line-height:1.35}
+.stat{display:grid;grid-template-columns:max-content 1fr 26px;align-items:center;gap:8px;margin:5px 0;font-weight:700}
+.barre{height:14px;border-radius:99px;background:#e5e7eb;overflow:hidden}
+.barre i{display:block;height:100%;border-radius:99px;background:var(--rar)}
+.ou{margin:10px 0;padding:10px 12px;border-radius:16px;background:#fff;border:3px dashed var(--ligne);font-size:15px;line-height:1.35}
+.stades{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.stades figure{margin:0;text-align:center;font-size:12.5px;font-weight:700;color:var(--doux)}
+.stades .p{aspect-ratio:1;border-radius:14px;background:#fff;border:3px solid var(--ligne)}
+.stades svg{width:100%;height:100%;display:block}
+.fiche h3{margin:14px 0 4px;font-family:'Lilita One',sans-serif;font-weight:400;font-size:18px;color:#9a3412}
+.secretFiche{text-align:center;padding:10px 0}
+.secretFiche .grand{width:min(60vw,220px);margin:0 auto}
+@media (max-width:480px){.ficheHaut{flex-direction:column;text-align:center}.pills{justify-content:center}.criFiche{justify-content:center}.stades{grid-template-columns:repeat(2,1fr)}}
+
+.pied{max-width:1100px;margin:0 auto;padding:10px 16px max(24px,env(safe-area-inset-bottom));text-align:center;font-size:13px;color:var(--doux)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}

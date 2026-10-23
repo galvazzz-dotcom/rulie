@@ -1,8 +1,10 @@
 /* La voix (mode aide) : lit les dialogues et les consignes à voix haute */
 let active = false;
 export const voixActive = v => { if (v !== undefined) { active = v; if (!v) speechSynthesis?.cancel(); } return active; };
-export function dire(texte) {
-  if (!active || !window.speechSynthesis) return;
+export function dire(texte) { if (active) lire(texte); }
+/* lire à voix haute, même quand la voix est coupée (le bouton 🔊 des astuces) */
+export function lire(texte) {
+  if (!window.speechSynthesis) return;
   const t = String(texte).replace(/<[^>]+>/g, ' ').replace(/[^\p{L}\p{N}\s'’!?.,:;…-]/gu, ' ').replace(/\s+/g, ' ').trim();
   if (!t) return;
   speechSynthesis.cancel();

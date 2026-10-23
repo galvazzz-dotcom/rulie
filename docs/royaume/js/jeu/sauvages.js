@@ -10,7 +10,7 @@ import { REGIONS } from '../donnees/regions.js';
 import { TYPES } from '../donnees/types.js';
 import { estJour, estNuit, estMatin } from '../moteur/temps.js';
 import { meteo } from '../moteur/meteo.js';
-import { glouglou } from '../moteur/sons.js';
+import { crier } from './cris.js';
 import * as J from './etat.js';
 import { typeFete } from './evenements.js';
 
@@ -124,7 +124,7 @@ export function creerSauvages(lieu, { etapeAtteinte, particules, quandVue }) {
           }
         }
         s.action -= dt;
-        if (s.action < 0) { s.action = 4 + Math.random() * 6; const r = Math.random(); m.jouer(r < .5 ? 'picore' : r < .8 ? 'glouglou' : 'roue'); if (r >= .5 && r < .8 && d < 10) glouglou(1 + Math.random() * .3); }
+        if (s.action < 0) { s.action = 4 + Math.random() * 6; const r = Math.random(); m.jouer(r < .5 ? 'picore' : r < .8 ? 'glouglou' : 'roue'); if (r >= .5 && r < .8 && d < 10) crier(s, { volume: d < 5 ? .8 : .55 }); }
       }
       if (!s.fantome) q.y = lieu.sol(q.x, q.z);
       m.maj(dt, t);

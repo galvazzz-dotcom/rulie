@@ -4,12 +4,13 @@
    Le lieu change : le Domaine reste en mémoire, une région est construite quand on y arrive et libérée quand on part.
    La lumière suit l'heure (et la météo dans les régions) ; tout se sauvegarde. */
 import * as THREE from 'three';
-import { scene, camera, renderer, chaqueImage, soleil, ciel, couleursCiel, centrerImage, distancesBrume, redimensionner } from '../moteur/rendu.js';
+import { scene, camera, renderer, chaqueImage, soleil, ciel, couleursCiel, centrerImage, distancesBrume, redimensionner, imageLegere } from '../moteur/rendu.js';
 import { entrees } from '../moteur/entrees.js';
 import { lumiere, heure, texteHeure, regler as reglerHeure, finForcage, forcerHeure, forcerPleineLune } from '../moteur/temps.js';
 import { meteo, METEOS, forcerMeteo } from '../moteur/meteo.js';
 import { $, el, toast, fenetreOuverte, enDialogue, fermerDerniere } from '../moteur/ui.js';
-import { pop, tada, glouglou, sonActif, musique, musiqueNuit, ambianceMusique, audio, pluieSon } from '../moteur/sons.js';
+import { pop, tada, glouglou, sonActif, musique, musiqueNuit, ambianceMusique, audio, pluieSon, bruit } from '../moteur/sons.js';
+import { crier } from '../jeu/cris.js';
 import { voixActive } from '../moteur/voix.js';
 import { texRonde, partager } from '../moteur/materiaux.js';
 import { melanger } from '../moteur/couleurs.js';
@@ -83,16 +84,29 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
   const vC = new THREE.Vector3();
   const placerCamera = (dt = 1) => {
     /* pendant une course, c'est la course qui tient la caméra (l'ombre suit la caméra) */
-    if (camCourse) { soleil.target.position.set(Math.round(camera.position.x), 0, Math.round(camera.position.z)); return; }
+    if (camCourse) { suivreOmbre(camera.position.x, camera.position.z); return; }
     /* pendant une capture, la caméra cadre Roullieee et la dindie */
     const visee = cadre ? vC.copy(moi.racine.position).lerp(cadre.s.m.racine.position, .55) : moi.racine.position;
     cible.lerp(visee, Math.min(1, dt * (cadre ? 3 : 5)));
     const z = cadre ? Math.min(zoom, 12.5) : zoom;
     camera.position.set(cible.x, cible.y + z * .64, cible.z + z * .77);
     camera.lookAt(cible.x, cible.y + .8, cible.z);
-    /* l'ombre du soleil suit Roullieee (sur une grille, pour ne pas trembler) */
-    soleil.target.position.set(Math.round(cible.x), 0, Math.round(cible.z));
+    suivreOmbre(cible.x, cible.z);
   };
+  /* l'ombre du soleil suit Roullieee : la zone d'ombre avance d'un pixel d'ombre entier à la fois, vu du soleil
+     (sinon, à chaque pas, les bords des ombres frémissent) */
+  const dirS = new THREE.Vector3(), droiteS = new THREE.Vector3(), hautS = new THREE.Vector3(), visS = new THREE.Vector3();
+  function suivreOmbre(x, z) {
+    const sd = soleil.userData.dir || [.5, 1, .5], C = soleil.shadow.camera, pas = (C.right - C.left) / soleil.shadow.mapSize.x;
+    dirS.set(sd[0], sd[1], sd[2]).normalize();
+    droiteS.set(0, 1, 0).cross(dirS); if (droiteS.lengthSq() < 1e-6) droiteS.set(1, 0, 0); droiteS.normalize();
+    hautS.copy(dirS).cross(droiteS).normalize();
+    visS.set(x, 0, z);
+    const a = visS.dot(droiteS), b = visS.dot(hautS);
+    visS.addScaledVector(droiteS, Math.round(a / pas) * pas - a).addScaledVector(hautS, Math.round(b / pas) * pas - b);
+    soleil.target.position.copy(visS);
+    soleil.position.set(visS.x + sd[0] * 30, visS.y + sd[1] * 30, visS.z + sd[2] * 30);
+  }
   centrerImage(0, 0);
   Object.assign(soleil.shadow.camera, { left: -24, right: 24, top: 24, bottom: -24, near: 1, far: 90 }); soleil.shadow.camera.updateProjectionMatrix();
   soleil.shadow.bias = -.0015; soleil.shadow.normalBias = .06;
@@ -124,6 +138,11 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
   const appliquerReglages = () => {
     const r = E().reglages;
     sonActif(r.son); voixActive(r.voix); reglerHeure(r.heure);
+    /* le confort (étape 9) : les textes en grand, moins d'animations, des couleurs faciles à distinguer */
+    document.body.classList.toggle('grandsTextes', !!r.grandsTextes);
+    document.body.classList.toggle('calme', !!r.calme);
+    document.body.classList.toggle('daltonien', !!r.daltonien);
+    imageLegere(!!r.legere);
     ambianceMusique(monde.ambiance, lumiere().nuit > .5);
     musique(r.son && r.musique);
     majLumiere(true);
@@ -160,6 +179,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
   /* ── des cœurs, des étincelles, de la poussière ── */
   const effets = [];
   function particules(pos, { n = 12, couleur = '#ff6b9d', taille = .35, vitesse = 2, duree = 1.4, monte = 2, texture = texRonde() } = {}) {
+    if (document.body.classList.contains('calme')) n = Math.ceil(n / 3);
     const g = new THREE.BufferGeometry(), p = new Float32Array(n * 3), v = [];
     for (let i = 0; i < n; i++) { p.set([pos.x, pos.y, pos.z], i * 3); v.push([(Math.random() - .5) * vitesse, monte * (.5 + Math.random()), (Math.random() - .5) * vitesse]); }
     g.setAttribute('position', new THREE.BufferAttribute(p, 3));
@@ -240,7 +260,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
       else if (id.startsWith('objet-') || id.startsWith('deco-')) await S.interagir(id);
       else if (I.trouvaille) {
         const t = ramasser(I.trouvaille, monde.id);
-        if (t) { tada(); toast(t, { duree: 3400, classe: 'grand' }); particules(new THREE.Vector3(I.x, monde.sol(I.x, I.z) + 1, I.z), { n: 34, couleur: I.trouvaille.sorte === 'coffre' ? '#facc15' : I.trouvaille.sorte === 'oeuf' ? '#fef3c7' : '#d8b4fe', taille: .4, vitesse: 4, monte: 3.5, duree: 1.6 }); J.changer('inventaire'); }
+        if (t) { bruit(I.trouvaille.sorte === 'coffre' ? 'coffre' : 'pierre'); toast(t, { duree: 3400, classe: 'grand' }); particules(new THREE.Vector3(I.x, monde.sol(I.x, I.z) + 1, I.z), { n: 34, couleur: I.trouvaille.sorte === 'coffre' ? '#facc15' : I.trouvaille.sorte === 'oeuf' ? '#fef3c7' : '#d8b4fe', taille: .4, vitesse: 4, monte: 3.5, duree: 1.6 }); J.changer('inventaire'); }
         monde.retirerTrouvaille(I.trouvaille.id);
       }
       else if (I.gadget) { const fait = await S.gadget(I.gadget); if (fait) { monde.gadgets[I.gadget]?.anim?.(); majLumiere(true); } }
@@ -308,7 +328,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
   }
   /* le filet : il vole, tombe sur la dindie… et tremble 3 fois (ou elle s'échappe) */
   async function lancerFilet(s, reussi) {
-    moi.jouer('saut');
+    moi.jouer('saut'); bruit('filet');
     const g = new THREE.Group();
     const voile = new THREE.Mesh(new THREE.ConeGeometry(.95, 1.25, 18, 1, true), new THREE.MeshBasicMaterial({ color: '#f8fafc', transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }));
     voile.rotation.x = Math.PI; voile.position.y = .62; g.add(voile);
@@ -329,7 +349,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
       }
       particules(new THREE.Vector3(q.x, q.y + 1.2, q.z), { n: 30, couleur: '#fde68a', taille: .4, vitesse: 3, monte: 3, duree: 1.4 });
     } else {
-      s.m.jouer('saut');
+      s.m.jouer('saut'); bruit('rate');
       await new Promise(r => { const t1 = performance.now(); const stop = chaqueImage(() => { const u = (performance.now() - t1) / 600; g.position.x = q.x + u * 1.2; voile.material.opacity = .55 * (1 - u); if (u >= 1) { stop(); r(); } }); });
     }
     scene.remove(g); voile.geometry.dispose(); voile.material.dispose(); bord.geometry.dispose(); bord.material.dispose();
@@ -455,7 +475,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     lieu: () => monde.id,
     poserObjet: (...a) => monde.poserObjet(...a), retirerObjet: id => monde.retirerObjet(id), gonflerBallon: v => domaine.gonflerBallon(v),
     allumerLanterne: (i, v) => monde.gadgets?.['lanterne' + i]?.allumer(v),
-    choisirStarter: P.choisirStarter, ouvrirLabo: P.ouvrirLabo, ouvrirBoutique: P.ouvrirBoutique,
+    choisirStarter: P.choisirStarter, ouvrirLabo: () => P.ouvrirLabo({ surChange: syncDindies }), ouvrirBoutique: P.ouvrirBoutique,
     ouvrirMonde: () => ouvrirMonde({ ici: monde.id, ouverte: S.regionOuverte, surChoix: id => partirVers(id) }),
     celebrer: () => { tada(); particules(new THREE.Vector3(moi.racine.position.x, moi.racine.position.y + 2, moi.racine.position.z), { n: 50, couleur: '#facc15', taille: .4, vitesse: 5, monte: 4, duree: 2 }); moi.jouer('content'); },
     async construireEnclosAnime(type) {
@@ -576,7 +596,12 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
 
   /* ── la sauvegarde automatique ── */
   let sale = true;
-  J.surChangement(quoi => { sale = true; majHud(); if (quoi === 'dindies' || quoi === 'compagnon') syncDindies(); });
+  let piecesAvant = E().pieces;
+  J.surChangement(quoi => {
+    sale = true; majHud(); if (quoi === 'dindies' || quoi === 'compagnon') syncDindies();
+    /* le petit « tching » des pièces gagnées */
+    if (quoi === 'pieces') { if (E().pieces > piecesAvant) bruit('pieces'); piecesAvant = E().pieces; }
+  });
   function sauver() {
     const pos = [+moi.racine.position.x.toFixed(2), +moi.racine.position.z.toFixed(2)];
     E().monde.lieu = monde.id; E().monde.positions[monde.id] = pos;
@@ -616,8 +641,6 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     ombreRonde.position.set(p.x, p.y + .03, p.z);
     if (anneau.visible) { anneau.userData.t += dt; anneau.scale.setScalar(1 + Math.sin(anneau.userData.t * 6) * .15); }
     placerCamera(dt);
-    const sd = soleil.userData.dir || [.5, 1, .5];
-    soleil.position.set(soleil.target.position.x + sd[0] * 30, sd[1] * 30, soleil.target.position.z + sd[2] * 30);
     /* le bouton d'action */
     const I = fenetreOuverte() || enDialogue() || captureActive() || camCourse ? null : plusProche();
     const b = $('#hAction');
@@ -657,7 +680,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
         if (A.prochaineAction < 0) {
           A.prochaineAction = 4 + Math.random() * 7;
           const r = Math.random(); m.jouer(r < .5 ? 'picore' : r < .8 ? 'glouglou' : 'roue');
-          if (r >= .5 && r < .8 && Math.hypot(q.x - moi.racine.position.x, q.z - moi.racine.position.z) < 9) glouglou(1 + Math.random() * .3);
+          if (r >= .5 && r < .8) { const dj = Math.hypot(q.x - moi.racine.position.x, q.z - moi.racine.position.z); if (dj < 9) crier(A.d, { volume: dj < 4 ? .75 : .5 }); }
         }
       } else {
         const dx = A.cible[0] - q.x, dz = A.cible[1] - q.z, d = Math.hypot(dx, dz);
@@ -757,7 +780,7 @@ export function demarrerJeu({ idProfil, etat, changerProfil }) {
     enCourse = true; const avant = occupe; occupe = true; chemin = null; anneau.visible = false;
     let res = null;
     try {
-      ambianceMusique('course', false);
+      ambianceMusique(def.finale || def.gagner ? 'grandeCourse' : 'course', false);
       const { C, nettoyer } = await lancerCourse(def, d, {
         lieu: monde, chaqueImage, nuit: nuitK > .5, nomJoueuse: 'Roullieee', particules, equipe,
         cadrer: on => { camCourse = on; if (!on) { cible.copy(moi.racine.position); placerCamera(1); } },

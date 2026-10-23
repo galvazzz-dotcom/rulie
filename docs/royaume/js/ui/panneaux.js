@@ -5,10 +5,12 @@ import { ESPECES, PAR_ID } from '../donnees/especes.js';
 import { TYPES, RARETES, ORDRE_TYPES } from '../donnees/types.js';
 import { variante } from '../dindies/adn.js';
 import { portraitDindie } from '../dindies/portrait.js';
-import { fenetre, toast, $, $$, el, echapper, barre, fermerTout, fenetreOuverte, enDialogue } from '../moteur/ui.js';
-import { pop, tada, glouglou } from '../moteur/sons.js';
+import { fenetre, toast, $, $$, el, echapper, barre, fermerTout, fenetreOuverte, enDialogue, dialogue } from '../moteur/ui.js';
+import { pop, tada, bruit } from '../moteur/sons.js';
+import { crier } from '../jeu/cris.js';
+import { astuce, ouvrirAstuces } from './astuces.js';
 import * as J from '../jeu/etat.js';
-import { OBJETS, enBoutique, meilleurFilet } from '../jeu/objets.js';
+import { OBJETS, enBoutique, meilleurFilet, resteDuJour, noterAchat } from '../jeu/objets.js';
 import { texteConditions, regleDe, REGIONS } from '../donnees/regions.js';
 import * as EL from '../jeu/elevage.js';
 import { ouvrirEveil, duree } from './elevage.js';
@@ -20,7 +22,8 @@ import { ORDRE_ENCLOS } from '../monde/domaine.js';
 import * as PR from '../jeu/production.js';
 import * as QD from '../jeu/quetesDomaine.js';
 import * as GQ from '../jeu/grandesQuetes.js';
-import { PERSONNAGES } from '../personnages/chibi.js';
+import { PERSONNAGES, portraitChibi } from '../personnages/chibi.js';
+import * as DB from '../jeu/doublons.js';
 import { CHAPEAUX, DECORATIONS } from '../donnees/production.js';
 import { boutonsFiche, brancherFiche, boutonRelacher, blocAmeliorer, brancherAmeliorer, plumesHtml, proposerHabitat } from './production.js';
 import * as DF from '../jeu/defis.js';
@@ -47,12 +50,14 @@ export function ouvrirBoutique() {
     F.contenu.innerHTML = `<p class="bourse">Tu as <b>${E().pieces} 🪙</b></p><div class="rayons">` + ids.map(id => {
       const O = OBJETS[id], q = id === 'friandise' || O.prefere || O.graine ? 5 : 1;
       return `<div class="article"><span class="em">${O.e}</span><div><b>${O.nom}</b><small>${O.desc}</small><small class="possede">Tu en as : ${J.combien(id)}</small></div>
-        <button class="btn acheter" data-id="${id}" data-q="${q}" ${E().pieces < O.prix * q ? 'disabled' : ''}>${q > 1 ? q + ' pour ' : ''}${O.prix * q} 🪙</button></div>`;
+        ${O.parJour ? `<small class="possede">Mimi en a encore ${resteDuJour(id, E())} aujourd’hui</small>` : ''}
+        <button class="btn acheter" data-id="${id}" data-q="${q}" ${E().pieces < O.prix * q || resteDuJour(id, E()) < q ? 'disabled' : ''}>${q > 1 ? q + ' pour ' : ''}${O.prix * q} 🪙</button></div>`;
     }).join('') + '</div>';
     $$('.acheter', F.contenu).forEach(b => b.onclick = () => {
       const id = b.dataset.id, q = +b.dataset.q;
+      if (resteDuJour(id, E()) < q) { toast('Mimi n’en a plus aujourd’hui : reviens demain !'); return; }
       if (!J.depenser(OBJETS[id].prix * q)) { toast('Il te manque des pièces !'); return; }
-      J.ajouterObjet(id, q); pop(); toast(`${OBJETS[id].e} ${OBJETS[id].nom}${q > 1 ? ' × ' + q : ''} : merci !`);
+      noterAchat(id, q, E()); J.ajouterObjet(id, q); pop(); toast(`${OBJETS[id].e} ${OBJETS[id].nom}${q > 1 ? ' × ' + q : ''} : merci !`);
       S.evenement('achat', id); dessiner();
     });
   };
@@ -60,14 +65,17 @@ export function ouvrirBoutique() {
 }
 
 /* ── le Labo : le Professeur, le Grand Livre, les talents, des conseils ── */
-export function ouvrirLabo() {
+export function ouvrirLabo({ surChange } = {}) {
   const F = fenetre('🔬 Le Labo du Professeur', `<div class="menuLabo">
     <button class="btn grand" id="lLivre">📖 Ouvrir le Grand Livre</button>
     <button class="btn grand jaune" id="lTalents">⭐ Lire les talents de mes dindies</button>
     ${S.etapeAtteinte('parlerPlumeau4') ? '<button class="btn grand" id="lEveil">🌟 L’éveil</button>' : ''}
+    ${DB.especesAvecDoubles().length ? '<button class="btn grand" id="lEtude">🔬 Étudier un double</button>' : ''}
     <button class="btn grand vert" id="lConseil">💡 Un conseil, Professeur ?</button></div>`);
+  if (DB.especesAvecDoubles().length) astuce('talents', F);
   $('#lLivre', F.el).onclick = () => { pop(); ouvrirLivre(); };
   const ev = $('#lEveil', F.el); if (ev) ev.onclick = () => { pop(); F.fermer(); ouvrirEveil(); };
+  const et = $('#lEtude', F.el); if (et) et.onclick = () => { pop(); F.fermer(); ouvrirEtude({ surChange }); };
   $('#lTalents', F.el).onclick = () => {
     pop();
     const T = fenetre('⭐ Les talents', E().dindies.length ? `<p class="petitTexte">Chaque dindie a de 0 à 5 étoiles de talent par stat. Les bébés héritent des talents de leurs parents !</p>` +
@@ -87,6 +95,39 @@ export function ouvrirLabo() {
   };
 }
 
+/* ── étape 9 : le Professeur étudie un double ; la meilleure de l'espèce apprend de lui ── */
+const ST = ['⚡', '💪', '🦘'];
+const talentsTexte = d => ST.map((e, i) => `${e} ${'⭐'.repeat(d.talents[i])}${d.talents[i] ? '' : '–'}`).join(' · ');
+export function ouvrirEtude({ surChange } = {}) {
+  const F = fenetre('🔬 Étudier un double', '', { classe: 'etudeF', large: true });
+  const dessiner = () => {
+    const L = DB.especesAvecDoubles();
+    F.contenu.innerHTML = `<p class="petitTexte">Le Professeur étudie une dindie dont tu as un double, puis la rend à la nature. Ta <b>meilleure</b> dindie de la même espèce apprend d’elle :
+      de l’expérience, et <b>une étoile de talent</b> si le double en avait plus qu’elle sur une stat.</p>` + (L.length ? L.map(esp => {
+      const M = DB.meilleure(esp), autres = DB.memeEspece(esp).filter(d => d !== M);
+      return `<h3>${PAR_ID[esp].nom} <small>(${autres.length + 1})</small></h3>
+        <div class="etudeLigne meilleure"><div class="mini">${portrait(M)}</div><div><b>🏆 ${echapper(nomDe(M))}</b><small>niv. ${M.niveau} · ${talentsTexte(M)}</small></div></div>
+        ${autres.map(d => { const err = DB.peutEtudier(d), A = !err && DB.apercu(d);
+          return `<div class="etudeLigne"><div class="mini">${portrait(d)}</div><div><b>${echapper(nomDe(d))}${d.chroma ? ' ✨' : ''}</b><small>niv. ${d.niveau} · ${talentsTexte(d)}</small>
+            <small>${err ? '🔒 ' + err : `➡️ + ${A.xp} XP${A.talent !== null ? ` et ⭐ en ${ST[A.talent]}` : ''} pour ${echapper(nomDe(M))}`}</small></div>
+            ${err ? '' : `<button class="btn petit" data-etudier="${d.uid}">🔬 Étudier</button>`}</div>`; }).join('')}`;
+    }).join('') : '<p class="vide">Tu n’as pas de double à étudier. Attrape plusieurs dindies de la même espèce !</p>');
+    $$('[data-etudier]', F.contenu).forEach(b => b.onclick = async () => {
+      const d = J.parUid(b.dataset.etudier), A = DB.apercu(d); if (!A) return;
+      const prof = { nom: PERSONNAGES.plumeau.nom, portrait: portraitChibi(PERSONNAGES.plumeau, 'dlgEtude'), couleur: PERSONNAGES.plumeau.couleur };
+      const c = await dialogue([{ qui: prof, texte: `J’étudie ${echapper(nomDe(d))}, puis je la rends à la nature ? ${echapper(nomDe(A.M))} gagnera ${A.xp} XP${A.talent !== null ? ` et une étoile de talent en ${ST[A.talent]}` : ''}.`,
+        choix: [['oui', '🔬 Oui, étudie-la'], ['non', '🙅 Non, je la garde']] }]);
+      if (c !== 'oui') return;
+      const r = DB.etudier(d); if (typeof r === 'string') { toast('⚠️ ' + r); return; }
+      tada(); crier(r.M);
+      toast(`🔬 ${nomDe(r.M)} apprend : + ${r.xp} XP${r.talent !== null ? ` et ⭐ en ${ST[r.talent]} !` : ''}${r.niv ? ` · ⬆️ niveau ${r.niv.apres} !` : ''}`, { duree: 4200, classe: 'grand' });
+      surChange && surChange(); dessiner();
+    });
+  };
+  dessiner();
+  return F;
+}
+
 /* ── le Grand Livre : 72 pages, avec les silhouettes des espèces pas encore trouvées ── */
 export function ouvrirLivre() {
   const L = E().livre, vus = Object.keys(L.vus).length, att = Object.keys(L.attrapes).length;
@@ -98,7 +139,7 @@ export function ouvrirLivre() {
       <div class="filtres">${[['toutes', 'Toutes'], ...Object.keys(RARETES).map(k => [k, PASTILLE[k] + ' ' + RARETES[k].nom]), ...ORDRE_TYPES.map(t => [t, TYPES[t].e])].map(([k, t]) => `<button data-f="${k}" class="${k === filtre ? 'on' : ''}">${t}</button>`).join('')}</div>
       <div class="grille">${liste.map(e => {
         const a = L.attrapes[e.id], v = L.vus[e.id];
-        return `<button class="case ${e.rarete} ${a ? '' : v ? 'vue' : 'inconnue'}" data-id="${e.id}" style="--rar:${RARETES[e.rarete].couleur}"><span>${e.n}</span>${a ? '<em>✅</em>' : ''}${L.chromas && L.chromas[e.id] ? '<em class="chromaL">✨</em>' : ''}${portraitEsp(e.id, { silhouette: !v })}</button>`;
+        return `<button class="case ${e.rarete} ${a ? '' : v ? 'vue' : 'inconnue'}" data-id="${e.id}" style="--rar:${RARETES[e.rarete].couleur}"><span>${e.n}</span>${a ? '<em>✅</em>' : ''}${DB.memeEspece(e.id).length > 1 ? `<i class="nbLivre">× ${DB.memeEspece(e.id).length}</i>` : ''}${L.chromas && L.chromas[e.id] ? '<em class="chromaL">✨</em>' : ''}${portraitEsp(e.id, { silhouette: !v })}</button>`;
       }).join('')}</div>`;
     $$('.filtres button', F.contenu).forEach(b => b.onclick = () => { pop(); filtre = b.dataset.f; dessiner(); });
     $$('.case', F.contenu).forEach(b => b.onclick = () => { pop(); pageLivre(b.dataset.id); });
@@ -121,12 +162,15 @@ function indice(e) {
 }
 function pageLivre(id) {
   const e = PAR_ID[id], a = E().livre.attrapes[id], v = E().livre.vus[id], R = RARETES[e.rarete];
-  fenetre(v ? e.nom : `N° ${e.n} : ???`, `<div class="pageLivre" style="--rar:${R.couleur}">
+  const F = fenetre(v ? e.nom : `N° ${e.n} : ???`, `<div class="pageLivre" style="--rar:${R.couleur}">
     <div class="grandPortrait">${portraitEsp(id, { silhouette: !v })}</div>
     <p><span class="pill rar">${PASTILLE[e.rarete]} ${R.nom}</span> ${v ? e.types.map(t => `<span class="pill">${TYPES[t].e} ${TYPES[t].nom}</span>`).join(' ') : ''}</p>
-    ${a ? `<p>${e.desc}</p><p class="cri">« ${e.cri} »</p>${['⚡ Vitesse', '💪 Endurance', '🦘 Saut'].map((t, i) => `<div class="stat"><span>${t}</span>${barre(e.stats[i] / 10, R.couleur)}<b>${e.stats[i]}</b></div>`).join('')}`
+    ${a ? `<p>${e.desc}</p><p class="cri">« ${e.cri} » <button class="btn petit ecouter" id="lCri" title="Écouter son cri" aria-label="Écouter son cri">🔊</button></p>${['⚡ Vitesse', '💪 Endurance', '🦘 Saut'].map((t, i) => `<div class="stat"><span>${t}</span>${barre(e.stats[i] / 10, R.couleur)}<b>${e.stats[i]}</b></div>`).join('')}`
       : v ? `<p>Tu l’as déjà vue, mais pas encore attrapée.</p>` : '<p>Tu ne l’as encore jamais vue…</p>'}
+    ${DB.memeEspece(id).length ? `<p class="petitTexte">🦃 Tu en as <b>${DB.memeEspece(id).length}</b>. Ta meilleure : ${echapper(nomDe(DB.meilleure(id)))} (${talentsTexte(DB.meilleure(id))}).</p>` : ''}
     <p class="indice">${indice(e)}</p>${v && regleDe(id) ? `<p class="indice">🔎 ${texteConditions(id, nomObjet)}.</p>` : ''}</div>`);
+  bruit('page');
+  const b = $('#lCri', F.el); if (b) b.onclick = () => crier(id);
 }
 
 /* ── le Musée : les portraits des espèces attrapées, dans des cadres dorés ── */
@@ -146,7 +190,7 @@ export function ouvrirFiche(d, { surChange } = {}) {
     const e = PAR_ID[d.espece], R = RARETES[e.rarete], st = stats(d), C = CARACTERES[d.caractere], max = stats({ ...d, niveau: 50 });
     F.titre(`${e.types.map(t => TYPES[t].e).join('')} ${echapper(nomDe(d))}`);
     F.contenu.innerHTML = `<div class="ficheHaut" style="--rar:${R.couleur}"><div class="grandPortrait">${portrait(d)}</div>
-      <div><p class="nomEsp">${e.nom} ${d.chroma ? '✨' : ''}</p><p><span class="pill rar">${PASTILLE[e.rarete]} ${R.nom}</span></p>
+      <div><p class="nomEsp">${e.nom} ${d.chroma ? '✨' : ''} <button class="btn petit ecouter" id="fCri" title="Écouter son cri" aria-label="Écouter son cri">🔊</button></p><p><span class="pill rar">${PASTILLE[e.rarete]} ${R.nom}</span></p>
       <p class="niv">Niveau <b>${d.niveau}</b> <small>${d.niveau < 50 ? `${d.xp} / ${xpPourNiveau(d.niveau)} XP` : 'max'}</small></p>${barre(d.xp / xpPourNiveau(d.niveau), '#3b82f6')}
       <p class="coeurs" title="Bonheur">${'❤️'.repeat(Math.round(d.bonheur / 20))}<i class="eteinte">${'❤️'.repeat(5 - Math.round(d.bonheur / 20))}</i></p></div></div>
       ${['⚡ Vitesse', '💪 Endurance', '🦘 Saut'].map((t, i) => `<div class="stat"><span>${t}</span><div class="barreP double"><i style="width:${max[i]}%"></i><b style="width:${st[i]}%;background:${R.couleur}"></b></div><b>${st[i]}</b><small>${etoiles(d.talents[i])}</small></div>`).join('')}
@@ -172,14 +216,15 @@ export function ouvrirFiche(d, { surChange } = {}) {
       if (err) { toast('⚠️ ' + err); return; }
       pop(); toast(`${nomDe(d)} → ${lieuTexte(d.lieu)}`); S.evenement('deplacement', d.uid); surChange && surChange(); dessiner();
     });
+    $('#fCri', F.el).onclick = () => crier(d);
     $('#fCaresse', F.el).onclick = () => {
       const t = Date.now();
       if (t - (d.derniereCaresse || 0) < 20000) { toast(`${nomDe(d)} a déjà eu plein de câlins. Reviens dans un moment !`); return; }
-      d.derniereCaresse = t; d.bonheur = Math.min(100, d.bonheur + 5); glouglou(1.2); toast(`💗 ${nomDe(d)} adore les câlins !`); J.changer('dindies'); window.dispatchEvent(new CustomEvent('dindie-joie', { detail: d.uid })); dessiner();
+      d.derniereCaresse = t; d.bonheur = Math.min(100, d.bonheur + 5); crier(d, { hauteur: 1.06 }); toast(`💗 ${nomDe(d)} adore les câlins !`); J.changer('dindies'); window.dispatchEvent(new CustomEvent('dindie-joie', { detail: d.uid })); dessiner();
     };
     $('#fMiam', F.el).onclick = () => {
       const r = EL.nourrir(d); if (!r) return;
-      glouglou(1.1); tada();
+      crier(d); tada();
       toast(`${OBJETS[r.id].e} Miam ! ${nomDe(d)} se régale${r.pref ? ' : sa friandise préférée !' : ''}${r.gourmande ? ' (deux fois plus, elle est gourmande !)' : ''}${r.bebe ? ' Elle grandit plus vite (− 3 min).' : ''}`, { cle: 'miam' });
       if (r.niv) niveauToast(d, r.niv);
       J.changer('dindies'); window.dispatchEvent(new CustomEvent('dindie-joie', { detail: d.uid }));
@@ -187,7 +232,7 @@ export function ouvrirFiche(d, { surChange } = {}) {
     };
     const bi = $('#fBiscuit', F.el); if (bi) bi.onclick = () => {
       if (!J.retirerObjet('biscuit')) return;
-      const niv = EL.donnerXp(d, EL.XP.biscuit); tada(); glouglou(1.2);
+      const niv = EL.donnerXp(d, EL.XP.biscuit); tada(); crier(d, { hauteur: 1.06 });
       toast(`🍘 + 150 XP pour ${nomDe(d)} !`, { cle: 'biscuit' }); if (niv) niveauToast(d, niv);
       window.dispatchEvent(new CustomEvent('dindie-joie', { detail: d.uid })); dessiner();
     };
@@ -312,9 +357,9 @@ export function ouvrirJournal() {
   }).join('');
   /* en haut : les défis du jour et les succès (étape 8) */
   const nb = DF.aReclamer();
-  h = `<div class="ligneBtn journalHaut"><button class="btn petit jaune" data-pan="defis">📅 Les défis${nb ? ` <i class="pastille">${nb}</i>` : ''}</button><button class="btn petit jaune" data-pan="succes">🏆 ${SU.nbObtenus()} / ${SU.SUCCES.length} succès</button></div>` + h;
+  h = `<div class="ligneBtn journalHaut"><button class="btn petit jaune" data-pan="defis">📅 Les défis${nb ? ` <i class="pastille">${nb}</i>` : ''}</button><button class="btn petit jaune" data-pan="astuces">💡 Les astuces</button><button class="btn petit jaune" data-pan="succes">🏆 ${SU.nbObtenus()} / ${SU.SUCCES.length} succès</button></div>` + h;
   const F = fenetre('📜 Journal des quêtes', h);
-  $$('[data-pan]', F.el).forEach(b => b.onclick = () => { pop(); F.fermer(); ouvrirPanneau({ onglet: b.dataset.pan, journal: ouvrirJournal }); });
+  $$('[data-pan]', F.el).forEach(b => b.onclick = () => { pop(); F.fermer(); if (b.dataset.pan === 'astuces') ouvrirAstuces(); else ouvrirPanneau({ onglet: b.dataset.pan, journal: ouvrirJournal }); });
 }
 
 /* ── la carte du lieu où l'on est (on peut toucher un endroit pour y aller) ── */
@@ -341,10 +386,16 @@ export function ouvrirMaison({ appliquerReglages, changerProfil, idProfil }) {
     <h3>⚙️ Réglages</h3>
     <label class="reglage"><input type="checkbox" id="mSon" ${r.son ? 'checked' : ''}> 🔊 Les sons</label>
     <label class="reglage"><input type="checkbox" id="mMus" ${r.musique ? 'checked' : ''}> 🎵 La musique</label>
-    <label class="reglage"><input type="checkbox" id="mVoix" ${r.voix ? 'checked' : ''}> 🗣️ La voix lit les dialogues</label>
-    <label class="reglage"><input type="checkbox" id="mAide" ${r.aide ? 'checked' : ''}> 🧸 Mode aide : la capture est plus facile</label>
+    <label class="reglage"><input type="checkbox" id="mVoix" ${r.voix ? 'checked' : ''}> 🗣️ La voix lit les dialogues et les messages</label>
+    <label class="reglage"><input type="checkbox" id="mAide" ${r.aide ? 'checked' : ''}> 🧸 Mode aide : la capture et les courses sont plus faciles, les minuteurs vont 2 fois plus vite</label>
     <label class="reglage">🕐 L’heure du jeu :
       <select id="mHeure"><option value="vraie">la vraie heure</option><option value="jour">toujours le jour</option><option value="nuit">toujours la nuit</option></select></label>
+    <h3>♿ Le confort</h3>
+    <label class="reglage"><input type="checkbox" id="mGrands" ${r.grandsTextes ? 'checked' : ''}> 🔠 Les textes en grand</label>
+    <label class="reglage"><input type="checkbox" id="mCalme" ${r.calme ? 'checked' : ''}> 🐢 Moins d’animations</label>
+    <label class="reglage"><input type="checkbox" id="mDalto" ${r.daltonien ? 'checked' : ''}> 🎨 Des couleurs faciles à distinguer (la zone de capture en bleu)</label>
+    <label class="reglage"><input type="checkbox" id="mLegere" ${r.legere ? 'checked' : ''}> 🔋 Une image plus légère (pour les petits téléphones et la batterie)</label>
+    <div class="ligneBtn"><button class="btn petit jaune" id="mAstuces">💡 Le carnet d’astuces</button></div>
     <h3>💾 Sauvegarde</h3>
     <p class="petitTexte">Le jeu se sauvegarde tout seul sur cet appareil. Pour ne jamais perdre ta partie (ou la continuer ailleurs), garde ton <b>code de sauvegarde</b>.</p>
     <div class="ligneBtn"><button class="btn" id="mCode">📋 Voir mon code</button><button class="btn jaune" id="mFichier">⬇️ Télécharger</button></div>
@@ -355,8 +406,15 @@ export function ouvrirMaison({ appliquerReglages, changerProfil, idProfil }) {
     <button class="btn" id="mProfil">👥 Changer de profil</button>
     <h3>🎵 Crédits</h3><div class="ligneBtn"><button class="btn petit" id="mCredits">🎶 Les musiques du jeu</button><button class="btn petit" id="mPrologue">🌙 Revoir le prologue</button>${S.etapeAtteinte('fin') ? '<button class="btn petit jaune" id="mGenerique">🌈 Revoir le générique</button>' : ''}</div>`);
   $('#mHeure', F.el).value = r.heure;
-  const maj = () => { r.son = $('#mSon', F.el).checked; r.musique = $('#mMus', F.el).checked; r.voix = $('#mVoix', F.el).checked; r.aide = $('#mAide', F.el).checked; r.heure = $('#mHeure', F.el).value; appliquerReglages(); J.changer('reglages'); };
-  ['#mSon', '#mMus', '#mVoix', '#mAide', '#mHeure'].forEach(s => $(s, F.el).onchange = maj);
+  const maj = () => {
+    /* le mode aide, c'est aussi la voix qui lit tout (on peut la recouper juste après) */
+    if ($('#mAide', F.el).checked && !r.aide) $('#mVoix', F.el).checked = true;
+    r.son = $('#mSon', F.el).checked; r.musique = $('#mMus', F.el).checked; r.voix = $('#mVoix', F.el).checked; r.aide = $('#mAide', F.el).checked; r.heure = $('#mHeure', F.el).value;
+    r.grandsTextes = $('#mGrands', F.el).checked; r.calme = $('#mCalme', F.el).checked; r.daltonien = $('#mDalto', F.el).checked; r.legere = $('#mLegere', F.el).checked;
+    appliquerReglages(); J.changer('reglages');
+  };
+  ['#mSon', '#mMus', '#mVoix', '#mAide', '#mHeure', '#mGrands', '#mCalme', '#mDalto', '#mLegere'].forEach(s => $(s, F.el).onchange = maj);
+  $('#mAstuces', F.el).onclick = () => { pop(); ouvrirAstuces(); };
   $('#mCredits', F.el).onclick = () => { pop(); credits(); };
   $('#mPrologue', F.el).onclick = () => { pop(); F.fermer(); import('../scenes/titre.js').then(m => m.prologue()); };
   const gen = $('#mGenerique', F.el); if (gen) gen.onclick = () => { pop(); F.fermer(); import('./generique.js').then(m => m.ouvrirGenerique()); };
@@ -389,7 +447,7 @@ export function choisirStarter() {
       <div id="sNom" class="cache renommer"><p>Comment veux-tu l’appeler ?</p><input id="sInput" maxlength="14"><button class="btn jaune" id="sDe">🎲</button><button class="btn vert grand" id="sOk">✅ C’est elle !</button></div>`,
       { classe: 'starterF', large: true, surFermer: () => resoudre(choisie) });
     $$('.starter', F.el).forEach(b => b.onclick = () => {
-      $$('.starter', F.el).forEach(x => x.classList.toggle('choisi', x === b)); glouglou(1.25);
+      $$('.starter', F.el).forEach(x => x.classList.toggle('choisi', x === b)); crier(b.dataset.id);
       $('#sNom', F.el).classList.remove('cache'); const i = $('#sInput', F.el);
       if (!i.value) i.value = NOMS_RIGOLOS[Math.floor(Math.random() * NOMS_RIGOLOS.length)];
       F.el.dataset.choix = b.dataset.id;
@@ -432,8 +490,10 @@ export function voeu(effet) {
 /* ── les crédits des musiques (toutes libres : voir musique/CREDITS.md) ── */
 export function credits() {
   fenetre('🎶 Les musiques', `<p class="petitTexte">Toutes les musiques du jeu sont libres. Merci à leurs auteurs !</p>
-    <h3>Domaine public</h3><p>• <b>Searchlight Rag</b> — Scott Joplin (1907)<br>• <b>Something Doing Rag</b> — Scott Joplin et Scott Hayden (1903)<br>• <b>Das Alpenhorn</b> (orgue de foire) — air traditionnel<br>• <b>El Capitan</b> (orgue de foire) — John Philip Sousa (1896)<br>• <b>Unter dem Doppeladler</b> (orgue de foire) — Josef Franz Wagner (1893)<br><small>Versions du projet libre <b>OpenRCT2 OpenMusic</b>.</small></p>
-    <h3>CC BY-SA 3.0</h3><p>• <b>Harvest Festival</b>, <b>Albian Nocturne</b>, <b>Solstice Festival</b>, <b>Mountain Idyll</b>, <b>Peaks of Atlas</b>, <b>Mirage</b>, <b>Water’s Edge</b><br>
+    <h3>Domaine public</h3><p>• <b>Searchlight Rag</b> — Scott Joplin (1907)<br>• <b>Something Doing Rag</b> — Scott Joplin et Scott Hayden (1903)<br>• <b>Das Alpenhorn</b> (orgue de foire) — air traditionnel<br>• <b>El Capitan</b> (orgue de foire) — John Philip Sousa (1896)<br>• <b>Unter dem Doppeladler</b> (orgue de foire) — Josef Franz Wagner (1893)<br>• <b>Slavonic Dance</b> (orgue de foire) — air traditionnel<br><small>Versions du projet libre <b>OpenRCT2 OpenMusic</b>.</small></p>
+    <h3>CC BY-SA 4.0</h3><p>• <b>Snowbound</b> — Silver Aura, Jalmaan et Greyfade<br>• <b>The Ancient Lands</b> — Flyxxpy<br>• <b>Mystic Winds</b> — Skyshard<br>
+    <small>Musiques du projet libre <b>OpenRCT2 OpenMusic</b> (github.com/OpenRCT2/OpenMusic), licence Creative Commons Attribution - Partage dans les mêmes conditions 4.0. Converties en MP3, volume égalisé.</small></p>
+    <h3>CC BY-SA 3.0</h3><p>• <b>Harvest Festival</b>, <b>Albian Nocturne</b>, <b>Solstice Festival</b>, <b>Mountain Idyll</b>, <b>Peaks of Atlas</b>, <b>Mirage</b>, <b>Water’s Edge</b>, <b>Eastern Dreams</b>, <b>Sands of Time</b>, <b>Harvest Moon</b>, <b>Elysian Fields</b>, <b>Sunrise</b><br>
     <small>Musique d’<b>Omri Lahav</b> pour le jeu libre <b>0 A.D.</b>, © Wildfire Games (wildfiregames.com), licence Creative Commons Attribution - Partage dans les mêmes conditions 3.0. Converties en MP3, volume égalisé.</small></p>
     <p class="petitTexte">Le détail est dans le fichier <code>musique/CREDITS.md</code> du jeu.</p>`);
 }

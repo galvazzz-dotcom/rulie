@@ -18,25 +18,29 @@ export function fenetre(titre, contenu, { classe = '', surFermer = null, large =
   document.body.appendChild(f);
   const F = { el: f, contenu: c, fermer: () => {
     const i = pile.indexOf(F); if (i < 0) return;
-    pile.splice(i, 1); f.remove(); surFermer && surFermer();
+    pile.splice(i, 1); f.remove(); if (!pile.length) document.body.classList.remove('fenetreOuverte'); surFermer && surFermer();
   }, titre: t => { $('.ruban', f).innerHTML = t; } };
   $('.fermer', f).onclick = () => { pop(); F.fermer(); };
   f.addEventListener('pointerdown', ev => { if (ev.target === f) { pop(); F.fermer(); } });
-  pile.push(F);
+  pile.push(F); document.body.classList.add('fenetreOuverte');
   return F;
 }
+/* la touche Échap ferme la dernière fenêtre ouverte */
+addEventListener('keydown', ev => { if (ev.key === 'Escape' && pile.length && !dialogueEnCours) { ev.preventDefault(); fermerDerniere(); } });
 export function fermerTout() { while (pile.length) pile[pile.length - 1].fermer(); }
 export function fermerDerniere() { if (pile.length) { pile[pile.length - 1].fermer(); return true; } return false; }
 
 /* ── les petites notifications ── */
 /* cle : un nouveau message avec la même clé remplace l'ancien (au lieu de s'empiler) ; 4 messages au plus à l'écran */
 export function toast(texte, { duree = 2600, classe = '', cle = '' } = {}) {
-  let z = $('#toasts'); if (!z) { z = el('<div id="toasts"></div>'); document.body.appendChild(z); }
+  let z = $('#toasts'); if (!z) { z = el('<div id="toasts" role="status" aria-live="polite"></div>'); document.body.appendChild(z); }
   let t = cle ? [...z.children].find(x => x.dataset.cle === cle && !x.classList.contains('part')) : null;
   if (t) { t.innerHTML = texte; clearTimeout(t.fin); t.style.animation = 'none'; void t.offsetWidth; t.style.animation = ''; }
   else { t = el(`<div class="toast ${classe}">${texte}</div>`); if (cle) t.dataset.cle = cle; z.appendChild(t); }
   const partir = x => { x.classList.add('part'); setTimeout(() => x.remove(), 400); };
   t.fin = setTimeout(() => partir(t), duree);
+  /* la voix lit aussi les grands messages (pas pendant un dialogue : elle lit déjà le dialogue) */
+  if (/\bgrand\b/.test(classe) && !dialogueEnCours) dire(texte);
   const restent = [...z.children].filter(x => !x.classList.contains('part'));
   for (const x of restent.slice(0, Math.max(0, restent.length - 4))) { clearTimeout(x.fin); partir(x); }
 }
@@ -47,7 +51,7 @@ let dialogueEnCours = null;
 export const enDialogue = () => !!dialogueEnCours;
 export function dialogue(lignes) {
   return new Promise(resoudre => {
-    const b = el(`<div class="dialogue"><div class="dPortrait"></div><div class="dBulle"><div class="dNom"></div><div class="dTexte"></div><div class="dChoix"></div><div class="dSuite">▶</div></div></div>`);
+    const b = el(`<div class="dialogue" role="dialog" aria-live="polite"><div class="dPortrait"></div><div class="dBulle"><div class="dNom"></div><div class="dTexte"></div><div class="dChoix"></div><div class="dSuite">▶</div></div></div>`);
     document.body.appendChild(b);
     let i = -1, ecrit = 0, plein = '', minuteur = null, choixFait = null;
     const suivante = () => {

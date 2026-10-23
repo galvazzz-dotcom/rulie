@@ -124,6 +124,7 @@ export function texteConditions(espece, nomObjet = id => id) {
   if (r.quand) t.push(QUAND[r.quand]);
   if (r.meteo) t.push(METEO[r.meteo]);
   if (r.equipement) t.push('il faut ' + nomObjet(r.equipement));
-  if (r.quete) t.push('après une quête de ' + REGIONS[r.region].nom.replace(/^(Le |La |Les )/, m => m.toLowerCase()));
+  /* (« des Prés », « du Maroc imaginaire », « de la Belgique ») */
+  if (r.quete) t.push('après une quête ' + REGIONS[r.region].nom.replace(/^(Les |Le |La )/, m => ({ 'Les ': 'des ', 'Le ': 'du ', 'La ': 'de la ' })[m]));
   return t.filter(Boolean).join(' · ');
 }

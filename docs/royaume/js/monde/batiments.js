@@ -93,7 +93,7 @@ export function labo() {
   /* la porte vitrée, le grand hublot, les fenêtres */
   p.push(B('#1e3a8a', [0, 1.4, 3.02], [1.9, 2.6, .14])); f.push(B('#bfe3ff', [-.46, 1.4, 3.1], [.8, 2.4, .05]), B('#bfe3ff', [.46, 1.4, 3.1], [.8, 2.4, .05]));
   p.push(B('#cbd5e1', [0, .18, 3.5], [2.4, .36, 1.1]));
-  p.push(TO('#2563eb', [-2.7, 2.5, 3.04], [.85, .85, .6], [0, 0, 0], .16)); f.push(CY('#bfe3ff', [-2.7, 2.5, 3.04], [.82, .06, .82], [Math.PI / 2, 0, 0], 24));
+  p.push(TO('#2563eb', [-2.7, 2.5, 3.04], [.85, .85, .6], [0, 0, 0], .16)); f.push(CY('#bfe3ff', [-2.7, 2.5, 3.06], [.82, .06, .82], [Math.PI / 2, 0, 0], 24));
   fenetre(p, f, 2.7, 2.5, 3.02, 1.3, 1.1, '#2563eb');
   for (const s of [-1, 1]) for (const z of [-1.5, 1.5]) fenetre(p, f, s * 4.05, 2.4, z, 1, 1, '#2563eb', 'x');
   /* des fioles sur le rebord */
@@ -130,13 +130,13 @@ export function musee() {
   for (let k = 0; k < 3; k++) p.push(B('#e7e5e4', [0, .12 + k * .24, .3 - k * .15], [7.6 - k * .5, .24, 6.2 - k * .4]));
   p.push(B('#fef3c7', [0, 2.2, -.6], [5.8, 3.2, 4]));
   for (const x of [-2.6, -.9, .9, 2.6]) p.push(CY('#f8fafc', [x, 2.2, 2.1], [.3, 3.2, .3], [0, 0, 0], 14), CY('#e7e5e4', [x, 3.85, 2.1], [.42, .2, .42]), CY('#e7e5e4', [x, .78, 2.1], [.42, .2, .42]));
-  p.push(B('#e7e5e4', [0, 4.05, .3], [7, .35, 5.2]), T('#fbbf24', [0, 4.2, .3], [7.2, 1.6, 5.4]), T('#f8fafc', [0, 4.3, 2.95], [5.2, 1.05, .1]));
+  p.push(B('#e7e5e4', [0, 4.05, .3], [7, .35, 5.2]), T('#fbbf24', [0, 4.2, .3], [7.2, 1.6, 5.4]), T('#f8fafc', [0, 4.3, 3], [5.2, 1.05, .1]));
   p.push(B('#7c2d12', [0, 1.6, 1.42], [1.4, 2.4, .12]));
   fenetre(p, f, -2, 2.4, 1.42, .8, 1.2, '#d97706'); fenetre(p, f, 2, 2.4, 1.42, .8, 1.2, '#d97706');
   /* une statue dorée de dindie devant */
   p.push(CY('#e7e5e4', [3.8, .5, 3.4], [.5, 1, .5]), SP('#facc15', [3.8, 1.45, 3.4], [.38, .36, .4]), SP('#facc15', [3.8, 1.98, 3.6], .2), CO('#fbbf24', [3.8, 1.9, 3.1], [.45, .55, .12], [-.8, 0, 0]));
   const g = construire(p, f);
-  const ban = pancarte('📖 Musée du Grand Livre', 3.6, .62, { fond: '#fffbeb', encre: '#92400e', bord: '#d97706' }); ban.position.set(0, 4.65, 3.02); g.add(ban);
+  const ban = pancarte('📖 Musée du Grand Livre', 3.6, .62, { fond: '#fffbeb', encre: '#92400e', bord: '#d97706' }); ban.position.set(0, 4.65, 3.1); g.add(ban);
   return { g, obst: [[0, .2, 7.8, 6.4], [3.8, 3.4, 1.2, 1.2]], porte: [0, 4.4] };
 }
 
@@ -345,8 +345,9 @@ export function port() {
 export function fontaine() {
   const p = [];
   p.push(CY('#d6d3d1', [0, .3, 0], [2.1, .6, 2.1], [0, 0, 0], 28), CY('#e7e5e4', [0, .62, 0], [2.2, .08, 2.2], [0, 0, 0], 28));
-  p.push(CY('#60a5fa', [0, .5, 0], [1.85, .1, 1.85], [0, 0, 0], 28));
-  p.push(CY('#d6d3d1', [0, 1.2, 0], [.25, 1.4, .25]), CY('#e7e5e4', [0, 1.95, 0], [.9, .2, .9], [0, 0, 0], 20), CY('#60a5fa', [0, 2.02, 0], [.75, .06, .75], [0, 0, 0], 20));
+  /* (l'eau dépasse un peu des vasques : deux surfaces au même niveau scintillent) */
+  p.push(CY('#60a5fa', [0, .64, 0], [1.85, .08, 1.85], [0, 0, 0], 28));
+  p.push(CY('#d6d3d1', [0, 1.2, 0], [.25, 1.4, .25]), CY('#e7e5e4', [0, 1.95, 0], [.9, .2, .9], [0, 0, 0], 20), CY('#60a5fa', [0, 2.04, 0], [.75, .06, .75], [0, 0, 0], 20));
   p.push(SP('#facc15', [0, 2.35, 0], [.24, .22, .26]), SP('#facc15', [0, 2.62, .12], .13));
   const g = construire(p, []);
   const n = 70, pos = new Float32Array(n * 3), etat = Array.from({ length: n }, (_, i) => [Math.random() * 1.2, i / n * Math.PI * 2]);

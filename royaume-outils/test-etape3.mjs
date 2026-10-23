@@ -11,6 +11,7 @@
    les achats chez Mimi ; vérifie la mémoire en changeant de lieu, la sauvegarde, et aucune erreur. */
 import { chromium } from 'playwright';
 import { mkdirSync } from 'fs';
+import { enPartie, reprendre, laisser } from './partie.mjs';
 const URL = process.argv[2] || 'http://localhost:8765/royaume/index.html';
 const [w, h, mob] = (process.argv[3] || '390,844,1').split(',').map(Number), OUT = process.argv[4] || 'captures-etape3';
 mkdirSync(OUT, { recursive: true });
@@ -92,7 +93,9 @@ await pg.waitForFunction(() => window.__jeu, null, { timeout: 60000 });
 const t0 = Date.now();
 try {
   /* une sauvegarde de l'étape 2, à la fin du chapitre 1 */
-  await pg.evaluate(() => {
+  /* (la partie complète : on reprend la vraie partie du test d'avant, avec un coup de pouce) */
+  if (enPartie()) await reprendre(pg, () => { window.__auMoins({ pieces: 650, inventaire: { friandise: 3 } }); });
+  else await pg.evaluate(() => {
     const J = window.__jeu, e = J.etat();
     e.version = 1; e.quete.etape = 'fin'; e.quete.finies = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7']; e.pieces = 650;
     Object.assign(e.inventaire, { grandLivre: 1, filet: 1, billet: 1, friandise: 3 }); e.batiments.montgolfiere.reparee = true; e.batiments.clapier.repare = true;
@@ -174,5 +177,6 @@ try {
 } catch (e) { console.log('❌', e.message); echecs++; await pg.screenshot({ path: `${OUT}/erreur.png` }); }
 verifier(!errs.length, `aucune erreur dans le navigateur${errs.length ? ' : ' + errs.join(' / ') : ''}`);
 console.log(echecs ? `\n❌ étape 3 : ${echecs} échec(s)` : '\n✅ étape 3 : le chapitre 2 est jouable de bout en bout');
+if (!echecs) await laisser(pg);
 await b.close();
 process.exit(echecs ? 1 : 0);

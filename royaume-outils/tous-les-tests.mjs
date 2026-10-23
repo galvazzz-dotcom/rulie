@@ -1,6 +1,10 @@
 /* Lancer tous les tests du Royaume des Dindies, l'un après l'autre, puis afficher un résumé.
    Usage : node royaume-outils/tous-les-tests.mjs [options]
-     --etapes=1,2,3,4,5,6,7,8  les tests à lancer (par défaut : tous)
+     --etapes=1,2,3,4,5,6,7,8,9  les tests à lancer (par défaut : tous)
+     --partie                  la partie complète : les étapes 2 à 8 jouées l'une après l'autre sur UNE seule partie
+                               (chaque test reprend la vraie sauvegarde du précédent ; voir partie.mjs), au premier format ;
+                               on s'arrête au premier échec
+     --depuis=5                avec --partie : reprendre à l'étape 5, avec la sauvegarde laissée par l'étape 4
      --formats=tel             les formats pour les tests 2 à 8 : tel, paysage, tablette, ordi, ou « tous »
                                (par défaut : tel ; le test 1 essaie déjà les 4 formats tout seul)
      --adresse=URL             tester un site déjà en ligne, par exemple https://galvazzz-dotcom.github.io/rulie
@@ -12,15 +16,16 @@
    Chaque test joue son chapitre de bout en bout : la série complète prend environ deux heures. */
 import { spawn } from 'child_process';
 import { createServer } from 'http';
-import { readFile, stat } from 'fs/promises';
+import { readFile, stat, mkdir, rm } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname, join, extname, normalize } from 'path';
 
 const ICI = dirname(fileURLToPath(import.meta.url)), DOCS = join(ICI, '..', 'docs');
 const opt = Object.fromEntries(process.argv.slice(2).map(a => { const m = /^--([^=]+)=?(.*)$/.exec(a); return m ? [m[1], m[2]] : [a, '']; }));
-const ETAPES = (opt.etapes || '1,2,3,4,5,6,7,8').split(',').map(Number);
+const PARTIE = 'partie' in opt;
+const ETAPES = PARTIE ? [2, 3, 4, 5, 6, 7, 8].filter(n => n >= (+opt.depuis || 2)) : (opt.etapes || '1,2,3,4,5,6,7,8,9').split(',').map(Number);
 const FORMATS = { tel: '390,844,1', paysage: '844,390,1', tablette: '820,1180,1', ordi: '1280,800,0' };
-const formats = opt.formats === 'tous' ? Object.keys(FORMATS) : (opt.formats || 'tel').split(',');
+const formats = (opt.formats === 'tous' ? Object.keys(FORMATS) : (opt.formats || 'tel').split(',')).slice(0, PARTIE ? 1 : 9);
 for (const f of formats) if (!FORMATS[f]) { console.error(`format inconnu : ${f} (tel, paysage, tablette, ordi)`); process.exit(2); }
 const CAPTURES = opt.captures || 'captures-tests';
 const CDN = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
@@ -61,14 +66,24 @@ console.log(`Royaume des Dindies : les tests, sur ${adresse}/royaume/${S ? (opt.
 const resultats = [];
 const J = `${adresse}/royaume/index.html`;
 if (ETAPES.includes(1)) resultats.push(await lancer('étape 1 · le Grand Défilé (4 formats)', 'test-etape1.mjs', [`${adresse}/royaume/defile.html`, `${CAPTURES}/etape1`]));
+/* la partie complète : une seule sauvegarde, qui passe d'un test à l'autre */
+if (PARTIE) { await mkdir(CAPTURES, { recursive: true }); process.env.PARTIE = join(CAPTURES, 'partie.json'); if (!opt.depuis) await rm(process.env.PARTIE, { force: true }); console.log(`la partie complète, d'un seul tenant (sauvegarde : ${process.env.PARTIE})`); }
+const fini = () => PARTIE && resultats.length && !resultats[resultats.length - 1].ok;
 for (const f of formats) {
   if (ETAPES.includes(2)) resultats.push(await lancer(`étape 2 · le Domaine, chapitre 1 (${f})`, 'test-etape2.mjs', [J, 'crachin', FORMATS[f], `${CAPTURES}/etape2-${f}`]));
+  if (fini()) break;
   if (ETAPES.includes(3)) resultats.push(await lancer(`étape 3 · l’expédition, chapitre 2 (${f})`, 'test-etape3.mjs', [J, FORMATS[f], `${CAPTURES}/etape3-${f}`]));
+  if (fini()) break;
   if (ETAPES.includes(4)) resultats.push(await lancer(`étape 4 · l’élevage, chapitre 3 (${f})`, 'test-etape4.mjs', [J, FORMATS[f], `${CAPTURES}/etape4-${f}`]));
+  if (fini()) break;
   if (ETAPES.includes(5)) resultats.push(await lancer(`étape 5 · le Dindodrome, chapitre 4 (${f})`, 'test-etape5.mjs', [J, FORMATS[f], `${CAPTURES}/etape5-${f}`]));
+  if (fini()) break;
   if (ETAPES.includes(6)) resultats.push(await lancer(`étape 6 · la production, les quêtes du Domaine (${f})`, 'test-etape6.mjs', [J, FORMATS[f], `${CAPTURES}/etape6-${f}`]));
+  if (fini()) break;
   if (ETAPES.includes(7)) resultats.push(await lancer(`étape 7 · le monde entier, chapitres 5 à 7 (${f})`, 'test-etape7.mjs', [J, FORMATS[f], `${CAPTURES}/etape7-${f}`]));
+  if (fini()) break;
   if (ETAPES.includes(8)) resultats.push(await lancer(`étape 8 · la Ligue, la fin, l’après-histoire (${f})`, 'test-etape8.mjs', [J, FORMATS[f], `${CAPTURES}/etape8-${f}`]));
+  if (ETAPES.includes(9)) resultats.push(await lancer(`étape 9 · la version 1.0 : cris, musiques, doubles, astuces, confort (${f})`, 'test-etape9.mjs', [J, FORMATS[f], `${CAPTURES}/etape9-${f}`]));
 }
 S && S.close();
 console.log('\n══════════ Résumé ══════════');

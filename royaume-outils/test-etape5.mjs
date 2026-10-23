@@ -10,6 +10,7 @@
    (des milliers de courses simulées), les gains, les badges, la mémoire du Dindodrome, la sauvegarde, et qu'il n'y a aucune erreur. */
 import { chromium } from 'playwright';
 import { mkdirSync } from 'fs';
+import { enPartie, reprendre, laisser } from './partie.mjs';
 const URL = process.argv[2] || 'http://localhost:8765/royaume/index.html';
 const [w, h, mob] = (process.argv[3] || '390,844,1').split(',').map(Number), OUT = process.argv[4] || 'captures-etape5';
 mkdirSync(OUT, { recursive: true });
@@ -173,7 +174,9 @@ try {
   verifier(RG.perdue.place > 1 && !RG.perdue.badge && RG.perdue.conseil, `une finale perdue ne donne pas de badge, et les résultats donnent un conseil (${RG.perdue.place}e place)`);
 
   /* une sauvegarde de l'étape 4, à la fin du chapitre 3 : une dindie éveillée bien entraînée, et deux autres */
-  await pg.evaluate(async () => {
+  /* (la partie complète : on reprend la vraie partie du test d'avant, avec un coup de pouce) */
+  if (enPartie()) await reprendre(pg, () => { window.__auMoins({ pieces: 900, inventaire: { friandise: 12, biscuit: 2 } }); window.__pouce('atomium', { niveau: 30, stade: 'eveille', talents: [4, 4, 4], caractere: 'calme', lieu: 'equipe' }); window.__pouce('glouglou', { niveau: 12, caractere: 'calme' }); window.__pouce('dindasable', { niveau: 11, caractere: 'calme' }); });
+  else await pg.evaluate(async () => {
     const J = window.__jeu, e = J.etat(), { nouvelleDindie } = await import('./js/jeu/individus.js');
     e.version = 3; e.quete.etape = 'fin'; e.quete.finies = Array.from({ length: 22 }, (_, i) => 'q' + (i + 1)); e.pieces = 900;
     delete e.courses; delete e.batiments.dindodrome; delete e.batiments.entrainement;
@@ -270,5 +273,6 @@ try {
 } catch (e) { console.log('❌', e.message); echecs++; await pg.screenshot({ path: `${OUT}/erreur.png` }); }
 verifier(!errs.length, `aucune erreur dans le navigateur${errs.length ? ' : ' + errs.join(' / ') : ''}`);
 console.log(echecs ? `\n❌ étape 5 : ${echecs} échec(s)` : '\n✅ étape 5 : le chapitre 4 est jouable de bout en bout');
+if (!echecs) await laisser(pg);
 await b.close();
 process.exit(echecs ? 1 : 0);

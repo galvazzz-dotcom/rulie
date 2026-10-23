@@ -12,6 +12,7 @@
    3. La mémoire (le mode Décorer, les reconstructions, un aller-retour dans les Prés), la sauvegarde, et aucune erreur. */
 import { chromium } from 'playwright';
 import { mkdirSync } from 'fs';
+import { enPartie, reprendre, laisser } from './partie.mjs';
 const URL = process.argv[2] || 'http://localhost:8765/royaume/index.html';
 const [w, h, mob] = (process.argv[3] || '390,844,1').split(',').map(Number), OUT = process.argv[4] || 'captures-etape6';
 mkdirSync(OUT, { recursive: true });
@@ -198,22 +199,32 @@ try {
 
   /* ══════════ 2. une sauvegarde de l'étape 5, puis les quêtes du Domaine ══════════ */
   /* (la sauvegarde est écrite juste avant le rechargement : la partie en cours, elle, se sauve en partant) */
-  const [cle, json] = await pg.evaluate(async () => {
-    const J = window.__jeu, e = structuredClone(J.etat()), { nouvelleDindie } = await import('./js/jeu/individus.js'), SAUVE = await import('./js/moteur/sauvegarde.js');
-    for (const k of Object.keys(e)) if (!['profil', 'reglages', 'stats', 'quotidien'].includes(k)) delete e[k];
-    Object.assign(e, { version: 4, pieces: 2500, plumesOr: 2, inventaire: { grandLivre: 1, filet: 1, billet: 1, friandise: 12, chapeauSoleil: 1, parapluie: 1 }, dindies: [], compagnon: null,
-      enclos: { prairie: { construit: true, niveau: 1 }, pluie: { construit: true, niveau: 1 } },
-      batiments: { clapier: { repare: true, rangees: 1 }, montgolfiere: { reparee: true }, couvoir: { repare: true }, nurserie: { repare: true }, dindodrome: { ouvert: true }, entrainement: { repare: true } },
-      elevage: { couveuses: [null, null], croisements: 3, eclosions: 3, premierHybride: true, compteur: 3 }, livre: { vus: {}, attrapes: {}, chromas: {} },
-      courses: { badges: [1, 2, 3, 4], places: {}, faites: 20, victoires: 8, records: {}, entrainements: 5, lecons: 1 },
-      quete: { etape: 'fin', compteur: 0, finies: Array.from({ length: 30 }, (_, i) => 'q' + (i + 1)), nourries: [] },
-      monde: { position: [0, 30], ramasses: {}, lieu: 'domaine', positions: { pres: [0, 0], maroc: [0, 0], belgique: [0, 0] } } });
-    const D = [['paquerette', 'enclos:prairie', 'premiere'], ['glouglou', 'enclos:prairie', 'cadeau'], ['crachin', 'enclos:pluie', 'sauvage:belgique'], ['atomium', 'equipe', 'sauvage:belgique'], ['dindasable', 'equipe', 'sauvage:maroc'], ['trefle', 'clapier', 'sauvage:pres']];
-    for (const [esp, lieu, origine] of D) { const d = nouvelleDindie(esp, { niveau: esp === 'atomium' ? 30 : 15, stade: esp === 'atomium' ? 'eveille' : 'adulte', origine }); d.lieu = lieu; e.dindies.push(d); e.livre.attrapes[esp] = 1; e.livre.vus[esp] = 1; }
-    e.compagnon = e.dindies[3].uid; e.reglages.heure = 'jour';
-    return [`royaumeDindies.v1.${SAUVE.profilActif()}`, JSON.stringify(e)];
+  /* (la partie complète : on reprend la vraie partie du test d'avant, avec un coup de pouce) */
+  if (enPartie()) await reprendre(pg, () => {
+    /* (des dindies dans les enclos, pour les plumes du jour ; l'Atomium éveillé dans l'équipe) */
+    const e = window.__jeu.etat(); window.__auMoins({ pieces: 2500, plumesOr: 2, inventaire: { friandise: 12 } });
+    window.__pouce('atomium', { niveau: 30, stade: 'eveille', lieu: 'equipe' }); window.__pouce('trefle', { niveau: 15 }); window.__pouce('glouglou', { niveau: 15, lieu: 'enclos:prairie' });
+    const pr = e.dindies.find(d => d.lieu !== 'enclos:prairie' && d.lieu !== 'mission' && d.origine !== 'premiere' && d.espece !== 'trefle' && d.espece !== 'atomium' && ['glouglou', 'paquerette', 'coquelicot', 'rosee'].includes(d.espece)); if (pr) pr.lieu = 'enclos:prairie';
+    if (e.enclos.pluie?.construit) window.__pouce('crachin', { lieu: 'enclos:pluie' });
   });
-  await pg.addInitScript(([cle, json]) => { if (!sessionStorage.getItem('sauvegardeV4')) { localStorage.setItem(cle, json); sessionStorage.setItem('sauvegardeV4', '1'); } }, [cle, json]);
+  else {
+    const [cle, json] = await pg.evaluate(async () => {
+      const J = window.__jeu, e = structuredClone(J.etat()), { nouvelleDindie } = await import('./js/jeu/individus.js'), SAUVE = await import('./js/moteur/sauvegarde.js');
+      for (const k of Object.keys(e)) if (!['profil', 'reglages', 'stats', 'quotidien'].includes(k)) delete e[k];
+      Object.assign(e, { version: 4, pieces: 2500, plumesOr: 2, inventaire: { grandLivre: 1, filet: 1, billet: 1, friandise: 12, chapeauSoleil: 1, parapluie: 1 }, dindies: [], compagnon: null,
+        enclos: { prairie: { construit: true, niveau: 1 }, pluie: { construit: true, niveau: 1 } },
+        batiments: { clapier: { repare: true, rangees: 1 }, montgolfiere: { reparee: true }, couvoir: { repare: true }, nurserie: { repare: true }, dindodrome: { ouvert: true }, entrainement: { repare: true } },
+        elevage: { couveuses: [null, null], croisements: 3, eclosions: 3, premierHybride: true, compteur: 3 }, livre: { vus: {}, attrapes: {}, chromas: {} },
+        courses: { badges: [1, 2, 3, 4], places: {}, faites: 20, victoires: 8, records: {}, entrainements: 5, lecons: 1 },
+        quete: { etape: 'fin', compteur: 0, finies: Array.from({ length: 30 }, (_, i) => 'q' + (i + 1)), nourries: [] },
+        monde: { position: [0, 30], ramasses: {}, lieu: 'domaine', positions: { pres: [0, 0], maroc: [0, 0], belgique: [0, 0] } } });
+      const D = [['paquerette', 'enclos:prairie', 'premiere'], ['glouglou', 'enclos:prairie', 'cadeau'], ['crachin', 'enclos:pluie', 'sauvage:belgique'], ['atomium', 'equipe', 'sauvage:belgique'], ['dindasable', 'equipe', 'sauvage:maroc'], ['trefle', 'clapier', 'sauvage:pres']];
+      for (const [esp, lieu, origine] of D) { const d = nouvelleDindie(esp, { niveau: esp === 'atomium' ? 30 : 15, stade: esp === 'atomium' ? 'eveille' : 'adulte', origine }); d.lieu = lieu; e.dindies.push(d); e.livre.attrapes[esp] = 1; e.livre.vus[esp] = 1; }
+      e.compagnon = e.dindies[3].uid; e.reglages.heure = 'jour';
+      return [`royaumeDindies.v1.${SAUVE.profilActif()}`, JSON.stringify(e)];
+    });
+    await pg.addInitScript(([cle, json]) => { if (!sessionStorage.getItem('sauvegardeV4')) { localStorage.setItem(cle, json); sessionStorage.setItem('sauvegardeV4', '1'); } }, [cle, json]);
+  }
   await pg.reload(); await pg.waitForTimeout(1200);
   await pg.evaluate(() => document.querySelector('#profils .jouer').click());
   await pg.waitForFunction(() => window.__jeu, null, { timeout: 60000 }); await pg.waitForTimeout(1500);
@@ -304,10 +315,12 @@ try {
   for (const [k, esp] of [[0, 'glouglou'], [1, 'crachin']]) { await clic(`[data-choisir="${k}"]`); await attendre('.voile:last-child .carteDindie'); await pg.evaluate(esp => { const uid = window.__jeu.etat().dindies.find(d => d.espece === esp).uid; document.querySelector(`.voile:last-child .carteDindie[data-uid="${uid}"]`).click(); }, esp); await pg.waitForTimeout(300); }
   await pg.evaluate(() => { const c = document.querySelector('#cGateau'); c.checked = true; c.dispatchEvent(new Event('change')); });
   await pg.screenshot({ path: `${OUT}/couvoir-gateau.png` });
+  /* (dans la partie complète, l'œuf mystère du chapitre 3 couve peut-être encore : on compte l'œuf de plus) */
+  const oeufs0 = await pg.evaluate(() => window.__jeu.EL.elevage().couveuses.filter(Boolean).length);
   await clic('#cCroiser'); await pg.waitForTimeout(500);
   await jusqua('fin'); await fermer(); await log('le Gâteau d’amour est mangé au Couvoir');
   const fin = await pg.evaluate(() => ({ finies: window.__jeu.etat().quete.domaine.finies.length, hud: document.querySelector('#hQuete').textContent, oeufs: window.__jeu.EL.elevage().couveuses.filter(Boolean).length }));
-  verifier(fin.finies === 7 && fin.oeufs === 1, `les 7 quêtes du Domaine sont finies (un œuf couve au Couvoir) ; le bandeau : « ${fin.hud.slice(0, 50)}… »`);
+  verifier(fin.finies === 7 && fin.oeufs === oeufs0 + 1, `les 7 quêtes du Domaine sont finies (un œuf de plus couve au Couvoir : ${oeufs0} → ${fin.oeufs}) ; le bandeau : « ${fin.hud.slice(0, 50)}… »`);
   await pg.evaluate(() => window.__jeu.P.ouvrirJournal()); await pg.waitForTimeout(400); await pg.screenshot({ path: `${OUT}/journal.png` });
   verifier(await pg.evaluate(() => [...document.querySelectorAll('.quete.finie')].some(q => /Gâteau d’amour/.test(q.textContent))), 'le journal montre les quêtes du Domaine'); await fermer();
   /* rendre une dindie à la nature (avec la fiche) */
@@ -340,5 +353,6 @@ try {
 } catch (e) { console.log('❌', e.message); echecs++; await pg.screenshot({ path: `${OUT}/erreur.png` }); }
 verifier(!errs.length, `aucune erreur dans le navigateur${errs.length ? ' : ' + errs.join(' / ') : ''}`);
 console.log(echecs ? `\n❌ étape 6 : ${echecs} échec(s)` : '\n✅ étape 6 : le Domaine produit, se décore, et les missions rapportent');
+if (!echecs) await laisser(pg);
 await b.close();
 process.exit(echecs ? 1 : 0);

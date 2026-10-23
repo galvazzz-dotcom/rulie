@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f59e0b">
+<meta name="description" content="Les 72 dindies imaginaires du Royaume des Dindies : leurs portraits, leurs types, leurs talents, leurs cris, et où les trouver.">
+<title>📖 Le Grand Livre des Dindies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lilita+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="grand-livre.css">
+</head>
+<body>
+<header class="entete">
+  <nav class="liens">
+    <a class="lien" href="../index.html">🏠 Le site</a>
+    <a class="lien" href="defile.html">🦃 Le Grand Défilé</a>
+    <a class="lien jouer" href="index.html">▶ Jouer</a>
+  </nav>
+  <h1>📖 Le Grand Livre des Dindies</h1>
+  <p class="sousTitre">Les <b>72 dindies imaginaires</b> du Royaume : touche une dindie pour tout savoir d’elle, et 🔊 pour entendre son cri.</p>
+  <p class="resume" id="resume"></p>
+</header>
+<main>
+  <section class="filtres" aria-label="Filtres">
+    <div class="ligne"><span class="etiquette">Type</span><div class="puces" id="fType"></div></div>
+    <div class="ligne"><span class="etiquette">Rareté</span><div class="puces" id="fRarete"></div></div>
+    <div class="ligne"><span class="etiquette">Où ?</span><div class="puces" id="fOrigine"></div></div>
+    <div class="ligne bas">
+      <label class="recherche">🔎 <input id="fNom" type="search" placeholder="Chercher un nom…" autocomplete="off"></label>
+      <label class="bascule"><input type="checkbox" id="fChroma"> ✨ Chromatiques</label>
+      <label class="bascule"><input type="checkbox" id="fLegendes"> 🌈 Montrer les légendes</label>
+    </div>
+  </section>
+  <p class="compte" id="compte" aria-live="polite"></p>
+  <section class="grille" id="grille" aria-label="Les dindies"></section>
+</main>
+<div id="fiche" class="voile cache" role="dialog" aria-modal="true" aria-labelledby="ficheNom">
+  <div class="fiche"><button class="fermer" id="ficheFermer" aria-label="Fermer">✖</button><div id="ficheContenu"></div></div>
+</div>
+<footer class="pied">
+  <p>Le Royaume des Dindies · version 1.0 BETA · un jeu pour Roullieee et ses amis, de 5 à 16 ans.</p>
+  <p>Les portraits sont dessinés par le jeu, à partir de l’« ADN » de chaque espèce. Les musiques du jeu sont libres (voir <a href="musique/CREDITS.md">les crédits</a>).</p>
+</footer>
+<script type="module" src="js/grand-livre-main.js"></script>
+</body>
+</html>

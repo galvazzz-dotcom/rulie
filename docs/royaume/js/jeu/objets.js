@@ -45,7 +45,7 @@ export const OBJETS = {
   oeufMystere: { nom: 'Œuf mystère', e: '🥚', desc: 'Il est tout chaud ! Mets-le dans une couveuse du Couvoir : qui sait ce qui en sortira ?' },
   oeufProfesseur: { nom: 'Œuf du Professeur', e: '🥚', desc: 'Un œuf tout doux, prêt à éclore. Mets-le dans une couveuse du Couvoir !', important: true },
   sablier: { nom: 'Sablier', e: '⏳', desc: 'Fait gagner 30 minutes à un œuf dans sa couveuse.' },
-  biscuit: { nom: 'Biscuit de champion', e: '🍘', desc: 'Plein d’énergie : + 150 points d’expérience pour une dindie.', prix: 40, boutique: e => e.quete.finies.includes('q17') },
+  biscuit: { nom: 'Biscuit de champion', e: '🍘', desc: 'Plein d’énergie : + 150 points d’expérience pour une dindie.', prix: 40, parJour: 5, boutique: e => e.quete.finies.includes('q17') },
   kitConstruction: { nom: 'Kit de construction', e: '🧰', desc: 'Des planches, des clous, de la peinture : de quoi réparer un bâtiment du Domaine.', prix: 200, boutique: e => ['kitCouvoir', 'kitNurserie', 'kitEntrainement'].includes(e.quete.etape) && !e.inventaire.kitConstruction },
   pierreEveil: { nom: 'Pierre d’éveil', e: '💎', desc: 'Au Labo, elle éveille une dindie de niveau 20 : plus forte, et une toute nouvelle apparence !' },
   clous: { nom: 'Boîte de clous', e: '🔩', desc: 'De quoi réparer le Clapier à dindes.', prix: 80, boutique: e => e.quete.etape === 'clous' && !e.inventaire.clous },
@@ -83,6 +83,18 @@ export const OBJETS = {
   filet: { nom: 'Filet d’exploratrice', e: '🥅', desc: 'Pour attraper les dindies sauvages : gagne leur confiance, puis lance-le au bon moment !', filet: 1, important: true },
   billet: { nom: 'Billet de montgolfière', e: '🎫', desc: 'Le Capitaine Zéphyr t’emmène où tu veux, autant de fois que tu veux !', important: true }
 };
+/* certains articles sont comptés : Mimi n'en a que quelques-uns par jour (étape 9 : les biscuits, pour ne pas sauter tout l'entraînement) */
+const aujourdhui = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
+export function resteDuJour(id, etat) {
+  const O = OBJETS[id]; if (!O.parJour) return Infinity;
+  const A = etat.quotidien.achats; return A && A.jour === aujourdhui() ? Math.max(0, O.parJour - (A[id] || 0)) : O.parJour;
+}
+export function noterAchat(id, q, etat) {
+  if (!OBJETS[id].parJour) return;
+  const Q = etat.quotidien, j = aujourdhui();
+  if (!Q.achats || Q.achats.jour !== j) Q.achats = { jour: j };
+  Q.achats[id] = (Q.achats[id] || 0) + q;
+}
 export const enBoutique = (id, etat) => { const b = OBJETS[id].boutique; return typeof b === 'function' ? b(etat) : !!b; };
 /* la friandise préférée d'un type */
 export const friandisePreferee = type => Object.keys(OBJETS).find(id => OBJETS[id].prefere === type);

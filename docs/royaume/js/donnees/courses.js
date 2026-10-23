@@ -112,22 +112,22 @@ export const CHAMPIONNATS = [
   { n: 5, id: 'glace', nom: 'La Coupe de Glace', champion: 'inuk', type: 'glace', badge: { nom: 'le Badge Flocon', e: '❄️' },
     niveaux: [23, 26], especes: ['dindingloo', 'pingouin', 'aurore', 'givre', 'flocon'],
     courses: [{ id: 'c5a', sorte: 'sprint', piste: 'neutre' }, { id: 'c5b', sorte: 'marathon', piste: 'neutre' }, { id: 'c5c', sorte: 'piste', piste: 'glace' }],
-    finale: { id: 'c5f', sorte: 'piste', piste: 'glace', star: { espece: 'cristal', nom: 'Banquisette', niveau: 28, talents: [4, 4, 4], caractere: 'calme', competences: ['souffle'] } },
+    finale: { id: 'c5f', sorte: 'piste', piste: 'glace', star: { espece: 'cristal', nom: 'Banquisette', niveau: 30, talents: [4, 4, 4], caractere: 'calme', competences: ['souffle'] } },
     recompense: { pieces: 1400, plumesOr: 2, objets: { biscuit: 6 } } },
   { n: 6, id: 'lave', nom: 'La Coupe de Lave', champion: 'lava', type: 'feu', badge: { nom: 'le Badge Braise', e: '🔥' },
     niveaux: [26, 29], especes: ['cendre', 'braise', 'dindofeu', 'tournesol', 'vapeur'],
     courses: [{ id: 'c6a', sorte: 'haies', piste: 'neutre' }, { id: 'c6b', sorte: 'sprint', piste: 'neutre' }, { id: 'c6c', sorte: 'piste', piste: 'feu' }],
-    finale: { id: 'c6f', sorte: 'piste', piste: 'feu', star: { espece: 'magma', nom: 'Volcanix', niveau: 24, talents: [3, 3, 3], caractere: 'calme', competences: ['turbo'] } },
+    finale: { id: 'c6f', sorte: 'piste', piste: 'feu', star: { espece: 'magma', nom: 'Volcanix', niveau: 28, talents: [3, 3, 3], caractere: 'calme', competences: ['turbo'] } },
     recompense: { pieces: 1600, plumesOr: 2, objets: { biscuit: 6 } } },
   { n: 7, id: 'nuit', nom: 'La Coupe de la Nuit', champion: 'hibou', type: 'nuit', badge: { nom: 'le Badge Lune', e: '🌙' },
     niveaux: [29, 32], especes: ['lune', 'hibou', 'luciole', 'brume', 'amanite'],
     courses: [{ id: 'c7a', sorte: 'marathon', piste: 'neutre' }, { id: 'c7b', sorte: 'haies', piste: 'neutre' }, { id: 'c7c', sorte: 'piste', piste: 'nuit' }],
-    finale: { id: 'c7f', sorte: 'piste', piste: 'nuit', star: { espece: 'etoile', nom: 'Minuit', niveau: 31, talents: [3, 3, 3], caractere: 'calme', competences: ['canon'] } },
+    finale: { id: 'c7f', sorte: 'piste', piste: 'nuit', star: { espece: 'etoile', nom: 'Minuit', niveau: 33, talents: [3, 3, 3], caractere: 'calme', competences: ['canon'] } },
     recompense: { pieces: 1800, plumesOr: 3, objets: { biscuit: 7 } } },
   { n: 8, id: 'nuages', nom: 'La Coupe des Nuages', champion: 'azur', type: 'ciel', badge: { nom: 'le Badge Nuage', e: '☁️' },
     niveaux: [32, 35], especes: ['nuage', 'zephyr', 'dindarc', 'nimbus', 'pissenlit'],
     courses: [{ id: 'c8a', sorte: 'sprint', piste: 'neutre' }, { id: 'c8b', sorte: 'marathon', piste: 'neutre' }, { id: 'c8c', sorte: 'piste', piste: 'ciel' }],
-    finale: { id: 'c8f', sorte: 'piste', piste: 'ciel', star: { espece: 'orage', nom: 'Tonnerre', niveau: 34, talents: [3, 3, 3], caractere: 'calme', competences: ['turbo'] } },
+    finale: { id: 'c8f', sorte: 'piste', piste: 'ciel', star: { espece: 'orage', nom: 'Tonnerre', niveau: 37, talents: [3, 3, 3], caractere: 'calme', competences: ['turbo'] } },
     recompense: { pieces: 2200, plumesOr: 3, objets: { biscuit: 8 } } }
 ];
 /* les courses de l'histoire (hors championnat) */
@@ -140,16 +140,16 @@ export const SPECIALES = {
 };
 /* ── la Ligue des Légendes (chapitre 8) : les Quatre Plumes, puis Gontran ── */
 export const LIGUE = [
-  { id: 'ligue1', plume: 'plumeline', sorte: 'haies', piste: 'neutre', nom: 'La Ligue · Baronne Plumeline', niveaux: [37, 40], force: 7, especes: ['panthere', 'galaxie', 'amanite', 'pirate', 'yeti'],
+  { id: 'ligue1', plume: 'plumeline', sorte: 'haies', piste: 'neutre', nom: 'La Ligue · Baronne Plumeline', niveaux: [34, 37], force: 7, especes: ['panthere', 'galaxie', 'amanite', 'pirate', 'yeti'],
     rival: { espece: 'panthere', nom: 'Duchesse', dresseur: 'Baronne Plumeline', niveau: 41, talents: [3, 3, 3], caractere: 'calme', stade: 'eveille', competences: ['esquive', 'turbo'], entrainement: [8, 8, 8] } },
-  { id: 'ligue2', plume: 'dindini', sorte: 'piste', piste: 'nuit', nom: 'La Ligue · le Grand Dindini', niveaux: [38, 41], force: 7, especes: ['galaxie', 'momie', 'dracula', 'yeti', 'amanite'],
-    rival: { espece: 'galaxie', nom: 'Abracadabra', dresseur: 'le Grand Dindini', niveau: 42, talents: [3, 3, 3], caractere: 'calme', stade: 'eveille', competences: ['turbo', 'cri'], entrainement: [8, 8, 8] } },
-  { id: 'ligue3', plume: 'mamie', sorte: 'marathon', piste: 'neutre', nom: 'La Ligue · Mamie Glouglou', niveaux: [41, 44], force: 7, especes: ['mammouth', 'dragon', 'yeti', 'pirate', 'fritesfluo'],
-    rival: { espece: 'dragon', nom: 'Pépère', dresseur: 'Mamie Glouglou', niveau: 49, talents: [5, 5, 4], caractere: 'tetue', stade: 'eveille', competences: ['souffle', 'turbo'], entrainement: [15, 15, 12] } },
-  { id: 'ligue4', plume: 'rapido', sorte: 'sprint', piste: 'neutre', nom: 'La Ligue · Capitaine Rapido', niveaux: [40, 43], force: 7, especes: ['comete', 'dracula', 'galaxie', 'dragon', 'panthere'],
-    rival: { espece: 'comete', nom: 'Fusée', dresseur: 'Capitaine Rapido', niveau: 45, talents: [3, 3, 3], caractere: 'calme', stade: 'eveille', competences: ['turbo', 'sprint'], entrainement: [10, 8, 8] } },
-  { id: 'ligueGontran', plume: 'gontran', sorte: 'finale', piste: 'neutre', nom: 'La grande finale de la Ligue', niveaux: [39, 43], force: 8, especes: ['dracula', 'comete', 'dragon', 'galaxie', 'mammouth'],
-    rival: { espece: 'dindofeu', nom: 'Flamby', dresseur: 'Gontran', niveau: 45, talents: [4, 4, 4], caractere: 'calme', stade: 'eveille', competences: ['sprint', 'turbo'], entrainement: [10, 10, 10] } }
+  { id: 'ligue2', plume: 'dindini', sorte: 'piste', piste: 'nuit', nom: 'La Ligue · le Grand Dindini', niveaux: [33, 36], force: 7, especes: ['galaxie', 'momie', 'dracula', 'yeti', 'amanite'],
+    rival: { espece: 'galaxie', nom: 'Abracadabra', dresseur: 'le Grand Dindini', niveau: 40, talents: [3, 3, 3], caractere: 'calme', stade: 'eveille', competences: ['turbo', 'cri'], entrainement: [8, 8, 8] } },
+  { id: 'ligue3', plume: 'mamie', sorte: 'marathon', piste: 'neutre', nom: 'La Ligue · Mamie Glouglou', niveaux: [38, 41], force: 7, especes: ['mammouth', 'dragon', 'yeti', 'pirate', 'fritesfluo'],
+    rival: { espece: 'dragon', nom: 'Pépère', dresseur: 'Mamie Glouglou', niveau: 46, talents: [4, 5, 4], caractere: 'tetue', stade: 'eveille', competences: ['souffle', 'turbo'], entrainement: [15, 15, 12] } },
+  { id: 'ligue4', plume: 'rapido', sorte: 'sprint', piste: 'neutre', nom: 'La Ligue · Capitaine Rapido', niveaux: [35, 38], force: 7, especes: ['comete', 'dracula', 'galaxie', 'dragon', 'panthere'],
+    rival: { espece: 'comete', nom: 'Fusée', dresseur: 'Capitaine Rapido', niveau: 43, talents: [3, 3, 3], caractere: 'calme', stade: 'eveille', competences: ['turbo', 'sprint'], entrainement: [10, 8, 8] } },
+  { id: 'ligueGontran', plume: 'gontran', sorte: 'finale', piste: 'neutre', nom: 'La grande finale de la Ligue', niveaux: [34, 38], force: 8, especes: ['dracula', 'comete', 'dragon', 'galaxie', 'mammouth'],
+    rival: { espece: 'dindofeu', nom: 'Flamby', dresseur: 'Gontran', niveau: 44, talents: [4, 4, 4], caractere: 'calme', stade: 'eveille', competences: ['sprint', 'turbo'], entrainement: [10, 10, 10] } }
 ];
 /* ── après l'histoire : les Coupes des Maîtres (le champion de chaque championnat, niveau 50, talents forts) ── */
 export const MAITRES = CHAMPIONNATS.map(C => ({ id: 'maitre' + C.n, n: C.n, champion: C.champion, type: C.type, sorte: 'piste', piste: C.finale.piste, nom: `La Coupe des Maîtres · ${C.nom.replace(/^La Coupe (des |de la |de )/, '')}`,

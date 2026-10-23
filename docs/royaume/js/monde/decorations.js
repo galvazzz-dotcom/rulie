@@ -107,7 +107,7 @@ const FAB = {
   },
   puits(D) {
     return { g: maillage(g$(D.id, () => {
-      const p = [CY('#a8a29e', [0, .4, 0], [.6, .8, .6], [0, 0, 0], 12), CY('#1e3a8a', [0, .78, 0], [.5, .04, .5], [0, 0, 0], 12)];
+      const p = [CY('#a8a29e', [0, .4, 0], [.6, .8, .6], [0, 0, 0], 12), CY('#1e3a8a', [0, .8, 0], [.5, .04, .5], [0, 0, 0], 12)];
       for (const s of [-1, 1]) p.push(CY('#8a5a3c', [s * .55, 1.1, 0], [.05, 1.4, .05]));
       p.push(T('#b45309', [0, 1.75, 0], [1.5, .55, 1], [0, 0, 0]), CY('#8a5a3c', [0, 1.4, 0], [.05, 1.1, .05], [0, 0, Math.PI / 2]), CY('#a16207', [0, 1.05, 0], [.12, .18, .12]));
       for (let i = 0; i < 5; i++) fleur(p, Math.cos(i * 1.3) * .75, Math.sin(i * 1.3) * .75, ['#f472b6', '#facc15', '#a78bfa'][i % 3], .25);
@@ -194,7 +194,8 @@ const FAB = {
   parasol(D) {
     return { g: maillage(g$(D.id, () => {
       const p = [CY('#ffffff', [0, .5, 0], [.45, .05, .45]), CY('#9ca3af', [0, .25, 0], [.04, .5, .04]), CY('#9ca3af', [0, 1.1, 0], [.03, 2.2, .03])];
-      for (let i = 0; i < 8; i++) p.push(CO(i % 2 ? (D.couleurs ? D.couleurs[1] : '#ffffff') : (D.couleurs ? D.couleurs[0] : '#ef4444'), [0, 2.1, 0], [1.1, .4, 1.1], [0, i * Math.PI / 4, 0], 3));
+      /* (une bande sur deux un peu plus grande : des cônes de même taille, posés les uns sur les autres, scintillent) */
+      for (let i = 0; i < 8; i++) p.push(CO(i % 2 ? (D.couleurs ? D.couleurs[1] : '#ffffff') : (D.couleurs ? D.couleurs[0] : '#ef4444'), [0, 2.1 - (i % 2) * .02, 0], i % 2 ? [1.14, .43, 1.14] : [1.1, .4, 1.1], [0, i * Math.PI / 4, 0], 3));
       for (const s of [-1, 1]) p.push(B('#facc15', [s * .75, .3, 0], [.3, .05, .3]), B('#facc15', [s * .88, .5, 0], [.05, .4, .3]));
       return p;
     })) };

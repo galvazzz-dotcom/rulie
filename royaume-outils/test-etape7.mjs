@@ -13,6 +13,7 @@
    DEPUIS=legendes : pour aller vite, on part du chapitre 7 juste avant le vieux livre des légendes (sans jouer les chapitres 5 et 6). */
 import { chromium } from 'playwright';
 import { mkdirSync } from 'fs';
+import { enPartie, reprendre, laisser } from './partie.mjs';
 const URL = process.argv[2] || 'http://localhost:8765/royaume/index.html', LEGENDES = process.env.DEPUIS === 'legendes';
 const [w, h, mob] = (process.argv[3] || '390,844,1').split(',').map(Number), OUT = process.argv[4] || 'captures-etape7';
 mkdirSync(OUT, { recursive: true });
@@ -239,7 +240,17 @@ try {
 
   /* ══════════ 2. les chapitres 5 à 7 ══════════ */
   /* une sauvegarde de l'étape 6 : le chapitre 4 est fini, avec une belle équipe (les coureuses de l'étape 5) */
-  await pg.evaluate(async legendes => {
+  /* (la partie complète : on reprend la vraie partie du test d'avant, avec un coup de pouce) */
+  if (enPartie()) await reprendre(pg, () => {
+    /* (les coureuses de l'étape 5, bien entraînées, dans l'équipe ; les parents du jardin oublié au Clapier) */
+    const e = window.__jeu.etat(); window.__auMoins({ pieces: 3000, plumesOr: 10, inventaire: { filetDore: 1, friandise: 40, superFriandise: 30 } });
+    for (const d of e.dindies) if (d.lieu === 'equipe') d.lieu = 'clapier';
+    for (const x of ['cristal', 'comete', 'panthere', 'atomium']) window.__pouce(x, { niveau: 36, stade: 'eveille', talents: [5, 5, 5], entrainement: [15, 15, 15], lieu: 'equipe' });
+    for (const x of ['coquelicot', 'amanite']) window.__pouce(x, { niveau: 36, stade: 'eveille', talents: [5, 5, 5], lieu: 'clapier' });
+    /* (le temps a passé depuis les quêtes du Domaine : les œufs qui couvaient sont prêts) */
+    for (const o of e.elevage.couveuses) if (o) o.fin = Math.min(o.fin, Date.now() - 1000);
+  });
+  else await pg.evaluate(async legendes => {
     const W = window.__jeu, e = W.etat(), { nouvelleDindie } = await import('./js/jeu/individus.js');
     e.version = 5; e.quete.etape = 'fin'; e.quete.finies = Array.from({ length: 30 }, (_, i) => 'q' + (i + 1)); e.pieces = 3000; e.plumesOr = 10;
     Object.assign(e.inventaire, { grandLivre: 1, filet: 1, filetDore: 1, billet: 1, chapeauSoleil: 1, parapluie: 1, friandise: 40, superFriandise: 30 });
@@ -264,7 +275,8 @@ try {
   await pg.reload(); await pg.waitForTimeout(1200);
   await pg.evaluate(() => document.querySelector('#profils .jouer').click());
   await pg.waitForFunction(() => window.__jeu && window.__jeu.monde, null, { timeout: 60000 }); await pg.waitForTimeout(1000); await dialogues(); await fermer();
-  if (!LEGENDES) verifier(await etape() === 'parlerPlumeau6' && await pg.evaluate(() => window.__jeu.etat().version) >= 6, 'une sauvegarde de l’étape 6 (chapitre 4 fini) reprend au début du chapitre 5 (version 6 ou plus)');
+  /* (dans la partie complète, le Professeur a peut-être déjà donné la lettre de Tarzanette pendant les quêtes du Domaine) */
+  if (!LEGENDES) verifier(['parlerPlumeau6', 'jumelles'].includes(await etape()) && await pg.evaluate(() => window.__jeu.etat().version) >= 6, `une sauvegarde de l’étape 6 (chapitre 4 fini) reprend au début du chapitre 5 (version 6 ou plus) : ${await etape()}`);
   const coureuse = await pg.evaluate(() => Object.fromEntries(window.__jeu.etat().dindies.filter(d => d.lieu === 'equipe').map(d => [d.espece, d.uid])));
   const m0 = await memoire();
 
@@ -328,6 +340,13 @@ try {
   /* l'œuf mythique, au Couvoir, le matin */
   await voyager('domaine');
   await pg.evaluate(() => window.__jeu.forcerHeure(8, 30 * 60000));
+  /* (dans la partie complète, des œufs d'avant attendent peut-être d'éclore et prennent les couveuses : on les fait éclore, comme une joueuse) */
+  for (let k = 0; k < 4; k++) {
+    await agir('couvoir');
+    if (!await pg.$('[data-eclore]')) { await fermer(); break; }
+    await clic('[data-eclore]'); await pg.waitForSelector('#eclosion #eOk', { timeout: 20000 }); await pg.waitForTimeout(400);
+    await clic('#eOk'); await pg.waitForTimeout(700); await dialogues(); await fermer(); await log('un œuf d’avant éclot');
+  }
   const uids = await pg.evaluate(() => ['coquelicot', 'amanite'].map(x => window.__jeu.etat().dindies.find(d => d.espece === x && d.lieu === 'clapier').uid));
   await agir('couvoir'); await attendre('.couvoirF [data-choisir="0"]');
   for (const [i, u] of uids.entries()) { await clic(`[data-choisir="${i}"]`); await attendre(`.carteDindie[data-uid="${u}"]`); await clic(`.carteDindie[data-uid="${u}"]`); await pg.waitForTimeout(300); }
@@ -375,5 +394,6 @@ try {
 } catch (e) { console.log('❌', e.message); echecs++; await pg.screenshot({ path: `${OUT}/erreur.png` }); }
 verifier(!errs.length, `aucune erreur dans le navigateur${errs.length ? ' : ' + errs.join(' / ') : ''}`);
 console.log(echecs ? `\n❌ étape 7 : ${echecs} échec(s)` : '\n✅ étape 7 : les chapitres 5 à 7 sont jouables de bout en bout');
+if (!echecs) await laisser(pg);
 await b.close();
 process.exit(echecs ? 1 : 0);

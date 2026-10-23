@@ -11,6 +11,7 @@
    le sablier, la sauvegarde, et qu'il n'y a aucune erreur. */
 import { chromium } from 'playwright';
 import { mkdirSync } from 'fs';
+import { enPartie, reprendre, laisser } from './partie.mjs';
 const URL = process.argv[2] || 'http://localhost:8765/royaume/index.html';
 const [w, h, mob] = (process.argv[3] || '390,844,1').split(',').map(Number), OUT = process.argv[4] || 'captures-etape4';
 mkdirSync(OUT, { recursive: true });
@@ -52,7 +53,9 @@ await pg.waitForFunction(() => window.__jeu, null, { timeout: 60000 });
 const t0 = Date.now();
 try {
   /* une sauvegarde de l'étape 3, à la fin du chapitre 2, avec des dindies de plusieurs types */
-  await pg.evaluate(async () => {
+  /* (la partie complète : on reprend la vraie partie du test d'avant, avec un coup de pouce) */
+  if (enPartie()) await reprendre(pg, () => { window.__auMoins({ pieces: 900, inventaire: { friandise: 12 } }); window.__jeu.etat().inventaire.oeufMystere = 1; for (const x of ['glouglou', 'crachin', 'dindasable']) window.__pouce(x); window.__pouce('atomium', { niveau: 17 }); });
+  else await pg.evaluate(async () => {
     const J = window.__jeu, e = J.etat(), { nouvelleDindie } = await import('./js/jeu/individus.js');
     e.version = 2; e.quete.etape = 'fin'; e.quete.finies = Array.from({ length: 17 }, (_, i) => 'q' + (i + 1)); e.pieces = 900; delete e.elevage; delete e.batiments.couvoir; delete e.batiments.nurserie;
     Object.assign(e.inventaire, { grandLivre: 1, filet: 1, billet: 1, friandise: 12, chapeauSoleil: 1, parapluie: 1, oeufMystere: 1 }); e.batiments.montgolfiere.reparee = true; e.batiments.clapier.repare = true;
@@ -150,5 +153,6 @@ try {
 } catch (e) { console.log('❌', e.message); echecs++; await pg.screenshot({ path: `${OUT}/erreur.png` }); }
 verifier(!errs.length, `aucune erreur dans le navigateur${errs.length ? ' : ' + errs.join(' / ') : ''}`);
 console.log(echecs ? `\n❌ étape 4 : ${echecs} échec(s)` : '\n✅ étape 4 : le chapitre 3 est jouable de bout en bout');
+if (!echecs) await laisser(pg);
 await b.close();
 process.exit(echecs ? 1 : 0);

@@ -11,18 +11,23 @@ import { RARETES, TYPES } from '../donnees/types.js';
 import { variante } from '../dindies/adn.js';
 import { portraitDindie } from '../dindies/portrait.js';
 import { el, $, $$, toast, barre, fenetre, echapper } from '../moteur/ui.js';
-import { pop, tada, glouglou, audio, sonActif } from '../moteur/sons.js';
+import { pop, tada, audio, sonActif } from '../moteur/sons.js';
+import { crier } from './cris.js';
+import { astuce } from '../ui/astuces.js';
 import { dire } from '../moteur/voix.js';
 import { toon, contour } from '../moteur/materiaux.js';
 import * as J from './etat.js';
 import { OBJETS, friandisePreferee, meilleurFilet } from './objets.js';
 import { nouvelleDindie, nomDe, NOMS_RIGOLOS } from './individus.js';
+import * as DB from './doublons.js';
 
 const PASTILLE = { commune: '⚪', rare: '🔵', epique: '🟣', mythique: '🌈' };
 const K_RARETE = { commune: 1, rare: .8, epique: .62, mythique: .5 }, GAIN_RARETE = { commune: 1, rare: .8, epique: .62, mythique: .5 }, VITESSE = { commune: 1, rare: 1.08, epique: 1.17, mythique: 1.25 };
 let active = null;
 export const captureActive = () => active;
 
+/* (avec les couleurs faciles à distinguer, la zone est bleue) */
+const zoneNom = () => J.etat().reglages.daltonien ? 'zone bleue' : 'zone verte';
 export function lancerCapture(s, H) {
   return new Promise(resoudre => {
     const esp = PAR_ID[s.espece], R = RARETES[esp.rarete], e = J.etat(), aide = !!e.reglages.aide;
@@ -33,7 +38,7 @@ export function lancerCapture(s, H) {
     const q = s.m.racine.position;
     /* les anneaux au sol : la zone verte et le cercle qui rétrécit */
     const groupe = new THREE.Group(); groupe.position.set(q.x, (H.lieu.sol(q.x, q.z) || 0) + .06, q.z); H.lieu.racine.add(groupe);
-    const matV = new THREE.MeshBasicMaterial({ color: '#22c55e', transparent: true, opacity: .55, depthWrite: false, side: THREE.DoubleSide });
+    const matV = new THREE.MeshBasicMaterial({ color: J.etat().reglages.daltonien ? '#2563eb' : '#22c55e', transparent: true, opacity: .55, depthWrite: false, side: THREE.DoubleSide });
     const matB = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: .95, depthWrite: false, side: THREE.DoubleSide });
     const vert = new THREE.Mesh(new THREE.RingGeometry(1, 1.01, 48), matV); vert.rotation.x = -Math.PI / 2; groupe.add(vert);
     const cercle = new THREE.Mesh(new THREE.RingGeometry(.94, 1, 48), matB); cercle.rotation.x = -Math.PI / 2; groupe.add(cercle);
@@ -69,9 +74,11 @@ export function lancerCapture(s, H) {
       $('#cFilet', U).onclick = viser; $('#cPartir', U).onclick = () => terminer('partie');
     }
     majJauge(); boutons();
-    conseil(confiance < .3 ? `Donne-lui des friandises pour gagner sa confiance${pref ? ` (sa préférée : ${OBJETS[pref].e} ${OBJETS[pref].nom})` : ''}. Plus elle a confiance, plus la zone verte sera grande !` : '');
+    conseil(confiance < .3 ? `Donne-lui des friandises pour gagner sa confiance${pref ? ` (sa préférée : ${OBJETS[pref].e} ${OBJETS[pref].nom})` : ''}. Plus elle a confiance, plus la ${zoneNom()} sera grande !` : '');
     dire(`${esp.nom} ! Donne-lui des friandises, puis lance le filet.`);
-    glouglou(1 + Math.random() * .2); s.m.jouer('glouglou');
+    /* l'astuce de la capture, la toute première fois (pas pour celles et ceux qui ont déjà attrapé des dindies) */
+    if (!J.etat().dindies.some(d => String(d.origine).startsWith('sauvage:'))) setTimeout(() => astuce('capture'), 600);
+    crier(s); s.m.jouer('glouglou');
 
     let occupe = false;
     async function donner(id) {
@@ -91,7 +98,7 @@ export function lancerCapture(s, H) {
     function viser() {
       if (occupe || fini) return;
       phase = 'visee'; rayon = 3.1; majZone(); groupe.visible = true; boutons();
-      conseil('Lance quand le cercle blanc est dans la zone verte !');
+      conseil(`Lance quand le cercle blanc est dans la ${zoneNom()} !`);
     }
     async function lancer() {
       if (phase !== 'visee' || occupe || fini) return;
@@ -140,13 +147,19 @@ function attraper(s, region) {
   const base = { commune: 0, rare: 1, epique: 2, mythique: 3 }[esp.rarete];
   const d = J.ajouterDindie(nouvelleDindie(s.espece, { niveau: s.niveau, chroma: s.chroma, origine: 'sauvage:' + region, talents: [0, 1, 2].map(() => Math.min(5, base + Math.floor(Math.random() * 3))) }));
   if (nouvelle) J.gagnerPieces(50);
-  tada();
+  tada(); setTimeout(() => crier(d), 450);
+  /* ses talents, et ce qu'elle vaut à côté des autres de son espèce (étape 9 : les doubles servent à quelque chose) */
+  const et = k => '⭐'.repeat(k) + '<i class="eteinte">' + '⭐'.repeat(5 - k) + '</i>', ST = ['⚡', '💪', '🦘'], K = DB.comparer(d);
+  const talents = `<div class="talentsCapture">${ST.map((e, i) => `<span>${e} ${et(d.talents[i])}</span>`).join('')}</div>`;
+  const avis = !K.autres ? '' : K.mieux ? `<p class="avisDouble bon">🏆 C’est ta <b>meilleure</b> dindie de cette espèce ! (tu en as ${K.autres + 1})</p>`
+    : K.plus.length ? `<p class="avisDouble">⭐ Plus de ${K.plus.map(i => ST[i]).join(' et ')} que ta meilleure de cette espèce : au <b>Labo</b>, le Professeur peut l’étudier pour que ta meilleure apprenne d’elle !</p>`
+    : `<p class="avisDouble">Tu en as déjà une ${K.egale ? 'aussi douée' : 'plus douée'} (tu en as ${K.autres + 1}). 💡 Au <b>Labo</b>, le Professeur peut étudier un double : ta meilleure gagne de l’expérience.</p>`;
   const F = fenetre('🎉 Attrapée !', `<div class="carteCapture" style="--rar:${RARETES[esp.rarete].couleur}">
     <div class="grandPortrait">${portraitDindie(variante(esp, { chroma: s.chroma }), { id: 'att' + s.id })}</div>
     <p class="nomEsp">${esp.nom}${s.chroma ? ' ✨ <b>chromatique !</b>' : ''}</p>
     <p><span class="pill rar">${PASTILLE[esp.rarete]} ${RARETES[esp.rarete].nom}</span> ${esp.types.map(t => `<span class="pill">${TYPES[t].e} ${TYPES[t].nom}</span>`).join(' ')} <span class="pill">Niv. ${d.niveau}</span></p>
-    <p class="cri">« ${esp.cri} »</p>
-    ${nouvelle ? '<p class="bourse">📖 Nouvelle page du Grand Livre ! <b>+ 50 🪙</b> (la prime du Professeur)</p>' : ''}
+    <p class="cri">« ${esp.cri} »</p>${talents}
+    ${nouvelle ? '<p class="bourse">📖 Nouvelle page du Grand Livre ! <b>+ 50 🪙</b> (la prime du Professeur)</p>' : avis}
     <p class="petitTexte">${d.lieu === 'equipe' ? '🎒 Elle rejoint ton équipe.' : '🐾 Ton équipe est pleine : elle part au Clapier.'}</p>
     <div class="renommer"><input id="aNom" maxlength="14" placeholder="${echapper(esp.nom)}"><button class="btn jaune" id="aDe">🎲</button></div>
     <button class="btn grand vert" id="aOk">✅ Super !</button></div>`, { classe: 'captureF' });

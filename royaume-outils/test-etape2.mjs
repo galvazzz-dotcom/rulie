@@ -10,6 +10,7 @@
    que la sauvegarde reprend au bon endroit. Fait des captures à chaque grand moment. */
 import { chromium } from 'playwright';
 import { mkdirSync } from 'fs';
+import { enPartie, reprendre, laisser } from './partie.mjs';
 const URL = process.argv[2] || 'http://localhost:8765/royaume/index.html', STARTER = process.argv[3] || 'crachin';
 const [w, h, mob] = (process.argv[4] || '390,844,1').split(',').map(Number), OUT = process.argv[5] || 'captures-etape2';
 mkdirSync(OUT, { recursive: true });
@@ -116,5 +117,6 @@ console.log('après rechargement :', JSON.stringify(apres));
 if (apres.etape !== bilan.etape || apres.dindies !== bilan.dindies.length) { console.log('❌ la sauvegarde ne reprend pas au bon endroit'); echec = true; }
 if (errs.length) { console.log('❌ erreurs :', errs); echec = true; }
 console.log(echec ? '❌ étape 2 : échec' : '✅ étape 2 : chapitre 1 joué de bout en bout, sauvegarde OK, aucune erreur');
+if (!echec) await laisser(pg);
 await b.close();
 process.exit(echec ? 1 : 0);

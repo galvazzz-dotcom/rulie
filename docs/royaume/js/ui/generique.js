@@ -18,9 +18,11 @@ const ROLES = [
 ];
 const MUSIQUES = [
   ['Searchlight Rag', 'Scott Joplin (1907)'], ['Something Doing Rag', 'Scott Joplin et Scott Hayden (1903)'], ['El Capitan', 'John Philip Sousa (1896)'],
-  ['Unter dem Doppeladler', 'Josef Franz Wagner (1893)'], ['Das Alpenhorn', 'air traditionnel'],
+  ['Unter dem Doppeladler', 'Josef Franz Wagner (1893)'], ['Das Alpenhorn, Slavonic Dance', 'airs traditionnels'],
   ['(versions du projet OpenRCT2 OpenMusic, domaine public)', ''],
-  ['Harvest Festival, Albian Nocturne, Solstice Festival, Mountain Idyll, Peaks of Atlas, Mirage, Water’s Edge', 'Omri Lahav, pour le jeu libre 0 A.D. (© Wildfire Games, licence CC BY-SA 3.0)']
+  ['Snowbound', 'Silver Aura, Jalmaan et Greyfade'], ['The Ancient Lands', 'Flyxxpy'], ['Mystic Winds', 'Skyshard'],
+  ['(projet OpenRCT2 OpenMusic, licence CC BY-SA 4.0)', ''],
+  ['Harvest Festival, Albian Nocturne, Solstice Festival, Mountain Idyll, Peaks of Atlas, Mirage, Water’s Edge, Eastern Dreams, Sands of Time, Harvest Moon, Elysian Fields, Sunrise', 'Omri Lahav, pour le jeu libre 0 A.D. (© Wildfire Games, licence CC BY-SA 3.0)']
 ];
 
 let n = 0;

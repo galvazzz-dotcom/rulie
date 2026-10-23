@@ -57,19 +57,55 @@ export function redimensionner() {
 addEventListener('resize', redimensionner);
 redimensionner();
 
+/* ── la qualité s'adapte à l'appareil (étape 9) : si l'image rame (moins de 38 images par seconde pendant
+   quelques secondes), on dessine moins de pixels, puis des ombres plus simples, puis plus d'ombres du tout ;
+   quand tout va bien depuis longtemps, on remonte d'un cran. « Image légère » (dans la Maison) part du 3e cran.
+   (Pas pendant les tests automatiques : leur navigateur dessine sans carte graphique, donc toujours lentement.) ── */
+const PR0 = renderer.getPixelRatio();
+export const QUALITES = [
+  { nom: 'belle', pr: PR0, ombre: tactile ? 1024 : 2048 },
+  { nom: 'moyenne', pr: Math.min(PR0, 1.35), ombre: 1024 },
+  { nom: 'légère', pr: Math.min(PR0, 1), ombre: 512 },
+  { nom: 'très légère', pr: Math.min(PR0, .8), ombre: 0 }
+];
+let niveauQ = 0, minQ = 0, depuisQ = 0, mesureN = 0, mesureT = 0, debutMesure = 0;
+const automatique = !navigator.webdriver;
+export function regler(n) {
+  n = Math.max(minQ, Math.min(QUALITES.length - 1, n));
+  const Q = QUALITES[n]; niveauQ = n; depuisQ = performance.now();
+  if (renderer.getPixelRatio() !== Q.pr) { renderer.setPixelRatio(Q.pr); redimensionner(); }
+  soleil.castShadow = Q.ombre > 0;
+  if (Q.ombre && soleil.shadow.mapSize.x !== Q.ombre) { soleil.shadow.map?.dispose(); soleil.shadow.map = null; soleil.shadow.mapSize.set(Q.ombre, Q.ombre); }
+}
+export const imageLegere = v => { minQ = v ? 2 : 0; regler(Math.max(niveauQ, minQ)); };
+export const qualite = () => ({ niveau: niveauQ, ...QUALITES[niveauQ], automatique });
+function surveillerQualite(maintenant, dtVrai) {
+  if (!automatique || document.hidden) { mesureN = 0; mesureT = 0; return; }
+  if (!debutMesure) debutMesure = maintenant;
+  /* les premières secondes (les ombres et les matériaux se préparent) et les à-coups (un onglet caché) ne comptent pas */
+  if (maintenant - debutMesure < 6000 || dtVrai > 1) return;
+  mesureN++; mesureT += dtVrai;
+  if (mesureT < 2.5) return;
+  const fps = mesureN / mesureT; mesureN = 0; mesureT = 0;
+  if (fps < 38 && niveauQ < QUALITES.length - 1 && maintenant - depuisQ > 4000) regler(niveauQ + 1);
+  else if (fps > 57 && niveauQ > minQ && maintenant - depuisQ > 25000) regler(niveauQ - 1);
+}
+
 /* la boucle : chaque fonction inscrite reçoit (dt, t) */
 const abonnes = new Set();
 export const chaqueImage = f => { abonnes.add(f); return () => abonnes.delete(f); };
-let avant = performance.now(), t = 0, enPause = false;
+let avant = performance.now(), t = 0, enPause = false, nImage = 0;
 export const horloge = () => t;
 /* en pause (pendant un mini-jeu en plein écran) : la 3D ne bouge plus et ne se redessine plus */
 export const pauseRendu = v => { enPause = !!v; };
 function image(maintenant) {
-  const dt = Math.min(.05, (maintenant - avant) / 1000); avant = maintenant;
+  const dtVrai = (maintenant - avant) / 1000, dt = Math.min(.05, dtVrai); avant = maintenant;
   if (!enPause) {
     t += dt;
     for (const f of abonnes) f(dt, t);
-    renderer.render(scene, camera);
+    /* derrière une fenêtre, la 3D se redessine une image sur deux (la batterie dit merci) */
+    if (!(document.body.classList.contains('fenetreOuverte') && (nImage++ & 1))) renderer.render(scene, camera);
+    surveillerQualite(maintenant, dtVrai);
   }
   requestAnimationFrame(image);
 }

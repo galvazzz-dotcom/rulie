@@ -198,7 +198,7 @@ function modeleTrouvaille(sorte) {
   if (sorte === 'coffre') {
     g.add(construire([B('#8a5a3c', [0, .3, 0], [1.1, .6, .72]), B('#facc15', [-.4, .3, 0], [.08, .62, .74]), B('#facc15', [.4, .3, 0], [.08, .62, .74]), B('#facc15', [0, .42, .37], [.18, .18, .04])], [], .03));
     const couv = new THREE.Group(); couv.position.set(0, .6, -.36); g.add(couv);
-    couv.add(construire([CY('#a0764a', [0, 0, .36], [.36, 1.1, .36], [0, 0, Math.PI / 2], 14), B('#facc15', [-.4, .05, .36], [.08, .4, .76]), B('#facc15', [.4, .05, .36], [.08, .4, .76])], [], .03));
+    couv.add(construire([CY('#a0764a', [0, 0, .36], [.36, 1.13, .36], [0, 0, Math.PI / 2], 14), B('#facc15', [-.4, .05, .36], [.08, .4, .76]), B('#facc15', [.4, .05, .36], [.08, .4, .76])], [], .03));
     couv.children[0].scale.set(1, 1, 1);
     const l = lueur('#fde68a', 2.2); l.position.y = .7; g.add(l);
     let ouvert = -1, fin = null;

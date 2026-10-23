@@ -5,7 +5,9 @@ import { PAR_ID } from '../donnees/especes.js';
 import { TYPES, RARETES } from '../donnees/types.js';
 import { portraitDindie } from '../dindies/portrait.js';
 import { fenetre, toast, $, $$, el, echapper, barre } from '../moteur/ui.js';
-import { pop, tada, glouglou } from '../moteur/sons.js';
+import { pop, tada, glouglou, bruit } from '../moteur/sons.js';
+import { crier } from '../jeu/cris.js';
+import { astuce } from './astuces.js';
 import { dire } from '../moteur/voix.js';
 import * as J from '../jeu/etat.js';
 import * as L from '../jeu/elevage.js';
@@ -97,7 +99,7 @@ export function ouvrirCouvoir({ surChange, surEclosion } = {}) {
     const ep = $('#cEpique', F.el); if (ep) ep.onclick = () => { const r = L.couverOeufEpique(); if (typeof r === 'string') toast('⚠️ ' + r); else { tada(); toast('🟣 L’œuf épique brille dans sa couveuse… Il éclora dans 1 heure !', { duree: 3200 }); S.evenement('oeufPose', r); } dessiner(); };
     const m = $('#cMystere', F.el); if (m) m.onclick = () => { const r = L.couverOeufMystere(); if (typeof r === 'string') toast('⚠️ ' + r); else { pop(); toast('🥚 L’œuf mystère est au chaud…'); S.evenement('oeufPose', r); } dessiner(); };
   };
-  dessiner();
+  dessiner(); astuce('couvoir', F);
   /* les minuteurs avancent sous nos yeux ; quand un œuf est prêt, on redessine */
   minuteur = setInterval(() => {
     const C = L.elevage().couveuses;
@@ -127,9 +129,9 @@ export function eclosionAnimee(o, d) {
     let k = 0;
     const etapes = setInterval(() => {
       k++;
-      if (k <= 3) { box.innerHTML = oeufSvg(o.couleurs, k, 'ecl' + k); box.classList.remove('secoue'); void box.offsetWidth; box.classList.add('secoue'); pop(); return; }
+      if (k <= 3) { box.innerHTML = oeufSvg(o.couleurs, k, 'ecl' + k); box.classList.remove('secoue'); void box.offsetWidth; box.classList.add('secoue'); bruit('craque'); return; }
       clearInterval(etapes);
-      tada(); glouglou(1.6);
+      tada(); crier(d);
       const R = RARETES[esp.rarete];
       $('.scene', V).innerHTML = `<div class="bebe" style="--rar:${R.couleur}">${portrait(d)}</div>`;
       $('.texteE', V).innerHTML = `<b>C’est… ${esp.nom}${d.chroma ? ' ✨ chromatique' : ''}&nbsp;!</b>
@@ -162,13 +164,13 @@ export function ouvrirNurserie({ surChange } = {}) {
     $$('[data-nourrir]', F.el).forEach(b => b.onclick = () => {
       const d = J.parUid(b.dataset.nourrir), r = L.nourrir(d);
       if (!r) { toast('Il te faut une friandise !'); return; }
-      glouglou(1.6); pop(); toast(`${OBJETS[r.id].e} Miam ! ${nomDe(d)} grandit plus vite (− 3 min)${r.pref ? ' : sa friandise préférée !' : ''}`, { cle: 'miam' });
+      crier(d); pop(); toast(`${OBJETS[r.id].e} Miam ! ${nomDe(d)} grandit plus vite (− 3 min)${r.pref ? ' : sa friandise préférée !' : ''}`, { cle: 'miam' });
       window.dispatchEvent(new CustomEvent('dindie-joie', { detail: d.uid }));
       const evts = L.majCroissance(); evts.forEach(x => grandiToast(x)); if (evts.length) S.evenement('grandir', evts[0]);
       surChange && surChange(); dessiner();
     });
   };
-  dessiner();
+  dessiner(); astuce('grandir', F);
   minuteur = setInterval(() => {
     const evts = L.majCroissance(); if (evts.length) { evts.forEach(x => grandiToast(x)); S.evenement('grandir', evts[0]); surChange && surChange(); dessiner(); return; }
     $$('[data-croit]', F.el).forEach(s => { const d = J.parUid(s.dataset.croit); if (d) s.textContent = `${d.stade === 'poussin' ? '🐥' : '🦃'} dans ${duree(L.tempsCroissance(d))}`; });
@@ -208,7 +210,7 @@ function eveilAnime(d, avant) {
     document.body.appendChild(V); pop();
     setTimeout(() => { $('.scene', V).classList.add('flash'); tada(); }, 900);
     setTimeout(() => {
-      $('.scene', V).innerHTML = `<div class="bebe eveillee">${portrait(d)}</div>`; glouglou(.9);
+      $('.scene', V).innerHTML = `<div class="bebe eveillee">${portrait(d)}</div>`; crier(d);
       $('.texteE', V).innerHTML = `<b>🌟 ${echapper(nomDe(d))} est éveillée&nbsp;!</b><span>+ 1 à chaque stat de base, et une toute nouvelle allure.</span><button class="btn grand vert" id="vOk">✨ Magnifique !</button>`;
       dire(`${nomDe(d)} est éveillée !`);
       $('#vOk', V).onclick = () => { pop(); V.classList.add('part'); setTimeout(() => { V.remove(); resoudre(); }, 350); };

@@ -7,6 +7,7 @@ import * as DF from '../jeu/defis.js';
 import * as SU from '../jeu/succes.js';
 import * as EV from '../jeu/evenements.js';
 import { OBJETS } from '../jeu/objets.js';
+import { astuce } from './astuces.js';
 
 export function ouvrirPanneau({ onglet = 'defis', journal = null, surChange = null } = {}) {
   const F = fenetre('📜 Le Panneau des quêtes', '', { classe: 'panneauF', large: true });
@@ -53,6 +54,6 @@ export function ouvrirPanneau({ onglet = 'defis', journal = null, surChange = nu
       surChange && surChange(); dessiner();
     });
   };
-  dessiner();
+  dessiner(); astuce('defis', F);
   return F;
 }

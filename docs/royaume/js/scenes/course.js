@@ -12,7 +12,8 @@ import { creerCourse, COMPTE } from '../jeu/course.js';
 import { optionsCourse } from '../jeu/dindodrome.js';
 import { couloir, PLACES_PODIUM } from '../monde/dindodrome.js';
 import { el, $, $$, echapper } from '../moteur/ui.js';
-import { audio, sonActif, glouglou, tada, pop } from '../moteur/sons.js';
+import { audio, sonActif, tada, pop } from '../moteur/sons.js';
+import { crier } from '../jeu/cris.js';
 import { dire } from '../moteur/voix.js';
 import { camera } from '../moteur/rendu.js';
 
@@ -204,7 +205,7 @@ export function lancerCourse(def, d, H) {
           if (R.place === 1 && !def.solo) { foule.hourra(); commenter(`${R.nom} gagne la course !`); }
           if (R.joueur && def.solo) { foule.hourra(); commenter(def.sansFin ? `${Math.round(R.pos)} mètres ! ${ev.raison === 'chutes' ? 'Trois chutes…' : 'Plus de forces…'} Bravo !` : `${R.temps.toFixed(2)} secondes !`); }
           if (R.joueur) {
-            finiJoueuse = C.t; tada(); glouglou(1.1);
+            finiJoueuse = C.t; tada(); crier(d);
             $('.cCompte', U).innerHTML = def.sansFin ? `<b class="arrivee p1">♾️ ${Math.round(R.pos)} m !</b>` : def.solo ? `<b class="arrivee p1">⏱️ ${R.temps.toFixed(2)} s</b>`
               : `<b class="arrivee p${Math.min(4, R.place)}">${R.place <= 3 ? ['🥇', '🥈', '🥉'][R.place - 1] : '🏁'} ${ORD(R.place)} place !</b>`;
             H.particules(new THREE.Vector3(X.m.racine.position.x, 1.5, X.m.racine.position.z), { n: 60, couleur: R.place === 1 ? '#facc15' : '#f472b6', taille: .45, vitesse: 5, monte: 4, duree: 2 });

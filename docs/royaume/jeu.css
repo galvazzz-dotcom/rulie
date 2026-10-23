@@ -648,3 +648,34 @@ body.enDeco .hudBas, body.enDeco #hAction{display:none}
 .feteTexte{background:#fff7ed;border-radius:12px;padding:6px 10px}
 .titreFete{display:inline-block;margin:4px 0 0;padding:4px 14px;border-radius:14px;background:rgba(255,247,237,.92);color:#9a3412;font-weight:800;font-size:15px}
 body.enCinematique #hQuete,body.enCinematique .hudBas,body.enCinematique #hAction,body.enCinematique #hFleche{display:none}
+/* ── étape 9 : les doubles ── */
+.talentsCapture{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;font-size:14px;margin:4px 0}
+.avisDouble{background:#fff7ed;border-radius:12px;padding:6px 10px;font-size:14px;color:#7c2d12}.avisDouble.bon{background:#f0fdf4;color:#166534}
+.etudeLigne{display:flex;gap:10px;align-items:center;background:#fff;border:3px solid #e0e7ff;border-radius:16px;padding:8px;margin:6px 0}
+.etudeLigne > div:not(.mini){flex:1;min-width:0}.etudeLigne small{display:block;color:#6b4f33}.etudeLigne.meilleure{border-color:#fcd34d;background:#fffbeb}
+.nbLivre{position:absolute;right:3px;bottom:2px;font-size:11px;font-weight:800;font-style:normal;color:#7c2d12;background:#fef3c7;border-radius:8px;padding:0 4px}
+
+/* étape 9 : écouter le cri d'une dindie */
+.btn.ecouter { padding: 2px 8px; min-height: 0; font-size: .85em; vertical-align: middle; border-radius: 99px; }
+
+/* étape 9 : les astuces */
+.astuceBoite{flex-shrink:0;display:flex;gap:10px;align-items:flex-start;margin:4px 14px 6px;padding:10px 12px;border-radius:16px;background:#fefce8;border:3px solid #facc15;box-shadow:0 3px 0 rgba(0,0,0,.08)}
+.astuceBoite .em{font-size:26px;line-height:1}
+.astuceBoite b{color:#9a3412}
+.astuceBoite p{margin:4px 0 6px;font-size:14px}
+.astuceBoite .ligneBtn{margin:0;gap:6px;flex-wrap:wrap}
+details.astuce{background:#fff;border:3px solid #fde68a;border-radius:16px;margin:8px 0;padding:6px 12px}
+details.astuce summary{cursor:pointer;font-weight:700;font-size:17px;list-style:none;padding:4px 0}
+details.astuce summary::-webkit-details-marker{display:none}
+details.astuce summary .em{font-size:22px;margin-right:4px}
+details.astuce[open]{border-color:#f59e0b;background:#fffbeb}
+details.astuce ul{margin:4px 0 8px;padding-left:20px}
+details.astuce li{margin:4px 0;line-height:1.35}
+/* étape 9 : le confort */
+button:focus-visible,.btn:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:4px solid #2563eb;outline-offset:2px}
+body.grandsTextes .fenetre .contenu,body.grandsTextes .astuceBoite,body.grandsTextes .dialogue .dBulle,body.grandsTextes .toast,body.grandsTextes #hQuete{zoom:1.16}
+body.calme *:not(.genDefile),body.calme *::before,body.calme *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+@media (prefers-reduced-motion:reduce){.toast,.action,.fenetre{animation:none!important}}
+body.daltonien .cSaut .anneau.bon{border-color:#2563eb;box-shadow:0 0 14px #60a5fa;border-width:9px}
+/* (le ruban et l'astuce ne rétrécissent pas quand la fenêtre est pleine : c'est le contenu qui défile) */
+.fenetre .ruban{flex-shrink:0}

@@ -8,6 +8,7 @@ import { portraitDindie } from '../dindies/portrait.js';
 import { PERSONNAGES, portraitChibi } from '../personnages/chibi.js';
 import { fenetre, toast, $, $$, echapper } from '../moteur/ui.js';
 import { pop, tada } from '../moteur/sons.js';
+import { astuce } from './astuces.js';
 import * as J from '../jeu/etat.js';
 import * as DD from '../jeu/dindodrome.js';
 import { qualites } from '../jeu/course.js';
@@ -86,6 +87,7 @@ export function choisirCoureuse(def) {
     const equipe = [];
     const F = fenetre(`${SORTES[def.sorte].e} ${def.relais ? 'Ton équipe de relais' : 'Qui va courir ?'}`, '', { classe: 'choixCoureuseF', surFermer: () => resoudre(def.relais ? (choisie ? equipe : null) : choisie) });
     if (!L.length || (def.relais && L.length < 3)) { F.contenu.innerHTML = `<p class="vide">Il te faut ${def.relais ? '<b>3 dindies adultes</b>' : 'une dindie adulte'} dans ton équipe 🎒 pour courir ! Range-${def.relais ? 'les' : 'en une'} dans ton équipe (touche 🐾).</p>`; return; }
+    astuce('courses', F);
     F.contenu.innerHTML = `<p class="petitTexte"><b>${echapper(def.nom)}</b> · ${def.sansFin ? 'aussi loin que possible' : SORTES[def.sorte].distance + ' m'} · ${P.e} ${P.nom}. ${SORTES[def.sorte].desc}${def.relais ? ' <b>Touche 3 dindies, dans l’ordre du relais.</b>' : ''}</p>
       <div class="coureuses">${L.map(d => {
         const Q = qualites(d, P.type, !!E().reglages.aide), st = stats(d), e = PAR_ID[d.espece];
