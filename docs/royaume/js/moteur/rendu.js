@@ -1,5 +1,6 @@
 /* Le rendu : la toile, la scène, la caméra, les lumières, le ciel et la boucle */
 import * as THREE from 'three';
+import { decisionQualite } from './qualite.js';
 
 export const tactile = matchMedia('(pointer: coarse)').matches;
 export const toile = document.getElementById('toile');
@@ -59,7 +60,8 @@ redimensionner();
 
 /* ── la qualité s'adapte à l'appareil (étape 9) : si l'image rame (moins de 38 images par seconde pendant
    quelques secondes), on dessine moins de pixels, puis des ombres plus simples, puis plus d'ombres du tout ;
-   quand tout va bien depuis longtemps, on remonte d'un cran. « Image légère » (dans la Maison) part du 3e cran.
+   quand tout va bien depuis longtemps, on remonte d'un cran ; si baisser ne sert à rien (un téléphone bloqué à 30 images
+   par seconde en économie d'énergie), on revient et on ne baisse plus (voir qualite.js). « Image légère » (dans la Maison) part du 3e cran.
    (Pas pendant les tests automatiques : leur navigateur dessine sans carte graphique, donc toujours lentement.) ── */
 const PR0 = renderer.getPixelRatio();
 export const QUALITES = [
@@ -68,7 +70,7 @@ export const QUALITES = [
   { nom: 'légère', pr: Math.min(PR0, 1), ombre: 512 },
   { nom: 'très légère', pr: Math.min(PR0, .8), ombre: 0 }
 ];
-let niveauQ = 0, minQ = 0, depuisQ = 0, mesureN = 0, mesureT = 0, debutMesure = 0;
+let niveauQ = 0, minQ = 0, depuisQ = 0, mesureN = 0, mesureT = 0, debutMesure = 0, fpsAvant = 0, bloque = false;
 const automatique = !navigator.webdriver;
 export function regler(n) {
   n = Math.max(minQ, Math.min(QUALITES.length - 1, n));
@@ -87,8 +89,9 @@ function surveillerQualite(maintenant, dtVrai) {
   mesureN++; mesureT += dtVrai;
   if (mesureT < 2.5) return;
   const fps = mesureN / mesureT; mesureN = 0; mesureT = 0;
-  if (fps < 38 && niveauQ < QUALITES.length - 1 && maintenant - depuisQ > 4000) regler(niveauQ + 1);
-  else if (fps > 57 && niveauQ > minQ && maintenant - depuisQ > 25000) regler(niveauQ - 1);
+  const D = decisionQualite(QUALITES, { niveau: niveauQ, min: minQ, depuis: depuisQ, fpsAvant, bloque }, fps, maintenant);
+  fpsAvant = D.fpsAvant; bloque = D.bloque;
+  if (D.niveau !== niveauQ) regler(D.niveau);
 }
 
 /* la boucle : chaque fonction inscrite reçoit (dt, t) */

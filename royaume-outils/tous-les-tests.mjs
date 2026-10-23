@@ -12,15 +12,17 @@
      --three=chemin            avec le serveur local : utiliser ce fichier three.module.js au lieu du CDN
                                (pour tester sans Internet)
      --captures=dossier        où ranger les captures d'écran (par défaut : captures-tests)
+     --sans-express            ne pas commencer par le test express (test-express.mjs, 1 à 2 minutes)
    Il faut Playwright (npm i playwright) ; CHROMIUM=/chemin/vers/chromium si besoin.
-   Chaque test joue son chapitre de bout en bout : la série complète prend environ deux heures. */
+   On commence toujours par le test express (syntaxe, imports, les 3 pages) ; puis chaque test joue son chapitre de bout en bout :
+   la série complète prend plusieurs heures (sans carte graphique, environ 1 h 20 par format). */
 import { spawn } from 'child_process';
-import { createServer } from 'http';
-import { readFile, stat, mkdir, rm } from 'fs/promises';
+import { mkdir, rm } from 'fs/promises';
 import { fileURLToPath } from 'url';
-import { dirname, join, extname, normalize } from 'path';
+import { dirname, join } from 'path';
+import { serveur } from './serveur.mjs';
 
-const ICI = dirname(fileURLToPath(import.meta.url)), DOCS = join(ICI, '..', 'docs');
+const ICI = dirname(fileURLToPath(import.meta.url));
 const opt = Object.fromEntries(process.argv.slice(2).map(a => { const m = /^--([^=]+)=?(.*)$/.exec(a); return m ? [m[1], m[2]] : [a, '']; }));
 const PARTIE = 'partie' in opt;
 const ETAPES = PARTIE ? [2, 3, 4, 5, 6, 7, 8].filter(n => n >= (+opt.depuis || 2)) : (opt.etapes || '1,2,3,4,5,6,7,8,9').split(',').map(Number);
@@ -28,26 +30,6 @@ const FORMATS = { tel: '390,844,1', paysage: '844,390,1', tablette: '820,1180,1'
 const formats = (opt.formats === 'tous' ? Object.keys(FORMATS) : (opt.formats || 'tel').split(',')).slice(0, PARTIE ? 1 : 9);
 for (const f of formats) if (!FORMATS[f]) { console.error(`format inconnu : ${f} (tel, paysage, tablette, ordi)`); process.exit(2); }
 const CAPTURES = opt.captures || 'captures-tests';
-const CDN = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-
-/* ── le petit serveur local (docs/, avec three.module.js en local si on le demande) ── */
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json',
-  '.mp3': 'audio/mpeg', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.mp4': 'video/mp4', '.ico': 'image/x-icon', '.md': 'text/markdown; charset=utf-8' };
-async function serveur() {
-  const S = createServer(async (req, res) => {
-    try {
-      const chemin = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-      if (opt.three && chemin === '/three.module.js') { res.writeHead(200, { 'Content-Type': TYPES['.js'] }); res.end(await readFile(opt.three)); return; }
-      let f = normalize(join(DOCS, chemin)); if (!f.startsWith(DOCS)) { res.writeHead(403); res.end(); return; }
-      if ((await stat(f)).isDirectory()) f = join(f, 'index.html');
-      let corps = await readFile(f);
-      if (opt.three && extname(f) === '.html') corps = Buffer.from(corps.toString().replaceAll(CDN, '/three.module.js'));
-      res.writeHead(200, { 'Content-Type': TYPES[extname(f)] || 'application/octet-stream' }); res.end(corps);
-    } catch { res.writeHead(404); res.end(); }
-  });
-  await new Promise(r => S.listen(0, '127.0.0.1', r));
-  return { S, adresse: `http://127.0.0.1:${S.address().port}` };
-}
 
 /* ── lancer un test, en montrant ses lignes ✅ / ❌ ── */
 function lancer(nom, fichier, args) {
@@ -61,10 +43,16 @@ function lancer(nom, fichier, args) {
   });
 }
 
-const { S, adresse } = opt.adresse ? { S: null, adresse: opt.adresse.replace(/\/$/, '') } : await serveur();
+const { S, adresse } = opt.adresse ? { S: null, adresse: opt.adresse.replace(/\/$/, '') } : await serveur({ three: opt.three });
 console.log(`Royaume des Dindies : les tests, sur ${adresse}/royaume/${S ? (opt.three ? ' (serveur local, three.js local)' : ' (serveur local)') : ''}`);
 const resultats = [];
 const J = `${adresse}/royaume/index.html`;
+/* d'abord le test express (1 à 2 minutes) : s'il trouve une erreur, inutile de jouer des heures */
+if (!('sans-express' in opt)) {
+  const X = await lancer('le test express · syntaxe, imports, les 3 pages (téléphone et ordinateur)', 'test-express.mjs', [adresse]);
+  if (!X.ok) { console.log('\n❌ le test express a trouvé un problème : on s’arrête là (corrige-le, puis relance)'); S && S.close(); process.exit(1); }
+  console.log(`✅ test express (${Math.round(X.duree)} s)`);
+}
 if (ETAPES.includes(1)) resultats.push(await lancer('étape 1 · le Grand Défilé (4 formats)', 'test-etape1.mjs', [`${adresse}/royaume/defile.html`, `${CAPTURES}/etape1`]));
 /* la partie complète : une seule sauvegarde, qui passe d'un test à l'autre */
 if (PARTIE) { await mkdir(CAPTURES, { recursive: true }); process.env.PARTIE = join(CAPTURES, 'partie.json'); if (!opt.depuis) await rm(process.env.PARTIE, { force: true }); console.log(`la partie complète, d'un seul tenant (sauvegarde : ${process.env.PARTIE})`); }

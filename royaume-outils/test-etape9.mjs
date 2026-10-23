@@ -137,6 +137,15 @@ try {
   verifier(D.qualite.map(q => q[0]).join() === '0,1,2,3,0' && D.qualite[3][1] === false && D.qualite[2][1] === true && D.qualite[4][1] === true && D.qualite[3][2] <= .8 && D.legere === 2 && D.legere2 === 2,
     `la qualité d’image : 4 crans (le dernier sans ombres), et l’image légère ne remonte pas au-dessus du 3e ${JSON.stringify(D.qualite)}`);
 
+  /* la décision de la qualité (sans navigateur) : elle baisse quand le dessin ralentit, mais pas pour rien
+     (un téléphone en économie d'énergie reste bloqué à 30 images par seconde : baisser n'y change rien) */
+  const { decisionQualite } = await import('../docs/royaume/js/moteur/qualite.js');
+  const jouerQ = (Q, suite) => { let e = { niveau: 0, min: 0, depuis: 0, fpsAvant: 0, bloque: false }, t = 0; const n = [];
+    for (const f of suite) { t += 5000; const r = decisionQualite(Q, e, f, t); if (r.niveau !== e.niveau) e.depuis = t; e = { ...e, ...r }; n.push(e.niveau); } return n.join(''); };
+  const Q3 = [{ pr: 1.75, ombre: 1024 }, { pr: 1.35, ombre: 1024 }, { pr: 1, ombre: 512 }, { pr: .8, ombre: 0 }], Q1 = [{ pr: 1, ombre: 1024 }, { pr: 1, ombre: 1024 }, { pr: 1, ombre: 512 }, { pr: .8, ombre: 0 }];
+  const qa = jouerQ(Q3, [30, 30, 30, 30, 30]), qb = jouerQ(Q3, [20, 26, 34, 45, 45]), qc = jouerQ(Q1, [20, 30, 45]), qd = jouerQ(Q3, [60, 60, 60]), qe = jouerQ(Q3, [20, 45, 60, 60, 60, 60, 60, 60, 60]);
+  verifier(qa === '10000' && qb === '12333' && qc === '233' && qd === '000' && qe.endsWith('0'), `la qualité : bloqué à 30 images/s → on essaie, puis on revient (${qa}) ; un dessin lent → elle baisse cran par cran (${qb}) ; les crans pareils sont sautés (${qc}) ; un appareil rapide garde la belle image (${qd}) ; elle remonte quand tout va bien (${qe})`);
+
   /* la durée d'une partie, avec le simulateur (le vrai moteur de course) */
   const sim = spawnSync(process.execPath, ['--experimental-default-type=module', join(ICI, 'simulateur-partie.mjs'), '8'], { encoding: 'utf8', env: { ...process.env, PROFIL: 'typique' }, timeout: 300000 });
   const totaux = [...(sim.stdout || '').matchAll(/^total\s+(\d+) h (\d+)/gm)].map(m => +m[1] + +m[2] / 60);
