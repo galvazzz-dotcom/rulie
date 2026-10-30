@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#2f6fd6">
+<title>Gala Cerveau</title>
+<link rel="stylesheet" href="noyau/interface.css">
+</head>
+<body>
+<header class="entete">
+  <div class="entete-int">
+    <a href="#accueil" class="titre" id="titre" style="color:inherit;text-decoration:none"><span>🌿 Gala Cerveau</span></a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#accueil" aria-label="Jeux"><span aria-hidden="true">🎲</span><span class="masquer-mobile"> Jeux</span></a>
+      <a href="#progres" aria-label="Progrès"><span aria-hidden="true">📈</span><span class="masquer-mobile"> Progrès</span></a>
+      <a href="#reglages" aria-label="Réglages">⚙️</a>
+    </nav>
+  </div>
+</header>
+<main id="principal"></main>
+
+<!-- Noyau -->
+<script src="noyau/stockage.js"></script>
+<script src="noyau/moteur.js"></script>
+<script src="noyau/progression.js"></script>
+
+<!-- Données -->
+<script src="donnees/mots-fr.js"></script>
+<script src="donnees/proverbes-fr.js"></script>
+
+<!-- Jeux : ajouter une ligne par nouveau jeu -->
+<script src="jeux/paires/paires.js"></script>
+<script src="jeux/simon/simon.js"></script>
+<script src="jeux/empan/empan.js"></script>
+<script src="jeux/stroop/stroop.js"></script>
+<script src="jeux/intrus/intrus.js"></script>
+<script src="jeux/calcul/calcul.js"></script>
+<script src="jeux/pareil/pareil.js"></script>
+<script src="jeux/suites/suites.js"></script>
+<script src="jeux/sudoku/sudoku.js"></script>
+<script src="jeux/anagrammes/anagrammes.js"></script>
+<script src="jeux/proverbes/proverbes.js"></script>
+<script src="jeux/rotation/rotation.js"></script>
+<script src="jeux/2048/2048.js"></script>
+<script src="jeux/serpent/serpent.js"></script>
+<script src="jeux/demineur/demineur.js"></script>
+
+<!-- Application (toujours en dernier) -->
+<script src="noyau/app.js"></script>
+</body>
+</html>

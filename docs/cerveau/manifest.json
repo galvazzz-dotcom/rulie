@@ -1,0 +1,17 @@
+{
+  "name": "Gala Cerveau",
+  "short_name": "Gala Cerveau",
+  "description": "Jeux courts pour entraîner et entretenir son cerveau, avec une séance du jour.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f4ef",
+  "theme_color": "#2f6fd6",
+  "icons": [
+    { "src": "icones/icone-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icones/icone-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icones/icone-192-masque.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icones/icone-512-masque.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
