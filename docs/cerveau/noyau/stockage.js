@@ -15,7 +15,8 @@
       reglages: { taille: 1, theme: 'auto', sons: true, voix: true },
       jeux: {},
       jours: {}, // 'AAAA-MM-JJ' -> secondes jouées
-      seances: {} // 'AAAA-MM-JJ' -> { jeux: [ids], faits: [ids] }
+      seances: {}, // 'AAAA-MM-JJ' -> { jeux: [ids], faits: [ids] }
+      bilan: null // bilan de départ : { jeux, faits, niveaux: { domaine: niveau }, fin, masque }
     };
   }
 
@@ -42,7 +43,8 @@
       reglages: Object.assign(base.reglages, d.reglages),
       jeux: d.jeux && typeof d.jeux === 'object' ? d.jeux : {},
       jours: d.jours && typeof d.jours === 'object' ? d.jours : {},
-      seances: d.seances && typeof d.seances === 'object' ? d.seances : {}
+      seances: d.seances && typeof d.seances === 'object' ? d.seances : {},
+      bilan: d.bilan && typeof d.bilan === 'object' ? d.bilan : null
     };
   }
 

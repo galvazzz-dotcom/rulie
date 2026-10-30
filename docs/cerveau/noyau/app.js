@@ -47,9 +47,10 @@
     const [ecran, param] = (location.hash.slice(1) || 'accueil').split('/');
     document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('actif', a.getAttribute('href') === '#' + ecran));
     window.scrollTo(0, 0);
-    if (ecran === 'jeu' && Gala.trouverJeu(param)) ecranJeu(Gala.trouverJeu(param), false);
-    else if (ecran === 'seance' && Gala.trouverJeu(param)) ecranJeu(Gala.trouverJeu(param), true);
+    if (ecran === 'jeu' && Gala.trouverJeu(param)) ecranJeu(Gala.trouverJeu(param), null);
+    else if ((ecran === 'seance' || ecran === 'bilan') && Gala.trouverJeu(param)) ecranJeu(Gala.trouverJeu(param), ecran);
     else if (ecran === 'seance') ecranSeance();
+    else if (ecran === 'bilan') ecranBilan();
     else if (ecran === 'progres') ecranProgres();
     else if (ecran === 'reglages') ecranReglages();
     else ecranAccueil();
@@ -58,6 +59,11 @@
   function titre(html) {
     $('#titre').innerHTML = html;
   }
+
+  // Un parcours enchaîne plusieurs jeux : la séance du jour ou le bilan de départ.
+  const PARCOURS = { seance: 'Séance du jour', bilan: 'Bilan de départ' };
+  const parcours = mode => (mode === 'seance' ? P.seanceDuJour() : mode === 'bilan' ? P.bilan() : null);
+  const retour = mode => (mode ? '#' + mode : '#accueil');
 
   /* ---------- Accueil ---------- */
   function ecranAccueil() {
@@ -77,6 +83,17 @@
         <div class="chiffre"><b>${duree(P.secondesSur(1))}</b><span>aujourd'hui</span></div>
         <div class="chiffre"><b>${duree(P.secondesSur(7))}</b><span>sur 7 jours</span></div>
       </div>`;
+
+    const b = S.donnees.bilan;
+    if (!b || (!b.fin && !b.masque)) {
+      const faits = b ? b.faits.length : 0, total = b ? b.jeux.length : 6;
+      html += `<a class="carte carte-seance" href="#bilan">
+          <span class="icone" aria-hidden="true">🧪</span>
+          <span><b>Bilan de départ</b><br><small>${faits ? faits + ' / ' + total + ' jeux faits' : total + ' jeux, un par domaine, environ 12 min'} · règle ton niveau de départ partout</small></span>
+          <span class="bouton principal">${faits ? 'Continuer' : 'Faire le bilan'}</span>
+        </a>
+        <div style="margin-top:-.6rem;text-align:right"><button class="petit" id="masquer-bilan" style="min-height:36px;padding:.2rem .7rem">Ne plus proposer</button></div>`;
+    }
 
     const seance = P.seanceDuJour();
     if (seance.jeux.length) {
@@ -118,6 +135,40 @@
     }
     html += '</div>';
     main.innerHTML = html;
+    const masquer = $('#masquer-bilan');
+    if (masquer) masquer.addEventListener('click', () => {
+      P.bilan().masque = true;
+      S.sauver();
+      ecranAccueil();
+    });
+  }
+
+  /* ---------- Bilan de départ ---------- */
+  function ecranBilan() {
+    titre('<span>🧪 Bilan de départ</span>');
+    const b = P.bilan();
+    const prochain = b.jeux.find(id => !b.faits.includes(id));
+    const lignes = b.jeux.map((id, k) => {
+      const j = Gala.trouverJeu(id), fait = b.faits.includes(id);
+      const domaine = Gala.DOMAINES.find(d => d.id === j.domaine);
+      const niv = b.niveaux[j.domaine];
+      return `<li class="${fait ? 'fait' : id === prochain ? 'prochain' : ''}">
+          <span class="etape" aria-hidden="true">${fait ? '✓' : k + 1}</span>
+          <span class="icone" aria-hidden="true">${j.icone}</span>
+          <span><b>${domaine ? domaine.nom : ''}</b> · ${echapper(j.nom)}<br><small class="discret">${fait ? 'niveau de départ réglé sur ' + niv : 'à faire'}</small></span>
+        </li>`;
+    }).join('');
+    main.innerHTML = `<div class="pile">
+      <p class="discret" style="margin:0">Un jeu par domaine, joué au niveau ${P.NIVEAU_BILAN}. Ton résultat règle le niveau de départ de tous les jeux du domaine que tu n'as pas encore joués. Ensuite, chaque jeu s'adapte tout seul.</p>
+      <ol class="liste-seance">${lignes}</ol>
+      <div class="groupe">
+        ${prochain ? `<a class="bouton principal-lien" href="#bilan/${prochain}">▶ ${b.faits.length ? 'Continuer' : 'Commencer'} le bilan</a>`
+                   : '<div class="carte">✅ Bilan terminé : tes niveaux de départ sont réglés. Bon entraînement !</div>'}
+        <a class="bouton" href="#accueil">Accueil</a>
+        ${prochain ? '' : '<button id="refaire-bilan">↻ Refaire le bilan</button>'}
+      </div></div>`;
+    const refaire = $('#refaire-bilan');
+    if (refaire) refaire.addEventListener('click', () => { P.commencerBilan(); ecranBilan(); });
   }
 
   /* ---------- Séance du jour ---------- */
@@ -145,14 +196,14 @@
   }
 
   /* ---------- Écran de jeu ---------- */
-  function ecranJeu(def, enSeance) {
+  function ecranJeu(def, mode) {
     titre(`<span aria-hidden="true">${def.icone}</span><span>${echapper(def.nom)}</span>`);
-    let niveau = P.niveauConseille(def);
+    let niveau = mode === 'bilan' ? Math.min(P.NIVEAU_BILAN, def.niveaux) : P.niveauConseille(def);
     const conseille = niveau;
-    const seance = enSeance ? P.seanceDuJour() : null;
-    const etape = seance ? `<p class="discret petit" style="margin:0">Séance du jour · jeu ${seance.jeux.indexOf(def.id) + 1} sur ${seance.jeux.length}</p>` : '';
+    const suite = parcours(mode);
+    const etape = suite ? `<p class="discret petit" style="margin:0">${PARCOURS[mode]} · jeu ${suite.jeux.indexOf(def.id) + 1} sur ${suite.jeux.length}${mode === 'bilan' ? ' · niveau ' + niveau : ''}</p>` : '';
 
-    const choix = def.niveaux > 1 ? `
+    const choix = def.niveaux > 1 && mode !== 'bilan' ? `
       <div class="choix-niveau">
         <span>Niveau</span>
         <button data-niv="-1" aria-label="Niveau inférieur">−</button>
@@ -169,7 +220,7 @@
         <div class="groupe">
           <button class="principal" id="go">▶ Commencer</button>
           ${Gala.voixDisponible && S.donnees.reglages.voix ? '<button id="voix">🔊 Lire la consigne</button>' : ''}
-          <a class="bouton" href="${enSeance ? '#seance' : '#accueil'}">Retour</a>
+          <a class="bouton" href="${retour(mode)}">Retour</a>
         </div>
       </div></div>`;
 
@@ -179,18 +230,18 @@
     }));
     const voix = $('#voix');
     if (voix) voix.addEventListener('click', () => Gala.lire(def.consigne));
-    $('#go').addEventListener('click', () => lancer(def, niveau, enSeance));
+    $('#go').addEventListener('click', () => lancer(def, niveau, mode));
     $('#go').focus();
   }
 
-  function lancer(def, niveau, enSeance) {
+  function lancer(def, niveau, mode) {
     arreterPartie();
     main.innerHTML = `<div class="pile">
       <div class="barre-jeu">
         <div class="stats" id="stats"></div>
         <div class="groupe">
           ${def.niveaux > 1 ? `<span class="stat"><span>Niveau</span><b>${niveau}</b></span>` : ''}
-          <a class="bouton" href="${enSeance ? '#seance' : '#accueil'}">Quitter</a>
+          <a class="bouton" href="${retour(mode)}">Quitter</a>
         </div>
       </div>
       <div class="message" id="message" role="status" aria-live="polite"></div>
@@ -203,7 +254,7 @@
         $('#stats').innerHTML = Object.entries(obj)
           .map(([k, v]) => `<div class="stat"><span>${echapper(k)}</span><b>${echapper(v)}</b></div>`).join('');
       },
-      fin: r => terminer(def, niveau, r, enSeance)
+      fin: r => terminer(def, niveau, r, mode)
     };
     partieEnCours = Gala.creerContexte(def, niveau, $('#zone'), ui);
     try {
@@ -214,11 +265,13 @@
     }
   }
 
-  function terminer(def, niveau, r, enSeance) {
-    const seance = enSeance ? P.marquerFait(def.id) : null;
-    const prochain = seance ? seance.jeux.find(id => !seance.faits.includes(id)) : null;
+  function terminer(def, niveau, r, mode) {
     const info = S.enregistrerPartie(def, { n: niveau, v: r.valeur, r: r.reussite, s: r.duree });
-    const changement = def.adaptatif && r.reussite != null ? P.apresPartie(def, r.reussite, niveau) : 0;
+    let suite = null, changement = 0;
+    if (mode === 'seance') suite = P.marquerFait(def.id);
+    if (mode === 'bilan') suite = P.noterBilan(def, r.reussite || 0);
+    else if (def.adaptatif && r.reussite != null) changement = P.apresPartie(def, r.reussite, niveau);
+    const prochain = suite ? suite.jeux.find(id => !suite.faits.includes(id)) : null;
     const nouveauNiveau = P.niveauConseille(def);
     Gala.son(r.reussi ? 'fin' : 'erreur');
 
@@ -235,21 +288,26 @@
       lignes += `<div class="discret petit">Durée : ${duree(r.duree)}</div>`;
       if (changement > 0) lignes += `<div class="record">⬆️ Bravo, tu passes au niveau ${nouveauNiveau} !</div>`;
       if (changement < 0) lignes += `<div class="discret">On revient au niveau ${nouveauNiveau} pour consolider.</div>`;
+      if (mode === 'bilan') {
+        const domaine = Gala.DOMAINES.find(d => d.id === def.domaine);
+        lignes += `<div class="record">Niveau de départ en ${domaine ? domaine.nom.toLowerCase() : 'ce domaine'} : ${suite.niveaux[def.domaine]}</div>`;
+      }
 
       const voile = document.createElement('div');
       voile.className = 'voile';
       voile.innerHTML = `<div class="carte" role="dialog" aria-modal="true" aria-labelledby="titre-res">
           <h2 id="titre-res">${r.reussi ? 'Bien joué !' : 'Partie terminée'}</h2>
           ${lignes}
-          ${seance ? `<div class="discret petit">Séance du jour : ${seance.faits.length} / ${seance.jeux.length}</div>` : ''}
+          ${suite ? `<div class="discret petit">${PARCOURS[mode]} : ${suite.faits.length} / ${suite.jeux.length}</div>` : ''}
           <div class="actions">
-            ${seance ? `<a class="bouton principal-lien" id="suite" href="${prochain ? '#seance/' + prochain : '#seance'}">${prochain ? 'Jeu suivant →' : '✅ Terminer la séance'}</a>` : ''}
-            <button class="${seance ? '' : 'principal'}" id="rejouer">↻ Rejouer${changement ? ' (niveau ' + nouveauNiveau + ')' : ''}</button>
-            ${seance ? '' : '<a class="bouton" href="#accueil">Accueil</a>'}
+            ${suite ? `<a class="bouton principal-lien" id="suite" href="${prochain ? '#' + mode + '/' + prochain : '#' + mode}">${prochain ? 'Jeu suivant →' : mode === 'bilan' ? '✅ Voir le bilan' : '✅ Terminer la séance'}</a>` : ''}
+            ${mode === 'bilan' ? '' : `<button class="${suite ? '' : 'principal'}" id="rejouer">↻ Rejouer${changement ? ' (niveau ' + nouveauNiveau + ')' : ''}</button>`}
+            ${suite ? '' : '<a class="bouton" href="#accueil">Accueil</a>'}
           </div></div>`;
       document.body.appendChild(voile);
-      (seance ? $('#suite') : $('#rejouer')).focus();
-      $('#rejouer').addEventListener('click', () => lancer(def, def.adaptatif ? nouveauNiveau : niveau, enSeance));
+      (suite ? $('#suite') : $('#rejouer')).focus();
+      const rejouer = $('#rejouer');
+      if (rejouer) rejouer.addEventListener('click', () => lancer(def, def.adaptatif ? nouveauNiveau : niveau, mode));
     }, 700);
   }
 
@@ -366,6 +424,11 @@
         <div><a class="bouton" href="gala-cerveau.zip" download>⬇️ Télécharger le zip</a></div>
       </div>` : ''}
       <div class="carte pile">
+        <h2>Bilan de départ</h2>
+        <p class="discret" style="margin:0">Un jeu par domaine pour régler le niveau de départ des jeux que tu n'as pas encore essayés.</p>
+        <div><button id="refaire-bilan">🧪 ${S.donnees.bilan && S.donnees.bilan.fin ? 'Refaire' : 'Faire'} le bilan</button></div>
+      </div>
+      <div class="carte pile">
         <h2>Tout effacer</h2>
         <div><button id="effacer">🗑️ Remettre à zéro</button></div>
       </div>
@@ -388,6 +451,10 @@
       if (nom === 'sons' && r.sons) Gala.son('ok');
       if (nom === 'voix') ecranReglages();
     }));
+    $('#refaire-bilan').addEventListener('click', () => {
+      P.commencerBilan();
+      location.hash = '#bilan';
+    });
     $('#exporter').addEventListener('click', () => {
       S.exporter();
       $('#info-sauvegarde').textContent = 'Fichier enregistré dans tes téléchargements.';
