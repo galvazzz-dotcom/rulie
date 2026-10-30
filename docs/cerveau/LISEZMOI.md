@@ -1,6 +1,6 @@
 # Gala Cerveau
 
-Plateforme de jeux pour entraîner et entretenir le cerveau. Version : phase 2 (V1, 12 jeux).
+Plateforme de jeux pour entraîner et entretenir le cerveau. Version : phase 3 (24 jeux d'entraînement + 3 de détente, bilan de départ).
 
 En ligne : https://galvazzz-dotcom.github.io/rulie/cerveau/
 
@@ -26,16 +26,17 @@ noyau/
 manifest.json, sw.js   installation sur téléphone et cache hors ligne (version en ligne seulement)
 icones/                icônes de l'application
 donnees/
-  mots-fr.js           listes de mots (anagrammes)
+  mots-fr.js           listes de mots (anagrammes, mots mêlés)
   proverbes-fr.js      proverbes à compléter
+  synonymes-fr.js      synonymes et contraires
 jeux/
-  paires/  simon/  empan/        mémoire
-  stroop/  intrus/               attention
-  calcul/  pareil/               vitesse
-  suites/  sudoku/               logique
-  anagrammes/  proverbes/        langage
-  rotation/                      organisation (rotation mentale)
-  2048/  serpent/  demineur/   détente, repris de jeux-offline.html
+  paires/  simon/  empan/  objets/                 mémoire
+  stroop/  intrus/  barrage/  compte/              attention
+  calcul/  pareil/  reflexes/  code/               vitesse
+  suites/  sudoku/  hanoi/  mastermind/            logique
+  anagrammes/  proverbes/  synonymes/  motsmeles/  langage
+  rotation/  regle/  monnaie/  labyrinthe/         organisation
+  2048/  serpent/  demineur/                       détente, repris de jeux-offline.html
 ```
 
 ## Ajouter un jeu
@@ -72,7 +73,7 @@ Gala.enregistrer({
 
 2. Ajoute une ligne dans `index.html`, avant `noyau/app.js` :
    `<script src="jeux/mon-jeu/mon-jeu.js"></script>`
-3. Ajoute le fichier à la liste `FICHIERS` de `sw.js` et change `VERSION` (par ex. `gala-cerveau-v3`),
+3. Ajoute le fichier à la liste `FICHIERS` de `sw.js` et change `VERSION` (par ex. `gala-cerveau-v4`),
    pour que la version en ligne le garde hors connexion.
 
 Règles pour que tout marche aussi en local (`file://`) : pas de `import`/`export`, pas de `fetch`.
@@ -84,6 +85,13 @@ Un jeu marqué `detente: true` est rangé dans « Détente » et n'entre pas dan
 
 Chaque jour, 4 jeux de domaines différents sont tirés, en priorité dans les domaines les moins
 travaillés ces 7 derniers jours. On les enchaîne depuis la carte « Séance du jour » de l'accueil.
+
+## Bilan de départ
+
+Six jeux, un par domaine (empan, intrus, pareil, suites, proverbes, rotation), joués au niveau 2.
+Le résultat règle le niveau de départ de tous les jeux du domaine pas encore joués :
+85 % ou plus donne le niveau 3, 60 % ou plus le niveau 2, en dessous le niveau 1.
+Proposé sur l'accueil tant qu'il n'est pas fini ; on peut le refaire depuis les Réglages.
 
 ## Difficulté adaptative
 

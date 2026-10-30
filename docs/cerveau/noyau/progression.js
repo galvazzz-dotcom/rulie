@@ -117,5 +117,42 @@
     return s;
   }
 
-  Gala.progression = { niveauConseille, apresPartie, serieJours, secondesSur, totalParties, seanceDuJour, marquerFait };
+  /* ---------- Bilan de départ ----------
+     Un jeu par domaine, joué au niveau 2. Sa réussite règle le niveau de départ de tous les jeux
+     du domaine qui n'ont pas encore été joués (et du jeu du bilan lui-même). */
+  const JEUX_BILAN = ['empan', 'intrus', 'pareil', 'suites', 'proverbes', 'rotation'];
+  const NIVEAU_BILAN = 2;
+
+  function commencerBilan() {
+    S().donnees.bilan = { jeux: JEUX_BILAN.filter(id => Gala.trouverJeu(id)), faits: [], niveaux: {}, fin: null, masque: false };
+    S().sauver();
+    return S().donnees.bilan;
+  }
+
+  function bilan() {
+    return S().donnees.bilan || commencerBilan();
+  }
+
+  function noterBilan(def, reussite) {
+    const b = bilan();
+    if (!b.jeux.includes(def.id)) return b;
+    const niveau = reussite >= 0.85 ? 3 : reussite >= 0.6 ? 2 : 1;
+    b.niveaux[def.domaine] = niveau;
+    if (!b.faits.includes(def.id)) b.faits.push(def.id);
+    Gala.jeux.filter(j => j.domaine === def.domaine && j.adaptatif && !j.detente).forEach(j => {
+      const info = S().jeu(j.id);
+      if (j.id === def.id || !info.parties.length) {
+        info.niveau = Math.min(niveau, j.niveaux);
+        info.compteurs = { haut: 0, bas: 0 };
+      }
+    });
+    if (b.faits.length >= b.jeux.length) b.fin = new Date().toISOString();
+    S().sauver();
+    return b;
+  }
+
+  Gala.progression = {
+    niveauConseille, apresPartie, serieJours, secondesSur, totalParties, seanceDuJour, marquerFait,
+    bilan, commencerBilan, noterBilan, NIVEAU_BILAN
+  };
 })();
