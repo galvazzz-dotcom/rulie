@@ -1,6 +1,6 @@
 # Gala Cerveau
 
-Plateforme de jeux pour entraîner et entretenir le cerveau. Version : phase 3 (24 jeux d'entraînement + 3 de détente, bilan de départ).
+Plateforme de jeux pour entraîner et entretenir le cerveau. Version : phase 4 (30 jeux d'entraînement + 3 de détente, bilan de départ, listes de mots enrichies).
 
 En ligne : https://galvazzz-dotcom.github.io/rulie/cerveau/
 
@@ -29,13 +29,15 @@ donnees/
   mots-fr.js           listes de mots (anagrammes, mots mêlés)
   proverbes-fr.js      proverbes à compléter
   synonymes-fr.js      synonymes et contraires
+  definitions-fr.js    définitions (jeu Définitions)
+  etapes-fr.js         étapes des tâches courantes (jeu Dans l'ordre)
 jeux/
-  paires/  simon/  empan/  objets/                 mémoire
-  stroop/  intrus/  barrage/  compte/              attention
-  calcul/  pareil/  reflexes/  code/               vitesse
-  suites/  sudoku/  hanoi/  mastermind/            logique
-  anagrammes/  proverbes/  synonymes/  motsmeles/  langage
-  rotation/  regle/  monnaie/  labyrinthe/         organisation
+  paires/  simon/  empan/  objets/  prenoms/                    mémoire
+  stroop/  intrus/  barrage/  compte/  differences/               attention
+  calcul/  pareil/  reflexes/  code/  plusgrand/                  vitesse
+  suites/  sudoku/  hanoi/  mastermind/  balance/                 logique
+  anagrammes/  proverbes/  synonymes/  motsmeles/  definitions/   langage
+  rotation/  regle/  monnaie/  labyrinthe/  ordre/                organisation
   2048/  serpent/  demineur/                       détente, repris de jeux-offline.html
 ```
 
@@ -73,7 +75,7 @@ Gala.enregistrer({
 
 2. Ajoute une ligne dans `index.html`, avant `noyau/app.js` :
    `<script src="jeux/mon-jeu/mon-jeu.js"></script>`
-3. Ajoute le fichier à la liste `FICHIERS` de `sw.js` et change `VERSION` (par ex. `gala-cerveau-v4`),
+3. Ajoute le fichier à la liste `FICHIERS` de `sw.js` et change `VERSION` (par ex. `gala-cerveau-v5`),
    pour que la version en ligne le garde hors connexion.
 
 Règles pour que tout marche aussi en local (`file://`) : pas de `import`/`export`, pas de `fetch`.
