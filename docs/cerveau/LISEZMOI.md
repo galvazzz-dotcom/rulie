@@ -1,6 +1,6 @@
 # Gala Cerveau
 
-Plateforme de jeux pour entraîner et entretenir le cerveau. Version : phase 4 (30 jeux d'entraînement + 3 de détente, bilan de départ, listes de mots enrichies).
+Plateforme de jeux pour entraîner et entretenir le cerveau. Version : phase 5 (30 jeux d'entraînement, 4 problèmes longs, 3 jeux de détente, bilan de départ).
 
 En ligne : https://galvazzz-dotcom.github.io/rulie/cerveau/
 
@@ -38,6 +38,7 @@ jeux/
   suites/  sudoku/  hanoi/  mastermind/  balance/                 logique
   anagrammes/  proverbes/  synonymes/  motsmeles/  definitions/   langage
   rotation/  regle/  monnaie/  labyrinthe/  ordre/                organisation
+  deduction/  enonces/  cible/  nonogramme/        problèmes (plus longs, hors séance)
   2048/  serpent/  demineur/                       détente, repris de jeux-offline.html
 ```
 
@@ -75,13 +76,14 @@ Gala.enregistrer({
 
 2. Ajoute une ligne dans `index.html`, avant `noyau/app.js` :
    `<script src="jeux/mon-jeu/mon-jeu.js"></script>`
-3. Ajoute le fichier à la liste `FICHIERS` de `sw.js` et change `VERSION` (par ex. `gala-cerveau-v5`),
+3. Ajoute le fichier à la liste `FICHIERS` de `sw.js` et change `VERSION` (par ex. `gala-cerveau-v6`),
    pour que la version en ligne le garde hors connexion.
 
 Règles pour que tout marche aussi en local (`file://`) : pas de `import`/`export`, pas de `fetch`.
 Les données (listes de mots…) se déclarent dans un fichier `.js`.
 
-Un jeu marqué `detente: true` est rangé dans « Détente » et n'entre pas dans la séance du jour.
+Un jeu marqué `detente: true` est rangé dans « Détente », un jeu marqué `probleme: true` dans « Problèmes » :
+ni l'un ni l'autre n'entre dans la séance du jour, le bilan ou les courbes par domaine.
 
 ## Séance du jour
 
