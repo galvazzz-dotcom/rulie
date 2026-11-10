@@ -1,6 +1,6 @@
 # Gala Cerveau
 
-Plateforme de jeux pour entraîner et entretenir le cerveau. Version : phase 5 (30 jeux d'entraînement, 4 problèmes longs, 3 jeux de détente, bilan de départ).
+Plateforme de jeux pour entraîner et entretenir le cerveau. Version : phase 6 (33 jeux d'entraînement, 7 problèmes longs, 3 jeux de détente, bilan de départ).
 
 En ligne : https://galvazzz-dotcom.github.io/rulie/cerveau/
 
@@ -31,14 +31,18 @@ donnees/
   synonymes-fr.js      synonymes et contraires
   definitions-fr.js    définitions (jeu Définitions)
   etapes-fr.js         étapes des tâches courantes (jeu Dans l'ordre)
+  histoires-fr.js      petites histoires et leurs questions (jeu Histoire à retenir)
+  tueur-grilles.js     grilles 9×9 de sudoku tueur préparées à l'avance
 jeux/
   paires/  simon/  empan/  objets/  prenoms/                    mémoire
+  courses/  histoire/  numeros/                                 mémoire de la vie courante
   stroop/  intrus/  barrage/  compte/  differences/               attention
   calcul/  pareil/  reflexes/  code/  plusgrand/                  vitesse
   suites/  sudoku/  hanoi/  mastermind/  balance/                 logique
   anagrammes/  proverbes/  synonymes/  motsmeles/  definitions/   langage
   rotation/  regle/  monnaie/  labyrinthe/  ordre/                organisation
   deduction/  enonces/  cible/  nonogramme/        problèmes (plus longs, hors séance)
+  pesees/  bidons/  tueur/                         problèmes (suite)
   2048/  serpent/  demineur/                       détente, repris de jeux-offline.html
 ```
 
@@ -76,7 +80,7 @@ Gala.enregistrer({
 
 2. Ajoute une ligne dans `index.html`, avant `noyau/app.js` :
    `<script src="jeux/mon-jeu/mon-jeu.js"></script>`
-3. Ajoute le fichier à la liste `FICHIERS` de `sw.js` et change `VERSION` (par ex. `gala-cerveau-v6`),
+3. Ajoute le fichier à la liste `FICHIERS` de `sw.js` et change `VERSION` (par ex. `gala-cerveau-v7`),
    pour que la version en ligne le garde hors connexion.
 
 Règles pour que tout marche aussi en local (`file://`) : pas de `import`/`export`, pas de `fetch`.
