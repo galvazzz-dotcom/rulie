@@ -70,7 +70,7 @@
     titre('<span>🌿 Gala Cerveau</span>');
     const prenom = S.donnees.profil.prenom;
     const serie = P.serieJours();
-    const domainesAvecJeux = Gala.DOMAINES.filter(d => Gala.jeux.some(j => j.domaine === d.id && !j.detente));
+    const domainesAvecJeux = Gala.DOMAINES.filter(d => Gala.jeux.some(j => j.domaine === d.id && !j.detente && !j.probleme));
     const domainesAVenir = Gala.DOMAINES.filter(d => !domainesAvecJeux.includes(d));
 
     let html = '<div class="pile">';
@@ -121,9 +121,16 @@
 
     domainesAvecJeux.forEach(d => {
       html += `<section class="domaine"><h2><span aria-hidden="true">${d.icone}</span> ${d.nom}</h2><div class="grille-jeux">`;
-      Gala.jeux.filter(j => j.domaine === d.id && !j.detente).forEach(j => { html += tuile(j); });
+      Gala.jeux.filter(j => j.domaine === d.id && !j.detente && !j.probleme).forEach(j => { html += tuile(j); });
       html += '</div></section>';
     });
+
+    const problemes = Gala.jeux.filter(j => j.probleme);
+    if (problemes.length) {
+      html += `<section class="domaine"><h2><span aria-hidden="true">🏔️</span> Problèmes</h2>
+        <p class="discret petit" style="margin:-.3rem 0 .6rem">Plus longs et plus complexes, à faire à tête reposée. Ils ne font pas partie de la séance du jour.</p>
+        <div class="grille-jeux">${problemes.map(tuile).join('')}</div></section>`;
+    }
 
     const detente = Gala.jeux.filter(j => j.detente);
     if (detente.length) {
@@ -364,7 +371,7 @@
     }
     let html = '<h2>Par domaine</h2><div class="domaines">';
     Gala.DOMAINES.forEach(d => {
-      const jeux = Gala.jeux.filter(j => j.domaine === d.id && !j.detente);
+      const jeux = Gala.jeux.filter(j => j.domaine === d.id && !j.detente && !j.probleme);
       if (!jeux.length) return;
       const parJour = {};
       let parties = 0;

@@ -89,14 +89,14 @@
     const existante = seances[cle];
     if (existante && existante.jeux.every(id => Gala.trouverJeu(id))) return existante;
 
-    const candidats = Gala.jeux.filter(j => !j.detente);
+    const candidats = Gala.jeux.filter(j => !j.detente && !j.probleme);
     const domaines = {};
     candidats.forEach(j => {
       const t = secondesRecentes(j.id) + Math.random(); // le hasard départage les égalités
       if (!domaines[j.domaine] || t < domaines[j.domaine].t) domaines[j.domaine] = { id: j.id, t };
     });
     const choix = Object.keys(domaines)
-      .map(d => ({ id: domaines[d].id, t: Gala.jeux.filter(j => j.domaine === d && !j.detente).reduce((s, j) => s + secondesRecentes(j.id), 0) + Math.random() }))
+      .map(d => ({ id: domaines[d].id, t: Gala.jeux.filter(j => j.domaine === d && !j.detente && !j.probleme).reduce((s, j) => s + secondesRecentes(j.id), 0) + Math.random() }))
       .sort((a, b) => a.t - b.t)
       .slice(0, TAILLE_SEANCE)
       .map(x => x.id);
@@ -139,7 +139,7 @@
     const niveau = reussite >= 0.85 ? 3 : reussite >= 0.6 ? 2 : 1;
     b.niveaux[def.domaine] = niveau;
     if (!b.faits.includes(def.id)) b.faits.push(def.id);
-    Gala.jeux.filter(j => j.domaine === def.domaine && j.adaptatif && !j.detente).forEach(j => {
+    Gala.jeux.filter(j => j.domaine === def.domaine && j.adaptatif && !j.detente && !j.probleme).forEach(j => {
       const info = S().jeu(j.id);
       if (j.id === def.id || !info.parties.length) {
         info.niveau = Math.min(niveau, j.niveaux);

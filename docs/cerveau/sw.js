@@ -1,7 +1,7 @@
 /* Gala Cerveau — cache hors ligne de la version en ligne.
    Ignoré quand on ouvre index.html en fichier local. Portée limitée au dossier de l'application.
    Stratégie : on répond depuis le cache tout de suite, et on met le cache à jour en arrière-plan. */
-const VERSION = 'gala-cerveau-v4';
+const VERSION = 'gala-cerveau-v5';
 const FICHIERS = [
   './', 'index.html', 'manifest.json',
   'noyau/interface.css', 'noyau/stockage.js', 'noyau/moteur.js', 'noyau/progression.js', 'noyau/app.js',
@@ -14,6 +14,7 @@ const FICHIERS = [
   'jeux/2048/2048.js', 'jeux/serpent/serpent.js', 'jeux/demineur/demineur.js',
   'jeux/objets/objets.js', 'jeux/barrage/barrage.js', 'jeux/compte/compte.js', 'jeux/reflexes/reflexes.js', 'jeux/code/code.js', 'jeux/hanoi/hanoi.js', 'jeux/mastermind/mastermind.js', 'jeux/synonymes/synonymes.js', 'jeux/motsmeles/motsmeles.js', 'jeux/regle/regle.js', 'jeux/monnaie/monnaie.js', 'jeux/labyrinthe/labyrinthe.js',
   'jeux/prenoms/prenoms.js', 'jeux/differences/differences.js', 'jeux/plusgrand/plusgrand.js', 'jeux/balance/balance.js', 'jeux/definitions/definitions.js', 'jeux/ordre/ordre.js',
+  'jeux/deduction/deduction.js', 'jeux/enonces/enonces.js', 'jeux/cible/cible.js', 'jeux/nonogramme/nonogramme.js',
   'icones/icone-192.png', 'icones/icone-512.png'
 ];
 
