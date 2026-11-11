@@ -1,11 +1,14 @@
 /* Calcul éclair — vitesse de traitement et calcul mental.
-   15 calculs, 4 réponses proposées. Score = temps total + 3 s par erreur (moins = mieux). */
+   15 calculs, 4 réponses proposées. Deux façons de jouer, choisies au début de la partie
+   (le dernier choix est retenu) :
+   - avec chrono : score = temps total + 3 s par erreur (moins = mieux), la réussite tient compte de la vitesse ;
+   - sans chrono : pas de temps, pas de record ; la réussite ne dépend que des bonnes réponses. */
 Gala.enregistrer({
   id: 'calcul',
   nom: 'Calcul éclair',
   icone: '➗',
   domaine: 'vitesse',
-  consigne: 'Résous les 15 calculs le plus vite possible en touchant la bonne réponse. Chaque erreur ajoute 3 secondes.',
+  consigne: 'Résous les 15 calculs en touchant la bonne réponse. Avec chrono : va le plus vite possible, chaque erreur ajoute 3 secondes. Sans chrono : prends ton temps.',
   niveaux: 5,
   adaptatif: true,
   mesure: { unite: 's', meilleur: 'bas' },
@@ -17,6 +20,9 @@ Gala.enregistrer({
       .calcul-reponses button { min-height: 72px; font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
       .calcul-reponses button.bon { border-color: var(--ok); background: var(--ok); color: #fff; }
       .calcul-reponses button.faux { border-color: var(--erreur); background: var(--erreur); color: #fff; }
+      .calcul-modes { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; width: min(92vw, 420px); }
+      .calcul-modes button { min-height: 96px; flex-direction: column; gap: .2rem; font-size: 1.15rem; font-weight: 700; }
+      .calcul-modes button small { font-weight: 400; font-size: .85rem; color: inherit; opacity: .85; }
     `);
     const QUESTIONS = 15, PENALITE = 3;
     const CIBLE = [0, 5, 6, 7, 8, 9][ctx.niveau]; // secondes par calcul pour 100 %
@@ -64,6 +70,8 @@ Gala.enregistrer({
     ctx.zone.append(question, reponses);
 
     let numero = 0, erreurs = 0, actuelle = null, actif = false, debut = 0;
+    const memo = Gala.stockage.jeu('calcul');
+    let chrono = memo.chrono !== false;
     const majStats = () => ctx.stats({ Calcul: Math.min(numero + 1, QUESTIONS) + ' / ' + QUESTIONS, Erreurs: erreurs });
 
     function suivante() {
@@ -78,9 +86,14 @@ Gala.enregistrer({
     function terminer() {
       const secondes = Math.round((performance.now() - debut) / 1000);
       const bonnes = QUESTIONS - erreurs;
-      const vitesse = Math.min(1, (CIBLE * QUESTIONS) / Math.max(1, secondes));
       question.textContent = '✓';
       reponses.innerHTML = '';
+      if (!chrono) {
+        ctx.message(`${bonnes} bonnes réponses sur ${QUESTIONS}`);
+        ctx.fin({ valeur: null, reussite: bonnes / QUESTIONS, reussi: bonnes >= QUESTIONS / 2 });
+        return;
+      }
+      const vitesse = Math.min(1, (CIBLE * QUESTIONS) / Math.max(1, secondes));
       ctx.message(`${bonnes} bonnes réponses en ${secondes} s`);
       ctx.fin({ valeur: secondes + PENALITE * erreurs, reussite: (bonnes / QUESTIONS) * vitesse, reussi: bonnes >= QUESTIONS / 2 });
     }
@@ -103,19 +116,45 @@ Gala.enregistrer({
       ctx.attendre(bon ? 250 : 900, suivante);
     });
 
-    // Petit compte à rebours avant de lancer le chrono.
-    let compte = 3;
-    question.textContent = compte;
-    ctx.stats({ Calcul: '0 / ' + QUESTIONS, Erreurs: 0 });
-    const decompte = ctx.repeter(700, () => {
-      compte--;
-      if (compte > 0) {
-        question.textContent = compte;
+    // Choix du mode, puis petit compte à rebours avant de lancer le chrono.
+    function lancer() {
+      if (!chrono) {
+        ctx.message('Sans chrono : prends ton temps.');
+        debut = performance.now();
+        suivante();
         return;
       }
-      clearInterval(decompte);
-      debut = performance.now();
-      suivante();
+      let compte = 3;
+      question.textContent = compte;
+      const decompte = ctx.repeter(700, () => {
+        compte--;
+        if (compte > 0) {
+          question.textContent = compte;
+          return;
+        }
+        clearInterval(decompte);
+        debut = performance.now();
+        suivante();
+      });
+    }
+    ctx.stats({ Calcul: '0 / ' + QUESTIONS, Erreurs: 0 });
+    const modes = document.createElement('div');
+    modes.className = 'calcul-modes';
+    modes.innerHTML =
+      `<button data-chrono="1" class="${chrono ? 'principal' : ''}">⏱️ Avec chrono<small>le plus vite possible</small></button>` +
+      `<button data-chrono="0" class="${chrono ? '' : 'principal'}">🧘 Sans chrono<small>à ton rythme</small></button>`;
+    question.textContent = 'Comment veux-tu jouer ?';
+    question.style.fontSize = '1.4rem';
+    ctx.zone.insertBefore(modes, reponses);
+    ctx.ecouter(modes, 'click', e => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      chrono = b.dataset.chrono === '1';
+      memo.chrono = chrono;
+      Gala.stockage.sauver();
+      modes.remove();
+      question.style.fontSize = '';
+      lancer();
     });
   }
 });
