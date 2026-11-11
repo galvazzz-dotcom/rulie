@@ -1,6 +1,6 @@
 # Gala Cerveau
 
-Plateforme de jeux pour entraîner et entretenir le cerveau. Version : phase 11 (37 jeux d'entraînement, 8 problèmes longs, 5 jeux de détente, bilan de départ).
+Plateforme de jeux pour entraîner et entretenir le cerveau. Version : phase 12 (37 jeux d'entraînement, 8 problèmes longs, 5 jeux de détente, bilan de départ).
 
 En ligne : https://galvazzz-dotcom.github.io/rulie/cerveau/
 
@@ -131,5 +131,5 @@ tâche parmi 5 réponses (A à E). Après chaque réponse, l'effet des dés de l
 Les exercices sont tirés au hasard. Un exercice n'est gardé que si une seule réponse est possible :
 le programme essaie toutes les règles qui collent aux exemples et vérifie qu'elles donnent toutes le
 même résultat. Niveau 1 : 3 dés, un seul dé par exemple. Niveau 2 : 4 dés, 2 par ligne.
-Niveaux 3 à 5 : comme au Selor, 3 exemples de 3 dés (5 dés, puis les 6 faces ; au niveau 5, un dé
-peut aussi faire tourner la figure d'un quart de tour).
+Niveaux 3 à 5 : comme au Selor, des exemples de 3 dés (niveau 3 : 5 dés et 3 exemples ;
+niveau 4 : les 6 faces et 4 exemples ; niveau 5 : les 6 faces et seulement 3 exemples).
