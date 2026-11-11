@@ -1,6 +1,6 @@
 # Gala Cerveau
 
-Plateforme de jeux pour entraîner et entretenir le cerveau. Version : phase 10 (37 jeux d'entraînement, 8 problèmes longs, 5 jeux de détente, bilan de départ).
+Plateforme de jeux pour entraîner et entretenir le cerveau. Version : phase 11 (37 jeux d'entraînement, 8 problèmes longs, 5 jeux de détente, bilan de départ).
 
 En ligne : https://galvazzz-dotcom.github.io/rulie/cerveau/
 
@@ -122,13 +122,14 @@ Un jeu adaptatif monte d'un niveau après 3 parties à 85 % de réussite ou plus
 
 ## Dés et figures (raisonnement abstrait)
 
-Le genre d'exercice des tests de sélection (Selor, Défense, police). Chaque face de dé applique un
-effet caché à une figure : inverser la couleur, changer la taille, échanger carré et cercle, tourner,
-ajouter ou enlever un trait, un petit point… Les dés agissent de gauche à droite. On devine l'effet de
-chaque dé dans les exemples, puis on choisit le résultat de la tâche. Après chaque réponse, l'effet des
-dés de la tâche est expliqué.
+Le format des tests de sélection (Selor, Défense, police). Chaque face de dé applique un effet caché
+à une figure : inverser la couleur (blanc ↔ noir), échanger carré et cercle, changer la taille,
+ajouter ou enlever la ligne horizontale ou la ligne verticale, ou ne rien changer. Les dés agissent de
+gauche à droite. On devine l'effet de chaque dé dans les exemples, puis on choisit le résultat de la
+tâche parmi 5 réponses (A à E). Après chaque réponse, l'effet des dés de la tâche est expliqué.
 
 Les exercices sont tirés au hasard. Un exercice n'est gardé que si une seule réponse est possible :
 le programme essaie toutes les règles qui collent aux exemples et vérifie qu'elles donnent toutes le
-même résultat. Niveau 1 : 3 dés, un seul dé par exemple. Niveau 3 : 5 dés, 3 dés par ligne.
-Niveaux 4 et 5 : gris, triangle, effets en cycle (blanc → gris → noir), 4 réponses au choix.
+même résultat. Niveau 1 : 3 dés, un seul dé par exemple. Niveau 2 : 4 dés, 2 par ligne.
+Niveaux 3 à 5 : comme au Selor, 3 exemples de 3 dés (5 dés, puis les 6 faces ; au niveau 5, un dé
+peut aussi faire tourner la figure d'un quart de tour).
