@@ -1,6 +1,6 @@
 # Gala Cerveau
 
-Plateforme de jeux pour entraîner et entretenir le cerveau. Version : phase 8 (36 jeux d'entraînement, 8 problèmes longs, 5 jeux de détente, bilan de départ).
+Plateforme de jeux pour entraîner et entretenir le cerveau. Version : phase 10 (37 jeux d'entraînement, 8 problèmes longs, 5 jeux de détente, bilan de départ).
 
 En ligne : https://galvazzz-dotcom.github.io/rulie/cerveau/
 
@@ -44,6 +44,7 @@ jeux/
   stroop/  intrus/  barrage/  compte/  differences/               attention
   calcul/  pareil/  reflexes/  code/  plusgrand/                  vitesse
   suites/  sudoku/  hanoi/  mastermind/  balance/                 logique
+  des/                                                          logique (raisonnement abstrait)
   anagrammes/  proverbes/  synonymes/  motsmeles/  definitions/   langage
   motscroises/                                                  langage
   rotation/  regle/  monnaie/  labyrinthe/  ordre/                organisation
@@ -118,3 +119,16 @@ Proposé sur l'accueil tant qu'il n'est pas fini ; on peut le refaire depuis les
 
 Un jeu adaptatif monte d'un niveau après 3 parties à 85 % de réussite ou plus, et redescend après
 2 parties sous 60 %. Seules les parties jouées au niveau conseillé comptent.
+
+## Dés et figures (raisonnement abstrait)
+
+Le genre d'exercice des tests de sélection (Selor, Défense, police). Chaque face de dé applique un
+effet caché à une figure : inverser la couleur, changer la taille, échanger carré et cercle, tourner,
+ajouter ou enlever un trait, un petit point… Les dés agissent de gauche à droite. On devine l'effet de
+chaque dé dans les exemples, puis on choisit le résultat de la tâche. Après chaque réponse, l'effet des
+dés de la tâche est expliqué.
+
+Les exercices sont tirés au hasard. Un exercice n'est gardé que si une seule réponse est possible :
+le programme essaie toutes les règles qui collent aux exemples et vérifie qu'elles donnent toutes le
+même résultat. Niveau 1 : 3 dés, un seul dé par exemple. Niveau 3 : 5 dés, 3 dés par ligne.
+Niveaux 4 et 5 : gris, triangle, effets en cycle (blanc → gris → noir), 4 réponses au choix.
