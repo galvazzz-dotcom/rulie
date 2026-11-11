@@ -496,6 +496,17 @@
     document.head.appendChild(lien);
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('sw.js', { scope: './' }).catch(() => {}));
+      // Nouvelle version installée : on recharge pour l'afficher tout de suite,
+      // mais jamais au milieu d'une partie (on attend le prochain changement d'écran).
+      if (navigator.serviceWorker.controller) {
+        let aRecharger = false;
+        const enPartie = () => /^#(jeu|seance|bilan)\//.test(location.hash);
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (enPartie()) aRecharger = true;
+          else location.reload();
+        });
+        window.addEventListener('hashchange', () => { if (aRecharger && !enPartie()) location.reload(); });
+      }
     }
   }
 

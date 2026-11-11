@@ -15,14 +15,10 @@
   const EFFETS = {
     rien:      { attr: [],      texte: 'ne change rien', f: f => f },
     couleur:   { attr: ['couleur'], texte: 'inverse la couleur (blanc ↔ noir)', f: f => ({ ...f, couleur: 2 - f.couleur }) },
-    couleur3:  { attr: ['couleur'], texte: 'fonce la couleur (blanc → gris → noir → blanc)', f: f => ({ ...f, couleur: (f.couleur + 1) % 3 }) },
     taille:    { attr: ['taille'],  texte: 'change la taille (grand ↔ petit)', f: f => ({ ...f, taille: 1 - f.taille }) },
     forme:     { attr: ['forme'],   texte: 'échange carré et cercle', f: f => ({ ...f, forme: f.forme === 2 ? 2 : 1 - f.forme }) },
-    forme3:    { attr: ['forme'],   texte: 'change la forme (carré → cercle → triangle → carré)', f: f => ({ ...f, forme: (f.forme + 1) % 3 }) },
-    tourner:   { attr: ['H', 'V'], texte: 'tourne d\'un quart de tour (ligne horizontale ↔ ligne verticale)', f: f => ({ ...f, traits: ((f.traits & 1) << 1) | ((f.traits & 2) >> 1) }) },
     traitH:    { attr: ['H'],     texte: 'ajoute ou enlève la ligne horizontale', f: f => ({ ...f, traits: f.traits ^ 1 }) },
-    traitV:    { attr: ['V'],     texte: 'ajoute ou enlève la ligne verticale', f: f => ({ ...f, traits: f.traits ^ 2 }) },
-    point:     { attr: ['point'],   texte: 'ajoute ou enlève le petit point', f: f => ({ ...f, point: 1 - f.point }) }
+    traitV:    { attr: ['V'],     texte: 'ajoute ou enlève la ligne verticale', f: f => ({ ...f, traits: f.traits ^ 2 }) }
   };
 
   /* ---------- Réglages par niveau ---------- */
@@ -34,8 +30,8 @@
     { des: 3, parLigne: 1, tache: 2, exemples: 3, choix: 5, effets: BASE, formes: 2, couleurs: [0, 2], point: false },
     { des: 4, parLigne: 2, exemples: 4, choix: 5, effets: BASE, formes: 2, couleurs: [0, 2], point: false },
     { des: 5, parLigne: 3, exemples: 3, choix: 5, effets: BASE, formes: 2, couleurs: [0, 2], point: false },
-    { des: 6, parLigne: 3, exemples: 3, choix: 5, effets: BASE, formes: 2, couleurs: [0, 2], point: false },
-    { des: 6, parLigne: 3, exemples: 3, choix: 5, effets: [...BASE, 'tourner'], formes: 2, couleurs: [0, 2], point: false }
+    { des: 6, parLigne: 3, exemples: 4, choix: 5, effets: BASE, formes: 2, couleurs: [0, 2], point: false },
+    { des: 6, parLigne: 3, exemples: 3, choix: 5, effets: BASE, formes: 2, couleurs: [0, 2], point: false }
   ];
 
   const hasard = n => Math.floor(Math.random() * n);
@@ -164,12 +160,10 @@
     let traits = '';
     if (f.traits & 1) traits += `<line x1="0" y1="${ty}" x2="100" y2="${ty}"/>`;
     if (f.traits & 2) traits += `<line x1="${c}" y1="0" x2="${c}" y2="100"/>`;
-    const point = f.point ? `<circle cx="88" cy="12" r="7" fill="${ENCRE}"/>` : '';
-    return `<svg viewBox="0 0 100 100" aria-hidden="true">
+        return `<svg viewBox="0 0 100 100" aria-hidden="true">
       <defs><clipPath id="${id}">${forme}</clipPath></defs>
       <g fill="${TEINTE[f.couleur]}" stroke="${ENCRE}" stroke-width="3">${forme}</g>
-      <g stroke="${trait}" stroke-width="3" clip-path="url(#${id})">${traits}</g>
-      ${point}</svg>`;
+      <g stroke="${trait}" stroke-width="3" clip-path="url(#${id})">${traits}</g></svg>`;
   }
 
   const POINTS = {
