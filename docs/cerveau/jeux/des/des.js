@@ -1,6 +1,6 @@
 /* Dés et figures — raisonnement abstrait (domaine « Logique »).
    Inspiré des tests de raisonnement abstrait des sélections (Selor, Défense, police) :
-   chaque face de dé applique un effet caché à une figure (couleur, taille, forme, traits…).
+   chaque face de dé applique un effet caché à une figure (couleur, forme, taille, ligne horizontale ou verticale…).
    On devine l'effet de chaque dé à partir des exemples, puis on l'applique à la tâche.
    Exercices tirés au hasard ; un exercice n'est gardé que si sa réponse est la seule possible
    d'après les exemples (vérifié en essayant toutes les règles imaginables). 6 questions, sans chrono. */
@@ -13,25 +13,29 @@
 
   /* ---------- Effets des dés ---------- */
   const EFFETS = {
-    rien:      { attr: null,      texte: 'ne change rien', f: f => f },
-    couleur:   { attr: 'couleur', texte: 'inverse la couleur (blanc ↔ noir)', f: f => ({ ...f, couleur: 2 - f.couleur }) },
-    couleur3:  { attr: 'couleur', texte: 'fonce la couleur (blanc → gris → noir → blanc)', f: f => ({ ...f, couleur: (f.couleur + 1) % 3 }) },
-    taille:    { attr: 'taille',  texte: 'change la taille (grand ↔ petit)', f: f => ({ ...f, taille: 1 - f.taille }) },
-    forme:     { attr: 'forme',   texte: 'échange carré et cercle', f: f => ({ ...f, forme: f.forme === 2 ? 2 : 1 - f.forme }) },
-    forme3:    { attr: 'forme',   texte: 'change la forme (carré → cercle → triangle → carré)', f: f => ({ ...f, forme: (f.forme + 1) % 3 }) },
-    tourner:   { attr: 'traits',  texte: 'tourne d\'un quart de tour (trait couché ↔ trait debout)', f: f => ({ ...f, traits: ((f.traits & 1) << 1) | ((f.traits & 2) >> 1) }) },
-    traitH:    { attr: 'traits',  texte: 'ajoute ou enlève le trait couché', f: f => ({ ...f, traits: f.traits ^ 1 }) },
-    traitV:    { attr: 'traits',  texte: 'ajoute ou enlève le trait debout', f: f => ({ ...f, traits: f.traits ^ 2 }) },
-    point:     { attr: 'point',   texte: 'ajoute ou enlève le petit point', f: f => ({ ...f, point: 1 - f.point }) }
+    rien:      { attr: [],      texte: 'ne change rien', f: f => f },
+    couleur:   { attr: ['couleur'], texte: 'inverse la couleur (blanc ↔ noir)', f: f => ({ ...f, couleur: 2 - f.couleur }) },
+    couleur3:  { attr: ['couleur'], texte: 'fonce la couleur (blanc → gris → noir → blanc)', f: f => ({ ...f, couleur: (f.couleur + 1) % 3 }) },
+    taille:    { attr: ['taille'],  texte: 'change la taille (grand ↔ petit)', f: f => ({ ...f, taille: 1 - f.taille }) },
+    forme:     { attr: ['forme'],   texte: 'échange carré et cercle', f: f => ({ ...f, forme: f.forme === 2 ? 2 : 1 - f.forme }) },
+    forme3:    { attr: ['forme'],   texte: 'change la forme (carré → cercle → triangle → carré)', f: f => ({ ...f, forme: (f.forme + 1) % 3 }) },
+    tourner:   { attr: ['H', 'V'], texte: 'tourne d\'un quart de tour (ligne horizontale ↔ ligne verticale)', f: f => ({ ...f, traits: ((f.traits & 1) << 1) | ((f.traits & 2) >> 1) }) },
+    traitH:    { attr: ['H'],     texte: 'ajoute ou enlève la ligne horizontale', f: f => ({ ...f, traits: f.traits ^ 1 }) },
+    traitV:    { attr: ['V'],     texte: 'ajoute ou enlève la ligne verticale', f: f => ({ ...f, traits: f.traits ^ 2 }) },
+    point:     { attr: ['point'],   texte: 'ajoute ou enlève le petit point', f: f => ({ ...f, point: 1 - f.point }) }
   };
 
   /* ---------- Réglages par niveau ---------- */
+  /* Comme au Selor : 5 réponses au choix (A à E), et des effets sur la couleur, la forme, la taille
+     et les lignes horizontale et verticale. Les niveaux 3 à 5 reprennent le format du test :
+     3 exemples de 3 dés, puis la tâche. */
+  const BASE = ['rien', 'couleur', 'taille', 'forme', 'traitH', 'traitV'];
   const NIVEAUX = [null,
-    { des: 3, parLigne: 1, tache: 2, exemples: 3, choix: 3, effets: ['rien', 'couleur', 'taille', 'forme', 'traitH', 'traitV'], formes: 2, couleurs: [0, 2], point: false },
-    { des: 4, parLigne: 2, exemples: 4, choix: 3, effets: ['rien', 'couleur', 'taille', 'forme', 'tourner', 'traitH', 'traitV', 'point'], formes: 2, couleurs: [0, 2], point: true },
-    { des: 5, parLigne: 3, exemples: 3, choix: 3, effets: ['rien', 'couleur', 'taille', 'forme', 'tourner', 'traitH', 'traitV', 'point'], formes: 2, couleurs: [0, 2], point: true },
-    { des: 5, parLigne: 3, exemples: 4, choix: 4, effets: ['rien', 'couleur', 'couleur3', 'taille', 'forme', 'forme3', 'tourner', 'traitH', 'traitV', 'point'], formes: 3, couleurs: [0, 1, 2], point: true },
-    { des: 6, parLigne: 3, exemples: 4, choix: 4, effets: ['rien', 'couleur', 'couleur3', 'taille', 'forme', 'forme3', 'tourner', 'traitH', 'traitV', 'point'], formes: 3, couleurs: [0, 1, 2], point: true }
+    { des: 3, parLigne: 1, tache: 2, exemples: 3, choix: 5, effets: BASE, formes: 2, couleurs: [0, 2], point: false },
+    { des: 4, parLigne: 2, exemples: 4, choix: 5, effets: BASE, formes: 2, couleurs: [0, 2], point: false },
+    { des: 5, parLigne: 3, exemples: 3, choix: 5, effets: BASE, formes: 2, couleurs: [0, 2], point: false },
+    { des: 6, parLigne: 3, exemples: 3, choix: 5, effets: BASE, formes: 2, couleurs: [0, 2], point: false },
+    { des: 6, parLigne: 3, exemples: 3, choix: 5, effets: [...BASE, 'tourner'], formes: 2, couleurs: [0, 2], point: false }
   ];
 
   const hasard = n => Math.floor(Math.random() * n);
@@ -78,11 +82,11 @@
       const pris = new Set();
       let ok = true;
       for (const d of faces) {
-        const libres = N.effets.filter(e => !pris.has(EFFETS[e].attr || e));
+        const libres = N.effets.filter(e => (e === 'rien' ? !pris.has('rien') : EFFETS[e].attr.every(a => !pris.has(a))));
         if (!libres.length) { ok = false; break; }
         const e = pioche(libres);
         regle[d] = e;
-        pris.add(EFFETS[e].attr || e);
+        (e === 'rien' ? ['rien'] : EFFETS[e].attr).forEach(a => pris.add(a));
       }
       if (!ok) continue;
 
@@ -125,6 +129,14 @@
       // Garder des leurres qui ressemblent à la bonne réponse : on préfère ceux qui en diffèrent peu.
       const ecart = f => ['forme', 'couleur', 'taille', 'traits', 'point'].filter(k => f[k] !== juste[k]).length;
       choisis.sort((a, b) => ecart(a) - ecart(b));
+      // Au besoin, compléter par des figures qui ne diffèrent de la bonne réponse que d'un détail.
+      const voisins = [f => ({ ...f, couleur: 2 - f.couleur }), f => ({ ...f, taille: 1 - f.taille }), f => ({ ...f, forme: 1 - f.forme }),
+        f => ({ ...f, traits: f.traits ^ 1 }), f => ({ ...f, traits: f.traits ^ 2 }), f => ({ ...f, traits: f.traits ^ 3 })];
+      for (const v of melanger(voisins)) {
+        if (choisis.length >= N.choix - 1) break;
+        const g = v(juste);
+        if (code(g) !== code(juste) && !choisis.some(c => code(c) === code(g))) choisis.push(g);
+      }
       if (choisis.length < N.choix - 1) continue;
       const propositions = melanger([juste, ...choisis.slice(0, N.choix - 1)]);
       return { faces, regle, exemples, tache, juste, propositions, bonne: propositions.indexOf(juste) };
@@ -177,7 +189,7 @@
     nom: 'Dés et figures',
     icone: '🎲',
     domaine: 'logique',
-    consigne: 'Chaque dé change la figure d\'une façon cachée (couleur, taille, forme, traits…). Les dés agissent de gauche à droite. Regarde les exemples pour deviner ce que fait chaque dé, puis choisis le bon résultat pour la tâche. Il n\'y a pas de chrono.',
+    consigne: 'Chaque dé change la figure d\'une façon cachée (couleur, forme, taille, ligne horizontale ou verticale…). Les dés agissent de gauche à droite. Regarde les exemples pour deviner ce que fait chaque dé, puis choisis le bon résultat pour la tâche parmi les 5 réponses, comme au Selor. Il n\'y a pas de chrono.',
     niveaux: 5,
     adaptatif: true,
     mesure: { unite: 'bonnes réponses', meilleur: 'haut' },
@@ -195,10 +207,10 @@
         .des-rangee { display: flex; justify-content: center; align-items: center; gap: .3rem; }
         .des-rangee .des-de { width: 2rem; height: 2rem; }
         .des-rangee .fleche { color: #5b6170; font-size: 1.1rem; margin-left: .2rem; }
-        .des-choix { display: grid; gap: .5rem; }
-        .des-choix button { background: ${PAPIER}; color: ${ENCRE}; display: flex; flex-direction: column; align-items: center; padding: .3rem; min-height: 0; }
+        .des-choix { display: grid; gap: .35rem; }
+        .des-choix button { background: ${PAPIER}; color: ${ENCRE}; display: flex; flex-direction: column; align-items: center; padding: .25rem; min-height: 0; min-width: 0; }
         .des-choix button b { font-size: 1rem; }
-        .des-choix button svg { width: 3.6rem; height: 3.6rem; display: block; }
+        .des-choix button svg { width: 100%; max-width: 3.6rem; height: auto; aspect-ratio: 1; display: block; }
         .des-choix button.bon { border-color: var(--ok); border-width: 4px; }
         .des-choix button.faux { border-color: var(--erreur); border-width: 4px; }
         .des-explication { font-size: .95rem; }
@@ -208,7 +220,7 @@
       `);
       const QUESTIONS = 6;
       const N = NIVEAUX[ctx.niveau];
-      const LETTRES = 'ABCD';
+      const LETTRES = 'ABCDE';
 
       const jeu = document.createElement('div');
       jeu.className = 'des-jeu';
