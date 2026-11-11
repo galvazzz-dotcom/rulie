@@ -1,6 +1,6 @@
 # Gala Cerveau
 
-Plateforme de jeux pour entraîner et entretenir le cerveau. Version : phase 6 (33 jeux d'entraînement, 7 problèmes longs, 3 jeux de détente, bilan de départ).
+Plateforme de jeux pour entraîner et entretenir le cerveau. Version : phase 8 (36 jeux d'entraînement, 8 problèmes longs, 5 jeux de détente, bilan de départ).
 
 En ligne : https://galvazzz-dotcom.github.io/rulie/cerveau/
 
@@ -22,6 +22,7 @@ noyau/
   moteur.js            registre des jeux, contexte de partie, sons, voix
   progression.js       difficulté adaptative, série de jours, temps de jeu
   app.js               écrans : accueil, jeu, progrès, réglages
+  quiz.js              moteur commun des quiz (Culture générale, Géographie)
   interface.css        thème clair/sombre, gros caractères
 manifest.json, sw.js   installation sur téléphone et cache hors ligne (version en ligne seulement)
 icones/                icônes de l'application
@@ -33,17 +34,23 @@ donnees/
   etapes-fr.js         étapes des tâches courantes (jeu Dans l'ordre)
   histoires-fr.js      petites histoires et leurs questions (jeu Histoire à retenir)
   tueur-grilles.js     grilles 9×9 de sudoku tueur préparées à l'avance
+  motscroises-fr.js    mots et définitions des mots croisés
+  culture-fr.js        questions de culture générale
+  geographie-fr.js     pays et capitales, questions de géographie
 jeux/
   paires/  simon/  empan/  objets/  prenoms/                    mémoire
   courses/  histoire/  numeros/                                 mémoire de la vie courante
+  culture/  geographie/                                         mémoire des connaissances (quiz)
   stroop/  intrus/  barrage/  compte/  differences/               attention
   calcul/  pareil/  reflexes/  code/  plusgrand/                  vitesse
   suites/  sudoku/  hanoi/  mastermind/  balance/                 logique
   anagrammes/  proverbes/  synonymes/  motsmeles/  definitions/   langage
+  motscroises/                                                  langage
   rotation/  regle/  monnaie/  labyrinthe/  ordre/                organisation
   deduction/  enonces/  cible/  nonogramme/        problèmes (plus longs, hors séance)
-  pesees/  bidons/  tueur/                         problèmes (suite)
+  pesees/  bidons/  tueur/  kakuro/                problèmes (suite)
   2048/  serpent/  demineur/                       détente, repris de jeux-offline.html
+  cartes/  solitaire/  freecell/                   détente, réussites (cartes.js : dessin des cartes partagé)
 ```
 
 ## Ajouter un jeu
@@ -80,7 +87,7 @@ Gala.enregistrer({
 
 2. Ajoute une ligne dans `index.html`, avant `noyau/app.js` :
    `<script src="jeux/mon-jeu/mon-jeu.js"></script>`
-3. Ajoute le fichier à la liste `FICHIERS` de `sw.js` et change `VERSION` (par ex. `gala-cerveau-v7`),
+3. Ajoute le fichier à la liste `FICHIERS` de `sw.js` et change `VERSION` (par ex. `gala-cerveau-v8`),
    pour que la version en ligne le garde hors connexion.
 
 Règles pour que tout marche aussi en local (`file://`) : pas de `import`/`export`, pas de `fetch`.
@@ -88,6 +95,12 @@ Les données (listes de mots…) se déclarent dans un fichier `.js`.
 
 Un jeu marqué `detente: true` est rangé dans « Détente », un jeu marqué `probleme: true` dans « Problèmes » :
 ni l'un ni l'autre n'entre dans la séance du jour, le bilan ou les courbes par domaine.
+
+## Calcul éclair : avec ou sans chrono
+
+Au début de chaque partie, on choisit « Avec chrono » (score en secondes, record, la vitesse compte
+pour le niveau) ou « Sans chrono » (à son rythme, sans record ; seules les bonnes réponses comptent).
+Le dernier choix est proposé par défaut.
 
 ## Séance du jour
 
