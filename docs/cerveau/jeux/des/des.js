@@ -8,7 +8,8 @@
   /* ---------- Figures ----------
      forme 0 carré, 1 cercle, 2 triangle · couleur 0 blanc, 1 gris, 2 noir · taille 0 petite, 1 grande
      traits : bit 1 = trait horizontal, bit 2 = trait vertical · point : 0 ou 1 (petit point à côté) */
-  const code = f => f.forme * 48 + f.couleur * 16 + f.taille * 8 + f.traits * 2 + f.point;
+  // Avec l'option 2 ou 3 formes par ligne, une « figure » est un groupe de formes : chaque dé agit sur toutes.
+  const code = f => Array.isArray(f) ? f.map(code).join('|') : f.forme * 48 + f.couleur * 16 + f.taille * 8 + f.traits * 2 + f.point;
   const copie = f => ({ forme: f.forme, couleur: f.couleur, taille: f.taille, traits: f.traits, point: f.point });
 
   /* ---------- Effets des dés ---------- */
@@ -43,11 +44,13 @@
   };
 
   function figureAuHasard(N) {
+    if (N.groupe) return Array.from({ length: N.groupe }, () => figureAuHasard({ ...N, groupe: 0 }));
     return { forme: hasard(N.formes), couleur: pioche(N.couleurs), taille: hasard(2), traits: hasard(4), point: N.point ? hasard(2) : 0 };
   }
 
   // Applique les dés de gauche à droite.
-  const appliquer = (f, des, regle) => des.reduce((g, d) => EFFETS[regle[d]].f(g), f);
+  const appliquer = (f, des, regle) => Array.isArray(f) ? f.map(g => appliquer(g, des, regle))
+    : des.reduce((g, d) => EFFETS[regle[d]].f(g), f);
 
   /* Toutes les règles possibles (chaque dé = un effet de la liste du niveau, doublons permis)
      qui expliquent les exemples ; renvoie l'ensemble des résultats possibles pour la tâche. */
@@ -69,8 +72,8 @@
     return res;
   }
 
-  function nouvelExercice(niveau) {
-    const N = NIVEAUX[niveau];
+  function nouvelExercice(niveau, formes = 1) {
+    const N = { ...NIVEAUX[niveau], groupe: formes > 1 ? formes : 0 };
     for (let essai = 0; essai < 400; essai++) {
       // Dés utilisés et leurs effets (un effet par sorte de changement, au plus un « rien »).
       const faces = melanger([1, 2, 3, 4, 5, 6]).slice(0, N.des).sort((a, b) => a - b);
@@ -123,14 +126,16 @@
       ajouter(tache.entree);
       const choisis = melanger([...leurres.values()]);
       // Garder des leurres qui ressemblent à la bonne réponse : on préfère ceux qui en diffèrent peu.
-      const ecart = f => ['forme', 'couleur', 'taille', 'traits', 'point'].filter(k => f[k] !== juste[k]).length;
+      const ecart1 = (f, j) => ['forme', 'couleur', 'taille', 'traits', 'point'].filter(k => f[k] !== j[k]).length;
+      const ecart = f => Array.isArray(f) ? f.reduce((n, g, i) => n + ecart1(g, juste[i]), 0) : ecart1(f, juste);
       choisis.sort((a, b) => ecart(a) - ecart(b));
       // Au besoin, compléter par des figures qui ne diffèrent de la bonne réponse que d'un détail.
       const voisins = [f => ({ ...f, couleur: 2 - f.couleur }), f => ({ ...f, taille: 1 - f.taille }), f => ({ ...f, forme: 1 - f.forme }),
         f => ({ ...f, traits: f.traits ^ 1 }), f => ({ ...f, traits: f.traits ^ 2 }), f => ({ ...f, traits: f.traits ^ 3 })];
       for (const v of melanger(voisins)) {
         if (choisis.length >= N.choix - 1) break;
-        const g = v(juste);
+        // Pour un groupe, une seule des 3 formes est fausse.
+        const g = Array.isArray(juste) ? (k => juste.map((h, i) => (i === k ? v(h) : h)))(hasard(juste.length)) : v(juste);
         if (code(g) !== code(juste) && !choisis.some(c => code(c) === code(g))) choisis.push(g);
       }
       if (choisis.length < N.choix - 1) continue;
@@ -146,6 +151,10 @@
   const TEINTE = ['#ffffff', '#9aa0aa', ENCRE];
   let idClip = 0;
   function dessinFigure(f) {
+    if (Array.isArray(f)) {
+      return `<svg viewBox="0 0 ${f.length * 100} 100" class="des-groupe-svg" aria-hidden="true">${f.map((g, i) =>
+        dessinFigure(g).replace('<svg viewBox="0 0 100 100"', `<svg x="${i * 100}" y="0" width="100" height="100" viewBox="0 0 100 100"`)).join('')}</svg>`;
+    }
     const r = f.taille ? 36 : 22, c = 50;
     const id = 'des-clip-' + (idClip++);
     let forme;
@@ -183,7 +192,7 @@
     nom: 'Dés et figures',
     icone: '🎲',
     domaine: 'logique',
-    consigne: 'Chaque dé change la figure d\'une façon cachée (couleur, forme, taille, ligne horizontale ou verticale…). Les dés agissent de gauche à droite. Regarde les exemples pour deviner ce que fait chaque dé, puis choisis le bon résultat pour la tâche parmi les 5 réponses, comme au Selor. Il n\'y a pas de chrono.',
+    consigne: 'Chaque dé change la figure d\'une façon cachée (couleur, forme, taille, ligne horizontale ou verticale…). Les dés agissent de gauche à droite. Regarde les exemples pour deviner ce que fait chaque dé, puis choisis le bon résultat pour la tâche parmi les 5 réponses, comme au Selor. Au début, choisis 1, 2 ou 3 formes par ligne : les dés agissent sur toutes les formes. Il n\'y a pas de chrono.',
     niveaux: 5,
     adaptatif: true,
     mesure: { unite: 'bonnes réponses', meilleur: 'haut' },
@@ -205,6 +214,21 @@
         .des-choix button { background: ${PAPIER}; color: ${ENCRE}; display: flex; flex-direction: column; align-items: center; padding: .25rem; min-height: 0; min-width: 0; }
         .des-choix button b { font-size: 1rem; }
         .des-choix button svg { width: 100%; max-width: 3.6rem; height: auto; aspect-ratio: 1; display: block; }
+        .des-question { text-align: center; font-size: 1.3rem; font-weight: 600; margin: .5rem 0 0; }
+        .des-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+        .des-modes button { display: flex; flex-direction: column; align-items: center; gap: .2rem; font-size: 1.3rem; letter-spacing: .1rem; padding: .8rem .3rem; }
+        .des-modes button small { font-size: .9rem; letter-spacing: 0; font-weight: 400; }
+        .des-groupe-2 .des-ligne { grid-template-columns: 4.6rem 1fr 4.6rem !important; }
+        .des-groupe-2 .des-ligne > svg, .des-groupe-2 .des-inconnu { width: 4.6rem !important; height: 2.3rem !important; }
+        .des-groupe .des-ligne { grid-template-columns: 6.3rem 1fr 6.3rem; gap: .25rem; }
+        .des-groupe .des-ligne > svg, .des-groupe .des-inconnu { width: 6.3rem; height: 2.1rem; }
+        .des-groupe .des-inconnu { font-size: 1.3rem; }
+        .des-groupe .des-rangee { gap: .15rem; }
+        .des-groupe .des-rangee .des-de { width: 1.5rem; height: 1.5rem; }
+        .des-groupe .des-choix { grid-template-columns: 1fr !important; }
+        .des-groupe .des-choix button { flex-direction: row; justify-content: center; gap: 1rem; padding: .3rem .6rem; }
+        .des-groupe .des-choix button svg { max-width: 10rem; aspect-ratio: 3; }
+        .des-groupe-2 .des-choix button svg { max-width: 7rem; aspect-ratio: 2; }
         .des-choix button.bon { border-color: var(--ok); border-width: 4px; }
         .des-choix button.faux { border-color: var(--erreur); border-width: 4px; }
         .des-explication { font-size: .95rem; }
@@ -214,6 +238,9 @@
       `);
       const QUESTIONS = 6;
       const N = NIVEAUX[ctx.niveau];
+      // Option choisie au début de la partie : 1, 2 ou 3 formes par ligne (le dernier choix est retenu).
+      const memo = Gala.stockage.jeu('des');
+      let formes = [1, 2, 3].includes(memo.formes) ? memo.formes : 1;
       const LETTRES = 'ABCDE';
 
       const jeu = document.createElement('div');
@@ -229,7 +256,7 @@
           ctx.fin({ valeur: bonnes, reussite: bonnes / QUESTIONS, reussi: bonnes >= QUESTIONS / 2 });
           return;
         }
-        ex = nouvelExercice(ctx.niveau);
+        ex = nouvelExercice(ctx.niveau, formes);
         jeu.innerHTML = `
           <div class="des-bloc"><h3>Exemples</h3>
             ${ex.exemples.map(e => `<div class="des-ligne">${dessinFigure(e.entree)}${rangee(e.des)}${dessinFigure(e.sortie)}</div>`).join('')}
@@ -281,12 +308,27 @@
         expliquer(i === ex.bonne);
       });
       ctx.ecouter(document, 'keydown', e => {
+        if (!ex) return;
         const k = e.key.toUpperCase();
         const i = LETTRES.indexOf(k) >= 0 ? LETTRES.indexOf(k) : Number(e.key) - 1;
         if (actif && i >= 0 && i < N.choix) jeu.querySelector(`.des-choix [data-i="${i}"]`).click();
       });
 
-      suivante();
+      // Choix du nombre de formes par ligne, puis la partie commence.
+      ctx.stats({ Question: '1 / ' + QUESTIONS, Bonnes: 0 });
+      jeu.innerHTML = `<p class="des-question">Combien de formes par ligne ?</p>
+        <div class="des-modes">${[1, 2, 3].map(n => `<button data-formes="${n}" class="${n === formes ? 'principal' : ''}">${'◼'.repeat(n)}<small>${n} forme${n > 1 ? 's' : ''}</small></button>`).join('')}</div>`;
+      const modes = jeu.querySelector('.des-modes');
+      ctx.ecouter(modes, 'click', e => {
+        const b = e.target.closest('button');
+        if (!b) return;
+        formes = Number(b.dataset.formes);
+        memo.formes = formes;
+        Gala.stockage.sauver();
+        jeu.classList.toggle('des-groupe', formes > 1);
+        jeu.classList.toggle('des-groupe-2', formes === 2);
+        suivante();
+      });
     }
   });
 })();
