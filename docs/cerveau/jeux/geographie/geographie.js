@@ -1,4 +1,4 @@
-/* Géographie — mémoire des connaissances : France et monde, capitales, fleuves, montagnes.
+/* Géographie — mémoire des connaissances : Belgique, France et monde, provinces, capitales, fleuves, montagnes.
    10 questions, 3 réponses proposées au niveau 1 puis 4. Une partie des questions est fabriquée
    à partir de la liste des pays et de leurs capitales. Sans chrono. Données dans donnees/geographie-fr.js. */
 Gala.enregistrer({
@@ -6,7 +6,7 @@ Gala.enregistrer({
   nom: 'Géographie',
   icone: '🌍',
   domaine: 'memoire',
-  consigne: 'Dix questions de géographie, en France et dans le monde : choisis la bonne réponse. Pas de chrono.',
+  consigne: 'Dix questions de géographie, en Belgique, en France et dans le monde : choisis la bonne réponse. Pas de chrono.',
   niveaux: 5,
   adaptatif: true,
   mesure: { unite: 'bonnes réponses', meilleur: 'haut' },
@@ -35,6 +35,17 @@ Gala.enregistrer({
         questions.push({ theme: 'Capitales', q: `${capitale} est la capitale de quel pays ?`, bonne: M(pays), faux: proches(p).map(x => M(x[0])) });
       }
     });
-    Gala.quiz(ctx, 'geographie', questions, { nombre: 10, choix: ctx.niveau === 1 ? 3 : 4 });
+    // Provinces belges et leurs chefs-lieux.
+    const provinces = G.provinces || [];
+    provinces.filter(p => DIFF.includes(p[3]) || (ctx.niveau >= 4 && p[3] === 3)).forEach(p => {
+      const [province, chefLieu] = p;
+      const autres = Gala.outils.melanger(provinces.filter(x => x !== p)).slice(0, 3);
+      if (Math.random() < 0.6) {
+        questions.push({ theme: 'Belgique', q: `Quel est le chef-lieu de ${province} ?`, bonne: chefLieu, faux: autres.map(x => x[1]) });
+      } else {
+        questions.push({ theme: 'Belgique', q: `${chefLieu} est le chef-lieu de quelle province ?`, bonne: M(province), faux: autres.map(x => M(x[0])) });
+      }
+    });
+    Gala.quiz(ctx, 'geographie', questions, { nombre: 10, choix: ctx.niveau === 1 ? 3 : 4, theme: 'Belgique', part: 0.5 }); // public surtout belge : la moitié sur la Belgique
   }
 });

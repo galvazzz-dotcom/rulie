@@ -16,6 +16,6 @@ Gala.enregistrer({
     const questions = Gala.donnees.culture
       .filter(q => DIFF.includes(q[4]))
       .map(([theme, q, bonne, faux]) => ({ theme, q, bonne, faux }));
-    Gala.quiz(ctx, 'culture', questions, { nombre: 10, choix: ctx.niveau === 1 ? 3 : 4 });
+    Gala.quiz(ctx, 'culture', questions, { nombre: 10, choix: ctx.niveau === 1 ? 3 : 4, theme: 'Belgique', part: 0.5 }); // public surtout belge : la moitié sur la Belgique
   }
 });

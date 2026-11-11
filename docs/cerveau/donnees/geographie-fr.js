@@ -1,7 +1,9 @@
 /* Quiz de géographie. Utilisé par le jeu « Géographie ».
    - pays : [pays, capitale, continent, difficulté 1 à 3] ; sert à fabriquer les questions
      « Quelle est la capitale de… ? » et « De quel pays … est-elle la capitale ? ».
+   - provinces : [province (avec article), chef-lieu, région, difficulté 1 à 3] ; questions sur les provinces belges.
    - questions : [thème, question, bonne réponse, [trois mauvaises réponses], difficulté 1 à 3].
+   Public surtout belge : une bonne part des questions porte sur la Belgique (thème « Belgique »).
    Déclaré en JavaScript (et non en JSON) pour fonctionner aussi en file://. */
 window.Gala = window.Gala || {};
 Gala.donnees = Gala.donnees || {};
@@ -13,6 +15,7 @@ Gala.donnees.geographie = {
     ['l\'Allemagne', 'Berlin', 'Europe', 1],
     ['le Royaume-Uni', 'Londres', 'Europe', 1],
     ['la Belgique', 'Bruxelles', 'Europe', 1],
+    ['le Luxembourg', 'Luxembourg', 'Europe', 1],
     ['le Portugal', 'Lisbonne', 'Europe', 1],
     ['la Grèce', 'Athènes', 'Europe', 1],
     ['la Russie', 'Moscou', 'Europe', 1],
@@ -74,8 +77,35 @@ Gala.donnees.geographie = {
     ['l\'Afrique du Sud', 'Pretoria', 'Afrique', 3]
   ],
 
+  provinces: [
+    ['la province d\'Anvers', 'Anvers', 'Flandre', 1],
+    ['la province de Liège', 'Liège', 'Wallonie', 1],
+    ['la province de Namur', 'Namur', 'Wallonie', 1],
+    ['la province de Hainaut', 'Mons', 'Wallonie', 2],
+    ['la province de Flandre-Occidentale', 'Bruges', 'Flandre', 2],
+    ['la province de Flandre-Orientale', 'Gand', 'Flandre', 2],
+    ['la province de Luxembourg', 'Arlon', 'Wallonie', 2],
+    ['la province de Brabant wallon', 'Wavre', 'Wallonie', 3],
+    ['la province de Brabant flamand', 'Louvain', 'Flandre', 3],
+    ['la province de Limbourg', 'Hasselt', 'Flandre', 3]
+  ],
+
   questions: [
     // ---------- Difficulté 1 ----------
+    ['Belgique', 'Combien la Belgique compte-t-elle de provinces ?', '10', ['9', '11', '12'], 1],
+    ['Belgique', 'Combien la Belgique compte-t-elle de régions ?', '3', ['2', '4', '5'], 1],
+    ['Belgique', 'Quelle mer borde la côte belge ?', 'La mer du Nord', ['La Manche', 'La mer Baltique', 'L\'océan Atlantique'], 1],
+    ['Belgique', 'Quel fleuve traverse Namur, Dinant et Liège ?', 'La Meuse', ['L\'Escaut', 'La Sambre', 'L\'Ourthe'], 1],
+    ['Belgique', 'Quel fleuve traverse Tournai, Gand et Anvers ?', 'L\'Escaut', ['La Meuse', 'La Lys', 'La Dyle'], 1],
+    ['Belgique', 'Quelle ville belge est surnommée « la Venise du Nord » ?', 'Bruges', ['Gand', 'Malines', 'Ostende'], 1],
+    ['Belgique', 'Avec combien de pays la Belgique a-t-elle une frontière ?', '4', ['3', '5', '6'], 1],
+    ['Belgique', 'Dans quelle ville se trouve l\'Atomium ?', 'Bruxelles', ['Anvers', 'Liège', 'Charleroi'], 1],
+    ['Belgique', 'Quel est le plus grand port de Belgique ?', 'Anvers', ['Zeebruges', 'Ostende', 'Gand'], 1],
+    ['Belgique', 'Dans quelle région de Belgique se trouve Namur ?', 'La Wallonie', ['La Flandre', 'Bruxelles-Capitale', 'La Communauté germanophone'], 1],
+    ['Belgique', 'Quelle région boisée couvre le sud-est de la Belgique ?', 'L\'Ardenne', ['La Campine', 'Le Hageland', 'Le Westhoek'], 1],
+    ['Belgique', 'Quelle ville belge est célèbre pour son carnaval et ses Gilles ?', 'Binche', ['Mons', 'Ath', 'Malmedy'], 1],
+    ['Belgique', 'Quelle ville belge a une célèbre station balnéaire avec une longue digue, à la côte ?', 'Ostende', ['Namur', 'Hasselt', 'Wavre'], 1],
+    ['Belgique', 'Quelle est la capitale de la Wallonie ?', 'Namur', ['Liège', 'Charleroi', 'Mons'], 1],
     ['France', 'Quel fleuve traverse Paris ?', 'La Seine', ['La Loire', 'Le Rhône', 'La Garonne'], 1],
     ['France', 'Quel est le plus haut sommet des Alpes ?', 'Le mont Blanc', ['Le Cervin', 'Le mont Ventoux', 'La Meije'], 1],
     ['France', 'Quelle mer borde Nice et Marseille ?', 'La Méditerranée', ['La Manche', 'La mer du Nord', 'L\'Atlantique'], 1],
@@ -97,6 +127,25 @@ Gala.donnees.geographie = {
     ['Monde', 'Quel pays a la forme d\'une botte ?', 'L\'Italie', ['La Grèce', 'Le Chili', 'Le Portugal'], 1],
 
     // ---------- Difficulté 2 ----------
+    ['Belgique', 'Quel est le point culminant de la Belgique ?', 'Le signal de Botrange', ['Le mont Kemmel', 'Le mont Rigi', 'La Baraque de Fraiture'], 2],
+    ['Belgique', 'Dans quel massif se trouve le signal de Botrange ?', 'Les Hautes Fagnes', ['La Campine', 'Le Condroz', 'La Gaume'], 2],
+    ['Belgique', 'Quelle rivière se jette dans la Meuse à Namur ?', 'La Sambre', ['L\'Ourthe', 'La Lesse', 'La Semois'], 2],
+    ['Belgique', 'Quelle rivière se jette dans la Meuse à Liège ?', 'L\'Ourthe', ['La Sambre', 'La Lesse', 'La Dyle'], 2],
+    ['Belgique', 'Quelle rivière rejoint l\'Escaut à Gand ?', 'La Lys', ['La Senne', 'La Dendre', 'La Dyle'], 2],
+    ['Belgique', 'Quelle rivière serpente autour de Bouillon ?', 'La Semois', ['La Lesse', 'L\'Amblève', 'L\'Ourthe'], 2],
+    ['Belgique', 'Dans quelle province se trouvent les grottes de Han ?', 'La province de Namur', ['La province de Luxembourg', 'La province de Liège', 'La province de Hainaut'], 2],
+    ['Belgique', 'Dans quelle province se trouve le champ de bataille de Waterloo ?', 'Le Brabant wallon', ['Le Hainaut', 'Le Brabant flamand', 'La province de Namur'], 2],
+    ['Belgique', 'Quelle est la plus grande province belge par la superficie ?', 'La province de Luxembourg', ['La province de Liège', 'La province de Hainaut', 'La province d\'Anvers'], 2],
+    ['Belgique', 'Quelle est la plus petite province belge par la superficie ?', 'Le Brabant wallon', ['Le Brabant flamand', 'La province de Limbourg', 'La province de Namur'], 2],
+    ['Belgique', 'Quelle ville est le siège de la Communauté germanophone ?', 'Eupen', ['Saint-Vith', 'Malmedy', 'Arlon'], 2],
+    ['Belgique', 'Quelle ville de Flandre-Occidentale est connue pour la porte de Menin et la Grande Guerre ?', 'Ypres', ['Courtrai', 'Ostende', 'Furnes'], 2],
+    ['Belgique', 'Quelle ville ardennaise est connue pour le siège de l\'hiver 1944 ?', 'Bastogne', ['Malmedy', 'La Roche-en-Ardenne', 'Houffalize'], 2],
+    ['Belgique', 'Quelle ville belge a vu naître Adolphe Sax et est dominée par une citadelle ?', 'Dinant', ['Namur', 'Huy', 'Bouillon'], 2],
+    ['Belgique', 'Quelle ville belge a donné son nom aux villes d\'eaux du monde entier ?', 'Spa', ['Chaudfontaine', 'Ostende', 'Ottignies'], 2],
+    ['Belgique', 'Quelle ville universitaire a été construite dans les années 1970 dans le Brabant wallon ?', 'Louvain-la-Neuve', ['Wavre', 'Gembloux', 'Nivelles'], 2],
+    ['Belgique', 'Quelle ville belge est célèbre pour son Doudou ?', 'Mons', ['Ath', 'Binche', 'Tournai'], 2],
+    ['Belgique', 'Quelle est la commune la plus peuplée de Belgique ?', 'Anvers', ['Bruxelles-ville', 'Gand', 'Charleroi'], 2],
+    ['Belgique', 'Quel pays voisin a la plus longue frontière avec la Belgique ?', 'La France', ['Les Pays-Bas', 'L\'Allemagne', 'Le Luxembourg'], 2],
     ['France', 'Quel fleuve passe à Lyon, Avignon et Arles ?', 'Le Rhône', ['La Saône', 'La Loire', 'La Durance'], 2],
     ['France', 'Quel fleuve traverse Bordeaux ?', 'La Garonne', ['La Dordogne', 'La Loire', 'Le Lot'], 2],
     ['France', 'Quel fleuve passe à Nantes, Tours et Orléans ?', 'La Loire', ['La Seine', 'Le Cher', 'La Vienne'], 2],
@@ -126,6 +175,18 @@ Gala.donnees.geographie = {
     ['Monde', 'Quelle ville est traversée par le Bosphore ?', 'Istanbul', ['Athènes', 'Ankara', 'Le Caire'], 2],
 
     // ---------- Difficulté 3 ----------
+    ['Belgique', 'Quel est le plus grand plan d\'eau de Belgique ?', 'Les lacs de l\'Eau d\'Heure', ['Le lac de Bütgenbach', 'Le lac de Robertville', 'Le lac de Virelles'], 3],
+    ['Belgique', 'Combien de kilomètres mesure environ la côte belge ?', '67 km', ['27 km', '120 km', '250 km'], 3],
+    ['Belgique', 'Quelle ville belge se présente comme « la plus petite ville du monde » ?', 'Durbuy', ['Bouillon', 'Damme', 'Limbourg'], 3],
+    ['Belgique', 'Quelle rivière traverse Bruxelles, aujourd\'hui presque entièrement couverte ?', 'La Senne', ['La Dyle', 'La Woluwe', 'La Dendre'], 3],
+    ['Belgique', 'Quelle rivière traverse Louvain et Malines ?', 'La Dyle', ['La Senne', 'La Nèthe', 'Le Démer'], 3],
+    ['Belgique', 'Comment appelle-t-on la région sablonneuse du nord-est de la Belgique (Anvers, Limbourg) ?', 'La Campine', ['La Gaume', 'La Famenne', 'Le Pajottenland'], 3],
+    ['Belgique', 'Comment s\'appelle la petite région la plus méridionale de Belgique, autour de Virton ?', 'La Gaume', ['La Famenne', 'Le Condroz', 'La Hesbaye'], 3],
+    ['Belgique', 'Quelle région agricole de Belgique est célèbre pour ses vergers, entre Liège et Saint-Trond ?', 'La Hesbaye', ['La Campine', 'Le pays de Herve', 'La Thiérache'], 3],
+    ['Belgique', 'Quel canal relie Liège à Anvers ?', 'Le canal Albert', ['Le canal du Centre', 'Le canal de Willebroek', 'Le canal Bruxelles-Charleroi'], 3],
+    ['Belgique', 'Dans quelle région se trouvent les ascenseurs à bateaux de Strépy-Thieu ?', 'Le Centre, dans le Hainaut', ['Le Borinage', 'La Campine', 'Le Condroz'], 3],
+    ['Belgique', 'Quelle ville belge est la plus ancienne, selon la tradition ?', 'Tongres', ['Tournai', 'Arlon', 'Bruges'], 3],
+    ['Belgique', 'Quelle ville du Hainaut est célèbre pour sa cathédrale aux cinq clochers ?', 'Tournai', ['Mons', 'Charleroi', 'Soignies'], 3],
     ['France', 'Quel est le point culminant du Massif central ?', 'Le puy de Sancy', ['Le puy de Dôme', 'Le mont Lozère', 'Le Plomb du Cantal'], 3],
     ['France', 'Quel est le point culminant des Vosges ?', 'Le Grand Ballon', ['Le Hohneck', 'Le Donon', 'Le Ballon d\'Alsace'], 3],
     ['France', 'Quelle rivière se jette dans le Rhône à Lyon ?', 'La Saône', ['L\'Isère', 'La Durance', 'L\'Ain'], 3],
