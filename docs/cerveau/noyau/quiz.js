@@ -1,5 +1,5 @@
 /* Gala Cerveau — moteur commun des quiz à choix multiples (Culture générale, Géographie).
-   Gala.quiz(ctx, idJeu, questions, { nombre, choix })
+   Gala.quiz(ctx, idJeu, questions, { nombre, choix, theme, part })
      questions : [{ theme, q, bonne, faux: [...] }]  (au moins `nombre`)
    Évite de reposer les questions vues dans les dernières parties, affiche la bonne réponse
    après chaque choix, et termine par ctx.fin({ valeur: bonnes, reussite }). */
@@ -28,9 +28,17 @@
     // Questions récentes mises de côté (mémorisées avec les progrès du jeu).
     const memo = Gala.stockage.jeu(idJeu);
     const deja = new Set(memo.deja || []);
-    const neuves = Gala.outils.melanger(questions.filter(q => !deja.has(q.q)));
-    const vieilles = Gala.outils.melanger(questions.filter(q => deja.has(q.q)));
-    const serie = neuves.concat(vieilles).slice(0, NOMBRE);
+    const tirer = (liste, n) => {
+      const neuves = Gala.outils.melanger(liste.filter(q => !deja.has(q.q)));
+      const vieilles = Gala.outils.melanger(liste.filter(q => deja.has(q.q)));
+      return neuves.concat(vieilles).slice(0, n);
+    };
+    // options.theme + options.part : réserver une part de la série à un thème (ex. la moitié sur la Belgique).
+    let serie;
+    if (options && options.theme && options.part) {
+      const duTheme = tirer(questions.filter(q => q.theme === options.theme), Math.round(NOMBRE * options.part));
+      serie = Gala.outils.melanger(duTheme.concat(tirer(questions.filter(q => q.theme !== options.theme), NOMBRE - duTheme.length)));
+    } else serie = tirer(questions, NOMBRE);
     const garder = Math.max(0, Math.min(questions.length - NOMBRE * 2, 120));
     memo.deja = (memo.deja || []).concat(serie.map(q => q.q)).slice(-garder);
     if (!garder) memo.deja = [];

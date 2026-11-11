@@ -35,8 +35,8 @@ donnees/
   histoires-fr.js      petites histoires et leurs questions (jeu Histoire à retenir)
   tueur-grilles.js     grilles 9×9 de sudoku tueur préparées à l'avance
   motscroises-fr.js    mots et définitions des mots croisés
-  culture-fr.js        questions de culture générale
-  geographie-fr.js     pays et capitales, questions de géographie
+  culture-fr.js        questions de culture générale (dont beaucoup sur la Belgique)
+  geographie-fr.js     provinces belges, pays et capitales, questions de géographie
 jeux/
   paires/  simon/  empan/  objets/  prenoms/                    mémoire
   courses/  histoire/  numeros/                                 mémoire de la vie courante
@@ -87,7 +87,7 @@ Gala.enregistrer({
 
 2. Ajoute une ligne dans `index.html`, avant `noyau/app.js` :
    `<script src="jeux/mon-jeu/mon-jeu.js"></script>`
-3. Ajoute le fichier à la liste `FICHIERS` de `sw.js` et change `VERSION` (par ex. `gala-cerveau-v8`),
+3. Ajoute le fichier à la liste `FICHIERS` de `sw.js` et change `VERSION` (par ex. `gala-cerveau-v10`),
    pour que la version en ligne le garde hors connexion.
 
 Règles pour que tout marche aussi en local (`file://`) : pas de `import`/`export`, pas de `fetch`.

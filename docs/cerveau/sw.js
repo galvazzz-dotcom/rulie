@@ -1,7 +1,7 @@
 /* Gala Cerveau — cache hors ligne de la version en ligne.
    Ignoré quand on ouvre index.html en fichier local. Portée limitée au dossier de l'application.
    Stratégie : on répond depuis le cache tout de suite, et on met le cache à jour en arrière-plan. */
-const VERSION = 'gala-cerveau-v8';
+const VERSION = 'gala-cerveau-v9';
 const FICHIERS = [
   './', 'index.html', 'manifest.json',
   'noyau/interface.css', 'noyau/stockage.js', 'noyau/moteur.js', 'noyau/progression.js', 'noyau/app.js', 'noyau/quiz.js',
